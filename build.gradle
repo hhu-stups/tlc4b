@@ -1,0 +1,62 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+project.version = '1.0.0-SNAPSHOT'
+project.group = 'de.prob'
+
+
+repositories {
+	mavenCentral()
+   	mavenRepo name: 'cobra_ext', url: "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
+}
+
+dependencies {
+	compile (group: 'de.prob', name: 'prologlib', version: '2.4.10-SNAPSHOT')
+ 	compile (group: 'de.prob', name: 'parserbase', version: '2.4.10-SNAPSHOT')
+  	compile (group: 'de.prob', name: 'bparser', version: '2.4.10-SNAPSHOT')
+	compile (group: 'junit', name: 'junit', version: '4.+')
+}
+
+jar {
+	from sourceSets.main.allJava
+ }
+
+
+task pack(type: Jar, dependsOn: jar) {
+	baseName = 'All'
+	deps = configurations.runtime + configurations.archives.allArtifacts.getFiles()
+		depClasses = {
+		deps.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+	from(depClasses) {
+		exclude 'META-INF/MANIFEST.MF'
+	}
+	
+	manifest { attributes 'Main-Class': 'b2tla.Main' }
+
+	doLast{
+		println "Created archive: "+archivePath
+	}
+}
+
+task copy(dependsOn: pack) << {
+	copy {
+   from('build/libs/') { include 'B2TLA-'+project.version+'.jar' }
+   into 'build/b2tla'
+   rename '(B2TLA)-(.+)', '$1.jar'
+}
+copy {
+   from('src/main/resources/') { include '**/*' }
+   into 'build/b2tla'
+}}
+
+
+task deploy(type: Zip, dependsOn: copy) {
+   from('build/') { include 'b2tla/**' }
+   archiveName = 'b2tla.zip'
+}
+
+

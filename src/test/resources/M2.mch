@@ -1,0 +1,7 @@
+MACHINE M2
+CONSTANTS k2
+PROPERTIES k2 = 2
+& def1 = 1
+DEFINITIONS
+"file.def"
+END

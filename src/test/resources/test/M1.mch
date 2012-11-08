@@ -1,0 +1,4 @@
+MACHINE M1
+SEES M2
+INVARIANT k = 1 & x = 1
+END
