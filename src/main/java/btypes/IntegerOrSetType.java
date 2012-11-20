@@ -30,6 +30,6 @@ public class IntegerOrSetType extends AbstractHasFollowers {
 		return true;
 	}
 
-	
+
 	
 }

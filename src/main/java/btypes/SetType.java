@@ -1,5 +1,7 @@
 package btypes;
 
+import exceptions.UnificationException;
+
 public class SetType extends AbstractHasFollowers {
 
 	private BType subtype;
@@ -39,13 +41,17 @@ public class SetType extends AbstractHasFollowers {
 		if(other instanceof SequenceType){
 			return (SetType) other.unify(this, typechecker);
 		}
-		System.out.println(other.getClass());
-		throw new RuntimeException();
+		
+		if(other instanceof IntegerOrSetOfPairType){
+			return (SetType) other.unify(this, typechecker);
+		}
+		
+		throw new UnificationException();
 	}
 
 	@Override
 	public String toString() {
-		return "Set("+ subtype + ")";
+		return "POW("+ subtype + ")";
 	}
 
 	@Override

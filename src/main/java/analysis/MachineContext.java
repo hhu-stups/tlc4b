@@ -11,6 +11,7 @@ import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
+import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
 import de.be4.classicalb.core.parser.node.ADeferredSetSet;
@@ -520,12 +521,22 @@ public class MachineContext extends DepthFirstAdapter {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
 		}
-		if (node.getPredicate() != null) {
-			node.getPredicate().apply(this);
+		node.getPredicate().apply(this);
+		node.getExpression().apply(this);
+		contextTable.remove(contextTable.size() - 1);
+	}
+
+	@Override
+	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
+		contextTable.add(new Hashtable<String, Node>());
+		{
+			List<PExpression> copy = new ArrayList<PExpression>(
+					node.getIdentifiers());
+			for (PExpression e : copy) {
+				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
+			}
 		}
-		if (node.getExpression() != null) {
-			node.getExpression().apply(this);
-		}
+		node.getPredicates().apply(this);
 		contextTable.remove(contextTable.size() - 1);
 	}
 

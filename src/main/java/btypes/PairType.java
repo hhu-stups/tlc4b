@@ -54,8 +54,14 @@ public class PairType extends AbstractHasFollowers {
 		throw new RuntimeException("pair");
 	}
 
+	@Override
 	public String toString() {
-		return "Pair(" + first + "*" + second + ")";
+		String res = first + "*";
+		if (second instanceof PairType) {
+			res += "(" + second + ")";
+		} else
+			res += second;
+		return res;
 	}
 
 	@Override

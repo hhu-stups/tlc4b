@@ -20,8 +20,6 @@ public class BoolType implements BType{
 			((UntypedType) other).setFollowersTo(this, typechecker);
 			return this;
 		}
-		System.out.println(other);
-		//TODO 
 		throw new UnificationException();
 	}
 	

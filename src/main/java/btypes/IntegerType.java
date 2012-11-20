@@ -1,5 +1,7 @@
 package btypes;
 
+import exceptions.UnificationException;
+
 public class IntegerType implements BType{
 
 	private static IntegerType instance = new IntegerType();
@@ -23,8 +25,8 @@ public class IntegerType implements BType{
 		if(other instanceof IntegerOrSetType){
 			return other.unify(this, typechecker);
 		}
-		System.out.println(other.getClass());
-		throw new RuntimeException("Typeerror");
+		//System.out.println(other.getClass());
+		throw new UnificationException();
 	}
 	
 	@Override

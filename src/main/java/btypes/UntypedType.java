@@ -13,5 +13,10 @@ public class UntypedType extends AbstractHasFollowers {
 	public boolean isUntyped() {
 		return true;
 	}
+	
+//	@Override
+//	public String toString(){
+//		return "UNTYPED: Followers: "+ this.printFollower();
+//	}
 
 }

@@ -34,18 +34,19 @@ public abstract class AbstractHasFollowers implements BType{
 	}
 	
 	
-	public void setFollowersTo(BType type, ITypechecker typechecker){
+	
+	public void setFollowersTo(BType newType, ITypechecker typechecker){
 		for (Object obj: followers) {
 			if(obj instanceof Node){
-				typechecker.setType((Node) obj, type);
+				typechecker.setType((Node) obj, newType);
 			}else if(obj instanceof SetType){
-				((SetType) obj).setSubtype(type);
+				((SetType) obj).setSubtype(newType);
 			}else if(obj instanceof IntegerOrSetOfPairType){
-				((IntegerOrSetOfPairType) obj).update(this, type, typechecker);
+				((IntegerOrSetOfPairType) obj).update(this, newType, typechecker);
 			}else if(obj instanceof PairType){
-				((PairType) obj).update(this, type);
+				((PairType) obj).update(this, newType);
 			}else if(obj instanceof SequenceType){
-				((SequenceType) obj).setSubtype(type);
+				((SequenceType) obj).setSubtype(newType);
 			}
 			else{
 				throw new RuntimeException("Missing follower type: "+ obj.getClass());
