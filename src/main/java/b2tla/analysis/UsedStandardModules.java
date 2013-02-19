@@ -94,7 +94,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		public int compare(STANDARD_MODULES s1, STANDARD_MODULES s2) {
 			Integer i1 = new Integer(modules.indexOf(s1));
 			Integer i2 = new Integer(modules.indexOf(s2));
-			return Integer.compare(i1, i2);
+			return i1.compareTo(i2);
 		}
 
 	}
