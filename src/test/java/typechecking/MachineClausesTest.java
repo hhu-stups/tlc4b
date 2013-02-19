@@ -5,8 +5,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import b2tla.exceptions.TypeErrorException;
+
 import de.be4.classicalb.core.parser.exceptions.BException;
-import exceptions.TypeErrorException;
 
 public class MachineClausesTest {
 
@@ -49,7 +50,7 @@ public class MachineClausesTest {
 	public void testParameter() throws BException {
 		String machine = "MACHINE test(A) \n" + "END";
 		TestTypechecker t  = new TestTypechecker(machine);
-		assertEquals("A", t.parameters.get("A").toString());
+		assertEquals("POW(A)", t.parameters.get("A").toString());
 	}
 
 

@@ -1,18 +1,17 @@
 package standard;
 
-import static org.junit.Assert.assertEquals;
 
 import java.util.HashSet;
 import java.util.Hashtable;
 
 import org.junit.Test;
 
-import standard.SubsitutionTest.Env;
-import analysis.Ast2String;
-import analysis.MachineContext;
-import analysis.PrecedenceCollector;
-import analysis.Typechecker;
-import analysis.UnchangedVariablesFinder;
+import b2tla.analysis.Ast2String;
+import b2tla.analysis.MachineContext;
+import b2tla.analysis.PrecedenceCollector;
+import b2tla.analysis.Typechecker;
+import b2tla.analysis.UnchangedVariablesFinder;
+
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Node;
@@ -27,7 +26,7 @@ public class PrecedenceTest {
 		String machine = "MACHINE test\n" 
 				+ "PROPERTIES 1 = 1 & 2 = 2 or 3 = 3 \n"
 				+ "END";
-		Env env = new Env(machine);
+		new Env(machine);
 	}
 
 	
@@ -36,7 +35,7 @@ public class PrecedenceTest {
 		String machine = "MACHINE test\n" 
 				+ "PROPERTIES 1 * 2 * 3 = 6 \n"
 				+ "END";
-		Env env = new Env(machine);
+		 new Env(machine);
 	}
 
 

@@ -7,16 +7,17 @@ import java.util.Hashtable;
 
 import org.junit.Test;
 
-import analysis.Ast2String;
-import analysis.MachineContext;
-import analysis.Typechecker;
-import analysis.UnchangedVariablesFinder;
+import b2tla.analysis.Ast2String;
+import b2tla.analysis.MachineContext;
+import b2tla.analysis.Typechecker;
+import b2tla.analysis.UnchangedVariablesFinder;
+import b2tla.exceptions.SubstitutionException;
+
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
-import exceptions.SubstitutionException;
 
 public class SubsitutionTest {
 
@@ -127,7 +128,7 @@ public class SubsitutionTest {
 			System.out.println(ast2String2.toString());
 
 			MachineContext c = new MachineContext(start);
-			Typechecker t = new Typechecker(c);
+			new Typechecker(c);
 			UnchangedVariablesFinder u = new UnchangedVariablesFinder(c);
 			
 			unchangedVariablesOfOperation = new Hashtable<String, HashSet<Node>>();

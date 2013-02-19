@@ -16,6 +16,7 @@ dependencies {
  	compile (group: 'de.prob', name: 'parserbase', version: '2.4.10-SNAPSHOT')
   	compile (group: 'de.prob', name: 'bparser', version: '2.4.10-SNAPSHOT')
 	compile (group: 'junit', name: 'junit', version: '4.+')
+	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.3-SNAPSHOT')
 }
 
 jar {

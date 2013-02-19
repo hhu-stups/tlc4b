@@ -1,23 +1,18 @@
 package standard;
 
-import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import analysis.Ast2String;
-import analysis.MachineContext;
-import analysis.MachineDeclarationsCollector;
-import analysis.ScopeChecker;
-import analysis.Typechecker;
+import b2tla.analysis.Ast2String;
+import b2tla.analysis.MachineContext;
+
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.analysis.pragma.Pragma;
 import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;
@@ -52,7 +47,7 @@ public class CompoundScopeTest {
 		
 		
 		Hashtable<String, MachineContext> machineContextsTable = new Hashtable<String, MachineContext>();
-		Hashtable<String, Typechecker> typecheckerTable = new Hashtable<String, Typechecker>();
+		//Hashtable<String, Typechecker> typecheckerTable = new Hashtable<String, Typechecker>();
 		for (int i = 0; i < list.size(); i++) {
 			String name = list.get(i);
 			//System.out.println(name);

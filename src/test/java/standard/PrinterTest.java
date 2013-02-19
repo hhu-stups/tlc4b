@@ -1,22 +1,17 @@
 package standard;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
 
 import org.junit.Test;
 
-import standard.SubsitutionTest.Env;
-import analysis.Ast2String;
-import analysis.MachineContext;
-import analysis.PrecedenceCollector;
-import analysis.TLAPrinter;
-import analysis.Typechecker;
-import analysis.UnchangedVariablesFinder;
+import b2tla.analysis.Ast2String;
+import b2tla.analysis.MachineContext;
+import b2tla.analysis.PrecedenceCollector;
+import b2tla.analysis.TLAPrinter;
+import b2tla.analysis.Typechecker;
+import b2tla.analysis.UnchangedVariablesFinder;
+
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
-import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 
 public class PrinterTest {
@@ -24,7 +19,8 @@ public class PrinterTest {
 	
 	@Test
 	public void test3() throws BException {
-		String machine = "MACHINE test\n" + "VARIABLES x,y\n"
+		String machine = "MACHINE test\n" 
+	+ "VARIABLES x,y\n"
 				+ "INVARIANT x = 1 & y = 1\n"
 				+ "INITIALISATION x,y := 1,1 \n"
 				+ "OPERATIONS foo = x := 1\n" 
@@ -74,8 +70,8 @@ public class PrinterTest {
 			Typechecker t = new Typechecker(c);
 			UnchangedVariablesFinder u = new UnchangedVariablesFinder(c);
 			PrecedenceCollector p = new PrecedenceCollector(start, t.getTypes());
-			TLAPrinter printer = new TLAPrinter(c, t, u, p);
-			result = printer.getStringbuilder().toString();
+//			TLAPrinter printer = new TLAPrinter(c, t, u, p);
+//			result = printer.getStringbuilder().toString(); TODO
 		}
 
 	}

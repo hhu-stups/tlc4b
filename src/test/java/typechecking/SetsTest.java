@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import b2tla.exceptions.TypeErrorException;
+
 import de.be4.classicalb.core.parser.exceptions.BException;
-import exceptions.TypeErrorException;
 
 public class SetsTest {
 
@@ -90,6 +91,52 @@ public class SetsTest {
 	public void testPowerSetException() throws BException {
 		String machine = "MACHINE test\n" 
 				+ "PROPERTIES 1 = POW({1}) \n" + "END";
+		new TestTypechecker(machine);
+	}
+	
+	@Test
+	public void testUnion() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k, k2 \n"
+				+ "PROPERTIES k = {1} \\/ k2 \n" + "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+	}
+	
+	@Test (expected = TypeErrorException.class)
+	public void testUnionException() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k, k2 \n"
+				+ "PROPERTIES k = {1} \\/ 1 \n" + "END";
+		new TestTypechecker(machine);
+	}
+	
+	@Test (expected = TypeErrorException.class)
+	public void testUnionException2() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k, k2 \n"
+				+ "PROPERTIES 1 = {1} \\/ k \n" + "END";
+		new TestTypechecker(machine);
+	}
+	
+	@Test
+	public void testCard() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k \n"
+				+ "PROPERTIES k = card({1}) \n" + "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("INTEGER", t.constants.get("k").toString());
+	}
+	
+	@Test
+	public void testGerneralUnion() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k \n"
+				+ "PROPERTIES k = union({{1}, {2}}) \n" + "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+	}
+	
+	@Test (expected = TypeErrorException.class)
+	public void testGerneralUnionException() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k \n"
+				+ "PROPERTIES k = union({1}) \n" + "END";
 		new TestTypechecker(machine);
 	}
 	

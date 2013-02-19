@@ -4,8 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import b2tla.exceptions.TypeErrorException;
+
 import de.be4.classicalb.core.parser.exceptions.BException;
-import exceptions.TypeErrorException;
 
 public class MultTest{
 

@@ -2,10 +2,10 @@ package typechecking;
 
 import java.util.Hashtable;
 
-import analysis.Ast2String;
-import analysis.MachineContext;
-import analysis.Typechecker;
-import btypes.BType;
+import b2tla.analysis.Ast2String;
+import b2tla.analysis.MachineContext;
+import b2tla.analysis.Typechecker;
+import b2tla.btypes.BType;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
@@ -29,9 +29,14 @@ public class TestTypechecker {
 		MachineContext c = new MachineContext(start);
 		Typechecker t = new Typechecker(c);
 
-		for (String name : c.getMachineParameters().keySet()) {
+		for (String name : c.getSetParamter().keySet()) {
 			parameters.put(name,
-					t.getType(c.getMachineParameters().get(name)));
+					t.getType(c.getSetParamter().get(name)));
+		}
+		
+		for (String name : c.getScalarParameter().keySet()) {
+			parameters.put(name,
+					t.getType(c.getScalarParameter().get(name)));
 		}
 
 		for (String name : c.getConstants().keySet()) {

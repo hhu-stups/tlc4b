@@ -1,7 +1,5 @@
 package standard;
 
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,9 +19,9 @@ public class CompoundTest {
 	@Test
 	public void test() throws IOException, BException {
 		String filename = "src/test/resources/compound/M1.mch";
-		final int dot = filename.lastIndexOf('.');
+		//final int dot = filename.lastIndexOf('.');
 		final File machineFile = new File(filename);
-		final String probfilename = filename.substring(0, dot) + ".prob";
+		//final String probfilename = filename.substring(0, dot) + ".prob";
 
 		
 		

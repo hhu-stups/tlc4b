@@ -2,15 +2,14 @@ package standard;
 
 import org.junit.Test;
 
-import analysis.Ast2String;
-import analysis.MachineContext;
-import analysis.MachineDeclarationsCollector;
-import analysis.ScopeChecker;
+import b2tla.analysis.Ast2String;
+import b2tla.analysis.MachineContext;
+import b2tla.exceptions.ScopeException;
+
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
-import exceptions.ScopeException;
 
 public class ScopeTest {
 
@@ -225,7 +224,7 @@ public class ScopeTest {
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
 
-		MachineContext c = new MachineContext(start);
+		new MachineContext(start);
 	}
 
 }
