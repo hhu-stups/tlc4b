@@ -5,59 +5,69 @@ apply plugin: 'maven'
 project.version = '1.0.0-SNAPSHOT'
 project.group = 'de.prob'
 
+sourceCompatibility = 1.5
 
 repositories {
 	mavenCentral()
-   	mavenRepo name: 'cobra_ext', url: "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
+	mavenRepo name: 'cobra_ext', url: "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
 }
+
+configurations {
+	// configuration that holds jars to copy into lib
+	releaseJars
+	}
 
 dependencies {
+	compile files('externalLibs/tla')
 	compile (group: 'de.prob', name: 'prologlib', version: '2.4.10-SNAPSHOT')
- 	compile (group: 'de.prob', name: 'parserbase', version: '2.4.10-SNAPSHOT')
-  	compile (group: 'de.prob', name: 'bparser', version: '2.4.10-SNAPSHOT')
-	compile (group: 'junit', name: 'junit', version: '4.+')
-	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.3-SNAPSHOT')
-}
-
-jar {
-	from sourceSets.main.allJava
- }
-
-
-task pack(type: Jar, dependsOn: jar) {
-	baseName = 'All'
-	deps = configurations.runtime + configurations.archives.allArtifacts.getFiles()
-		depClasses = {
-		deps.collect {
-			it.isDirectory() ? it : zipTree(it)
-		}
-	}
-	from(depClasses) {
-		exclude 'META-INF/MANIFEST.MF'
-	}
+	compile (group: 'de.prob', name: 'parserbase', version: '2.4.10-SNAPSHOT')
+	compile (group: 'de.prob', name: 'bparser', version: '2.4.10-SNAPSHOT')
 	
-	manifest { attributes 'Main-Class': 'b2tla.Main' }
+	testCompile (group: 'junit', name: 'junit', version: '4.+')
+	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.3-SNAPSHOT')
+	
+	releaseJars (group: 'de.prob', name: 'prologlib', version: '2.4.10-SNAPSHOT')
+	releaseJars (group: 'de.prob', name: 'parserbase', version: '2.4.10-SNAPSHOT')
+	releaseJars (group: 'de.prob', name: 'bparser', version: '2.4.10-SNAPSHOT')
+	}
 
-	doLast{
-		println "Created archive: "+archivePath
+ant.importBuild 'build.xml'
+
+compileJava {
+	dependsOn tla
+}
+
+jar { from sourceSets.main.allJava }
+jar	{ 
+	from configurations.releaseJars.collect { it.isDirectory() ? it : zipTree(it) }
+}
+manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
+manifest.mainAttributes("Class-Path": './tla/')
+
+
+task copy(dependsOn: jar) << {
+	copy {
+		from('build/libs/')
+		into('build/b2tla')
+		include('b2tla-'+project.version+'.jar')
+		rename('(b2tla)-(.+)', 'B2TLA.jar')
+	}
+	copy {
+		from('src/main/resources/') { include '**/*' }
+		into 'build/b2tla'
+	}
+	copy {
+		from('build/b2tla')
+		into('externalLibs/')
+		include('B2TLA.jar')
 	}
 }
-
-task copy(dependsOn: pack) << {
-	copy {
-   from('build/libs/') { include 'B2TLA-'+project.version+'.jar' }
-   into 'build/b2tla'
-   rename '(B2TLA)-(.+)', '$1.jar'
-}
-copy {
-   from('src/main/resources/') { include '**/*' }
-   into 'build/b2tla'
-}}
 
 
 task deploy(type: Zip, dependsOn: copy) {
    from('build/') { include 'b2tla/**' }
    archiveName = 'b2tla.zip'
+   doLast{ println "Created archive: "+archivePath }
 }
 
 

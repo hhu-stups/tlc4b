@@ -3,13 +3,13 @@ package standard;
 
 import org.junit.Test;
 
-import b2tla.analysis.Ast2String;
-import b2tla.analysis.MachineContext;
-import b2tla.analysis.PrecedenceCollector;
-import b2tla.analysis.TLAPrinter;
-import b2tla.analysis.Typechecker;
-import b2tla.analysis.UnchangedVariablesFinder;
 
+import de.b2tla.analysis.Ast2String;
+import de.b2tla.analysis.MachineContext;
+import de.b2tla.analysis.PrecedenceCollector;
+import de.b2tla.analysis.Typechecker;
+import de.b2tla.analysis.UnchangedVariablesFinder;
+import de.b2tla.prettyprint.TLAPrinter;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;

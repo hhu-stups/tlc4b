@@ -10,9 +10,9 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import b2tla.analysis.Ast2String;
-import b2tla.analysis.MachineContext;
 
+import de.b2tla.analysis.Ast2String;
+import de.b2tla.analysis.MachineContext;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.analysis.pragma.Pragma;
 import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;

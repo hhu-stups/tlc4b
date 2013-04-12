@@ -1,7 +1,12 @@
 ---- MODULE test ----
-VARIABLES x, y
-Invariant == x = 1 /\ y = 1
-Init == x = 1 /\ y = 1
-foo == x' = 1 /\ UNCHANGED <<y>>
-Next == foo
+EXTENDS Naturals
+VARIABLES x
+k == 100000
+ASSUME k = 100000
+Invariant == x \in 1 .. k
+Init == x = 1
+inc == x < k /\ x' = x + 1
+reset == x = k /\ x' = 1
+Next == \/ inc
+	\/ reset
 ====
