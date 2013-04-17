@@ -1093,11 +1093,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAMaxExpression(AMaxExpression node) {
 		inAMaxExpression(node);
-		tlaModuleString.append("CHOOSE max \\in ");
+		tlaModuleString.append("(CHOOSE max \\in ");
 		node.getExpression().apply(this);
 		tlaModuleString.append(" : \\A p \\in ");
 		node.getExpression().apply(this);
-		tlaModuleString.append(" : max >= p");
+		tlaModuleString.append(" : max >= p)");
 		outAMaxExpression(node);
 	}
 

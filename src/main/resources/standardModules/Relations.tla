@@ -106,7 +106,8 @@ RelTotalFunc(S, S2) == {MakeRel(f): f \in [S -> S2]}
 
 RelITotalFunc(S, S2) == {MakeRel(f): f \in ITotalFunc(S, S2)} 
 
-RelParFunc(S, S2) == {MakeRel(f):  f \in UNION{[x -> S2] :x \in SUBSET S}}
+RelParFunc2(S, S2) == {MakeRel(f):  f \in UNION{[x -> S2] :x \in SUBSET S}}
+RelParFunc(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x)} 
 
 RelIParFunc(S, S2) == {MakeRel(f): f \in IParFunc(S, S2)}
 

@@ -8,7 +8,7 @@ import de.b2tla.util.StopWatch;
 
 public class TLCOutputEvaluator {
 	private final String moduleName;
-	private final ModuleMatcher moduleMatcher;
+	private ModuleMatcher moduleMatcher;
 
 	private StringBuilder trace;
 
@@ -18,7 +18,7 @@ public class TLCOutputEvaluator {
 
 	public TLCOutputEvaluator(String moduleName, String[] messages) {
 		this.moduleName = moduleName;
-		this.moduleMatcher = new ModuleMatcher(moduleName, ToolIO.getUserDir());
+		//this.moduleMatcher = new ModuleMatcher(moduleName, ToolIO.getUserDir());
 		StringBuilder sb = new StringBuilder();
 		boolean hasTrace = false;
 		for (int i = 0; i < messages.length; i++) {
@@ -26,7 +26,7 @@ public class TLCOutputEvaluator {
 			if (m.startsWith("State")) {
 				hasTrace = true;
 				String location = m.substring(0, m.indexOf("\n"));
-				String operationName = moduleMatcher.getName(location);
+				//String operationName = moduleMatcher.getName(location);
 
 				String predicate = m.substring(m.indexOf("\n") + 1);
 				String res = TLCExpressionParser.parseLine(predicate);

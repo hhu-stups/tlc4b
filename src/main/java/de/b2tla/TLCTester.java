@@ -8,7 +8,7 @@ public class TLCTester {
 
 	
 	public static void main(String[] args) throws IOException, BException{
-		String[] a = new String[]{"-tool", ".\\src\\test\\resources\\ForDistribution\\Counter.mch"};
+		String[] a = new String[]{".\\src\\test\\resources\\ForDistribution\\CAN_BUS.mch"};
 		B2TLA.main(a);
 	}
 }
