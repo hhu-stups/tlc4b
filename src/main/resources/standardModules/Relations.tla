@@ -52,7 +52,9 @@ RelRanSub(S, r) == {x \in r: x[2] \notin S}
 RelInverse(r) == {<<x[2],x[1]>>: x \in r} 
 
 (* Relational image *)
-RelImage(r, S) =={y[2] :y \in {x \in r: x[1] \in S}} 
+RelImage(r, S) =={y[2] :y \in {x \in r: x[1] \in S}}
+ 
+RelImage2(r, S) == {y \in RelRange(r): \E x \in RelDomain(r): <<x,y>> \in r}
 
 (* Relational overriding *)
 RelOver(r, r2) == {x \in r: x[1] \notin RelDomain(r2)} \cup r2 
@@ -140,6 +142,10 @@ iseq(S) == {x \in SUBSET {<<x,y>> \in (1 .. Cardinality(S)) \times S : TRUE }:
  /\ \E z \in 0.. Cardinality(S): RelDomain(x) = 1..z
  /\ is_func(x)
  /\ is_injectiv_func(x)} 
+
+ISeq_2(S) == {x \in Seq(S): Len(x) = Cardinality(Range(x)) }
+
+ 
 iseq1(S) == iseq(S) \ {{}} 
  
 total_func(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x) /\ RelDomain(x)= S} 
