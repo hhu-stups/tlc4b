@@ -7,6 +7,7 @@ import java.util.List;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
+import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
@@ -14,12 +15,14 @@ import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class ConstantExpressionFinder extends DepthFirstAdapter {
 	private MachineContext machineContext;
@@ -63,9 +66,9 @@ public class ConstantExpressionFinder extends DepthFirstAdapter {
 	@Override
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
 		Node refNode = machineContext.getReferences().get(node);
-		if(machineContext.getConstants().values().contains(refNode)){
+		if (machineContext.getConstants().values().contains(refNode)) {
 			constantDegree.put(node, 19);
-			defaultOut(refNode); //TODO verify
+			defaultOut(refNode); // TODO verify
 			return;
 		}
 		int degree = 0;
@@ -79,7 +82,7 @@ public class ConstantExpressionFinder extends DepthFirstAdapter {
 			degree++;
 		}
 		constantDegree.put(node, MAX_DEGREE);
-		constantDegree.put(node.parent(), MAX_DEGREE);
+		defaultOut(node);
 
 	}
 
@@ -87,7 +90,7 @@ public class ConstantExpressionFinder extends DepthFirstAdapter {
 		if (degree != null) {
 			Integer oldDegree = constantDegree.get(node);
 			if (oldDegree != null) {
-				constantDegree.put(node, Math.max(degree, oldDegree));
+				constantDegree.put(node, Math.min(degree, oldDegree));
 			} else {
 				constantDegree.put(node, degree);
 			}
@@ -167,6 +170,27 @@ public class ConstantExpressionFinder extends DepthFirstAdapter {
 	}
 
 	@Override
+	public void caseAAnySubstitution(AAnySubstitution node) {
+		HashSet<Node> set = new HashSet<Node>();
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			set.add(e);
+		}
+
+		contextTable.add(set);
+		node.getWhere().apply(this);
+		contextTable.remove(contextTable.size() - 1);
+		node.getThen().apply(this);
+
+		Integer degree = constantDegree.get(node);
+		if (degree != null) {
+			constantDegree.put(node, degree - 1);
+		}
+		outAAnySubstitution(node);
+	}
+
+	@Override
 	public void caseALambdaExpression(ALambdaExpression node) {
 		inALambdaExpression(node);
 		HashSet<Node> set = new HashSet<Node>();
@@ -209,6 +233,29 @@ public class ConstantExpressionFinder extends DepthFirstAdapter {
 			constantDegree.put(node, degree - 1);
 		}
 		outAComprehensionSetExpression(node);
+	}
+
+	@Override
+	public void caseAOperation(AOperation node) {
+		HashSet<Node> set = new HashSet<Node>();
+		{
+			List<PExpression> copy = new ArrayList<PExpression>(
+					node.getReturnValues());
+			for (PExpression e : copy) {
+				set.add(e);
+			}
+		}
+
+		{
+			List<PExpression> copy = new ArrayList<PExpression>(
+					node.getParameters());
+			for (PExpression e : copy) {
+				set.add(e);
+			}
+		}
+		contextTable.add(set);
+		node.getOperationBody().apply(this);
+		contextTable.remove(contextTable.size() - 1);
 	}
 
 }

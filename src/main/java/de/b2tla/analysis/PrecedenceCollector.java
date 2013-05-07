@@ -47,6 +47,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ASetSubtractionExpression", 8, 8, false);
 		put("AExistsPredicate", 1, 1, false);
 		put("AForallPredicate", 1, 1, false);
+		put("AModuloExpression",10, 11, true );
 	}
 
 	private Precedence getPrecedence(Node node) {

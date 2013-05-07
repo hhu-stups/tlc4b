@@ -16,6 +16,7 @@ import util.ToolIO;
 
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
+import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.exceptions.BException;
 
 public class B2TLA {
@@ -29,16 +30,17 @@ public class B2TLA {
 	B2TlaTranslator translator;
 
 	public static void main(String[] args) throws IOException {
-
+		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
-
+		
 		try {
 			b2tla.progress(args);
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 			System.err.println(e.getMessage());
 			return;
 		}
-		
+		StopWatch.stop("Translation");
 		if (Globals.tool) {
 			//ToolIO.setMode(ToolIO.TOOL);
 		}
@@ -189,6 +191,11 @@ public class B2TLA {
 		}
 		if (usedStandardModule.contains(STANDARD_MODULES.BBuiltIns)) {
 			createStandardModule("BBuiltIns", path,
+					translator.getUsedStandardModule());
+		}
+		
+		if (usedStandardModule.contains(STANDARD_MODULES.RelationsNew)) {
+			createStandardModule("RelationsNew", path,
 					translator.getUsedStandardModule());
 		}
 

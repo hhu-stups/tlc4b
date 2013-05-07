@@ -51,6 +51,7 @@ public class B2TlaTranslator {
 	
 	
 	public void translate() {
+		
 		MachineContext machineContext = new MachineContext(start);
 		this.machineName = machineContext.getMachineName();
 		
@@ -67,7 +68,6 @@ public class B2TlaTranslator {
 		TypeRestrictor typeRestrictor = new TypeRestrictor(start,
 				machineContext, typechecker);
 		start.apply(typeRestrictor);
-		
 		UsedStandardModules usedModules = new UsedStandardModules(typechecker,
 				typeRestrictor.getRestrictedTypes());
 		start.apply(usedModules);
@@ -88,6 +88,7 @@ public class B2TlaTranslator {
 		printer.start();
 		moduleString = printer.getStringbuilder().toString();
 		configString = printer.getConfigString().toString();
+		
 	}
 
 

@@ -63,6 +63,7 @@ import de.be4.classicalb.core.parser.node.APredecessorExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
 import de.be4.classicalb.core.parser.node.ARangeExpression;
+import de.be4.classicalb.core.parser.node.AReflexiveClosureExpression;
 import de.be4.classicalb.core.parser.node.ARelationsExpression;
 import de.be4.classicalb.core.parser.node.AReverseExpression;
 import de.be4.classicalb.core.parser.node.ASubsetStrictPredicate;
@@ -75,7 +76,7 @@ import de.be4.classicalb.core.parser.node.PExpression;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations
+		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, RelationsNew
 
 	}
 
@@ -88,6 +89,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		modules.add(STANDARD_MODULES.TLC);
 		modules.add(STANDARD_MODULES.BBuiltIns);
 		modules.add(STANDARD_MODULES.Relations);
+		modules.add(STANDARD_MODULES.RelationsNew);
 	}
 
 	private Set<STANDARD_MODULES> usedStandardModules;
@@ -391,7 +393,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inARangeExpression(ARangeExpression node) {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
+		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAIdentityExpression(AIdentityExpression node) {
@@ -446,9 +448,14 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAFunctionExpression(AFunctionExpression node) {
-		BType type = typechecker.getType(node);
+		BType type = typechecker.getType(node.getIdentifier());
 		if (type instanceof SetType) {
 			usedStandardModules.add(STANDARD_MODULES.Relations);
 		}
 	}
+
+	public void inAReflexiveClosureExpression(AReflexiveClosureExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.RelationsNew);
+	}
+
 }

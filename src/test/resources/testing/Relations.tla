@@ -52,7 +52,9 @@ RelRanSub(S, r) == {x \in r: x[2] \notin S}
 RelInverse(r) == {<<x[2],x[1]>>: x \in r} 
 
 (* Relational image *)
-RelImage(r, S) =={y[2] :y \in {x \in r: x[1] \in S}} 
+RelImage(r, S) =={y[2] :y \in {x \in r: x[1] \in S}}
+ 
+RelImage2(r, S) == {y \in RelRange(r): \E x \in RelDomain(r): <<x,y>> \in r}
 
 (* Relational overriding *)
 RelOver(r, r2) == {x \in r: x[1] \notin RelDomain(r2)} \cup r2 
@@ -89,7 +91,8 @@ is_partial_func(f) == \A x \in RelDomain(f): Cardinality(RelImage(f, {x})) =< 1
 
 is_partial_func2(f, S, S2) == /\ \A x \in f: x[1] \in S /\ x[2] \in S2 /\ RelImage(f, {x[1]}) = {x[2]} 
 
-is_func(f) == \A x \in RelDomain(f): Cardinality(RelImage(f, {x})) < 2 
+is_func(f) == Cardinality(RelDomain(f)) = Cardinality(f)
+is_func2(f) == \A x \in RelDomain(f): Cardinality(RelImage(f, {x})) < 2 
 
 (* convert a function to a relation*)
 MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f} 
@@ -103,10 +106,12 @@ RelIsTotalFunc(f, S, S2) ==
 
 
 RelTotalFunc(S, S2) == {MakeRel(f): f \in [S -> S2]}
+RelTotalFuncEleOf(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x) /\ RelDomain(x)= S} 
 
 RelITotalFunc(S, S2) == {MakeRel(f): f \in ITotalFunc(S, S2)} 
 
-RelParFunc(S, S2) == {MakeRel(f):  f \in UNION{[x -> S2] :x \in SUBSET S}}
+RelParFunc2(S, S2) == {MakeRel(f):  f \in UNION{[x -> S2] :x \in SUBSET S}}
+RelParFunc(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x)} 
 
 RelIParFunc(S, S2) == {MakeRel(f): f \in IParFunc(S, S2)}
 
@@ -139,12 +144,35 @@ iseq(S) == {x \in SUBSET {<<x,y>> \in (1 .. Cardinality(S)) \times S : TRUE }:
  /\ \E z \in 0.. Cardinality(S): RelDomain(x) = 1..z
  /\ is_func(x)
  /\ is_injectiv_func(x)} 
+
+ISeq_2(S) == {x \in Seq(S): Len(x) = Cardinality(Range(x)) }
+
+ 
 iseq1(S) == iseq(S) \ {{}} 
  
 total_func(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x) /\ RelDomain(x)= S} 
 
 test(S, S2) == {x \in (SUBSET (S \times S2)): RelDomain(x)= S /\ Cardinality(x) = Cardinality(RelDomain(x))} 
-    
+
+
+
+Rel(S, S2) == SUBSET (S \times S2)    
+func(f) == Cardinality(RelDomain(f)) = Cardinality(f)
+total(f, dom) == RelDomain(f) = dom
+inj(f) == Cardinality(RelRange(f)) = Cardinality(f)
+surj(f, ran) == RelRange(f) = ran
+
+TotalSurFunc(S, S2) == {f \in [S -> S2]: S2 = Range(f)}
+
+RelTotalSurFunc(S, S2) == {MakeRel(f): f \in TotalSurFunc(S, S2)} 
+
+RelTotalSurFuncEleOf(S, S2) == {f \in Rel(S,S2): 
+    /\ func(f) /\ total(f,S) /\ surj(f, S2)}
+
+BijFunc(S, S2) == {f \in [S -> S2]: S2 = Range(f) /\
+    Cardinality(DOMAIN f) = Cardinality(Range(f))}
+
+RelBijFunc(S, S2) == {MakeRel(f): f \in BijFunc(S, S2)}     
 ============
 
 

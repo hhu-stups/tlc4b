@@ -19,7 +19,7 @@ public class BBuildInsTest {
 		String machine = "MACHINE test\n" + "PROPERTIES {1} <<: {1,2} \n"
 				+ "END";
 		String expected = "---- MODULE test ----\n" + "EXTENDS BBuiltIns\n"
-				+ "ASSUME {1} \\subset {1, 2}\n" + "====";
+				+ "ASSUME ({1} \\subseteq  {1, 2} /\\ {1} # {1, 2})\n" + "====";
 		compareEquals(expected, machine);
 	}
 

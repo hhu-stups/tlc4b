@@ -34,10 +34,21 @@ public class StandardMadules {
 	public static final String CLOSURE = "Closure";
 
 	public static final String REL_TOTAL_FUNCTION = "RelTotalFunc";
+	public static final String REL_TOTAL_FUNCTION_ELEMENT_OF = "RelTotalFuncEleOf";
+	
 	public static final String REL_INJECTIVE_TOTAL_FUNCTION = "RelITotalFunc";
 	public static final String REL_PARTIAL_FUNCTION = "RelParFunc";
 	public static final String REL_INJECTIVE_PARTIAL_FUNCTION = "RelIParFunc";
 
+	
+	public static final String BIJECTIVE_FUNCTION = "BijFunc";
+	public static final String REL_BIJECTIVE_FUNCTION = "RelBijFunc";
+	
+	
+	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
+	public static final String REL_TOTAL_SURJECTIVE_FUNCTION = "RelTotalSurFunc";
+	public static final String REL_TOTAL_SURJECTIVE_FUNCTION_ELEMENT_OF = "RelTotalSurFuncEleOf";
+	
 	public static final String INJECTIVE_SEQUENCES = "ISeq";
 	public static final String NOT_EMPTY_INJECTIVE_SEQUENCES = "ISeq1";
 	
@@ -45,6 +56,8 @@ public class StandardMadules {
 	
 	public static final String REL_INJECTIVE_SEQUENCES = "RelISeq";
 	public static final String REL_NOT_EMPTY_INJECTIVE_SEQUENCES = "RelISeq1";
+	
+	public static final String REL_CLOSURE = "RelClosure";
 	
 	public static final ArrayList<String> Relations = new ArrayList<String>();
 

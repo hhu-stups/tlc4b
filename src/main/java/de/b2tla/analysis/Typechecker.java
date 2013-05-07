@@ -347,7 +347,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		Node originalIdentifier = referenceTable.get(node);
 		BType expected = getType(node);
 		if (expected == null) {
-			System.out.println(node.parent().getClass());
+			System.out.println("Not implemented in Typechecker:"
+					+ node.parent().getClass());
 			throw new RuntimeException(node + " Pos: " + node.getStartPos());
 		}
 
@@ -548,6 +549,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	@Override
 	public void caseAIntegerSetExpression(AIntegerSetExpression node) {
+		System.out.println(node.parent().getClass());
 		try {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
@@ -772,6 +774,9 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		} else if (expected instanceof IntegerOrSetOfPairType) {
 			setType(node.getLeft(), expected);
 			setType(node.getRight(), expected);
+		} else if (expected instanceof IntegerOrSetType) {
+			setType(node.getLeft(), expected);
+			setType(node.getRight(), expected);
 		} else {
 			throw new TypeErrorException("Excepted '" + getType(node)
 					+ "' , found 'POW(_A)' or 'INTEGER' in ' - '");
@@ -788,7 +793,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	@Override
 	public void caseAMultOrCartExpression(AMultOrCartExpression node) {
 		BType expected = getType(node);
-
+		System.out.println(node.parent().getClass());
 		if (expected instanceof UntypedType) {
 			IntegerOrSetOfPairType t = new IntegerOrSetOfPairType();
 			IntegerOrSetOfPairType res = (IntegerOrSetOfPairType) expected
@@ -1205,6 +1210,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseACardExpression(ACardExpression node) {
 		BType found = IntegerType.getInstance();
 		BType expected = getType(node);
+
 		try {
 			found = found.unify(expected, this);
 		} catch (UnificationException e) {
@@ -1533,12 +1539,22 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	@Override
+	public void caseATotalBijectionExpression(ATotalBijectionExpression node) {
+		evalFunction(node, node.getLeft(), node.getRight());
+	}
+
+	@Override
 	public void caseAPartialFunctionExpression(APartialFunctionExpression node) {
 		evalFunction(node, node.getLeft(), node.getRight());
 	}
 
 	@Override
 	public void caseAPartialInjectionExpression(APartialInjectionExpression node) {
+		evalFunction(node, node.getLeft(), node.getRight());
+	}
+
+	@Override
+	public void caseATotalSurjectionExpression(ATotalSurjectionExpression node) {
 		evalFunction(node, node.getLeft(), node.getRight());
 	}
 
@@ -1733,6 +1749,22 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "'");
 		}
+	}
+
+	@Override
+	public void caseAReflexiveClosureExpression(AReflexiveClosureExpression node) {
+		BType expected = getType(node);
+		UntypedType u = new UntypedType();
+		BType found = new SetType(new PairType(u, u));
+
+		try {
+			found = expected.unify(found, this);
+		} catch (UnificationException e) {
+			throw new TypeErrorException("Excepted '" + expected + "' , found "
+					+ found + "closure");
+		}
+		setType(node.getExpression(), found);
+		node.getExpression().apply(this);
 	}
 
 	@Override
@@ -2025,6 +2057,17 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + getType(node)
 					+ "' , found " + StringType.getInstance() + "'");
+		}
+	}
+
+	@Override
+	public void caseAStringSetExpression(AStringSetExpression node) {
+		SetType found = new SetType(StringType.getInstance());
+		try {
+			found.unify(getType(node), this);
+		} catch (UnificationException e) {
+			throw new TypeErrorException("Excepted '" + getType(node)
+					+ "' , found " + found + "'");
 		}
 	}
 

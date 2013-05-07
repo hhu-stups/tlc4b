@@ -155,4 +155,51 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore
+	@Test
+	public void testExist2Restrictions2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "SETS ROOM = {r}\n"
+				+ "PROPERTIES #x,y.(x = 1 & (r, x) = y)"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "ASSUME \\E x \\in {1} \\cap {2} : x = 1 /\\ x = 2\n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testExist3() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES #x.(x = 1 & x = x)"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "ASSUME \\E x \\in {1} : x = 1 /\\ x = x \n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testPreParams() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "VARIABLES x\n"
+				+ "INVARIANT x = 1\n" 
+				+ "INITIALISATION x := 1\n"
+				+ "OPERATIONS\n"
+				+ "foo(a) = PRE a = 1 & a = a  THEN x:= 3 END\n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "VARIABLES x \n"
+				+ "Invariant == x = 1\n"
+				+ "Init == x = 1 \n"
+				+ "foo(a) == (a = 1 /\\ a = a)	/\\ x' = 3\n"
+				+ "Next == \\E a \\in {1} : foo(a) \n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	
 }

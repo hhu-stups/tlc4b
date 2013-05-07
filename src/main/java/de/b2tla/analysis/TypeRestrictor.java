@@ -26,6 +26,7 @@ import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
 import de.be4.classicalb.core.parser.node.ASelectSubstitution;
+import de.be4.classicalb.core.parser.node.ASubsetPredicate;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PSubstitution;
@@ -127,8 +128,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				putRestrictedType(r_right, new ElementOfNode(left));
 			}
 			return;
+			
+			
 		}
-
+		
 		if (n instanceof AConjunctPredicate) {
 			analysePredicate(((AConjunctPredicate) n).getLeft(), list);
 			analysePredicate(((AConjunctPredicate) n).getRight(), list);
@@ -285,6 +288,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 	}
 
+	
 	@Override
 	public void caseAAnySubstitution(AAnySubstitution node) {
 		HashSet<Node> list = new HashSet<Node>();

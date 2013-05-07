@@ -62,7 +62,8 @@ public class Renamer extends DepthFirstAdapter {
 		KEYWORDS.add("VARIABLES");
 		KEYWORDS.add("WF_");
 		KEYWORDS.add("WITH");
-
+		KEYWORDS.add("STATE");
+		
 		KEYWORDS.add("Init");
 		KEYWORDS.add("Next");
 		KEYWORDS.add("INVARIANT");
@@ -111,6 +112,8 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	public void start() {
+		eval(machineContext.getDeferredSets());
+		eval(machineContext.getEnumeratedSets());
 		eval(machineContext.getConstants());
 		eval(machineContext.getVariables());
 		eval(machineContext.getOperations());

@@ -8,7 +8,7 @@ public class TLCTester {
 
 	
 	public static void main(String[] args) throws IOException, BException{
-		String[] a = new String[]{".\\src\\test\\resources\\ForDistribution\\CAN_BUS.mch"};
+		String[] a = new String[]{ ".\\src\\test\\resources\\test\\ToyFileSystem.mch"};
 		B2TLA.main(a);
 	}
 }
