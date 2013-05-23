@@ -114,6 +114,7 @@ public class B2TLA {
 									+ " and " + args[index]);
 				}
 				mainFileName = args[index];
+				
 			}
 			index++;
 		}
@@ -142,6 +143,8 @@ public class B2TLA {
 		name = name.replace("\\", File.separator);
 		name = name.replace("/", File.separator);
 
+		mainFileName = name;
+		
 		if (name.toLowerCase().endsWith(".mch")) {
 			name = name.substring(0, name.length() - 4);
 		}
