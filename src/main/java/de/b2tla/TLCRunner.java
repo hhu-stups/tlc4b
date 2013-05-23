@@ -44,7 +44,7 @@ public class TLCRunner {
 		}
 		String[] args = list.toArray(new String[list.size()]);
 		ProcessHelper helper = new ProcessHelper();
-		System.out.println("Starting TLC...");
+		System.out.println("Starting JVM...");
 		Process p = helper.startNewJavaProcess("", TLCRunner.class.getName(),
 				args);
 
@@ -61,7 +61,7 @@ public class TLCRunner {
 		return stdOut.getLog();
 	}
 
-	public static void runTLCOld(String machineName, String path) {
+	public static ArrayList<String> runTLC(String machineName, String path) {
 		ArrayList<String> list = new ArrayList<String>();
 		if (!Globals.deadlockCheck) {
 			list.add("-deadlock");
@@ -75,7 +75,7 @@ public class TLCRunner {
 		// ByteArrayOutputStream os = new ByteArrayOutputStream();
 		// PrintStream ps = new PrintStream(os);
 		BTLCPrintStream btlcStream = new BTLCPrintStream();
-		PrintStream old = System.out;
+		PrintStream systemOut = System.out;
 		System.setOut(btlcStream);
 		ToolIO.setMode(ToolIO.SYSTEM);
 
@@ -86,22 +86,36 @@ public class TLCRunner {
 			// call the actual processing method
 			tlc.process();
 		}
-		System.setOut(old);
+		System.setOut(systemOut);
 
-		String[] messages = btlcStream.getArray();
-		System.out.println(Arrays.asList(messages));
-		TLCOutput tlcOutput = new TLCOutput(machineName, messages);
-		tlcOutput.parseTLCOutput();
-		Globals.tlcOutput = tlcOutput;
+		ArrayList<String> messages = btlcStream.getArrayList();
+		
+		closeThreads();
+		return messages;
+		//TLCOutput tlcOutput = new TLCOutput(machineName, messages);
+		//tlcOutput.parseTLCOutput();
 		// TLCOutputEvaluator evaluator = new TLCOutputEvaluator(machineName,
 		// messages);
-		System.out.println("ERROR: " + tlcOutput.getError());
-		StringBuilder trace = tlcOutput.getErrorTrace();
-		if (tlcOutput.hasTrace()) {
-			createfile(path, machineName + ".tla.trace", trace.toString());
-		}
+		//System.out.println("ERROR: " + tlcOutput.getError());
+		//StringBuilder trace = tlcOutput.getErrorTrace();
+//		if (tlcOutput.hasTrace()) {
+//			createfile(path, machineName + ".tla.trace", trace.toString());
+//		}
 	}
 
+	private static void closeThreads() {
+		Set<Thread> threadSet = new HashSet<Thread>(Thread.getAllStackTraces().keySet());
+		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
+		for (int i = 0; i < threadArray.length; i++) {
+			Thread t = threadArray[i];
+			//System.out.println(t.getId()+ " "+t.getThreadGroup());
+			if(t.getName().equals("RMI Reaper")){
+				t.interrupt();
+			}
+		}
+		//System.exit(0);
+	}
+	
 	public static void createfile(String dir, String fileName, String text) {
 		File d = new File(dir);
 		d.mkdirs();

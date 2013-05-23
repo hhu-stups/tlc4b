@@ -24,30 +24,24 @@ public class BTLCPrintStream extends PrintStream {
 		return array.toArray(new String[array.size()]);
 	}
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		BTLCPrintStream my = new BTLCPrintStream();
-		System.setOut(my);
-		
-		System.out.print("hallo");
+	public ArrayList<String> getArrayList(){
+		return array;
 	}
+	
 
 	@Override
 	public void println(String str){
 		synchronized (BTLCPrintStream.class){
 			if(!Globals.tool){
-			//	console.println(str);
+				console.println("> " + str);
 			}
-				
 			array.add(str);
 		}
 	}
 	@Override
 	public void print(String str){
 		synchronized (BTLCPrintStream.class){
-			//console.println(str);
+			console.println(str);
 			array.add(str);
 		}
 	}

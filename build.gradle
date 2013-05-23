@@ -40,17 +40,17 @@ compileJava {
 }
 
 test {
-	//exclude('de/b2tla/tlc/integration/**')
+	exclude('de/b2tla/tlc/integration/**')
 }
 
 
 task integrationtest(type: Test){
+	forkEvery = 1
 	doFirst{
 		println("Running integration tests")
 	 }
 	scanForTestClasses = true
 	include('de/b2tla/tlc/integration/**')
-	
 }
 
 jar { from sourceSets.main.allJava }
@@ -61,7 +61,7 @@ manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
 manifest.mainAttributes("Class-Path": './tla/ tla2tools.jar')
 
 
-task copy(dependsOn: jar) << {
+task copy(dependsOn: build) << {
 	copy {
 		from('build/libs/')
 		into('build/b2tla')

@@ -48,10 +48,9 @@ public class B2TLA {
 		}
 		StopWatch.stop("Translation");
 		if (Globals.runTLC) {
-			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
+			ArrayList<String> output = TLCRunner.runTLC(
 					b2tla.machineName, b2tla.path);
 			b2tla.evalOutput(output, false);
-
 		}
 
 	}
@@ -67,7 +66,7 @@ public class B2TLA {
 		}
 
 		if (Globals.runTLC) {
-			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
+			ArrayList<String> output = TLCRunner.runTLC(
 					b2tla.machineName, b2tla.path);
 			ERROR error = TLCOutput.findError(output);
 			System.out.println(error);
@@ -76,6 +75,7 @@ public class B2TLA {
 		return null;
 	}
 
+	
 	private void evalOutput(ArrayList<String> output, boolean createTraceFile) {
 		TLCOutput tlcOutput = new TLCOutput(machineName,
 				output.toArray(new String[output.size()]));

@@ -13,6 +13,4 @@ public class Globals {
 	public static boolean setupConstants = false;
 	public static boolean deleteOnExit = false;
 	
-	
-	public static TLCOutput tlcOutput = null;
 }
