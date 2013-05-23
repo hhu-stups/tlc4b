@@ -24,6 +24,7 @@ public class TLCRunner {
 
 	public static void main(String[] args) {
 		// this method will be executed in a separate JVM
+		System.out.println("Starting TLC...");
 		String path = args[0];
 		ToolIO.setUserDir(path);
 		String[] parameters = new String[args.length - 1];
@@ -43,7 +44,7 @@ public class TLCRunner {
 		}
 		String[] args = list.toArray(new String[list.size()]);
 		ProcessHelper helper = new ProcessHelper();
-
+		System.out.println("Starting TLC...");
 		Process p = helper.startNewJavaProcess("", TLCRunner.class.getName(),
 				args);
 
