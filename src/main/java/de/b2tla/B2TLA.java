@@ -10,12 +10,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 import de.b2tla.Globals;
 
+import tla2tex.FindAlignments;
 import util.ToolIO;
 
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
+import de.b2tla.exceptions.B2tlaException;
+import de.b2tla.tlc.TLCOutput;
+import de.b2tla.tlc.TLCOutput.ERROR;
 import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.exceptions.BException;
 
@@ -32,27 +39,6 @@ public class B2TLA {
 	public static void main(String[] args) throws IOException {
 		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
-		
-		try {
-			b2tla.progress(args);
-		} 
-		catch (Exception e) {
-			System.err.println(e.getMessage());
-			return;
-		}
-		StopWatch.stop("Translation");
-		if (Globals.tool) {
-			//ToolIO.setMode(ToolIO.TOOL);
-		}
-		if (Globals.runTLC) {
-			TLCRunner.runtTLC(b2tla.machineName, b2tla.path);
-		}
-		System.exit(0);
-	}
-	
-	public static void test(String[] args) throws IOException {
-		//TODO raise Exception if it fails (TLC Error)
-		B2TLA b2tla = new B2TLA();
 
 		try {
 			b2tla.progress(args);
@@ -60,12 +46,46 @@ public class B2TLA {
 			System.err.println(e.getMessage());
 			return;
 		}
-		
-		if (Globals.tool) {
-			ToolIO.setMode(ToolIO.TOOL);
-		}
+		StopWatch.stop("Translation");
 		if (Globals.runTLC) {
-			TLCRunner.runtTLC(b2tla.machineName, b2tla.path);
+			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
+					b2tla.machineName, b2tla.path);
+			b2tla.evalOutput(output, false);
+
+		}
+
+	}
+
+	public static ERROR test(String[] args) {
+		B2TLA b2tla = new B2TLA();
+		try {
+			b2tla.progress(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+			return null;
+		}
+
+		if (Globals.runTLC) {
+			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
+					b2tla.machineName, b2tla.path);
+			ERROR error = TLCOutput.findError(output);
+			System.out.println(error);
+			return error;
+		}
+		return null;
+	}
+
+	private void evalOutput(ArrayList<String> output, boolean createTraceFile) {
+		TLCOutput tlcOutput = new TLCOutput(machineName,
+				output.toArray(new String[output.size()]));
+		tlcOutput.parseTLCOutput();
+		System.out.println("ERROR: " + tlcOutput.getError());
+		StringBuilder trace = tlcOutput.getErrorTrace();
+		if (tlcOutput.hasTrace() && createTraceFile) {
+			String tracefileName = machineName + ".tla.trace";
+			createFile(path, tracefileName, trace.toString(), "Trace file '"
+					+ path + tracefileName + "'created.", true);
 		}
 	}
 
@@ -85,24 +105,21 @@ public class B2TLA {
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				Globals.tool = true;
 			} else if (args[index].charAt(0) == '-') {
-				System.err
-						.println("Error: unrecognized option: " + args[index]);
-				System.exit(1);
+				throw new B2tlaException("Error: unrecognized option: "
+						+ args[index]);
 			} else {
 				if (mainFileName != null) {
-					System.out.println("Error: more than one input files: "
-							+ mainFileName + " and " + args[index]);
-					System.exit(1);
+					throw new B2tlaException(
+							"Error: more than one input files: " + mainFileName
+									+ " and " + args[index]);
 				}
 				mainFileName = args[index];
 			}
 			index++;
 		}
 		if (mainFileName == null) {
-			System.out.println("Main machine required!");
-			System.exit(1);
+			throw new B2tlaException("Main machine required!");
 		}
-
 	}
 
 	private void progress(String[] args) throws IOException, BException {
@@ -110,18 +127,12 @@ public class B2TLA {
 
 		handleMainFileName();
 		if (Globals.translate) {
-			try {
-				translator = new B2TlaTranslator(machineName, getFile());
-				translator.translate();
-			} catch (Exception e) {
-				System.err.println(e.getMessage());
-				//e.printStackTrace();
-				System.exit(1);
-			}
+			translator = new B2TlaTranslator(machineName, getFile());
+			translator.translate();
 
 			this.tlaModule = translator.getModuleString();
 			this.config = translator.getConfigString();
-			createTlaFiles();
+			createFiles();
 		}
 
 	}
@@ -144,65 +155,51 @@ public class B2TLA {
 		machineName = name.substring(name.lastIndexOf(File.separator) + 1);
 	}
 
-	private void createTlaFiles() {
-		File tlaFile = new File(pathAndName + ".tla");
-		try {
-			tlaFile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private void createFiles() {
+		createFile(path, machineName + ".tla", tlaModule, "TLA+ module '"
+				+ pathAndName + ".tla' created.", Globals.deleteOnExit);
+		createFile(path, machineName + ".cfg", config, "Configuration file '"
+				+ pathAndName + ".cfg' created.", Globals.deleteOnExit);
 
-		try {
-			Writer fw = new FileWriter(tlaFile);
-			fw.write(tlaModule);
-			fw.close();
-			System.out.println("TLA Module '" + pathAndName + ".tla' created.");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		File configFile = new File(pathAndName + ".cfg");
-		try {
-			configFile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try {
-			Writer fw = new FileWriter(configFile);
-			fw.write(config);
-			fw.close();
-			System.out.println("Configuration file '" + pathAndName
-					+ ".cfg' created.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		// createUsedStandardModules(path, translator.getUsedStandardModule());
-		createModules(path, translator.getUsedStandardModule());
+		createStandardModules();
 	}
 
-	private void createModules(String path2,
-			ArrayList<STANDARD_MODULES> usedStandardModule) {
-		if (usedStandardModule.contains(STANDARD_MODULES.Relations)) {
-			createStandardModule("Relations", path,
-					translator.getUsedStandardModule());
-		}
-		if (usedStandardModule.contains(STANDARD_MODULES.BBuiltIns)) {
-			createStandardModule("BBuiltIns", path,
-					translator.getUsedStandardModule());
+	private void createStandardModules() {
+		if (translator.getUsedStandardModule().contains(
+				STANDARD_MODULES.Relations)) {
+			createStandardModule(path, STANDARD_MODULES.Relations.toString());
 		}
 		
-		if (usedStandardModule.contains(STANDARD_MODULES.RelationsNew)) {
-			createStandardModule("RelationsNew", path,
-					translator.getUsedStandardModule());
+		if (translator.getUsedStandardModule().contains(
+				STANDARD_MODULES.Functions)) {
+			createStandardModule(path, STANDARD_MODULES.Functions.toString());
 		}
-
+		
+		if (translator.getUsedStandardModule().contains(
+				STANDARD_MODULES.FunctionsAsRelations)) {
+			createStandardModule(path, STANDARD_MODULES.FunctionsAsRelations.toString());
+			if (!translator.getUsedStandardModule().contains(
+					STANDARD_MODULES.Functions)) {
+				createStandardModule(path, STANDARD_MODULES.Functions.toString());
+			}
+		}
+	
+		if (translator.getUsedStandardModule().contains(
+				STANDARD_MODULES.SequencesExtended)) {
+			createStandardModule(path, STANDARD_MODULES.SequencesExtended.toString());
+		}
+		
+		if (translator.getUsedStandardModule().contains(
+				STANDARD_MODULES.SequencesAsRelations)) {
+			createStandardModule(path, STANDARD_MODULES.SequencesAsRelations.toString());
+		}
 	}
 
-	private void createStandardModule(String name, String path,
-			ArrayList<UsedStandardModules.STANDARD_MODULES> standardModules) {
+	private void createStandardModule(String path, String name) {
+		// standard modules are copied from the standardModules folder to the
+		// current directory
+		
+		File file = new File(path + name + ".tla");
 		InputStream is = null;
 		FileOutputStream fos = null;
 		try {
@@ -213,7 +210,7 @@ public class B2TLA {
 						+ name + ".tla");
 			}
 
-			fos = new FileOutputStream(path + name + ".tla");
+			fos = new FileOutputStream(file);
 
 			int read = 0;
 			byte[] bytes = new byte[1024];
@@ -227,6 +224,9 @@ public class B2TLA {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
+			if(Globals.deleteOnExit){
+				file.deleteOnExit();
+			}
 			try {
 				is.close();
 				fos.flush();
@@ -288,7 +288,7 @@ public class B2TLA {
 	private File getFile() {
 		File mainFile = new File(mainFileName);
 		if (!mainFile.exists()) {
-			throw new RuntimeException("The file " + mainFileName
+			throw new B2tlaException("The file " + mainFileName
 					+ " does not exist.");
 		}
 		return mainFile;
@@ -304,4 +304,27 @@ public class B2TLA {
 		in.close();
 		return res.toString();
 	}
+
+	public static void createFile(String dir, String fileName, String text,
+			String message, boolean deleteOnExit) {
+		File d = new File(dir);
+		d.mkdirs();
+		File file = new File(dir + File.separator + fileName);
+		try {
+			file.createNewFile();
+			FileWriter fw;
+			fw = new FileWriter(file);
+			fw.write(text);
+			fw.close();
+			System.out.println(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new B2tlaException(e.getMessage());
+		} finally {
+			if (deleteOnExit) {
+				file.deleteOnExit();
+			}
+		}
+	}
+
 }

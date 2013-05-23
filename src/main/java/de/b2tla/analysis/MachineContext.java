@@ -41,6 +41,7 @@ import de.be4.classicalb.core.parser.node.AOpSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
+import de.be4.classicalb.core.parser.node.APrimedIdentifierExpression;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
@@ -417,6 +418,20 @@ public class MachineContext extends DepthFirstAdapter {
 				+ "' at position: " + node.getStartPos());
 	}
 
+	@Override
+	public void caseAPrimedIdentifierExpression(APrimedIdentifierExpression node) {
+		String name = Utils.getIdentifierAsString(node.getIdentifier());
+		for (int i = contextTable.size() - 1; i >= 0; i--) {
+			LinkedHashMap<String, Node> currentScope = contextTable.get(i);
+			if (currentScope.containsKey(name)) {
+				this.referencesTable.put(node, currentScope.get(name));
+				return;
+			}
+		}
+		throw new ScopeException("Unkown Identifier: '" + name
+				+ "' at position: " + node.getStartPos());
+	}
+
 	private ArrayList<MachineContext> lookupExtendedMachines() {
 		ArrayList<MachineContext> list = new ArrayList<MachineContext>();
 		for (String s : seenMachines.keySet()) {
@@ -490,7 +505,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
 		this.assertionMachineClause = node;
-		
+
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 		ArrayList<MachineContext> list = lookupExtendedMachines();
 		for (int i = 0; i < list.size(); i++) {
@@ -504,7 +519,7 @@ public class MachineContext extends DepthFirstAdapter {
 			this.contextTable.add(s.getDefinitions());
 			this.contextTable.add(s.getVariables());
 		}
-		
+
 		List<PPredicate> copy = new ArrayList<PPredicate>(node.getPredicates());
 		for (PPredicate e : copy) {
 			e.apply(this);
@@ -556,7 +571,7 @@ public class MachineContext extends DepthFirstAdapter {
 		// first collect all operations
 		for (POperation e : copy) {
 			AOperation op = (AOperation) e;
-			///exist(op.getOpName());
+			// /exist(op.getOpName());
 			String name = Utils.getIdentifierAsString(op.getOpName());
 			operations.put(name, op);
 		}

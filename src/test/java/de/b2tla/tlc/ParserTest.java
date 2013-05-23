@@ -1,4 +1,4 @@
-package de.b2tla.tlc.output;
+package de.b2tla.tlc;
 
 import static de.b2tla.util.TestUtil.*;
 

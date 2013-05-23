@@ -1,182 +1,63 @@
----- MODULE Relations -----
-(* This module contains relational operator as well as functional operators,
- because in B function are relations and in some cases in TLA+ it is more effective
- to define a relation as a function *) 
+---------------------------- MODULE Relations ----------------------------
+EXTENDS FiniteSets, Naturals, TLC
 
-EXTENDS TLC, Sequences, FiniteSets, Integers
+Relation(x,y) == SUBSET (x \times y) (*Set of Relations*)
 
-
-				(* function operator *)
-				
-Range(f) == {f[x] : x \in DOMAIN f} (* Calculates the range of a function *)
-
-(* injective total function *)
-ITotalFunc(S,S2) == {f \in [S -> S2]: 
-    Cardinality(DOMAIN f) = Cardinality(Range(f))}
-
-(* partial function *)
-PartialFunction(S, S2) ==  UNION{[x -> S2] :x \in SUBSET S} 
-
-(* injective total function *)
-IParFunc(S, S2)== {f \in PartialFunction(S, S2): Cardinality(DOMAIN f) = Cardinality(Range(f))}
-
-
-
-(*Set of Relations*)
-Relations(x,y) == SUBSET (x \times y)
-
-(* Domain *)
 RelDomain(r) == {x[1]: x \in r}
 
 RelRange(r) == {x[2]: x \in r}
 
-(* Identity relation *)
 RelId(S) == {<<x,x>>: x \in S}
 
-(* Functional call on a relation *)
-RelCall(r, x) == (CHOOSE y \in r: y[1] = x)[2]
-
-(* Domain restriction of a relation *)
 RelDomRes(S, r) == {x \in r: x[1] \in S} 
 
-(* Domain substraction of a relation *)
 RelDomSub(S, r) == {x \in r: x[1] \notin S} 
 
-(* Range restriction *)
-RelRanRes(S, r) == {x \in r: x[2] \in S} 
+RelRanRes(r, S) == {x \in r: x[2] \in S} 
 
-(* Range substraction *)
-RelRanSub(S, r) == {x \in r: x[2] \notin S} 
+RelRanSub(r, S) == {x \in r: x[2] \notin S}
 
-(* Inverse of relation *)
-RelInverse(r) == {<<x[2],x[1]>>: x \in r} 
+RelInverse(r) == {<<x[2],x[1]>>: x \in r}
 
-(* Relational image *)
 RelImage(r, S) =={y[2] :y \in {x \in r: x[1] \in S}}
- 
-RelImage2(r, S) == {y \in RelRange(r): \E x \in RelDomain(r): <<x,y>> \in r}
 
-(* Relational overriding *)
-RelOver(r, r2) == {x \in r: x[1] \notin RelDomain(r2)} \cup r2 
+RelOverride(r, r2) == {x \in r: x[1] \notin RelDomain(r2)} \cup r2 
 
-(* Direct product *)
-RelDirectProduct(r1, r2) == {<<x, u>> \in (RelDomain(r1) \cup RelDomain(r2)) \times (RelRange(r1) \times RelRange(r2)): 
-	/\ u[1] \in RelImage(r1, {x}) 
-	/\ u[2] \in RelImage(r2,{x})}
-
-RelDirectProduct2(r1, r2) == {<<x, u>> \in (RelDomain(r1) \cup RelDomain(r2)) \times (RelRange(r1) \times RelRange(r2)): 
-	/\ <<u[1],u[2][1]>> \in r1 
-	/\ <<u[1],u[2][2]>> \in r2} 
+RelDirectProduct(r1, r2) == {<<x, u>> \in RelDomain(r1) \times (RelRange(r1) \times RelRange(r2) ): 
+    /\ <<x,u[1]>> \in r1 
+    /\ <<x,u[2]>> \in r2}
 
 RelComposition(r1, r2) == {<<u[1][1],u[2][2]>> : u \in 
-		{x \in RelRanRes(RelDomain(r2),r1) \times RelDomRes(RelRange(r1) ,r2): x[1][2] = x[2][1]}} 
+    {x \in RelRanRes(r1, RelDomain(r2)) \times RelDomRes(RelRange(r1) ,r2):
+        x[1][2] = x[2][1]}}
 
-Prj1(E, F) == {u \in E \times F \times E: u[1] = u[3]}
+RelParallelProduct(r1, r2) == {<<a, b>> \in (RelDomain(r1) \times RelDomain(r2)) 
+                                            \times (RelRange(r1) \times RelRange(r2))
+                              : <<a[1],b[1]>> \in r1 /\ <<a[2],b[2]>> \in r2 }
 
-Prj2(E, F) == {u \in E \times F \times F: u[2] = u[3]} 
+RelPrj1(E, F) == {<<<<a,b>>, a>> : a  \in E, b \in F}
 
-RECURSIVE iterate(_,_) 
-iterate(r, n) == CASE  n = 0 -> RelId(RelDomain(r) \cup RelRange(r)) 
-		[] n = 1 -> r 
-		[] OTHER -> iterate(RelComposition(r,r), n-1) 
+RelPrj2(E, F) == {<<<<a,b>>, b>> : a  \in E, b \in F}
 
-RECURSIVE Closure1(_) 
-Closure1(R) == IF RelComposition(R,R) \R # {} 
-		THEN R \cup Closure1(RelComposition(R,R)) 
-		ELSE R 
+RECURSIVE RelIterate(_,_) 
+RelIterate(r, n) == CASE n < 0 -> Assert(FALSE, "ERROR")
+        [] n = 0 -> RelId(RelDomain(r) \cup RelRange(r)) 
+        [] n = 1 -> r 
+        [] OTHER -> RelIterate(RelComposition(r,r), n-1) 
 
-Closure(R) == Closure1( R \cup {<<x[1],x[1]>>: x \in R} \cup {<<x[2],x[2]>>: x \in R}) 
+RECURSIVE RelClosure1(_) 
+RelClosure1(R) == IF RelComposition(R,R) \ R # {} 
+               THEN R \cup RelClosure1(RelComposition(R,R)) 
+               ELSE R 
 
-is_partial_func(f) == \A x \in RelDomain(f): Cardinality(RelImage(f, {x})) =< 1 
+RelClosure(r) == RelClosure1( r \cup {<<x[1],x[1]>>: x \in r} \cup RelIterate(r, 0)) 
 
-is_partial_func2(f, S, S2) == /\ \A x \in f: x[1] \in S /\ x[2] \in S2 /\ RelImage(f, {x[1]}) = {x[2]} 
+RelFnc(r) ==  {<<x, RelImage(r, {x})>> :x \in RelDomain(r)}
 
-is_func(f) == Cardinality(RelDomain(f)) = Cardinality(f)
-is_func2(f) == \A x \in RelDomain(f): Cardinality(RelImage(f, {x})) < 2 
-
-(* convert a function to a relation*)
-MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f} 
-
-(* test if a relation f is a total function *)
-RelIsTotalFunc(f, S, S2) == 
-    /\RelDomain(f) = S 
-    /\ \A x \in f: /\ x[1] \in S 
-        /\ x[2] \in S2 
-        /\ RelImage(f, {x[1]}) = {x[2]} 
-
-
-RelTotalFunc(S, S2) == {MakeRel(f): f \in [S -> S2]}
-RelTotalFuncEleOf(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x) /\ RelDomain(x)= S} 
-
-RelITotalFunc(S, S2) == {MakeRel(f): f \in ITotalFunc(S, S2)} 
-
-RelParFunc2(S, S2) == {MakeRel(f):  f \in UNION{[x -> S2] :x \in SUBSET S}}
-RelParFunc(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x)} 
-
-RelIParFunc(S, S2) == {MakeRel(f): f \in IParFunc(S, S2)}
-
-
-is_injectiv_func(f) == \A x \in RelRange(f): Cardinality(RelImage(RelInverse(f), {x})) =< 1 
- 
-
-
-total_surjection(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x)/\ RelDomain(x)= S /\ S2 = RelRange(x)} 
-
-partial_surjection(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x)/\ S2 = Range(x)} 
-
-total_bijection(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x) /\ RelDomain(x) = S /\ is_injectiv_func(x) /\ S2 = RelRange(x)} 
-
-MakeRelations(S) == {MakeRel(f): f \in S}
-
-(* Sequences *)
-ISeq(S) ==  UNION {ITotalFunc(1..n,S) :n \in 0..Cardinality(S)} 
-
-ISeq1(S) == ISeq(S) \ {<<>>} 
-
-Concat(s, s2) == {<<i, IF i \leq Cardinality(s) THEN RelCall(s, i) ELSE RelCall(s2, i-Cardinality(s))>> : i \in 1.. (Cardinality(s) + Cardinality(s2))}
-    
-RelISeq(S) == MakeRelations(ISeq(S))    
-
-RelISeq1(S) == MakeRelations(ISeq1(S))
-
-iseq(S) == {x \in SUBSET {<<x,y>> \in (1 .. Cardinality(S)) \times S : TRUE }: 
-    /\ Cardinality(x) =< Cardinality(S)
- /\ \E z \in 0.. Cardinality(S): RelDomain(x) = 1..z
- /\ is_func(x)
- /\ is_injectiv_func(x)} 
-
-ISeq_2(S) == {x \in Seq(S): Len(x) = Cardinality(Range(x)) }
-
- 
-iseq1(S) == iseq(S) \ {{}} 
- 
-total_func(S, S2) == {x \in (SUBSET (S \times S2)): is_func(x) /\ RelDomain(x)= S} 
-
-test(S, S2) == {x \in (SUBSET (S \times S2)): RelDomain(x)= S /\ Cardinality(x) = Cardinality(RelDomain(x))} 
-
-
-
-Rel(S, S2) == SUBSET (S \times S2)    
-func(f) == Cardinality(RelDomain(f)) = Cardinality(f)
-total(f, dom) == RelDomain(f) = dom
-inj(f) == Cardinality(RelRange(f)) = Cardinality(f)
-surj(f, ran) == RelRange(f) = ran
-
-TotalSurFunc(S, S2) == {f \in [S -> S2]: S2 = Range(f)}
-
-RelTotalSurFunc(S, S2) == {MakeRel(f): f \in TotalSurFunc(S, S2)} 
-
-RelTotalSurFuncEleOf(S, S2) == {f \in Rel(S,S2): 
-    /\ func(f) /\ total(f,S) /\ surj(f, S2)}
-
-BijFunc(S, S2) == {f \in [S -> S2]: S2 = Range(f) /\
-    Cardinality(DOMAIN f) = Cardinality(Range(f))}
-
-RelBijFunc(S, S2) == {MakeRel(f): f \in BijFunc(S, S2)}     
-============
-
-
-
-
-
+RECURSIVE RelRel(_)
+RelRel(r) == IF r = {}
+             THEN {}
+             ELSE LET e == CHOOSE x \in r: TRUE
+                  IN {<<e[1], y>>: y \in e[2]} \cup RelRel(r\{e})               
+=============================================================================
 

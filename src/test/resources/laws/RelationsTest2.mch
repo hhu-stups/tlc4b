@@ -1,4 +1,9 @@
-MACHINE RelationsTest
+MACHINE RelationsTest2
+VARIABLES x
+INVARIANT x : 1..3
+INITIALISATION x := 1
+OPERATIONS
+foo = PRE 1 = 1 THEN x := 2 END 
 ASSERTIONS
  {1} <-> {2} = {{}, {(1,2)}};
  dom({(1,2)}) = {1};
@@ -10,11 +15,5 @@ ASSERTIONS
  {1} <<| {(1,2), (3,4)} = {(3,4)};
  {(3,TRUE)}[{3}] = {TRUE};
  {(1,TRUE)}~ = {(TRUE,1)};
- {(1,1)} : {1} --> {1};
- {3,4} >+> {5} = {{}, {(3,5)}, {(4,5)}};
- {} : {1} +-> {1};
- {(1,2)} <+ {(1,3)} ={(1,3)};
- iseq({TRUE}) = {{}, {(1,TRUE)}};
- iseq1({TRUE}) = {{(1,TRUE)}};
- {1} >-> {TRUE} = { {(1,TRUE)} }
+ {(1,2)} <+ {(1,3)} ={(1,3)}
 END

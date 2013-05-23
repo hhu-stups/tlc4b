@@ -455,6 +455,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printUnchangedVariables(node, true);
 	}
 
+	@Override
+	public void caseABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
+		node.getPredicate().apply(this);
+		printUnchangedVariables(node, true);
+	}
+
 	private void printNormalAssignment(PExpression left, PExpression right) {
 		AIdentifierExpression id = (AIdentifierExpression) left;
 		String name = Utils.getIdentifierAsString(id.getIdentifier());
@@ -546,7 +552,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAChoiceSubstitution(AChoiceSubstitution node) {
 		List<PSubstitution> copy = new ArrayList<PSubstitution>(
 				node.getSubstitutions());
-
+		tlaModuleString.append("(");
 		for (int i = 0; i < copy.size(); i++) {
 			tlaModuleString.append("(");
 			copy.get(i).apply(this);
@@ -556,7 +562,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 
 		}
-
+		tlaModuleString.append(")");
 		printUnchangedVariables(node, true);
 	}
 
@@ -762,6 +768,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 			tlaModuleString.append("'");
 		}
 		outAIdentifierExpression(node);
+	}
+
+	@Override
+	public void caseAPrimedIdentifierExpression(APrimedIdentifierExpression node) {
+		String name = renamer.getName(node);
+		if (name == null) {
+			name = Utils.getIdentifierAsString(node.getIdentifier());
+		}
+		tlaModuleString.append(name);
 	}
 
 	@Override
@@ -1013,7 +1028,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseANatural1SetExpression(ANatural1SetExpression node) {
 		inANatural1SetExpression(node);
-		tlaModuleString.append("Nat \\ {0}");
+		tlaModuleString.append("(Nat \\ {0})");
 		outANatural1SetExpression(node);
 	}
 
@@ -1034,7 +1049,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseANat1SetExpression(ANat1SetExpression node) {
 		inANat1SetExpression(node);
-		tlaModuleString.append("Nat \\ {0}");
+		tlaModuleString.append("(Nat \\ {0})");
 		outANat1SetExpression(node);
 	}
 
@@ -1278,6 +1293,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 	}
 
+	/*****************************************************************************
+	 * Functions
+	 *****************************************************************************/
+
 	@Override
 	public void caseALambdaExpression(ALambdaExpression node) {
 		/**
@@ -1375,13 +1394,25 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAPartialFunctionExpression(APartialFunctionExpression node) {
-		SetType type = (SetType) typechecker.getType(node);
-		if (type.getSubtype() instanceof FunctionType) {
-			tlaModuleString.append(PARTIAL_FUNCTION + "(");
+	public void caseARangeExpression(ARangeExpression node) {
+		if (typechecker.getType(node.getExpression()) instanceof FunctionType) {
+			tlaModuleString.append(RANGE);
 		} else {
-			tlaModuleString.append(REL_PARTIAL_FUNCTION + "(");
+			tlaModuleString.append(REL_RANGE);
 		}
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAImageExpression(AImageExpression node) {
+		if (typechecker.getType(node.getLeft()) instanceof FunctionType) {
+			tlaModuleString.append(IMAGE);
+		} else {
+			tlaModuleString.append(REL_IMAGE);
+		}
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
@@ -1390,7 +1421,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseATotalFunctionExpression(ATotalFunctionExpression node) {
-		inATotalFunctionExpression(node);
 		BType type = this.typechecker.getType(node);
 		BType subtype = ((SetType) type).getSubtype();
 		if (subtype instanceof FunctionType) {
@@ -1411,91 +1441,83 @@ public class TLAPrinter extends DepthFirstAdapter {
 			node.getRight().apply(this);
 			tlaModuleString.append(")");
 		}
-		outATotalFunctionExpression(node);
+	}
+
+	private void setOfFuntions(Node node, String funcName, String relName,
+			String relEleOfName, Node left, Node right) {
+		BType type = this.typechecker.getType(node);
+		BType subtype = ((SetType) type).getSubtype();
+		if (subtype instanceof FunctionType) {
+			tlaModuleString.append(funcName);
+		} else {
+			if (node.parent() instanceof AMemberPredicate) {
+				tlaModuleString.append(relEleOfName);
+			} else {
+				tlaModuleString.append(relName);
+			}
+		}
+
+		tlaModuleString.append("(");
+		left.apply(this);
+		tlaModuleString.append(", ");
+		right.apply(this);
+		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseATotalInjectionExpression(ATotalInjectionExpression node) {
-		tlaModuleString.append(REL_INJECTIVE_TOTAL_FUNCTION + "(");
-		node.getLeft().apply(this);
-		tlaModuleString.append(", ");
-		node.getRight().apply(this);
-		tlaModuleString.append(")");
-	}
-
-	@Override
-	public void caseATotalBijectionExpression(ATotalBijectionExpression node) {
-		BType type = this.typechecker.getType(node);
-		BType subtype = ((SetType) type).getSubtype();
-		if (subtype instanceof FunctionType) {
-			tlaModuleString.append(BIJECTIVE_FUNCTION + "(");
-		} else {
-			tlaModuleString.append(REL_BIJECTIVE_FUNCTION + "(");
-		}
-
-		node.getLeft().apply(this);
-		tlaModuleString.append(", ");
-		node.getRight().apply(this);
-		tlaModuleString.append(")");
+		setOfFuntions(node, TOTAL_INJECTIVE_FUNCTION,
+				REL_TOTAL_INJECTIVE_FUNCTION,
+				REL_TOTAL_INJECTIVE_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
 	}
 
 	@Override
 	public void caseATotalSurjectionExpression(ATotalSurjectionExpression node) {
-		BType type = this.typechecker.getType(node);
-		BType subtype = ((SetType) type).getSubtype();
-		if (subtype instanceof FunctionType) {
-			tlaModuleString.append(TOTAL_SURJECTIVE_FUNCTION);
-		} else {
-			if (node.parent() instanceof AMemberPredicate) {
-				tlaModuleString
-						.append(REL_TOTAL_SURJECTIVE_FUNCTION_ELEMENT_OF);
-			} else {
-				tlaModuleString.append(REL_TOTAL_SURJECTIVE_FUNCTION);
-			}
-		}
-		tlaModuleString.append("(");
-		node.getLeft().apply(this);
-		tlaModuleString.append(", ");
-		node.getRight().apply(this);
-		tlaModuleString.append(")");
+		setOfFuntions(node, TOTAL_SURJECTIVE_FUNCTION,
+				REL_TOTAL_SURJECTIVE_FUNCTION,
+				REL_TOTAL_SURJECTIVE_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
 	}
 
-	/**
-	 * Sequences
-	 */
+	@Override
+	public void caseATotalBijectionExpression(ATotalBijectionExpression node) {
+		setOfFuntions(node, TOTAL_BIJECTIVE_FUNCTION,
+				REL_TOTAL_BIJECTIVE_FUNCTION,
+				REL_TOTAL_BIJECTIVE_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
+	}
 
 	@Override
-	public void caseASequenceExtensionExpression(
-			ASequenceExtensionExpression node) {
-		inASequenceExtensionExpression(node);
-		BType type = typechecker.getType(node);
-		if (type instanceof SetType) {
-			tlaModuleString.append("{");
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getExpression());
-			for (int i = 0; i < copy.size(); i++) {
-				tlaModuleString.append("<<");
-				tlaModuleString.append(i + 1);
-				tlaModuleString.append(", ");
-				copy.get(i).apply(this);
-				tlaModuleString.append(">>");
+	public void caseAPartialFunctionExpression(APartialFunctionExpression node) {
+		setOfFuntions(node, PARTIAL_FUNCTION, REL_PARTIAL_FUNCTION,
+				REL_PARTIAL_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
+	}
 
-				if (i < copy.size() - 1)
-					tlaModuleString.append(", ");
-			}
-			tlaModuleString.append("}");
-		} else {
-			tlaModuleString.append("<<");
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getExpression());
-			for (int i = 0; i < copy.size(); i++) {
-				copy.get(i).apply(this);
-				if (i < copy.size() - 1)
-					tlaModuleString.append(", ");
-			}
-			tlaModuleString.append(">>");
-		}
-		outASequenceExtensionExpression(node);
+	@Override
+	public void caseAPartialInjectionExpression(APartialInjectionExpression node) {
+		setOfFuntions(node, PARTIAL_INJECTIVE_FUNCTION,
+				REL_PARTIAL_INJECTIVE_FUNCTION,
+				REL_PARTIAL_INJECTIVE_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
+	}
+
+	@Override
+	public void caseAPartialSurjectionExpression(
+			APartialSurjectionExpression node) {
+		setOfFuntions(node, PARTIAL_SURJECTIVE_FUNCTION,
+				REL_PARTIAL_SURJECTIVE_FUNCTION,
+				REL_PARTIAL_SURJECTIVE_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
+	}
+
+	@Override
+	public void caseAPartialBijectionExpression(APartialBijectionExpression node) {
+		setOfFuntions(node, PARITAL_BIJECTIVE_FUNCTION,
+				REL_PARTIAL_BIJECTIVE_FUNCTION,
+				REL_PARTIAL_BIJECTIVE_FUNCTION_ELEMENT_OF, node.getLeft(),
+				node.getRight());
 	}
 
 	/**
@@ -1522,9 +1544,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAEmptySetExpression(AEmptySetExpression node) {
-		inAEmptySetExpression(node);
 		tlaModuleString.append("{}");
-		outAEmptySetExpression(node);
 	}
 
 	@Override
@@ -1756,7 +1776,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseARelationsExpression(ARelationsExpression node) {
-		tlaModuleString.append(RELATIONS + "(");
+		tlaModuleString.append(RELATION + "(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
@@ -1778,20 +1798,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseARangeExpression(ARangeExpression node) {
-		inARangeExpression(node);
-		if (typechecker.getType(node.getExpression()) instanceof FunctionType) {
-			tlaModuleString.append(RANGE + "(");
-
-		} else {
-			tlaModuleString.append(REL_RANGE + "(");
-		}
-		node.getExpression().apply(this);
-		tlaModuleString.append(")");
-		outARangeExpression(node);
-	}
-
-	@Override
 	public void caseAIdentityExpression(AIdentityExpression node) {
 		inAIdentityExpression(node);
 		tlaModuleString.append(REL_ID + "(");
@@ -1803,19 +1809,39 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseADomainRestrictionExpression(
 			ADomainRestrictionExpression node) {
-		inADomainRestrictionExpression(node);
-		tlaModuleString.append(REL_DOMAIN_RESTRICTION + "(");
+		tlaModuleString.append(REL_DOMAIN_RESTRICTION);
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
 		tlaModuleString.append(")");
-		outADomainRestrictionExpression(node);
 	}
 
 	@Override
 	public void caseADomainSubtractionExpression(
 			ADomainSubtractionExpression node) {
-		tlaModuleString.append(REL_DOMAIN_SUBSTRACTION + "(");
+		tlaModuleString.append(REL_DOMAIN_SUBSTRACTION);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseARangeRestrictionExpression(ARangeRestrictionExpression node) {
+		tlaModuleString.append(REL_RANGE_RESTRICTION);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseARangeSubtractionExpression(ARangeSubtractionExpression node) {
+		tlaModuleString.append(REL_RANGE_SUBSTRACTION);
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
@@ -1824,41 +1850,87 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAReverseExpression(AReverseExpression node) {
-		inAReverseExpression(node);
-		tlaModuleString.append(REL_INVERSE + "(");
+		tlaModuleString.append(REL_INVERSE);
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
-		tlaModuleString.append(")");
-		outAReverseExpression(node);
-	}
-
-	@Override
-	public void caseAImageExpression(AImageExpression node) {
-		tlaModuleString.append(REL_IMAGE + "(");
-		node.getLeft().apply(this);
-		tlaModuleString.append(", ");
-		node.getRight().apply(this);
-		tlaModuleString.append(")");
-	}
-
-	@Override
-	public void caseAPartialInjectionExpression(APartialInjectionExpression node) {
-		if (typechecker.getType(node.getLeft()) instanceof FunctionType) {
-			tlaModuleString.append(INJECTIVE_PARTIAL_FUNCTION + "(");
-		} else {
-			tlaModuleString.append(REL_INJECTIVE_PARTIAL_FUNCTION + "(");
-		}
-		node.getLeft().apply(this);
-		tlaModuleString.append(", ");
-		node.getRight().apply(this);
 		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseAOverwriteExpression(AOverwriteExpression node) {
-		tlaModuleString.append(REL_OVERRIDING + "(");
+		tlaModuleString.append(REL_OVERRIDING);
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseADirectProductExpression(ADirectProductExpression node) {
+		tlaModuleString.append(REL_DIRECT_PRODUCT);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAParallelProductExpression(AParallelProductExpression node) {
+		tlaModuleString.append(REL_PARALLEL_PRODUCT);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseACompositionExpression(ACompositionExpression node) {
+		tlaModuleString.append(REL_COMPOSITION);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAFirstProjectionExpression(AFirstProjectionExpression node) {
+		tlaModuleString.append(REL_PROJECTION_FUNCTION_FIRST);
+		tlaModuleString.append("(");
+		node.getExp1().apply(this);
+		tlaModuleString.append(", ");
+		node.getExp2().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseASecondProjectionExpression(ASecondProjectionExpression node) {
+		tlaModuleString.append(REL_PROJECTION_FUNCTION_SECOND);
+		tlaModuleString.append("(");
+		node.getExp1().apply(this);
+		tlaModuleString.append(", ");
+		node.getExp2().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAIterationExpression(AIterationExpression node) {
+		tlaModuleString.append(REL_ITERATE);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAClosureExpression(AClosureExpression node) {
+		tlaModuleString.append(REL_CLOSURE1);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 	}
 
@@ -1871,38 +1943,225 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAIseqExpression(AIseqExpression node) {
-		if (typechecker.getType(node.getExpression()) instanceof FunctionType) {
-			tlaModuleString.append(INJECTIVE_SEQUENCES + "(");
-		} else {
-			tlaModuleString.append("iseq(");
-			// stlaModuleString.append(REL_INJECTIVE_SEQUENCES + "(");
-		}
+	public void caseATransFunctionExpression(ATransFunctionExpression node) {
+		tlaModuleString.append(REL_FNC);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
 
+	@Override
+	public void caseATransRelationExpression(ATransRelationExpression node) {
+		tlaModuleString.append(REL_REL);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	/**
+	 * Sequences
+	 */
+
+	/**
+	 * Sequences
+	 */
+
+	@Override
+	public void caseASequenceExtensionExpression(
+			ASequenceExtensionExpression node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getExpression());
+		BType type = typechecker.getType(node);
+		if (type instanceof FunctionType) {
+			tlaModuleString.append("<<");
+
+			for (int i = 0; i < copy.size(); i++) {
+				copy.get(i).apply(this);
+				if (i < copy.size() - 1)
+					tlaModuleString.append(", ");
+			}
+			tlaModuleString.append(">>");
+		} else {
+			tlaModuleString.append("{");
+			for (int i = 0; i < copy.size(); i++) {
+				tlaModuleString.append("<<");
+				tlaModuleString.append(i + 1);
+				tlaModuleString.append(", ");
+				copy.get(i).apply(this);
+				tlaModuleString.append(">>");
+				if (i < copy.size() - 1)
+					tlaModuleString.append(", ");
+			}
+			tlaModuleString.append("}");
+		}
+	}
+
+	private void evalFunctionOrRelation(Node node, String function,
+			String relation) {
+		BType type = typechecker.getType(node);
+		if (type instanceof FunctionType) {
+			tlaModuleString.append(function);
+		} else {
+			tlaModuleString.append(relation);
+		}
+	}
+
+	@Override
+	public void caseAEmptySequenceExpression(AEmptySequenceExpression node) {
+		evalFunctionOrRelation(node, "<<>>", "{}");
+	}
+
+	@Override
+	public void caseASeqExpression(ASeqExpression node) {
+		tlaModuleString.append("Seq");
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseASizeExpression(ASizeExpression node) {
+		tlaModuleString.append("Len");
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAConcatExpression(AConcatExpression node) {
+		inAConcatExpression(node);
+		node.getLeft().apply(this);
+		tlaModuleString.append(" \\o ");
+		node.getRight().apply(this);
+		outAConcatExpression(node);
+	}
+
+	@Override
+	public void caseAInsertTailExpression(AInsertTailExpression node) {
+		tlaModuleString.append("Append");
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAFirstExpression(AFirstExpression node) {
+		tlaModuleString.append("Head");
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseATailExpression(ATailExpression node) {
+		tlaModuleString.append("Tail");
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	/**
+	 * SequencesExtended
+	 */
+
+	@Override
+	public void caseAIseqExpression(AIseqExpression node) {
+		if (node.parent() instanceof AMemberPredicate) {
+			tlaModuleString.append(INJECTIVE_SEQUENCE_ELEMENT_OF);
+		} else {
+			tlaModuleString.append(INJECTIVE_SEQUENCE);
+		}
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseAIseq1Expression(AIseq1Expression node) {
-		if (typechecker.getType(node.getExpression()) instanceof FunctionType) {
-			tlaModuleString.append(NOT_EMPTY_INJECTIVE_SEQUENCES + "(");
+		if (node.parent() instanceof AMemberPredicate) {
+			tlaModuleString.append(INJECTIVE_SEQUENCE_1_ELEMENT_OF);
 		} else {
-			tlaModuleString.append("iseq1(");
-			// tlaModuleString.append(REL_NOT_EMPTY_INJECTIVE_SEQUENCES + "(");
+			tlaModuleString.append(INJECTIVE_SEQUENCE_1);
 		}
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 	}
 
 	@Override
-	public void caseAEmptySequenceExpression(AEmptySequenceExpression node) {
-		tlaModuleString.append("{}");
+	public void caseASeq1Expression(ASeq1Expression node) {
+		tlaModuleString.append(SEQUENCE_1);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
 	}
 
 	@Override
-	public void caseAConcatExpression(AConcatExpression node) {
-		tlaModuleString.append(SEQ_CONCATINATION + "(");
+	public void caseALastExpression(ALastExpression node) {
+		tlaModuleString.append(SEQUENCE_LAST_ELEMENT);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAInsertFrontExpression(AInsertFrontExpression node) {
+		tlaModuleString.append(SEQUENCE_PREPEND_ELEMENT);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAPermExpression(APermExpression node) {
+		tlaModuleString.append(SEQUENCE_PERMUTATION);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseARevExpression(ARevExpression node) {
+		tlaModuleString.append(SEQUENCE_REVERSE);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAFrontExpression(AFrontExpression node) {
+		tlaModuleString.append(SEQUENCE_FRONT);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseAGeneralConcatExpression(AGeneralConcatExpression node) {
+		tlaModuleString.append(SEQUENCE_GENERAL_CONCATINATION);
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseARestrictFrontExpression(ARestrictFrontExpression node) {
+		tlaModuleString.append(SEQUENCE_TAKE_FIRST_ELEMENTS);
+		tlaModuleString.append("(");
+		node.getLeft().apply(this);
+		tlaModuleString.append(", ");
+		node.getRight().apply(this);
+		tlaModuleString.append(")");
+	}
+
+	@Override
+	public void caseARestrictTailExpression(ARestrictTailExpression node) {
+		tlaModuleString.append(SEQUENCE_DROP_FIRST_ELEMENTS);
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);

@@ -10,6 +10,7 @@ import de.b2tla.exceptions.SubstitutionException;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesElementOfSubstitution;
+import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceOrSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionSubstitution;
@@ -105,6 +106,19 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 							+ missingVariables);
 		}
 
+	}
+
+	@Override
+	public void caseABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		HashSet<Node> list = new HashSet<Node>();
+		for (PExpression e : copy) {
+			Node identifier = machineContext.getReferences().get(e);
+			list.add(identifier);
+		}
+		assignedVariablesTable.put(node, list);
+		defaultOut(node);
 	}
 
 	public void caseAAssignSubstitution(AAssignSubstitution node) {

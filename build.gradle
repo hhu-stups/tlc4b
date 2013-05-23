@@ -20,14 +20,14 @@ configurations {
 def parser_version = '2.4.18-SNAPSHOT'
 
 dependencies {
-	compile files('externalLibs/tla')
+	compile files('libs/tla2tools.jar')
 	compile (group: 'de.prob', name: 'prologlib', version: parser_version)
 	compile (group: 'de.prob', name: 'parserbase', version: parser_version)
 	compile (group: 'de.prob', name: 'bparser', version: parser_version)
 	
 	testCompile (group: 'junit', name: 'junit', version: '4.+')
 	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.3-SNAPSHOT')
-	
+		
 	releaseJars (group: 'de.prob', name: 'prologlib', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'parserbase', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'bparser', version: parser_version)
@@ -36,7 +36,21 @@ dependencies {
 ant.importBuild 'build.xml'
 
 compileJava {
-	dependsOn tla
+	dependsOn tla2tools
+}
+
+test {
+	//exclude('de/b2tla/tlc/integration/**')
+}
+
+
+task integrationtest(type: Test){
+	doFirst{
+		println("Running integration tests")
+	 }
+	scanForTestClasses = true
+	include('de/b2tla/tlc/integration/**')
+	
 }
 
 jar { from sourceSets.main.allJava }
@@ -44,7 +58,7 @@ jar	{
 	from configurations.releaseJars.collect { it.isDirectory() ? it : zipTree(it) }
 }
 manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
-manifest.mainAttributes("Class-Path": './tla/')
+manifest.mainAttributes("Class-Path": './tla/ tla2tools.jar')
 
 
 task copy(dependsOn: jar) << {

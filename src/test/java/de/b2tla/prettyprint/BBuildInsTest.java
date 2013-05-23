@@ -18,7 +18,7 @@ public class BBuildInsTest {
 	public void testStrictSubset() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES {1} <<: {1,2} \n"
 				+ "END";
-		String expected = "---- MODULE test ----\n" + "EXTENDS BBuiltIns\n"
+		String expected = "---- MODULE test ----\n"
 				+ "ASSUME ({1} \\subseteq  {1, 2} /\\ {1} # {1, 2})\n" + "====";
 		compareEquals(expected, machine);
 	}

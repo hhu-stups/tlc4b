@@ -16,8 +16,11 @@ import de.b2tla.btypes.SetType;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAddExpression;
 import de.be4.classicalb.core.parser.node.ACardExpression;
+import de.be4.classicalb.core.parser.node.AClosureExpression;
+import de.be4.classicalb.core.parser.node.ACompositionExpression;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConcatExpression;
+import de.be4.classicalb.core.parser.node.ADirectProductExpression;
 import de.be4.classicalb.core.parser.node.ADivExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
 import de.be4.classicalb.core.parser.node.ADomainRestrictionExpression;
@@ -25,8 +28,12 @@ import de.be4.classicalb.core.parser.node.ADomainSubtractionExpression;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AFin1SubsetExpression;
 import de.be4.classicalb.core.parser.node.AFinSubsetExpression;
+import de.be4.classicalb.core.parser.node.AFirstExpression;
+import de.be4.classicalb.core.parser.node.AFirstProjectionExpression;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
+import de.be4.classicalb.core.parser.node.AFrontExpression;
 import de.be4.classicalb.core.parser.node.AFunctionExpression;
+import de.be4.classicalb.core.parser.node.AGeneralConcatExpression;
 import de.be4.classicalb.core.parser.node.AGeneralIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
 import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
@@ -34,12 +41,15 @@ import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;
 import de.be4.classicalb.core.parser.node.AGreaterPredicate;
 import de.be4.classicalb.core.parser.node.AIdentityExpression;
 import de.be4.classicalb.core.parser.node.AImageExpression;
+import de.be4.classicalb.core.parser.node.AInsertFrontExpression;
 import de.be4.classicalb.core.parser.node.AIntSetExpression;
 import de.be4.classicalb.core.parser.node.AIntegerSetExpression;
 import de.be4.classicalb.core.parser.node.AIntervalExpression;
 import de.be4.classicalb.core.parser.node.AIseq1Expression;
 import de.be4.classicalb.core.parser.node.AIseqExpression;
+import de.be4.classicalb.core.parser.node.AIterationExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.ALastExpression;
 import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
 import de.be4.classicalb.core.parser.node.ALessPredicate;
 import de.be4.classicalb.core.parser.node.AMaxExpression;
@@ -55,20 +65,39 @@ import de.be4.classicalb.core.parser.node.ANaturalSetExpression;
 import de.be4.classicalb.core.parser.node.ANotSubsetPredicate;
 import de.be4.classicalb.core.parser.node.ANotSubsetStrictPredicate;
 import de.be4.classicalb.core.parser.node.AOverwriteExpression;
+import de.be4.classicalb.core.parser.node.AParallelProductExpression;
+import de.be4.classicalb.core.parser.node.APartialBijectionExpression;
 import de.be4.classicalb.core.parser.node.APartialFunctionExpression;
 import de.be4.classicalb.core.parser.node.APartialInjectionExpression;
+import de.be4.classicalb.core.parser.node.APartialSurjectionExpression;
+import de.be4.classicalb.core.parser.node.APermExpression;
 import de.be4.classicalb.core.parser.node.APow1SubsetExpression;
 import de.be4.classicalb.core.parser.node.APowerOfExpression;
 import de.be4.classicalb.core.parser.node.APredecessorExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
 import de.be4.classicalb.core.parser.node.ARangeExpression;
+import de.be4.classicalb.core.parser.node.ARangeRestrictionExpression;
+import de.be4.classicalb.core.parser.node.ARangeSubtractionExpression;
 import de.be4.classicalb.core.parser.node.AReflexiveClosureExpression;
 import de.be4.classicalb.core.parser.node.ARelationsExpression;
+import de.be4.classicalb.core.parser.node.ARestrictFrontExpression;
+import de.be4.classicalb.core.parser.node.ARestrictTailExpression;
+import de.be4.classicalb.core.parser.node.ARevExpression;
 import de.be4.classicalb.core.parser.node.AReverseExpression;
+import de.be4.classicalb.core.parser.node.ASecondProjectionExpression;
+import de.be4.classicalb.core.parser.node.ASeq1Expression;
+import de.be4.classicalb.core.parser.node.ASeqExpression;
+import de.be4.classicalb.core.parser.node.ASizeExpression;
 import de.be4.classicalb.core.parser.node.ASubsetStrictPredicate;
 import de.be4.classicalb.core.parser.node.ASuccessorExpression;
+import de.be4.classicalb.core.parser.node.ATailExpression;
+import de.be4.classicalb.core.parser.node.ATotalBijectionExpression;
 import de.be4.classicalb.core.parser.node.ATotalFunctionExpression;
+import de.be4.classicalb.core.parser.node.ATotalInjectionExpression;
+import de.be4.classicalb.core.parser.node.ATotalSurjectionExpression;
+import de.be4.classicalb.core.parser.node.ATransFunctionExpression;
+import de.be4.classicalb.core.parser.node.ATransRelationExpression;
 import de.be4.classicalb.core.parser.node.AUnaryMinusExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -76,11 +105,12 @@ import de.be4.classicalb.core.parser.node.PExpression;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, RelationsNew
-
+		Naturals, Integers, FiniteSets, Sequences, TLC,
+		BBuiltIns, Relations, FunctionsAsRelations,
+		Functions, SequencesExtended, SequencesAsRelations
 	}
 
-	public final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
+	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
 	static {
 		modules.add(STANDARD_MODULES.Naturals);
 		modules.add(STANDARD_MODULES.Integers);
@@ -89,7 +119,10 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		modules.add(STANDARD_MODULES.TLC);
 		modules.add(STANDARD_MODULES.BBuiltIns);
 		modules.add(STANDARD_MODULES.Relations);
-		modules.add(STANDARD_MODULES.RelationsNew);
+		modules.add(STANDARD_MODULES.Functions);
+		modules.add(STANDARD_MODULES.FunctionsAsRelations);
+		modules.add(STANDARD_MODULES.SequencesExtended);
+		modules.add(STANDARD_MODULES.SequencesAsRelations);
 	}
 
 	private Set<STANDARD_MODULES> usedStandardModules;
@@ -101,7 +134,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		this.usedStandardModules = new HashSet<STANDARD_MODULES>();
 		this.typechecker = typechecker;
 		this.restrictedTypesTable = restrictedTypesTable;
-
 	}
 
 	class StandardModuleComparator implements Comparator<STANDARD_MODULES> {
@@ -294,7 +326,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		if (t instanceof IntegerType) {
 			usedStandardModules.add(STANDARD_MODULES.Naturals);
 		} else {
-			// usedStandardModules.add(STANDARD_MODULES.Relations);
+			// usedStandardModules.add(STANDARD_MODULES.RelationsNew);
 		}
 	}
 
@@ -352,10 +384,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
-	public void inASubsetStrictPredicate(ASubsetStrictPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
-	}
-
 	public void inANotSubsetPredicate(ANotSubsetPredicate node) {
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
@@ -379,6 +407,84 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	/**
+	 * Functions
+	 */
+
+	public void inARangeExpression(ARangeExpression node) {
+		BType type = typechecker.getType(node.getExpression());
+		if (type instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.Functions);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.Relations);
+		}
+	}
+
+	public void inAImageExpression(AImageExpression node) {
+		BType type = typechecker.getType(node.getLeft());
+		if (type instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.Functions);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.Relations);
+		}
+	}
+
+	private void setOfFunctions(Node node) {
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.Functions);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+		}
+	}
+
+	public void inAPartialFunctionExpression(APartialFunctionExpression node) {
+		setOfFunctions(node);
+	}
+
+	public void inATotalInjectionExpression(ATotalInjectionExpression node) {
+		setOfFunctions(node);
+	}
+
+	public void inAPartialInjectionExpression(APartialInjectionExpression node) {
+		setOfFunctions(node);
+	}
+
+	public void inATotalSurjectionExpression(ATotalSurjectionExpression node) {
+		setOfFunctions(node);
+	}
+
+	public void inAPartialSurjectionExpression(APartialSurjectionExpression node) {
+		setOfFunctions(node);
+	}
+
+	public void inATotalBijectionExpression(ATotalBijectionExpression node) {
+		setOfFunctions(node);
+	}
+
+	public void inAPartialBijectionExpression(APartialBijectionExpression node) {
+		setOfFunctions(node);
+	}
+
+	/**
+	 * Functions as Relations
+	 */
+
+	// Function call
+	public void inAFunctionExpression(AFunctionExpression node) {
+		BType type = typechecker.getType(node.getIdentifier());
+		if (type instanceof SetType) {
+			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+		}
+	}
+
+	public void inATotalFunctionExpression(ATotalFunctionExpression node) {
+		SetType type = (SetType) typechecker.getType(node);
+		if (type.getSubtype() instanceof SetType) {
+			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+		}
+	}
+
+	/**
 	 * Relations
 	 */
 	public void inARelationsExpression(ARelationsExpression node) {
@@ -390,10 +496,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		if (!(t instanceof FunctionType)) {
 			usedStandardModules.add(STANDARD_MODULES.Relations);
 		}
-	}
-
-	public void inARangeExpression(ARangeExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAIdentityExpression(AIdentityExpression node) {
@@ -408,7 +510,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inAPartialFunctionExpression(APartialFunctionExpression node) {
+	public void inARangeRestrictionExpression(ARangeRestrictionExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	public void inARangeSubtractionExpression(ARangeSubtractionExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
@@ -416,46 +522,134 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inAImageExpression(AImageExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
-	}
-
-	public void inAPartialInjectionExpression(APartialInjectionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
-	}
-
 	public void inAOverwriteExpression(AOverwriteExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inAIseqExpression(AIseqExpression node) {
+	public void inADirectProductExpression(ADirectProductExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inAIseq1Expression(AIseq1Expression node) {
+	public void inAParallelProductExpression(AParallelProductExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inAConcatExpression(AConcatExpression node) {
+	public void inACompositionExpression(ACompositionExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inATotalFunctionExpression(ATotalFunctionExpression node) {
-		SetType type = (SetType) typechecker.getType(node);
-		if (type.getSubtype() instanceof SetType) {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
-		}
+	public void inAFirstProjectionExpression(AFirstProjectionExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
-	public void inAFunctionExpression(AFunctionExpression node) {
-		BType type = typechecker.getType(node.getIdentifier());
-		if (type instanceof SetType) {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
-		}
+	public void inASecondProjectionExpression(ASecondProjectionExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	public void inAIterationExpression(AIterationExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	public void inAClosureExpression(AClosureExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAReflexiveClosureExpression(AReflexiveClosureExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.RelationsNew);
+		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	public void inATransFunctionExpression(ATransFunctionExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	public void inATransRelationExpression(ATransRelationExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	/**
+	 * Sequences
+	 */
+
+	public void inASeqExpression(ASeqExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Sequences);
+	}
+
+	public void inASizeExpression(ASizeExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Sequences);
+	}
+
+	public void inAConcatExpression(AConcatExpression node) {
+		evalSequenceOrRelation(node);
+	}
+
+	private void evalSequenceOrRelation(Node node){
+		BType type = typechecker.getType(node);
+		if (type instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.Sequences);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		}
+	}
+	
+	public void inAFirstExpression(AFirstExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Sequences);
+	}
+
+	public void inATailExpression(ATailExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Sequences);
+	}
+
+	/**
+	 * SequencesExtended
+	 */
+
+	public void inAIseqExpression(AIseqExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inASeq1Expression(ASeq1Expression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inAInsertFrontExpression(AInsertFrontExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inALastExpression(ALastExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inAFrontExpression(AFrontExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inAPermExpression(APermExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inARevExpression(ARevExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inAGeneralConcatExpression(AGeneralConcatExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inARestrictFrontExpression(ARestrictFrontExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	public void inARestrictTailExpression(ARestrictTailExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+	}
+
+	/**
+	 * sonst
+	 * 
+	 */
+
+	public void inAIseq1Expression(AIseq1Expression node) {
+		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 }

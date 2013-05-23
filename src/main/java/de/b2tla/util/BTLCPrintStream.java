@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import de.b2tla.Globals;
 
 
-public class MyPrintStream extends PrintStream {
+public class BTLCPrintStream extends PrintStream {
 	private final PrintStream console;
 	private final ArrayList<String> array;
-	public MyPrintStream() {
+	public BTLCPrintStream() {
 		super(new PipedOutputStream());
 		this.console = System.out;
 		this.array = new ArrayList<String>();
@@ -28,7 +28,7 @@ public class MyPrintStream extends PrintStream {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MyPrintStream my = new MyPrintStream();
+		BTLCPrintStream my = new BTLCPrintStream();
 		System.setOut(my);
 		
 		System.out.print("hallo");
@@ -36,16 +36,18 @@ public class MyPrintStream extends PrintStream {
 
 	@Override
 	public void println(String str){
-		synchronized (MyPrintStream.class){
-			if(!Globals.tool)
-				console.println(str);
+		synchronized (BTLCPrintStream.class){
+			if(!Globals.tool){
+			//	console.println(str);
+			}
+				
 			array.add(str);
 		}
 	}
 	@Override
 	public void print(String str){
-		synchronized (MyPrintStream.class){
-			console.println(str);
+		synchronized (BTLCPrintStream.class){
+			//console.println(str);
 			array.add(str);
 		}
 	}

@@ -11,6 +11,17 @@
 		<unzip src="externalLibs/tla.zip" dest="externalLibs/" />
 	</target>
 
+	<target name="tla2tools.check">
+		<condition property="tla2tools.exists">
+			<available file="libs/tla2tools.jar"/>
+		</condition>
+	</target>
+
+	<target name="tla2tools" depends="tla2tools.check" unless="tla2tools.exists">
+		<mkdir dir="libs/" />
+		<get src="http://tla.msr-inria.inria.fr/tlatoolbox/dist/tla2tools.jar" dest="libs/" />
+	</target>
+
 
 	<target name="delete">
 		<delete dir="externalLibs" />

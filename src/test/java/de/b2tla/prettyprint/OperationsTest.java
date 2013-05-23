@@ -60,6 +60,63 @@ public class OperationsTest {
 	}
 	
 	@Test
+	public void testBecomesSuchThat() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES x,y\n"
+				+ "INVARIANT x = 1 & y = 1\n" 
+				+ "INITIALISATION  x,y:(x = 1 & y = 1)\n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "VARIABLES x, y \n"
+				+ "Invariant == x = 1 /\\ y = 1\n"
+				+ "Init == x = 1 /\\ y = 1 \n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testBecomesSuchThatInOperations() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES x,y\n"
+				+ "INVARIANT x = 1 & y = 1\n" 
+				+ "INITIALISATION  x,y:(x = 1 & y = 1)\n"
+				+ "OPERATIONS\n"
+				+ " foo = x,y:(x = 1 & y = 1)\n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "VARIABLES x, y \n"
+				+ "Invariant == x = 1 /\\ y = 1\n"
+				+ "Init == x = 1 /\\ y = 1 \n"
+				+ "foo == x' = 1 /\\ y' = 1\n"
+				+ "Next == foo\n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testBecomesSuchPreviousValue() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES x,y\n"
+				+ "INVARIANT x = 1 & y = 1\n" 
+				+ "INITIALISATION  x,y:(x = 1 & y = 1)\n"
+				+ "OPERATIONS\n"
+				+ " foo = x:(x = x$0 + 1)\n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals\n"
+				+ "VARIABLES x, y \n"
+				+ "Invariant == x = 1 /\\ y = 1\n"
+				+ "Init == x = 1 /\\ y = 1 \n"
+				+ "foo == x' = x + 1 /\\ UNCHANGED <<y>>\n"
+				+ "Next == foo\n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
 	public void testOperationParameter() throws Exception {
 		String machine = "MACHINE test\n" 
 				+ "VARIABLES x\n"
