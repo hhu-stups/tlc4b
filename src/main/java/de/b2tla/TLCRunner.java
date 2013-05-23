@@ -23,7 +23,7 @@ import tlc2.TLC;
 public class TLCRunner {
 
 	public static void main(String[] args) {
-		// this method will be executed in separate JVM
+		// this method will be executed in a separate JVM
 		String path = args[0];
 		ToolIO.setUserDir(path);
 		String[] parameters = new String[args.length - 1];
@@ -33,7 +33,8 @@ public class TLCRunner {
 		TLC.main(parameters);
 	}
 
-	public static ArrayList<String> runTLCInANewJVM(String machineName, String path) {
+	public static ArrayList<String> runTLCInANewJVM(String machineName,
+			String path) throws IOException {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(path);
 		list.add(machineName);
@@ -42,21 +43,21 @@ public class TLCRunner {
 		}
 		String[] args = list.toArray(new String[list.size()]);
 		ProcessHelper helper = new ProcessHelper();
-		try {
-			Process p = helper.startNewJavaProcess("",
-					TLCRunner.class.getName(), args);
 
-			StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
-			stdOut.start();
-			StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
-			errOut.start();
+		Process p = helper.startNewJavaProcess("", TLCRunner.class.getName(),
+				args);
+
+		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
+		stdOut.start();
+		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
+		errOut.start();
+		try {
 			p.waitFor();
-			
-			return stdOut.getLog();
-		} catch (Throwable t) {
-			t.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-		return null;
+
+		return stdOut.getLog();
 	}
 
 	public static void runTLCOld(String machineName, String path) {

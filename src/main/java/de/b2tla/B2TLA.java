@@ -56,7 +56,7 @@ public class B2TLA {
 
 	}
 
-	public static ERROR test(String[] args) {
+	public static ERROR test(String[] args) throws IOException {
 		B2TLA b2tla = new B2TLA();
 		try {
 			b2tla.progress(args);
