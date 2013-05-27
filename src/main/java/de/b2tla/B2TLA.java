@@ -66,7 +66,7 @@ public class B2TLA {
 		}
 
 		if (Globals.runTLC) {
-			ArrayList<String> output = TLCRunner.runTLC(
+			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
 					b2tla.machineName, b2tla.path);
 			ERROR error = TLCOutput.findError(output);
 			System.out.println(error);
@@ -80,7 +80,7 @@ public class B2TLA {
 		TLCOutput tlcOutput = new TLCOutput(machineName,
 				output.toArray(new String[output.size()]));
 		tlcOutput.parseTLCOutput();
-		System.out.println("ERROR: " + tlcOutput.getError());
+		System.out.println("Result: " + tlcOutput.getError());
 		StringBuilder trace = tlcOutput.getErrorTrace();
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			String tracefileName = machineName + ".tla.trace";

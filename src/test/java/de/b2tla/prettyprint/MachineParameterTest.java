@@ -28,8 +28,9 @@ public class MachineParameterTest {
 		String expectedModule = "---- MODULE test----\n" 
 				+ "VARIABLES a\n"
 				+ "Init == a \\in {1,2,3}\n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<a>>\n"
 				+ "======";
-		String expectedConfig = "INIT Init";
+		String expectedConfig = "INIT Init\nNEXT Next";
 		compareConfig(expectedModule, expectedConfig, machine);
 	}
 	

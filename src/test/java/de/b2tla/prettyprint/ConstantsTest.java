@@ -17,6 +17,7 @@ public class ConstantsTest {
 				+ "k == 1 \n"
 				+ "VARIABLES k2 \n"
 				+ "Init == k = 1 /\\ k2 \\in {k} \n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<k2>>\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -31,6 +32,7 @@ public class ConstantsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "VARIABLES k \n"
 				+ "Init == k \\in {1} \n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<k>>\n"
 				+ "======";
 		compare(expected, machine);
 	}

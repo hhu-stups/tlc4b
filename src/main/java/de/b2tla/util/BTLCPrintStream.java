@@ -33,7 +33,7 @@ public class BTLCPrintStream extends PrintStream {
 	public void println(String str){
 		synchronized (BTLCPrintStream.class){
 			if(!Globals.tool){
-				console.println("> " + str);
+				console.println("" + str);
 			}
 			array.add(str);
 		}
@@ -41,7 +41,7 @@ public class BTLCPrintStream extends PrintStream {
 	@Override
 	public void print(String str){
 		synchronized (BTLCPrintStream.class){
-			console.println(str);
+			console.println("> " +str);
 			array.add(str);
 		}
 	}

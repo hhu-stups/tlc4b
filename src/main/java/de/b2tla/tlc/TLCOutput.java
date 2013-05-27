@@ -11,8 +11,8 @@ public class TLCOutput {
 	private final String moduleName;
 	private String[] messages;
 
-	Date startTime;
-	Date finishedTime;
+	Date startingTime;
+	Date finishingTime;
 	ERROR error;
 	ArrayList<String> states = new ArrayList<String>();
 	StringBuilder trace;
@@ -23,7 +23,7 @@ public class TLCOutput {
 	}
 
 	public long getRunningTime() {
-		long time = (finishedTime.getTime() - startTime.getTime()) / 1000;
+		long time = (finishingTime.getTime() - startingTime.getTime()) / 1000;
 		return time;
 	}
 
@@ -48,10 +48,9 @@ public class TLCOutput {
 		for (int i = 0; i < messages.length; i++) {
 			String m = messages[i];
 			if (m.startsWith("Starting...")) {
-				// startingTime = m;
-				startTime = parseTime(m);
+				startingTime = parseTime(m);
 			} else if (m.startsWith("Finished.")) {
-				finishedTime = parseTime(m);
+				finishingTime = parseTime(m);
 			} else if (m.startsWith("Error:")) {
 				ERROR e = findError(m);
 				if(e != null){

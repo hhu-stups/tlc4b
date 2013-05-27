@@ -18,6 +18,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Inv == x = 1\n"
 				+ "Init == x = 1 \n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -55,6 +56,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -71,6 +73,7 @@ public class OperationsTest {
 				+ "VARIABLES x, y \n"
 				+ "Invariant == x = 1 /\\ y = 1\n"
 				+ "Init == x = 1 /\\ y = 1 \n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<x, y>>\n"
 				+ "====";
 		compare(expected, machine);
 	}

@@ -42,6 +42,9 @@ public class TLCRunner {
 		if (!Globals.deadlockCheck) {
 			list.add("-deadlock");
 		}
+		//list.add("-coverage");
+		//list.add("1");
+		
 		String[] args = list.toArray(new String[list.size()]);
 		ProcessHelper helper = new ProcessHelper();
 		System.out.println("Starting JVM...");
@@ -89,9 +92,17 @@ public class TLCRunner {
 		System.setOut(systemOut);
 
 		ArrayList<String> messages = btlcStream.getArrayList();
+		String[] ms =ToolIO.getAllMessages();
+		System.out.println("--------------------------------");
+		for (int i = 0; i < ms.length; i++) {
+			System.out.println(">> "+ms[i]);
+		}
 		
 		closeThreads();
+		//return new ArrayList<String>(Arrays.asList(ms));
 		return messages;
+		
+		
 		//TLCOutput tlcOutput = new TLCOutput(machineName, messages);
 		//tlcOutput.parseTLCOutput();
 		// TLCOutputEvaluator evaluator = new TLCOutputEvaluator(machineName,

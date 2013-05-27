@@ -10,7 +10,7 @@ import de.b2tla.tlc.TLCOutput;
 import de.b2tla.tlc.TLCOutput.ERROR;
 
 public class ErrorTest {
-
+	
 	@Test
 	public void testInvariantError() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\error\\InvariantError.mch" };
@@ -44,6 +44,12 @@ public class ErrorTest {
 	@Test
 	public void testNoError() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\error\\NoError.mch" };
+		assertEquals(TLCOutput.ERROR.NoError, B2TLA.test(a));
+	}
+	
+	@Test
+	public void testEnumerationError() throws Exception {
+		String[] a = new String[] { ".\\src\\test\\resources\\error\\EnumerationError.mch" };
 		assertEquals(TLCOutput.ERROR.NoError, B2TLA.test(a));
 	}
 

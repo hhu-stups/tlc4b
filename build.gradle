@@ -12,78 +12,60 @@ repositories {
 	mavenRepo name: 'cobra_ext', url: "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
 }
 
-configurations {
-	// configuration that holds jars to copy into lib
-	releaseJars
-	}
+configurations { // configuration that holds jars to copy into lib
+	releaseJars }
 
 def parser_version = '2.4.18-SNAPSHOT'
 
 dependencies {
-	compile files('libs/tla2tools.jar')
+	compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
 	compile (group: 'de.prob', name: 'prologlib', version: parser_version)
 	compile (group: 'de.prob', name: 'parserbase', version: parser_version)
 	compile (group: 'de.prob', name: 'bparser', version: parser_version)
-	
+
 	testCompile (group: 'junit', name: 'junit', version: '4.+')
 	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.3-SNAPSHOT')
-		
+
 	releaseJars (group: 'de.prob', name: 'prologlib', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'parserbase', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'bparser', version: parser_version)
-	}
-
-ant.importBuild 'build.xml'
-
-compileJava {
-	dependsOn tla2tools
 }
 
-test {
-	exclude('de/b2tla/tlc/integration/**')
-}
+
+test { exclude('de/b2tla/tlc/integration/**') }
 
 
 task integrationtest(type: Test){
-	forkEvery = 1
-	doFirst{
-		println("Running integration tests")
-	 }
+	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
 	include('de/b2tla/tlc/integration/**')
 }
 
 jar { from sourceSets.main.allJava }
-jar	{ 
+jar	{
 	from configurations.releaseJars.collect { it.isDirectory() ? it : zipTree(it) }
 }
 manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
 manifest.mainAttributes("Class-Path": './tla/ tla2tools.jar')
 
 
-task copy(dependsOn: build) << {
+task b2tla(dependsOn: build) << {
 	copy {
 		from('build/libs/')
 		into('build/b2tla')
 		include('b2tla-'+project.version+'.jar')
 		rename('(b2tla)-(.+)', 'B2TLA.jar')
 	}
-	copy {
-		from('src/main/resources/') { include '**/*' }
-		into 'build/b2tla'
-	}
-	copy {
-		from('build/b2tla')
-		into('externalLibs/')
-		include('B2TLA.jar')
-	}
 }
 
 
-task deploy(type: Zip, dependsOn: copy) {
-   from('build/') { include 'b2tla/**' }
-   archiveName = 'b2tla.zip'
-   doLast{ println "Created archive: "+archivePath }
+task deploy(dependsOn: build) {
+	copy {
+		from('build/libs/')
+		into('build/b2tla')
+		include('b2tla-'+project.version+'.jar')
+		rename('(b2tla)-(.+)', 'B2TLA.jar')
+	}
 }
 
 

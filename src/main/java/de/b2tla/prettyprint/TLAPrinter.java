@@ -121,7 +121,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (this.configFile.isInit()) {
 			this.configFileString.append("INIT Init\n");
 		}
-		if (this.configFile.isNext()) {
+		if (this.configFile.isInit()) {
 			this.configFileString.append("NEXT Next\n");
 		}
 		if (configFile.isInvariant()) {
@@ -276,8 +276,20 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private void printOperations() {
 		ArrayList<POperation> ops = this.tlaModule.getOperations();
-		if (ops.size() == 0)
+		if (ops.size() == 0) {
+			ArrayList<Node> vars = tlaModule.getVariables();
+			if (vars.size() > 0) {
+				tlaModuleString.append("Next == 1 = 2 /\\ UNCHANGED <<");
+				for (int i = 0; i < vars.size(); i++) {
+					vars.get(i).apply(this);
+					if (i < vars.size() - 1) {
+						tlaModuleString.append(", ");
+					}
+				}
+				tlaModuleString.append(">>\n");
+			}
 			return;
+		}
 		for (int i = 0; i < ops.size(); i++) {
 			ops.get(i).apply(this);
 		}
