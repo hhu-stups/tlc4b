@@ -10,10 +10,9 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import de.b2tla.tlc.ProcessHelper;
-import de.b2tla.tlc.TLCOutput;
 import de.b2tla.util.BTLCPrintStream;
 
 import util.SimpleFilenameToStream;
@@ -34,6 +33,28 @@ public class TLCRunner {
 		TLC.main(parameters);
 	}
 
+	private static Process startJVM(final String optionsAsString,
+			final String mainClass, final String[] arguments)
+			throws IOException {
+
+		String separator = System.getProperty("file.separator");
+
+		String jvm = System.getProperty("java.home") + separator + "bin"
+				+ separator + "java";
+		String classpath = System.getProperty("java.class.path");
+
+		List<String> command = new ArrayList<String>();
+		command.add(jvm);
+		command.add("-cp");
+		command.add(classpath);
+		command.add(mainClass);
+		command.addAll(Arrays.asList(arguments));
+
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		Process process = processBuilder.start();
+		return process;
+	}
+
 	public static ArrayList<String> runTLCInANewJVM(String machineName,
 			String path) throws IOException {
 		ArrayList<String> list = new ArrayList<String>();
@@ -42,14 +63,12 @@ public class TLCRunner {
 		if (!Globals.deadlockCheck) {
 			list.add("-deadlock");
 		}
-		//list.add("-coverage");
-		//list.add("1");
-		
+		// list.add("-coverage");
+		// list.add("1");
+
 		String[] args = list.toArray(new String[list.size()]);
-		ProcessHelper helper = new ProcessHelper();
 		System.out.println("Starting JVM...");
-		Process p = helper.startNewJavaProcess("", TLCRunner.class.getName(),
-				args);
+		Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
 
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
@@ -92,41 +111,41 @@ public class TLCRunner {
 		System.setOut(systemOut);
 
 		ArrayList<String> messages = btlcStream.getArrayList();
-		String[] ms =ToolIO.getAllMessages();
+		String[] ms = ToolIO.getAllMessages();
 		System.out.println("--------------------------------");
 		for (int i = 0; i < ms.length; i++) {
-			System.out.println(">> "+ms[i]);
+			System.out.println(">> " + ms[i]);
 		}
-		
+
 		closeThreads();
-		//return new ArrayList<String>(Arrays.asList(ms));
+		// return new ArrayList<String>(Arrays.asList(ms));
 		return messages;
-		
-		
-		//TLCOutput tlcOutput = new TLCOutput(machineName, messages);
-		//tlcOutput.parseTLCOutput();
+
+		// TLCOutput tlcOutput = new TLCOutput(machineName, messages);
+		// tlcOutput.parseTLCOutput();
 		// TLCOutputEvaluator evaluator = new TLCOutputEvaluator(machineName,
 		// messages);
-		//System.out.println("ERROR: " + tlcOutput.getError());
-		//StringBuilder trace = tlcOutput.getErrorTrace();
-//		if (tlcOutput.hasTrace()) {
-//			createfile(path, machineName + ".tla.trace", trace.toString());
-//		}
+		// System.out.println("ERROR: " + tlcOutput.getError());
+		// StringBuilder trace = tlcOutput.getErrorTrace();
+		// if (tlcOutput.hasTrace()) {
+		// createfile(path, machineName + ".tla.trace", trace.toString());
+		// }
 	}
 
 	private static void closeThreads() {
-		Set<Thread> threadSet = new HashSet<Thread>(Thread.getAllStackTraces().keySet());
+		Set<Thread> threadSet = new HashSet<Thread>(Thread.getAllStackTraces()
+				.keySet());
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 		for (int i = 0; i < threadArray.length; i++) {
 			Thread t = threadArray[i];
-			//System.out.println(t.getId()+ " "+t.getThreadGroup());
-			if(t.getName().equals("RMI Reaper")){
+			// System.out.println(t.getId()+ " "+t.getThreadGroup());
+			if (t.getName().equals("RMI Reaper")) {
 				t.interrupt();
 			}
 		}
-		//System.exit(0);
+		// System.exit(0);
 	}
-	
+
 	public static void createfile(String dir, String fileName, String text) {
 		File d = new File(dir);
 		d.mkdirs();

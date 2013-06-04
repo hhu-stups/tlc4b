@@ -37,6 +37,7 @@ import de.be4.classicalb.core.parser.node.AGeneralConcatExpression;
 import de.be4.classicalb.core.parser.node.AGeneralIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
 import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
+import de.be4.classicalb.core.parser.node.AGeneralUnionExpression;
 import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;
 import de.be4.classicalb.core.parser.node.AGreaterPredicate;
 import de.be4.classicalb.core.parser.node.AIdentityExpression;
@@ -105,9 +106,7 @@ import de.be4.classicalb.core.parser.node.PExpression;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC,
-		BBuiltIns, Relations, FunctionsAsRelations,
-		Functions, SequencesExtended, SequencesAsRelations
+		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations
 	}
 
 	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
@@ -397,6 +396,10 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
+	public void inAGeneralUnionExpression(AGeneralUnionExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+	}
+
 	public void inAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
@@ -582,7 +585,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		evalSequenceOrRelation(node);
 	}
 
-	private void evalSequenceOrRelation(Node node){
+	private void evalSequenceOrRelation(Node node) {
 		BType type = typechecker.getType(node);
 		if (type instanceof FunctionType) {
 			usedStandardModules.add(STANDARD_MODULES.Sequences);
@@ -590,7 +593,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
-	
+
 	public void inAFirstExpression(AFirstExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Sequences);
 	}

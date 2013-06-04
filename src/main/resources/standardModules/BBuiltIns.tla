@@ -1,6 +1,6 @@
 ----------------------------- MODULE BBuiltIns -----------------------------
 
-EXTENDS Integers, FiniteSets
+EXTENDS Integers, FiniteSets, TLC
 
 RECURSIVE SIGMA(_) 
 SIGMA(S) == LET e == CHOOSE e \in S: TRUE
@@ -22,11 +22,20 @@ notSubset(a, b) == ~ (a \subseteq b)
 
 notStrictSubset(a, b) == ~ (a \subset b )
 
-RECURSIVE INTER(_)
-INTER(S) == LET e == (CHOOSE e \in S: TRUE)
-            IN IF  Cardinality(S) = 1 
-               THEN e 
-               ELSE e \cap INTER(S \ {e})
+RECURSIVE Inter(_)
+Inter(S) == IF S = {}
+	    THEN Assert(FALSE, "Applied inter operator to an empty set")
+	    ELSE LET e == (CHOOSE e \in S: TRUE)
+            	  IN IF  Cardinality(S) = 1 
+               	    THEN e 
+                   ELSE e \cap Inter(S \ {e})
 
+RECURSIVE Union(_)
+Union(S) == IF S = {}
+	    THEN {}
+	    ELSE LET e == (CHOOSE e \in S: TRUE)
+            	 IN IF  Cardinality(S) = 1 
+               	    THEN e 
+                    ELSE e \cup Inter(S \ {e})
 
 =============================================================================

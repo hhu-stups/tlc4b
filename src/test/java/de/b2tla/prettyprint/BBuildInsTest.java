@@ -81,7 +81,7 @@ public class BBuildInsTest {
 				+ "PROPERTIES INTER(z).(z: {1,2} & 1 = 1| {z}) = {} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME INTER({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {}\n"
+				+ "ASSUME Inter({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {}\n"
 				+ "====";
 		compareEquals(expected, machine);
 	}

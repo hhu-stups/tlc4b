@@ -145,9 +145,10 @@ public class SetTest {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES union({{1},{2}}) = {1,2} \n" + "END";
 		String expected = "---- MODULE test ----\n"
-				+ "ASSUME UNION({{1}, {2}}) = {1, 2}\n"
+				+ "EXTENDS BBuiltIns\n"
+				+ "ASSUME Union({{1}, {2}}) = {1, 2}\n"
 				+ "====";
-		compare(expected, machine);
+		assertEquals(expected, translate(machine));
 	}
 	
 	
@@ -157,7 +158,7 @@ public class SetTest {
 				+ "PROPERTIES inter({{1},{1,2}}) = {1} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME inter({{1}, {1, 2}}) = {1}\n"
+				+ "ASSUME Inter({{1}, {1, 2}}) = {1}\n"
 				+ "====";
 		assertEquals(expected, translate(machine));
 	}
@@ -168,7 +169,7 @@ public class SetTest {
 				+ "PROPERTIES UNION(z).(z: {1,2} & 1 = 1| {z}) = {1,2} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME UNION({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {1, 2}\n"
+				+ "ASSUME Union({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {1, 2}\n"
 				+ "====";
 		//TODO ERROR in TLA2B
 		compareEquals(expected, machine);
@@ -180,7 +181,7 @@ public class SetTest {
 				+ "PROPERTIES INTER(z).(z: {1,2} & 1 = 1| {z}) = {} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME INTER({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {}\n"
+				+ "ASSUME Inter({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {}\n"
 				+ "====";
 		System.out.println(expected);
 		compareEquals(expected, machine);

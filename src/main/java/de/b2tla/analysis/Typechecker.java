@@ -557,7 +557,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	@Override
 	public void caseAIntegerSetExpression(AIntegerSetExpression node) {
-		System.out.println(node.parent().getClass());
 		try {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
@@ -1090,23 +1089,18 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	@Override
 	public void caseASetExtensionExpression(ASetExtensionExpression node) {
-		SetType set;
-		try {
-			set = new SetType(new UntypedType()).unify(getType(node), this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'POW(_A)' in ' {...} '");
-		}
-
+		UntypedType u = new UntypedType();
 		for (PExpression e : node.getExpressions()) {
-			setType(e, set.getSubtype());
+			setType(e, u);
 		}
-
+		BType expected = getType(node);
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getExpressions());
 		for (PExpression e : copy) {
 			e.apply(this);
 		}
+		BType found = new SetType(getType(copy.get(0)));
+		unify(expected, found, node);
 	}
 
 	@Override
@@ -1930,7 +1924,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "' at " + node.getClass() + "\n "
+					+ found + "' at " + node.getClass().getSimpleName() + "\n "
 					+ node.getStartPos());
 		}
 	}

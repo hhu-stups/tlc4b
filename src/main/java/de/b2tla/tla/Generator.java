@@ -127,7 +127,6 @@ public class Generator extends DepthFirstAdapter {
 			configFile.setInit();
 			tlaModule.addInit(clause.getPredicates());
 		} else {
-			Globals.setupConstants = true;
 			tlaModule.addAssume(clause.getPredicates());
 		}
 	}
@@ -231,7 +230,6 @@ public class Generator extends DepthFirstAdapter {
 			}
 
 		} else {
-			Globals.setupConstants = true;
 			tlaModule.addAssume(propertiesPerdicate);
 		}
 	}

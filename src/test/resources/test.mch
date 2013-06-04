@@ -1,4 +1,3 @@
-MACHINE test
-CONSTANTS k
-PROPERTIES k = {1} * {2}
+MACHINE Test
+PROPERTIES inter({{1}}) = {1}
 END

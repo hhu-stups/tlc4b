@@ -39,8 +39,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	private Hashtable<Node, NodeType> restrictedTypes;
 	private Hashtable<Node, ArrayList<NodeType>> restrictedTypesSet;
-	
-	
+
 	public TypeRestrictor(Start start, MachineContext machineContext,
 			Typechecker typechecker) {
 		this.machineContext = machineContext;
@@ -54,23 +53,21 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		return restrictedTypes;
 	}
 
-	public ArrayList<NodeType> getRestrictedTypesSet(Node node){
+	public ArrayList<NodeType> getRestrictedTypesSet(Node node) {
 		return restrictedTypesSet.get(node);
 	}
-	
-	
+
 	private void putRestrictedType(Node identifier, NodeType expression) {
 		ArrayList<NodeType> list = restrictedTypesSet.get(identifier);
-		
-		if(list == null){
+
+		if (list == null) {
 			list = new ArrayList<NodeType>();
 			list.add(expression);
 			restrictedTypesSet.put(identifier, list);
-		}else{
+		} else {
 			list.add(expression);
 		}
-		
-		
+
 		if (restrictedTypes.containsKey(identifier))
 			return;
 
@@ -128,10 +125,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				putRestrictedType(r_right, new ElementOfNode(left));
 			}
 			return;
-			
-			
+
 		}
-		
+
 		if (n instanceof AConjunctPredicate) {
 			analysePredicate(((AConjunctPredicate) n).getLeft(), list);
 			analysePredicate(((AConjunctPredicate) n).getRight(), list);
@@ -149,6 +145,8 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			// e.apply(this);
 			list.add(e);
 		}
+		// TODO test if the expression is really a implication, currently a
+		// class cast exception is thrown
 		AImplicationPredicate implication = (AImplicationPredicate) node
 				.getImplication();
 		analysePredicate(implication.getLeft(), list);
@@ -288,7 +286,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 	}
 
-	
 	@Override
 	public void caseAAnySubstitution(AAnySubstitution node) {
 		HashSet<Node> list = new HashSet<Node>();

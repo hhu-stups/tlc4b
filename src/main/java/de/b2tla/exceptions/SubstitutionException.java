@@ -7,4 +7,9 @@ public class SubstitutionException extends B2tlaException{
 		super(e);
 	}
 
+	@Override
+	public String getError() {
+		return "SubstitutionError";
+	}
+
 }

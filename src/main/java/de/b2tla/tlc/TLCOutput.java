@@ -4,12 +4,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.b2tla.Globals;
 
 public class TLCOutput {
 	private final String moduleName;
 	private String[] messages;
+	private TLCOutputInfo tlcOutputInfo;
 
 	Date startingTime;
 	Date finishingTime;
@@ -19,7 +22,7 @@ public class TLCOutput {
 	String parseError;
 
 	public static enum ERROR {
-		Deadlock, Goal, Invariant, ParseError, NoError, Assertion, PropertiesError, EnumerateError
+		Deadlock, Goal, Invariant, ParseError, NoError, Assertion, PropertiesError, EnumerateError, TLCError
 	}
 
 	public long getRunningTime() {
@@ -28,10 +31,14 @@ public class TLCOutput {
 	}
 
 	public String getError() {
+		if(error == ERROR.Invariant){
+			return "Invariant Violation";
+		}
 		return error.toString();
 	}
 
 	public StringBuilder getErrorTrace() {
+		parseTrace();
 		return trace;
 	}
 
@@ -39,9 +46,11 @@ public class TLCOutput {
 		return states.size() > 0;
 	}
 
-	public TLCOutput(String moduleName, String[] messages) {
+	public TLCOutput(String moduleName, String[] messages,
+			TLCOutputInfo tlcOutputInfo) {
 		this.moduleName = moduleName;
 		this.messages = messages;
+		this.tlcOutputInfo = tlcOutputInfo;
 	}
 
 	public void parseTLCOutput() {
@@ -53,8 +62,8 @@ public class TLCOutput {
 				finishingTime = parseTime(m);
 			} else if (m.startsWith("Error:")) {
 				ERROR e = findError(m);
-				if(e != null){
-					this.error = e; 
+				if (e != null) {
+					this.error = e;
 				}
 			} else if (m.startsWith("State")) {
 				states.add(m);
@@ -67,7 +76,6 @@ public class TLCOutput {
 			this.error = ERROR.NoError;
 		}
 
-		System.out.println("Model checking time: " + getRunningTime());
 	}
 
 	private void parseTrace() {
@@ -75,18 +83,40 @@ public class TLCOutput {
 		// ToolIO.getUserDir());
 
 		trace = new StringBuilder();
-		if (Globals.setupConstants) {
-			/**
-			 * There is only one possibility to setup the constants. As a
-			 * consequence ProB has to find the values for the constants so that
-			 * the predicate 1=1 is satisfied.
-			 */
-			trace.append("1 = 1 \n");
+
+		if (tlcOutputInfo.hasConstants()) {
+			String m1 = states.get(0);
+			String[] a = m1.split("\n");
+			Pattern pattern = Pattern.compile("\\w+");
+			String constantSetup = "";
+			for (int i = 1; i < a.length; i++) {
+				String line = a[i];
+				Matcher matcher = pattern.matcher(line);
+				matcher.find();
+				String identifier = matcher.group();
+				if (tlcOutputInfo.isAConstant(identifier)) {
+					constantSetup += line + "\n";
+				}
+			}
+
+			if (constantSetup.equals("")) {
+				/**
+				 * There is only one possibility to setup the constants. As a
+				 * consequence ProB has to find the values for the constants so
+				 * that the predicate 1=1 is satisfied.
+				 */
+				trace.append("1 = 1 \n");
+			} else {
+				constantSetup = TLCExpressionParser.parseLine(constantSetup);
+				trace.append(constantSetup);
+				trace.append("\n");
+			}
+
 		}
 
 		for (int i = 0; i < states.size(); i++) {
 			String m = states.get(i);
-			System.out.println(m);
+			// System.out.println(m);
 			String location = m.substring(0, m.indexOf("\n"));
 			// String operationName = moduleMatcher.getName(location);
 
@@ -125,12 +155,11 @@ public class TLCOutput {
 			return ERROR.PropertiesError;
 		} else if (m.equals("Error: TLC threw an unexpected exception.")) {
 			return ERROR.ParseError;
-		}else if (m.startsWith("Error: Attempted to enumerate")) {
-			return ERROR.EnumerateError;
-		}else if (m.startsWith("Error: The behavior up to")){
+		} else if (m.startsWith("Error: The behavior up to")) {
 			return null;
 		}
-		throw new RuntimeException(m);
+		System.out.println(m);
+		return ERROR.TLCError;
 	}
 
 	private static Date parseTime(String m) {

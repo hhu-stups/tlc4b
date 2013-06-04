@@ -18,6 +18,8 @@ import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
+import de.b2tla.tlc.TLCOutput;
+import de.b2tla.tlc.TLCOutputInfo;
 import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
@@ -31,6 +33,8 @@ public class B2TlaTranslator {
 	private String configString;
 	private String machineName;
 	private ArrayList<STANDARD_MODULES> usedStandardModules;
+	private TLCOutputInfo tlcOutputInfo;
+	
 	
 	public B2TlaTranslator(String machineString) throws BException{
 		this.machineString = machineString;
@@ -56,7 +60,6 @@ public class B2TlaTranslator {
 		this.machineName = machineContext.getMachineName();
 		
 		Typechecker typechecker = new Typechecker(machineContext);
-		
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
 				machineContext);
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
@@ -89,6 +92,8 @@ public class B2TlaTranslator {
 		moduleString = printer.getStringbuilder().toString();
 		configString = printer.getConfigString().toString();
 		
+		
+		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer, typechecker.getTypes());
 	}
 
 
@@ -116,6 +121,10 @@ public class B2TlaTranslator {
 		return machineName;
 	}
 
+	public TLCOutputInfo getTLCOutputInfo(){
+		return tlcOutputInfo;
+	}
+	
 	public boolean containsUsedStandardModule(STANDARD_MODULES module){
 		return usedStandardModules.contains(module);
 	}

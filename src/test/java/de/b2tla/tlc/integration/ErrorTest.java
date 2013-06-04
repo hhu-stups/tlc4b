@@ -50,7 +50,7 @@ public class ErrorTest {
 	@Test
 	public void testEnumerationError() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\error\\EnumerationError.mch" };
-		assertEquals(TLCOutput.ERROR.NoError, B2TLA.test(a));
+		assertEquals(TLCOutput.ERROR.TLCError, B2TLA.test(a));
 	}
 
 }

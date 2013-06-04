@@ -1709,8 +1709,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAGeneralUnionExpression(AGeneralUnionExpression node) {
 		inAGeneralUnionExpression(node);
-		tlaModuleString.append("UNION ");
+		tlaModuleString.append("Union(");
 		node.getExpression().apply(this);
+		tlaModuleString.append(")");
 		outAGeneralUnionExpression(node);
 	}
 
@@ -1718,7 +1719,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAGeneralIntersectionExpression(
 			AGeneralIntersectionExpression node) {
 		inAGeneralIntersectionExpression(node);
-		tlaModuleString.append("inter(");
+		tlaModuleString.append("Inter(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 		outAGeneralIntersectionExpression(node);
@@ -1729,7 +1730,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 
-		tlaModuleString.append("UNION({");
+		tlaModuleString.append("Union({");
 		node.getExpression().apply(this);
 		tlaModuleString.append(": ");
 		printIdentifierList(copy);
@@ -1749,7 +1750,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 
-		tlaModuleString.append("INTER({");
+		tlaModuleString.append("Inter({");
 		node.getExpression().apply(this);
 		tlaModuleString.append(": ");
 		printIdentifierList(copy);

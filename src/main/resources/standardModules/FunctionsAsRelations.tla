@@ -1,17 +1,20 @@
 ------------------------ MODULE FunctionsAsRelations ----------------------------------
-EXTENDS FiniteSets, Relations, Functions
+EXTENDS FiniteSets, Functions, TLC, Sequences
+
+LOCAL RelDom(r) == { x[1] :x \in r} 
+LOCAL RelRan(r) == { x[2] :x \in r} 
 
 RelCall(r, x) == 
-    IF Assert(Cardinality(r) = Cardinality(RelDomain(r)), "ERROR")
+    IF Assert(Cardinality(r) = Cardinality(RelDom(r)), "Applied a function call to the relation: " \o ToString(r))
     THEN (CHOOSE y \in r: y[1] = x)[2]
     ELSE FALSE
                  
-MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f}    
-Rel(S, S2) == SUBSET (S \times S2)    
-func(f) == Cardinality(RelDomain(f)) = Cardinality(f)
-total(f, dom) == RelDomain(f) = dom
-inj(f) == Cardinality(RelRange(f)) = Cardinality(f)
-surj(f, ran) == RelRange(f) = ran
+LOCAL MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f}    
+LOCAL Rel(S, S2) == SUBSET (S \times S2)    
+LOCAL func(f) == Cardinality(RelDom(f)) = Cardinality(f)
+LOCAL total(f, dom) == RelDom(f) = dom
+LOCAL inj(f) == Cardinality(RelRan(f)) = Cardinality(f)
+LOCAL surj(f, ran) == RelRan(f) = ran
 
 RelTotalFunc(S, S2) == {MakeRel(f): f \in [S -> S2]}
 RelTotalFuncEleOf(S, S2) == {f \in Rel(S,S2): func(f) /\ total(f,S)}

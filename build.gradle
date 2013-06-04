@@ -35,7 +35,7 @@ dependencies {
 test { exclude('de/b2tla/tlc/integration/**') }
 
 
-task integrationtest(type: Test){
+task integrationtests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
 	include('de/b2tla/tlc/integration/**')
@@ -57,15 +57,4 @@ task b2tla(dependsOn: build) << {
 		rename('(b2tla)-(.+)', 'B2TLA.jar')
 	}
 }
-
-
-task deploy(dependsOn: build) {
-	copy {
-		from('build/libs/')
-		into('build/b2tla')
-		include('b2tla-'+project.version+'.jar')
-		rename('(b2tla)-(.+)', 'B2TLA.jar')
-	}
-}
-
 
