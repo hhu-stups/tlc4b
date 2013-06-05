@@ -24,6 +24,10 @@ public class TLCOutputInfo {
 		return typesTable.get(tlaName);
 	}
 	
+	public Hashtable<String, BType> getTypes(){
+		return typesTable;
+	}
+	
 	public boolean isAConstant(String tlaName){
 		return constants.contains(getBName(tlaName));
 	}

@@ -121,7 +121,9 @@ public class TLCOutput {
 			// String operationName = moduleMatcher.getName(location);
 
 			String predicate = m.substring(m.indexOf("\n") + 1);
-			String res = TLCExpressionParser.parseLine(predicate);
+			//String res = TLCExpressionParser.parseLine(predicate);
+			//TODO OUTPUT
+			String res = TLCExpressionParser.parseLine(predicate, tlcOutputInfo.getTypes());
 			trace.append(res);
 			trace.append("\n");
 		}

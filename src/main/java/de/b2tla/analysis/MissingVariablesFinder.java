@@ -16,6 +16,7 @@ import de.be4.classicalb.core.parser.node.AChoiceSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AIfSubstitution;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
+import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.AParallelSubstitution;
 import de.be4.classicalb.core.parser.node.APreconditionSubstitution;
@@ -149,6 +150,17 @@ class MissingVariablesFinder extends DepthFirstAdapter {
 		expectedVariablesTable.put(node.getThen(), new HashSet<Node>());
 		node.getThen().apply(this);
 	}
+	
+    @Override
+    public void caseALetSubstitution(ALetSubstitution node)
+    {
+		check(node);
+
+		expectedOutputParametersTable.put(node.getSubstitution(), new HashSet<Node>());
+		expectedVariablesTable.put(node.getSubstitution(), new HashSet<Node>());
+		node.getSubstitution().apply(this);
+    }
+
 
 	@Override
 	public void caseAChoiceSubstitution(AChoiceSubstitution node) {

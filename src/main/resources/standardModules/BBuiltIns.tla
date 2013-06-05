@@ -24,7 +24,7 @@ notStrictSubset(a, b) == ~ (a \subset b )
 
 RECURSIVE Inter(_)
 Inter(S) == IF S = {}
-	    THEN Assert(FALSE, "Applied inter operator to an empty set")
+	    THEN Assert(FALSE, "Applied the inter operator to an empty set.")
 	    ELSE LET e == (CHOOSE e \in S: TRUE)
             	  IN IF  Cardinality(S) = 1 
                	    THEN e 

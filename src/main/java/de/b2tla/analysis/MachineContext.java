@@ -36,6 +36,7 @@ import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AMachineHeader;
 import de.be4.classicalb.core.parser.node.AOpSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
@@ -642,6 +643,18 @@ public class MachineContext extends DepthFirstAdapter {
 				e.apply(this);
 			}
 		}
+	}
+
+	@Override
+	public void caseALetSubstitution(ALetSubstitution node) {
+		contextTable.add(new LinkedHashMap<String, Node>());
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
+		}
+		node.getPredicate().apply(this);
+		node.getSubstitution().apply(this);
 	}
 
 	@Override

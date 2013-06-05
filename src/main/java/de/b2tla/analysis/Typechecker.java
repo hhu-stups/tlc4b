@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-
 import de.b2tla.btypes.AbstractHasFollowers;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.BoolType;
@@ -526,7 +525,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		node.getSet().apply(this);
 	}
 
-	
 	@Override
 	public void caseAAnySubstitution(AAnySubstitution node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
@@ -538,6 +536,19 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getWhere(), BoolType.getInstance());
 		node.getWhere().apply(this);
 		node.getThen().apply(this);
+	}
+
+	@Override
+	public void caseALetSubstitution(ALetSubstitution node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			setType(v, new UntypedType());
+		}
+		setType(node.getPredicate(), BoolType.getInstance());
+		node.getPredicate().apply(this);
+		node.getSubstitution().apply(this);
 	}
 
 	/****************************************************************************

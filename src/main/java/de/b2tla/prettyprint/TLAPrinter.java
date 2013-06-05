@@ -719,6 +719,36 @@ public class TLAPrinter extends DepthFirstAdapter {
 		outAAnySubstitution(node);
 	}
 
+	 @Override
+	    public void caseALetSubstitution(ALetSubstitution node)
+	    {
+	        inALetSubstitution(node);
+	    	List<PExpression> copy = new ArrayList<PExpression>(
+					node.getIdentifiers());
+			if (copy.size() > 0) {
+				tlaModuleString.append("\\E ");
+				for (int i = 0; i < copy.size(); i++) {
+					PExpression e = copy.get(i);
+					e.apply(this);
+					tlaModuleString.append(" \\in ");
+					printTypeOfIdentifier(e);
+					if (i < copy.size() - 1) {
+						tlaModuleString.append(", ");
+					}
+				}
+				tlaModuleString.append(" : ");
+			}
+
+			node.getPredicate().apply(this);
+			tlaModuleString.append("\n\t/\\ ");
+			node.getSubstitution().apply(this);
+			printUnchangedVariables(node, true);
+	        
+	        
+	        
+	        outALetSubstitution(node);
+	    }
+	
 	@Override
 	public void caseAOperation(AOperation node) {
 		String name = renamer.getName(node);

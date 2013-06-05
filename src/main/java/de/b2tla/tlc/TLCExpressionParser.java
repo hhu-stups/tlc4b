@@ -170,7 +170,13 @@ public class TLCExpressionParser {
 				isSequence = false;
 				first = ((PairType) type).getFirst();
 				second = ((PairType) type).getSecond();
-			} else {
+			}else if (type instanceof SetType){
+				isSequence = false;
+				SetType set = (SetType) type;
+				PairType pair = (PairType) set.getSubtype();
+				first = pair.getSecond();
+				second = pair.getSecond();
+			}else {
 				FunctionType f = (FunctionType) type;
 				first = f.getRange();
 				second = f.getRange();

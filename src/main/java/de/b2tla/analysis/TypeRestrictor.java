@@ -19,6 +19,7 @@ import de.be4.classicalb.core.parser.node.AForallPredicate;
 import de.be4.classicalb.core.parser.node.AImplicationPredicate;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AMemberPredicate;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.APreconditionSubstitution;
@@ -300,4 +301,21 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		node.getWhere().apply(this);
 		node.getThen().apply(this);
 	}
+	
+    @Override
+    public void caseALetSubstitution(ALetSubstitution node)
+    {
+    	HashSet<Node> list = new HashSet<Node>();
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			list.add(e);
+		}
+		list.addAll(getExpectedIdentifier(node));
+		analysePredicate(node.getPredicate(), list);
+
+		node.getPredicate().apply(this);
+		node.getSubstitution().apply(this);
+    }
+	
 }
