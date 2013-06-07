@@ -37,11 +37,11 @@ Conc(S) == IF S = <<>>
            THEN <<>>
            ELSE Head(S) \o Conc(Tail(S))
 
-TakeFirstElements(s, n) == IF Assert(n \in 0..Len(s), "ERROR") 
+TakeFirstElements(s, n) == IF Assert(n \in 0..Len(s), "Well defineness condition of take-first-operator is violated") 
                            THEN [i \in 1..n |-> s[i]] 
                            ELSE FALSE 
 
-DropFirstElements(s, n) == IF Assert(n \in 0..Len(s), "ERROR") 
+DropFirstElements(s, n) == IF Assert(n \in 0..Len(s), "Well defineness condition of drop-first-operator its violated") 
                            THEN [i \in 1..(Len(s)-n) |-> s[n + i]] 
                            ELSE FALSE 
 =============================================================================
