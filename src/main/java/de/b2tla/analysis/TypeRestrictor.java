@@ -8,6 +8,7 @@ import java.util.List;
 import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
+import de.b2tla.analysis.nodes.SubsetNode;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
@@ -126,8 +127,19 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				putRestrictedType(r_right, new ElementOfNode(left));
 			}
 			return;
-
 		}
+		
+		if (n instanceof ASubsetPredicate) {
+			PExpression left = ((ASubsetPredicate) n).getLeft();
+			Node r_left = machineContext.getReferences().get(left);
+			PExpression right = ((ASubsetPredicate) n).getRight();
+
+			if (list.contains(r_left) && cEF.isconstant(right)) {
+				putRestrictedType(r_left, new SubsetNode(right));
+			}
+			return;
+		}
+		
 
 		if (n instanceof AConjunctPredicate) {
 			analysePredicate(((AConjunctPredicate) n).getLeft(), list);

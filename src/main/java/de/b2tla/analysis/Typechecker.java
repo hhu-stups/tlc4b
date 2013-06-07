@@ -448,6 +448,13 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	@Override
+	public void caseAAssertionSubstitution(AAssertionSubstitution node) {
+		setType(node.getPredicate(), BoolType.getInstance());
+		node.getPredicate().apply(this);
+		node.getSubstitution().apply(this);
+	}
+
+	@Override
 	public void caseASelectSubstitution(ASelectSubstitution node) {
 		setType(node.getCondition(), BoolType.getInstance());
 		node.getCondition().apply(this);

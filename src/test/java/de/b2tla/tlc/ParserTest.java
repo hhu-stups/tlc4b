@@ -42,6 +42,13 @@ public class ParserTest {
 	}
 
 	@Test
+	public void testModelvalue2() throws Exception {
+		String tla = " x = {a,b}";
+		String b = "x = {a,b}";
+		compareExpr(b, tla);
+	}
+	
+	@Test
 	public void testFunction() throws Exception {
 		String tla = "x = (3 :> TRUE @@ 4 :> TRUE)";
 		String b = "x = { (3,TRUE), (4,TRUE)}";

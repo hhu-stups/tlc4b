@@ -8,6 +8,7 @@ import java.util.List;
 import de.b2tla.exceptions.SubstitutionException;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
+import de.be4.classicalb.core.parser.node.AAssertionSubstitution;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
 import de.be4.classicalb.core.parser.node.ABlockSubstitution;
@@ -150,17 +151,16 @@ class MissingVariablesFinder extends DepthFirstAdapter {
 		expectedVariablesTable.put(node.getThen(), new HashSet<Node>());
 		node.getThen().apply(this);
 	}
-	
-    @Override
-    public void caseALetSubstitution(ALetSubstitution node)
-    {
+
+	@Override
+	public void caseALetSubstitution(ALetSubstitution node) {
 		check(node);
 
-		expectedOutputParametersTable.put(node.getSubstitution(), new HashSet<Node>());
+		expectedOutputParametersTable.put(node.getSubstitution(),
+				new HashSet<Node>());
 		expectedVariablesTable.put(node.getSubstitution(), new HashSet<Node>());
 		node.getSubstitution().apply(this);
-    }
-
+	}
 
 	@Override
 	public void caseAChoiceSubstitution(AChoiceSubstitution node) {
@@ -243,6 +243,15 @@ class MissingVariablesFinder extends DepthFirstAdapter {
 		// HashSet<Node> foundVariables = new HashSet<Node>(foundIdentifiers);
 		// foundVariables.removeAll(expectedOutputParametersTable.get(node));
 
+		expectedOutputParametersTable.put(node.getSubstitution(),
+				expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getSubstitution(),
+				expectedVariablesTable.get(node));
+		node.getSubstitution().apply(this);
+	}
+
+	@Override
+	public void caseAAssertionSubstitution(AAssertionSubstitution node) {
 		expectedOutputParametersTable.put(node.getSubstitution(),
 				expectedOutputParametersTable.get(node));
 		expectedVariablesTable.put(node.getSubstitution(),

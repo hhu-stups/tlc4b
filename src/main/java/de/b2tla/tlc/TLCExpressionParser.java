@@ -36,11 +36,7 @@ public class TLCExpressionParser {
 
 	public void parse() {
 		string = string.replaceAll("\\s", "");
-		try {
-			parsePredicate();
-		} catch (MatchException e) {
-			throw new RuntimeException("Can not parse string: " + string);
-		}
+		parsePredicate();
 	}
 
 	private BType getType(String var) {
@@ -79,8 +75,8 @@ public class TLCExpressionParser {
 			parseFunction(type);
 		} else if (comes("{")) {
 			parseSet(type);
-		}else{
-			throw new RuntimeException("Error: "+ string);
+		} else {
+			throw new RuntimeException("Error: " + string);
 		}
 		return;
 	}
@@ -91,11 +87,11 @@ public class TLCExpressionParser {
 			subtype = ((SetType) type).getSubtype();
 		}
 		replace("{", "{");
-		if(comes("}")){
+		if (comes("}")) {
 			replace("}", "}");
 			return;
 		}
-		parseExpr(type);
+		parseExpr(subtype);
 		while (comes(",")) {
 			replace(",", ",");
 			parseExpr(subtype);
@@ -170,13 +166,13 @@ public class TLCExpressionParser {
 				isSequence = false;
 				first = ((PairType) type).getFirst();
 				second = ((PairType) type).getSecond();
-			}else if (type instanceof SetType){
+			} else if (type instanceof SetType) {
 				isSequence = false;
 				SetType set = (SetType) type;
 				PairType pair = (PairType) set.getSubtype();
 				first = pair.getSecond();
 				second = pair.getSecond();
-			}else {
+			} else {
 				FunctionType f = (FunctionType) type;
 				first = f.getRange();
 				second = f.getRange();
@@ -184,15 +180,16 @@ public class TLCExpressionParser {
 		}
 
 		replace("<<", isSequence ? "[" : "(");
-		try {
+		if (comes(">>")) {
+			replace(">>", isSequence ? "]" : ")");
+			return;
+		}else{
 			parseExpr(first);
 			while (comes(",")) {
 				replace(",", ",");
 				parseExpr(second);
 			}
-		} catch (Exception e) {
 		}
-
 		replace(">>", isSequence ? "]" : ")");
 	}
 
@@ -218,7 +215,7 @@ public class TLCExpressionParser {
 		}
 	}
 
-	class MatchException extends Exception {
+	class MatchException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
 

@@ -33,8 +33,9 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ADisjunctPredicate", 3, 3, true);
 		put("AConjunctPredicate", 3, 3, true);
 		put("AGreaterPredicate", 5, 5, false);
-		//put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
+		// put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
 		put("APreconditionSubstitution", 3, 3, true);
+		put("AAssertionSubstitution", 3, 3, true);
 		put("AUnionExpression", 8, 8, true);
 		put("AIntervalExpression", 9, 9, true);
 		put("AUnionExpression", 8, 8, true);
@@ -47,9 +48,9 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ASetSubtractionExpression", 8, 8, false);
 		put("AExistsPredicate", 1, 1, false);
 		put("AForallPredicate", 1, 1, false);
-		put("AModuloExpression",10, 11, true );
+		put("AModuloExpression", 10, 11, true);
 		put("AConcatExpression", 13, 13, true);
-		
+
 	}
 
 	private Precedence getPrecedence(Node node) {

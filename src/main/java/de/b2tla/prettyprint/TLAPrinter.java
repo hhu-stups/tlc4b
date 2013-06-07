@@ -17,6 +17,7 @@ import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
+import de.b2tla.analysis.nodes.SubsetNode;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
@@ -653,6 +654,16 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		outAPreconditionSubstitution(node);
 	}
+	
+	 @Override
+	    public void caseAAssertionSubstitution(AAssertionSubstitution node)
+	    {
+	        inAAssertionSubstitution(node);
+	        node.getPredicate().apply(this);
+			tlaModuleString.append("\n\t/\\ ");
+			node.getSubstitution().apply(this);
+	        outAAssertionSubstitution(node);
+	    }
 
 	@Override
 	public void caseASelectSubstitution(ASelectSubstitution node) {
@@ -1315,7 +1326,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 			tlaModuleString.append("{");
 			n.getExpression().apply(this);
 			tlaModuleString.append("}");
-		} else {
+		} else if(n instanceof SubsetNode){
+			tlaModuleString.append("SUBSET(");
+			n.getExpression().apply(this);
+			tlaModuleString.append(")");
+		}else{
 			n.getExpression().apply(this);
 		}
 	}

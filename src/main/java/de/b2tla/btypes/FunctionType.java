@@ -105,7 +105,7 @@ public class FunctionType extends AbstractHasFollowers {
 	}
 
 	public String getTlaType() {
-		return "[" + domain + " -> " + range + "]";
+		return "[" + domain.getTlaType() + " -> " + range.getTlaType() + "]";
 	}
 
 	public boolean containsIntegerType() {

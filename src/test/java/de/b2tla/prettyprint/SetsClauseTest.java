@@ -14,7 +14,7 @@ public class SetsClauseTest {
 				+ "CONSTANTS d\n"
 				+ "======";
 		String expectedConfig = "CONSTANTS\n" +
-				"d = {d_1, d_2, d_3}\n";
+				"d = {d1, d2, d3}\n";
 
 		compareConfig(expectedModule, expectedConfig, machine);
 	}

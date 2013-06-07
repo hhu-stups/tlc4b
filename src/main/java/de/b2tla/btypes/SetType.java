@@ -87,7 +87,7 @@ public class SetType extends AbstractHasFollowers {
 	}
 
 	public String getTlaType() {
-		return "SUBSET("+ subtype + ")";
+		return "SUBSET("+ subtype.getTlaType() + ")";
 	}
 
 	public boolean containsIntegerType() {

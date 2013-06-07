@@ -13,7 +13,7 @@ public class DeferredSetSize {
 		String expectedModule = "---- MODULE test----\n"
 				+ "CONSTANTS S\n"
 				+ "======";
-		String expectedConfig = "CONSTANTS S = {S_1, S_2, S_3} "; 
+		String expectedConfig = "CONSTANTS S = {S1, S2, S3} "; 
 		compareConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -28,7 +28,7 @@ public class DeferredSetSize {
 				+ "CONSTANTS S\n"
 				+ "ASSUME Cardinality(S) = 4 \n"
 				+ "======";
-		String expectedConfig = "CONSTANTS S = {S_1, S_2, S_3, S_4} "; 
+		String expectedConfig = "CONSTANTS S = {S1, S2, S3, S4} "; 
 		compareConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -43,7 +43,7 @@ public class DeferredSetSize {
 				+ "CONSTANTS S\n"
 				+ "ASSUME 4 = Cardinality(S) \n"
 				+ "======";
-		String expectedConfig = "CONSTANTS S = {S_1, S_2, S_3, S_4} "; 
+		String expectedConfig = "CONSTANTS S = {S1, S2, S3, S4} "; 
 		compareConfig(expectedModule, expectedConfig, machine);
 	}
 }

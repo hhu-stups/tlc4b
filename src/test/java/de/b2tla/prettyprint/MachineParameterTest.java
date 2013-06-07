@@ -56,7 +56,7 @@ public class MachineParameterTest {
 		String expectedModule = "---- MODULE test----\n" 
 				+ "CONSTANTS AA\n"
 				+ "======";
-		String expectedConfig = "CONSTANTS AA = {AA_1, AA_2, AA_3}";
+		String expectedConfig = "CONSTANTS AA = {AA1, AA2, AA3}";
 		compareConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -71,7 +71,7 @@ public class MachineParameterTest {
 				+ "a == 1\n"
 				+ "ASSUME a = 1 /\\ Cardinality(B) = 2\n"
 				+ "====";
-		String expectedConfig = "CONSTANTS B = {B_1, B_2, B_3}";
+		String expectedConfig = "CONSTANTS B = {B1, B2, B3}";
 		compareConfig(expectedModule, expectedConfig, machine);
 	}
 	

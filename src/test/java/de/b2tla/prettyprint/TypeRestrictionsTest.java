@@ -68,6 +68,17 @@ public class TypeRestrictionsTest {
 	}
 	
 	@Test
+	public void testSubsetEq() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES #x.(x <: {1,2,3} & 1 = 1) \n" + "END";
+		
+		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
+				+ "ASSUME \\E x \\in SUBSET({1, 2, 3}): x \\subseteq {1,2,3} /\\ 1 = 1 \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
 	public void testSetComprehension2VariablesConstant() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "CONSTANTS k \n"

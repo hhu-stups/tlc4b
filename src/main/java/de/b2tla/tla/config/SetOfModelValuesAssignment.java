@@ -46,7 +46,7 @@ public class SetOfModelValuesAssignment extends ConfigFileAssignment{
 		
 		res += conString + " = {";
 		for (int j = 1; j < size + 1; j++) {
-			res += conString +"_" + j;
+			res += conString + j;
 			if (j < size) {
 				res += ", ";
 			}

@@ -15,6 +15,7 @@ import de.b2tla.btypes.IntegerType;
 import de.b2tla.btypes.SetType;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAddExpression;
+import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AClosureExpression;
 import de.be4.classicalb.core.parser.node.ACompositionExpression;
@@ -527,6 +528,16 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public void inAOverwriteExpression(AOverwriteExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
+	}
+
+	public void inAAssignSubstitution(AAssignSubstitution node) {
+		List<PExpression> copy = new ArrayList<PExpression>(node.getLhsExpression());
+        for(PExpression e : copy)
+        {
+        	if (e instanceof AFunctionExpression) {
+        		usedStandardModules.add(STANDARD_MODULES.Relations);
+        	}
+        }
 	}
 
 	public void inADirectProductExpression(ADirectProductExpression node) {

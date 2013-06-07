@@ -106,11 +106,11 @@ public class PairType extends AbstractHasFollowers {
 	}
 
 	public String getTlaType() {
-		String res = first + "*";
+		String res = first.getTlaType() + "*";
 		if (second instanceof PairType) {
-			res += "(" + second + ")";
+			res += "(" + second.getTlaType() + ")";
 		} else
-			res += second;
+			res += second.getTlaType();
 		return res;
 	}
 
