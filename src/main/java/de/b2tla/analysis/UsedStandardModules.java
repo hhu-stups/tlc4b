@@ -127,13 +127,13 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	private Set<STANDARD_MODULES> usedStandardModules;
 	private Typechecker typechecker;
-	private Hashtable<Node, NodeType> restrictedTypesTable;
+	private TypeRestrictor typeRestrictor;
 
 	public UsedStandardModules(Typechecker typechecker,
-			Hashtable<Node, NodeType> restrictedTypesTable) {
+			TypeRestrictor typeRestrictor) {
 		this.usedStandardModules = new HashSet<STANDARD_MODULES>();
 		this.typechecker = typechecker;
-		this.restrictedTypesTable = restrictedTypesTable;
+		this.typeRestrictor = typeRestrictor;
 	}
 
 	class StandardModuleComparator implements Comparator<STANDARD_MODULES> {
@@ -155,91 +155,43 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		return list;
 	}
 
-	private void containsStandardModule(Node node) {
-		if (restrictedTypesTable.containsKey(node)) {
-			return;
-		}
-		// TODO add types beside Integer
-		BType t = typechecker.getType(node);
-
-		if (t instanceof IntegerType) {
-
-			usedStandardModules.add(STANDARD_MODULES.Integers);
-		}
-	}
-
-	@Override
-	public void caseALambdaExpression(ALambdaExpression node) {
-		inALambdaExpression(node);
-		{
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getIdentifiers());
-			for (PExpression e : copy) {
-				containsStandardModule(e);
-				e.apply(this);
-			}
-		}
-		if (node.getPredicate() != null) {
-			node.getPredicate().apply(this);
-		}
-		if (node.getExpression() != null) {
-			node.getExpression().apply(this);
-		}
-		outALambdaExpression(node);
-	}
-
-	@Override
-	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
-		inAComprehensionSetExpression(node);
-		{
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getIdentifiers());
-			for (PExpression e : copy) {
-				containsStandardModule(e);
-				e.apply(this);
-			}
-		}
-		if (node.getPredicates() != null) {
-			node.getPredicates().apply(this);
-		}
-		outAComprehensionSetExpression(node);
-	}
-
 	/**
 	 * Bounded Variables
 	 * 
 	 */
+
+	private void searchForIntegerTypeinTypesOFBoundedVariables(
+			List<PExpression> list) {
+		for (PExpression e : list) {
+			if (typeRestrictor.hasARestrictedType(e)) {
+				continue;
+			}
+			BType t = typechecker.getType(e);
+			if (t.containsIntegerType()) {
+				usedStandardModules.add(STANDARD_MODULES.Integers);
+			}
+		}
+	}
+
 	public void inAForallPredicate(AForallPredicate node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			NodeType n = restrictedTypesTable.get(e);
-			if (n != null)
-				continue;
-			BType t = typechecker.getType(e);
-			if (t.containsIntegerType()) {
-				usedStandardModules.add(STANDARD_MODULES.Integers);
-			}
-		}
-		node.getImplication().apply(this);
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 	}
 
-	@Override
-	public void caseAExistsPredicate(AExistsPredicate node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			NodeType n = restrictedTypesTable.get(e);
-			if (n != null)
-				continue;
-			BType t = typechecker.getType(e);
-			if (t.containsIntegerType()) {
-				usedStandardModules.add(STANDARD_MODULES.Integers);
-			}
-		}
-		node.getPredicate().apply(this);
-	}
+    public void inAExistsPredicate(AExistsPredicate node)
+    {
+    	searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
+    }
 
+    public void inALambdaExpression(ALambdaExpression node)
+    {
+    	searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
+    }
+    
+    public void inAComprehensionSetExpression(AComprehensionSetExpression node)
+    {
+    	searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
+    }
+    
 	/**
 	 * Naturals
 	 */
@@ -357,10 +309,12 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 * BBuiltIns
 	 */
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
@@ -403,10 +357,12 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public void inAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
@@ -531,13 +487,13 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(node.getLhsExpression());
-        for(PExpression e : copy)
-        {
-        	if (e instanceof AFunctionExpression) {
-        		usedStandardModules.add(STANDARD_MODULES.Relations);
-        	}
-        }
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getLhsExpression());
+		for (PExpression e : copy) {
+			if (e instanceof AFunctionExpression) {
+				usedStandardModules.add(STANDARD_MODULES.Relations);
+			}
+		}
 	}
 
 	public void inADirectProductExpression(ADirectProductExpression node) {

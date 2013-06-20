@@ -36,6 +36,6 @@ Union(S) == IF S = {}
 	    ELSE LET e == (CHOOSE e \in S: TRUE)
             	 IN IF  Cardinality(S) = 1 
                	    THEN e 
-                    ELSE e \cup Inter(S \ {e})
+                    ELSE e \cup Union(S \ {e})
 
 =============================================================================

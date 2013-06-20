@@ -174,7 +174,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo(p) == \\E p2 \\in {1} : p = 1 /\\ p2 = 1 /\\ x' = p + p2\n"
+				+ "foo(p) == \\E p2 \\in {1} : TRUE /\\ x' = p + p2\n"
 				+ "Next == \\E p \\in {1} : foo(p)\n"
 				+ "====";
 		compare(expected, machine);

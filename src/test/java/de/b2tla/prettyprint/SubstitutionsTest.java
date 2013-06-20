@@ -17,7 +17,7 @@ public class SubstitutionsTest {
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
 				+ "Inv == x = 1\n"
-				+ "Init == \\E a \\in {1}, b \\in {2} : a = 1 /\\ b = 2	/\\ x = a + b \n"
+				+ "Init == \\E a \\in {1}, b \\in {2} : TRUE /\\ x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);
@@ -35,7 +35,7 @@ public class SubstitutionsTest {
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
-				+ "Init == \\E a \\in {1}, b \\in {2} : a = 1 /\\ b = 2	/\\ x = a + b \n"
+				+ "Init == \\E a \\in {1}, b \\in {2} : TRUE /\\ x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);

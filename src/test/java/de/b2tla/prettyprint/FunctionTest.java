@@ -17,7 +17,19 @@ public class FunctionTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers\n"
-				+ "ASSUME <<1>> = [x \\in { x \\in {1} : x = 1} |-> 1 ]\n"
+				+ "ASSUME <<1>> = [x \\in {1} |-> 1 ]\n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testLambdaAbstraction2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES [1] = %x.(x = 1 & 1 = 1| 1)\n"
+				+ "END";
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Integers\n"
+				+ "ASSUME <<1>> = [x \\in {x \\in {1}: 1=1} |-> 1 ]\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -28,7 +40,7 @@ public class FunctionTest {
 				+ "PROPERTIES 1 = %x.(x = 1 | 1)(1)\n"
 				+ "END";
 		String expected = "---- MODULE test----\n"
-				+ "ASSUME 1 = [x \\in { x \\in {1} : x = 1} |-> 1 ][1]\n"
+				+ "ASSUME 1 = [x \\in {1} |-> 1 ][1]\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -54,7 +66,7 @@ public class FunctionTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers\n"
-				+ "ASSUME {<<1,1>>} = {<<x, 1>> : x \\in { x \\in {1} : x = 1}}\n"
+				+ "ASSUME {<<1,1>>} = {<<x, 1>> : x \\in {1}}\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -77,7 +89,7 @@ public class FunctionTest {
 				+ "PROPERTIES {1} = dom(%x.(x = 1 | 1))\n"
 				+ "END";
 		String expected = "---- MODULE test----\n"
-				+ "ASSUME {1} = DOMAIN [x \\in { x \\in {1} : x = 1} |-> 1 ]\n"
+				+ "ASSUME {1} = DOMAIN [x \\in {1} |-> 1 ]\n"
 				+ "======";
 		compare(expected, machine);
 	}

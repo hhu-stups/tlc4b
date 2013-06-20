@@ -1,7 +1,0 @@
-MACHINE ParseError
-VARIABLES x
-INVARIANT x = 1
-INITIALISATION x := 1
-OPERATIONS
-foo = PRE  {} : {1} +-> {1} THEN x:= 2 END 
-END

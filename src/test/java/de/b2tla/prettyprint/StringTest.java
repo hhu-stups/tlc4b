@@ -23,7 +23,7 @@ public class StringTest {
 				+ "PROPERTIES #x.(x: STRING)" + "END";
 		
 		String expected = "---- MODULE test----\n" 
-				+ "ASSUME \\E x \\in STRING : x \\in STRING \n"
+				+ "ASSUME \\E x \\in STRING : TRUE \n"
 				+ "======";
 		compare(expected, machine);
 	}

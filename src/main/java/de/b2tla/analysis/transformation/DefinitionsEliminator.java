@@ -26,10 +26,7 @@ import de.be4.classicalb.core.parser.node.Start;
  * 
  * Note: All parameters of a definition are replaced before calls of
  * sub-definitions are resolved. This behavior is similar to what ProB does by
- * eliminating of all definitions.
- * 
- * 
- * @author Dominik Hansen <Dominik.Hansen at hhu.de>
+ * eliminatingall definitions.
  * 
  */
 public class DefinitionsEliminator extends DepthFirstAdapter {

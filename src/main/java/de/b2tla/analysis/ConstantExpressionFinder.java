@@ -10,15 +10,20 @@ import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
+import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
+import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
 import de.be4.classicalb.core.parser.node.AOperation;
+import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
+import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
@@ -119,6 +124,33 @@ public class ConstantExpressionFinder extends DepthFirstAdapter {
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		node.getPredicates().apply(this);
+	}
+
+	@Override
+	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
+		List<PDefinition> copy = new ArrayList<PDefinition>(
+				node.getDefinitions());
+		for (PDefinition e : copy) {
+			e.apply(this);
+		}
+	}
+
+	@Override
+	public void caseAPredicateDefinitionDefinition(
+			APredicateDefinitionDefinition node) {
+		node.getRhs().apply(this);
+	}
+
+	@Override
+	public void caseASubstitutionDefinitionDefinition(
+			ASubstitutionDefinitionDefinition node) {
+		node.getRhs().apply(this);
+	}
+
+	@Override
+	public void caseAExpressionDefinitionDefinition(
+			AExpressionDefinitionDefinition node) {
+		node.getRhs().apply(this);
 	}
 
 	@Override

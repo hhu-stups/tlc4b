@@ -5,12 +5,12 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
-
 import de.b2tla.exceptions.ScopeException;
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.ADeferredSetSet;
+import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AMachineHeader;
@@ -18,20 +18,16 @@ import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
-/**
- * 
- * @author Dominik Hansen <Dominik.Hansen at hhu.de>
- * 
- */
 public class MachineDeclarationsCollector extends DepthFirstAdapter {
 
 	private String machineName;
-	private final Start start;
-	
+	private final Node start;
+
 	private final Hashtable<String, Node> machineParameters;
 	private final Hashtable<String, Node> deferredSets;
 	private final Hashtable<String, Node> enumeratedSets;
@@ -42,7 +38,7 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 
 	private final Hashtable<String, AIdentifierExpression> seenMachines;
 
-	public MachineDeclarationsCollector(Start start) {
+	public MachineDeclarationsCollector(Node start) {
 		this.start = start;
 		machineParameters = new Hashtable<String, Node>();
 		deferredSets = new Hashtable<String, Node>();
@@ -56,14 +52,14 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 		start.apply(this);
 	}
 
-	public String getName(){
+	public String getName() {
 		return machineName;
 	}
-	
-	public Start getTree(){
+
+	public Node getStart() {
 		return start;
 	}
-	
+
 	public Hashtable<String, Node> getConstants() {
 		return constants;
 	}
@@ -91,13 +87,11 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 	public Hashtable<String, Node> getMachineParameters() {
 		return machineParameters;
 	}
-	
 
 	public Hashtable<String, AIdentifierExpression> getSeenMachines() {
 		return seenMachines;
 	}
 
-	
 	private void exist(LinkedList<TIdentifierLiteral> list) {
 		String name = Utils.getIdentifierAsString(list);
 		if (constants.containsKey(name) || variables.containsKey(name)
@@ -107,7 +101,7 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 				|| enumValues.containsKey(name)
 				|| machineParameters.containsKey(name)
 				|| seenMachines.containsKey(name)) {
-			throw new ScopeException("Duplicate identifier: '" + name +"'");
+			throw new ScopeException("Duplicate identifier: '" + name + "'");
 		}
 	}
 
@@ -118,13 +112,14 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			AIdentifierExpression p = (AIdentifierExpression) e;
 			String name = Utils.getIdentifierAsString(p.getIdentifier());
-			
+
 			try {
 				exist(p.getIdentifier());
 			} catch (ScopeException e2) {
-				throw new ScopeException("Machine '"+ name+ "' is seen twice." );
+				throw new ScopeException("Machine '" + name
+						+ "' is seen twice.");
 			}
-			
+
 			seenMachines.put(name, p);
 		}
 	}
@@ -135,7 +130,7 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 			List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(
 					node.getName());
 			machineName = Utils.getIdentifierAsString(copy);
-			
+
 		}
 		{
 			List<PExpression> copy = new ArrayList<PExpression>(
@@ -148,7 +143,7 @@ public class MachineDeclarationsCollector extends DepthFirstAdapter {
 			}
 		}
 	}
-
+	
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
 		List<PExpression> copy = new ArrayList<PExpression>(

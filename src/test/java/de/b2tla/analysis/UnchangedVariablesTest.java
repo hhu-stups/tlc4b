@@ -1,4 +1,4 @@
-package de.b2tla.prettyprint;
+package de.b2tla.analysis;
 
 import static de.b2tla.util.TestUtil.compare;
 

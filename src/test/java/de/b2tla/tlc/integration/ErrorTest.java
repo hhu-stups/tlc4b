@@ -30,12 +30,6 @@ public class ErrorTest {
 	}
 	
 	@Test
-	public void testTranslationError() throws Exception {
-		String[] a = new String[] { ".\\src\\test\\resources\\error\\ParseError.mch" };
-		assertEquals(TLCOutput.ERROR.ParseError, B2TLA.test(a));
-	}
-	
-	@Test
 	public void testNoFile() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\error\\NoFile.mch" };
 		assertEquals(null, B2TLA.test(a));

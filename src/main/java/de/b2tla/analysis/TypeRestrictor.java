@@ -39,26 +39,34 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	private MachineContext machineContext;
 	private ConstantExpressionFinder cEF;
 
-	private Hashtable<Node, NodeType> restrictedTypes;
 	private Hashtable<Node, ArrayList<NodeType>> restrictedTypesSet;
-
+	private HashSet<Node> removedNodes;
+	
+	
 	public TypeRestrictor(Start start, MachineContext machineContext,
 			Typechecker typechecker) {
 		this.machineContext = machineContext;
-		restrictedTypes = new Hashtable<Node, NodeType>();
-		restrictedTypesSet = new Hashtable<Node, ArrayList<NodeType>>();
-
+		this.restrictedTypesSet = new Hashtable<Node, ArrayList<NodeType>>();
+		this.removedNodes = new HashSet<Node>();
+		
 		cEF = new ConstantExpressionFinder(start, machineContext);
-	}
 
-	public Hashtable<Node, NodeType> getRestrictedTypes() {
-		return restrictedTypes;
+		start.apply(this);
+
 	}
 
 	public ArrayList<NodeType> getRestrictedTypesSet(Node node) {
 		return restrictedTypesSet.get(node);
 	}
 
+	public boolean hasARestrictedType(Node node) {
+		return restrictedTypesSet.containsKey(node);
+	}
+
+	public boolean removeNode(Node node){
+		return this.removedNodes.contains(node);
+	}
+	
 	private void putRestrictedType(Node identifier, NodeType expression) {
 		ArrayList<NodeType> list = restrictedTypesSet.get(identifier);
 
@@ -69,12 +77,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		} else {
 			list.add(expression);
 		}
-
-		if (restrictedTypes.containsKey(identifier))
-			return;
-
-		restrictedTypes.put(identifier, expression);
-
 	}
 
 	@Override
@@ -106,10 +108,12 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			if (list.contains(r_left) && cEF.isconstant(right)) {
 				EqualsNode setNode = new EqualsNode(right);
 				putRestrictedType(r_left, setNode);
+				removedNodes.add(n);
 			}
 			if (list.contains(r_right) && cEF.isconstant(left)) {
 				EqualsNode setNode = new EqualsNode(left);
 				putRestrictedType(r_right, setNode);
+				removedNodes.add(n);
 			}
 			return;
 		}
@@ -122,13 +126,15 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 			if (list.contains(r_left) && cEF.isconstant(right)) {
 				putRestrictedType(r_left, new ElementOfNode(right));
+				removedNodes.add(n);
 			}
 			if (list.contains(r_right) && cEF.isconstant(left)) {
 				putRestrictedType(r_right, new ElementOfNode(left));
+				removedNodes.add(n);
 			}
 			return;
 		}
-		
+
 		if (n instanceof ASubsetPredicate) {
 			PExpression left = ((ASubsetPredicate) n).getLeft();
 			Node r_left = machineContext.getReferences().get(left);
@@ -136,10 +142,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 			if (list.contains(r_left) && cEF.isconstant(right)) {
 				putRestrictedType(r_left, new SubsetNode(right));
+				removedNodes.add(n);
 			}
 			return;
 		}
-		
 
 		if (n instanceof AConjunctPredicate) {
 			analysePredicate(((AConjunctPredicate) n).getLeft(), list);
@@ -172,11 +178,12 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
-			// e.apply(this);
 			list.add(e);
 		}
 		analysePredicate(node.getPredicate(), list);
-		node.getPredicate().apply(this);
+		if (node.getPredicate() != null) {
+			node.getPredicate().apply(this);
+		}
 	}
 
 	@Override
@@ -313,11 +320,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		node.getWhere().apply(this);
 		node.getThen().apply(this);
 	}
-	
-    @Override
-    public void caseALetSubstitution(ALetSubstitution node)
-    {
-    	HashSet<Node> list = new HashSet<Node>();
+
+	@Override
+	public void caseALetSubstitution(ALetSubstitution node) {
+		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
@@ -328,6 +334,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 		node.getPredicate().apply(this);
 		node.getSubstitution().apply(this);
-    }
-	
+	}
+
 }

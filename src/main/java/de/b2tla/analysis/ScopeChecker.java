@@ -52,7 +52,7 @@ public class ScopeChecker extends DepthFirstAdapter {
 
 	public ScopeChecker(MachineDeclarationsCollector c,
 			Hashtable<String, MachineDeclarationsCollector> table) {
-
+		
 		declarations = c;
 
 		if (table == null)
@@ -62,7 +62,7 @@ public class ScopeChecker extends DepthFirstAdapter {
 
 		referencesTable = new Hashtable<Node, Node>();
 
-		c.getTree().apply(this);
+		c.getStart().apply(this);
 	}
 
 	private void putLocalVariableIntoCurrentScope(AIdentifierExpression node)

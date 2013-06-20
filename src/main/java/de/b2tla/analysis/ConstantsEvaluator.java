@@ -20,6 +20,13 @@ import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 
+/**
+ * In the class the order of constants is determined. Constants can depend on
+ * other constants: as an example in the expression k = k2 + 1 the value of the
+ * constant k depends on k2. Constants are translated as definitions to TLA+ and
+ * these definitions must be in order.
+ * 
+ */
 public class ConstantsEvaluator extends DepthFirstAdapter {
 	private Hashtable<Node, HashSet<Node>> dependsOnIdentifierTable;
 	private MachineContext machineContext;
@@ -63,13 +70,12 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 
 		this.valueOfIdentifier = new LinkedHashMap<Node, Node>();
 
-		
 		evalIdentifier(machineContext.getConstants().values());
-		
+
 		evalIdentifier(machineContext.getScalarParameter().values());
 	}
 
-	private void evalIdentifier(Collection<Node> ids){
+	private void evalIdentifier(Collection<Node> ids) {
 		boolean newRun = true;
 		while (newRun) {
 			newRun = false;
@@ -81,8 +87,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable
 						.get(id);
 				for (Node val : idValues) {
-					HashSet<Node> idsInVal = dependsOnIdentifierTable
-							.get(val);
+					HashSet<Node> idsInVal = dependsOnIdentifierTable.get(val);
 					if (idsInVal.size() == 0) {
 						valueOfIdentifier.put(id, val);
 						removeIdentifier(ids, id);
@@ -94,7 +99,8 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		}
 	}
 
-	private void removeIdentifier(Collection<Node> collection, Node identifierToRemove) {
+	private void removeIdentifier(Collection<Node> collection,
+			Node identifierToRemove) {
 		Iterator<Node> itr = collection.iterator();
 		while (itr.hasNext()) {
 			Node id = itr.next();
@@ -141,7 +147,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				HashSet<Node> set = dependsOnIdentifierTable.get(node);
 				set.add(refNode);
 			}
-			// it must be bounded variable
+			// it must be a bounded variable
 			defaultOut(node);
 		}
 	}
@@ -182,9 +188,9 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				return;
 			} else if (n instanceof AGreaterPredicate) {
 				analyseGreaterPredicate((AGreaterPredicate) n);
-			}else if(n instanceof ALessEqualPredicate){
-				analyseLessEqualPredicate((ALessEqualPredicate)n);
-			}else if (n instanceof AConjunctPredicate) {
+			} else if (n instanceof ALessEqualPredicate) {
+				analyseLessEqualPredicate((ALessEqualPredicate) n);
+			} else if (n instanceof AConjunctPredicate) {
 				analysePredicate(((AConjunctPredicate) n).getLeft());
 				analysePredicate(((AConjunctPredicate) n).getRight());
 				return;

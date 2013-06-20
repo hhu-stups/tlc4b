@@ -1,4 +1,4 @@
-package de.b2tla.prettyprint;
+package de.b2tla.analysis;
 
 import static de.b2tla.util.TestUtil.compare;
 
@@ -16,7 +16,6 @@ public class PrecedenceTest {
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Naturals\n"
 				+ "k == (1 .. 3) \\times (1 .. 3)\n"
-				+ "ASSUME k = (1 .. 3) \\times (1 .. 3)\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -56,6 +55,31 @@ public class PrecedenceTest {
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers\n"
 				+ "ASSUME (1 = 1 /\\ 1 = 1) \\/ 1 = 1 \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	
+	@Test
+	public void testGreaterThan() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES TRUE = bool(2 > 1)\n"
+				+ "END";
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Naturals\n"
+				+ "ASSUME TRUE = (2 > 1)\n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testNatural1() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {1} =  NATURAL - NATURAL1\n"
+				+ "END";
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Naturals\n"
+				+ "ASSUME {1} = Nat \\ (Nat \\ {0})\n"
 				+ "======";
 		compare(expected, machine);
 	}

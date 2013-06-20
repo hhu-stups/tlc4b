@@ -43,7 +43,7 @@ public class MachineParameterTest {
 		String expected = "---- MODULE test----\n" 
 				+ "a == 1\n"
 				+ "b == 2 \n"
-				+ "ASSUME a = 1 /\\ b = 2\n"
+				+ "ASSUME TRUE\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -69,7 +69,7 @@ public class MachineParameterTest {
 				+ "EXTENDS FiniteSets\n"
 				+ "CONSTANTS B\n"
 				+ "a == 1\n"
-				+ "ASSUME a = 1 /\\ Cardinality(B) = 2\n"
+				+ "ASSUME Cardinality(B) = 2\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS B = {B1, B2, B3}";
 		compareConfig(expectedModule, expectedConfig, machine);

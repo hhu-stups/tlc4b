@@ -81,7 +81,7 @@ public class BBuildInsTest {
 				+ "PROPERTIES INTER(z).(z: {1,2} & 1 = 1| {z}) = {} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME Inter({{z}: z \\in {z \\in {1, 2}: z \\in {1, 2} /\\ 1 = 1}}) = {}\n"
+				+ "ASSUME Inter({{z}: z \\in {z \\in {1, 2}: 1 = 1}}) = {}\n"
 				+ "====";
 		compareEquals(expected, machine);
 	}
@@ -106,7 +106,7 @@ public class BBuildInsTest {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES SIGMA(z).(z : {1,2,3}| z) = 6 \n" + "END";
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS BBuiltIns\n"
+				+ "EXTENDS Integers, BBuiltIns\n"
 				+ "ASSUME SIGMA({z : z \\in { z \\in Int : z \\in {1, 2, 3}}}) = 6\n"
 				+ "====";
 		compareEquals(expected, machine);

@@ -14,7 +14,7 @@ public class ExpressionConstantTest {
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME k = 1 /\\ \\A x \\in {k} : x = k => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {k} : x = k => 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -28,7 +28,6 @@ public class ExpressionConstantTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "k2 == 1 \n"
 				+ "k == k2 \n"
-				+ "ASSUME k = k2 /\\ k2 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -51,7 +50,7 @@ public class ExpressionConstantTest {
 		
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers \n"
-				+ "ASSUME \\A x \\in Int, y \\in {1} : x = y /\\ y = 1 => 1 = 1 \n"
+				+ "ASSUME \\A x \\in Int, y \\in {1} : x = y => 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}

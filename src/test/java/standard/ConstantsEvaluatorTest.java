@@ -16,7 +16,6 @@ public class ConstantsEvaluatorTest {
 		String expected = "---- MODULE test----\n"
 				+ "k2 == 1 \n"
 				+ "k == k2 \n"
-				+ "ASSUME k = k2 /\\ k2 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -32,7 +31,6 @@ public class ConstantsEvaluatorTest {
 				+ "k3 == 1 \n"
 				+ "k2 == k3 \n"
 				+ "k == k2 + 1 \n"
-				+ "ASSUME k = k2 + 1 /\\ k2 = k3 /\\ k3 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}

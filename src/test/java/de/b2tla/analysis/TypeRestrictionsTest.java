@@ -1,4 +1,4 @@
-package de.b2tla.prettyprint;
+package de.b2tla.analysis;
 
 import static de.b2tla.util.TestUtil.compare;
 
@@ -14,7 +14,29 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "k == {x \\in {1}: x  = 1} \n"
-				+ "ASSUME k = {x \\in {1}: x = 1} \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	
+	@Test
+	public void testExistentielQuantification() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES #x.(x = 1 & 1 = 1)\n" + "END";
+		
+		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
+				+ "ASSUME \\E x \\in {1}: 1 = 1 \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testExistentielQuantification2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES #x.(x = 1)\n" + "END";
+		
+		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
+				+ "ASSUME \\E x \\in {1}: TRUE \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -26,7 +48,6 @@ public class TypeRestrictionsTest {
 				+ "PROPERTIES k = {x | x : {1,2}}\n" + "END";
 		String expected = "---- MODULE test----\n"
 				+ "k == {x \\in {1,2}: x \\in {1,2}} \n"
-				+ "ASSUME k = {x \\in {1,2}: x \\in {1,2}} \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -38,7 +59,6 @@ public class TypeRestrictionsTest {
 				+ "PROPERTIES k = {x | x : {1,2} & 1 = 1}\n" + "END";
 		String expected = "---- MODULE test----\n"
 				+ "k == {x \\in {1,2}: x \\in {1,2} /\\ 1 = 1} \n"
-				+ "ASSUME k = {x \\in {1,2}: x \\in {1,2} /\\ 1 = 1} \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -51,7 +71,6 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test----\n"
 				+ " k == {<<x, y>> \\in ({1, 2} \\times {1}): x \\in {1, 2} /\\ y = 1} \n"
-				+ "ASSUME k = {<<x, y>> \\in ({1, 2} \\times {1}): x \\in {1, 2} /\\ y = 1} \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -62,7 +81,7 @@ public class TypeRestrictionsTest {
 				+ "PROPERTIES #x,y.(x = 1 & x = y) \n" + "END";
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME \\E x \\in {1}, y \\in Int: x = 1 /\\ x = y \n"
+				+ "ASSUME \\E x \\in {1}, y \\in Int: x = y \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -73,7 +92,7 @@ public class TypeRestrictionsTest {
 				+ "PROPERTIES #x.(x <: {1,2,3} & 1 = 1) \n" + "END";
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME \\E x \\in SUBSET({1, 2, 3}): x \\subseteq {1,2,3} /\\ 1 = 1 \n"
+				+ "ASSUME \\E x \\in SUBSET({1, 2, 3}): 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -86,7 +105,7 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME k = 1 /\\ \\E x \\in {1}, y \\in {k +1}: x = 1 /\\ y = k + 1\n"
+				+ "ASSUME \\E x \\in {1}, y \\in {k +1}: TRUE \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -98,7 +117,7 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME \\E x \\in Int: \\E y \\in {x}: x = 1 /\\ y = x\n"
+				+ "ASSUME \\E x \\in Int: \\E y \\in {x}: x = 1 \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -111,7 +130,7 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME k = 1 /\\ \\A x \\in {k} : x = k => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {k} : x = k => 1 = 1 \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -124,7 +143,7 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME k = 1 /\\ \\A x \\in {k} : x = k => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {k} : x = k => 1 = 1 \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -145,7 +164,6 @@ public class TypeRestrictionsTest {
 				+ "EXTENDS Naturals\n"
 				+ "VARIABLES x \n"
 				+ "k == 1 .. 4\n"
-				+ "ASSUME k = 1 .. 4 \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
 				+ "foo(a) == a \\in k /\\ x' = a\n"
@@ -161,21 +179,22 @@ public class TypeRestrictionsTest {
 				+ "END";
 
 		String expected = "---- MODULE test ----\n"
-				+ "ASSUME \\E x \\in {1} \\cap {2} : x = 1 /\\ x = 2\n"
+				+ "ASSUME \\E x \\in {1} \\cap {2} : TRUE\n"
 				+ "====";
 		compare(expected, machine);
 	}
 	
-	@Ignore
+	
+	
 	@Test
-	public void testExist2Restrictions2() throws Exception {
+	public void testExistDependingVariables() throws Exception {
 		String machine = "MACHINE test\n"
-				+ "SETS ROOM = {r}\n"
-				+ "PROPERTIES #x,y.(x = 1 & (r, x) = y)"
+				+ "PROPERTIES #x,y.(x = 1 & y = x)"
 				+ "END";
 
 		String expected = "---- MODULE test ----\n"
-				+ "ASSUME \\E x \\in {1} \\cap {2} : x = 1 /\\ x = 2\n"
+				+ "EXTENDS Integers \n"
+				+ "ASSUME \\E x \\in {1}, y \\in Int : y = x \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -187,7 +206,7 @@ public class TypeRestrictionsTest {
 				+ "END";
 
 		String expected = "---- MODULE test ----\n"
-				+ "ASSUME \\E x \\in {1} : x = 1 /\\ x = x \n"
+				+ "ASSUME \\E x \\in {1} : x = x \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -206,7 +225,7 @@ public class TypeRestrictionsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo(a) == (a = 1 /\\ a = a)	/\\ x' = 3\n"
+				+ "foo(a) == (a = a)	/\\ x' = 3\n"
 				+ "Next == \\E a \\in {1} : foo(a) \n"
 				+ "====";
 		compare(expected, machine);

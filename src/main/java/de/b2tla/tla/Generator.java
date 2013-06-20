@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.b2tla.Globals;
@@ -18,12 +19,15 @@ import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
+import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
+import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.POperation;
 import de.be4.classicalb.core.parser.node.PPredicate;
@@ -55,8 +59,8 @@ public class Generator extends DepthFirstAdapter {
 		evalSetValuedParameter();
 		evalScalarParameter();
 		evalMachineSets();
-		evalDefinitions();
 		evalConstants();
+		evalDefinitions();
 		evalOperations();
 		evalGoal();
 		machineContext.getTree().apply(this);
@@ -171,11 +175,10 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	private void evalDefinitions() {
-		ADefinitionsMachineClause node = machineContext
-				.getDefinitionMachineClause();
-		if (null != node) {
-			for (Node def : node.getDefinitions()) {
-				this.tlaModule.addBDefinitions(def);
+		ADefinitionsMachineClause node = machineContext.getDefinitionMachineClause();
+		if (node != null) {
+			for (PDefinition def : node.getDefinitions()) {
+				this.tlaModule.addToAllDefinitions(def);
 			}
 		}
 	}
@@ -194,15 +197,23 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	private void evalConstants() {
-		if (machineContext.getConstantsMachineClause() == null)
+		if (machineContext.getPropertiesMachineClause() == null)
 			return;
 		LinkedHashMap<Node, Node> conValueTable = constantsEvaluator
 				.getValueOfIdentifierMap();
 		Iterator<Node> cons = conValueTable.keySet().iterator();
 		while (cons.hasNext()) {
-			Node con = cons.next();
+			AIdentifierExpression con = (AIdentifierExpression) cons.next();
 			Node value = conValueTable.get(con);
 			tlaModule.definitions.add(new TLADefinition(con, value));
+
+			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
+					con.getIdentifier().get(0), new LinkedList<PExpression>(),
+					(PExpression) value.clone());
+			machineContext.getReferences().put(exprDef, con);
+
+			
+			this.tlaModule.addToAllDefinitions(exprDef);
 		}
 
 		ArrayList<Node> vars = new ArrayList<Node>();
@@ -253,10 +264,10 @@ public class Generator extends DepthFirstAdapter {
 	@Override
 	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
 		this.tlaModule.invariant = node.getPredicates();
-		if(Globals.invariant){
-			this.configFile.setInvariant();	
+		if (Globals.invariant) {
+			this.configFile.setInvariant();
 		}
-		
+
 	}
 
 	@Override

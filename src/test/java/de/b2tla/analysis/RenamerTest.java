@@ -1,4 +1,4 @@
-package de.b2tla.prettyprint;
+package de.b2tla.analysis;
 
 import static de.b2tla.util.TestUtil.compare;
 
@@ -14,7 +14,6 @@ public class RenamerTest {
 				+ "PROPERTIES WITH = 1 \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "WITH_1 == 1\n"
-				+ "ASSUME WITH_1 = 1\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -72,7 +71,7 @@ public class RenamerTest {
 	
 	
 	@Test
-	public void testDefinitionHasSameNameAsConstant() throws Exception {
+	public void testDefinitionParameterHasSameNameAsConstant() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "CONSTANTS x\n"
 				+ "DEFINITIONS foo(x) == x  = 1 "
@@ -80,9 +79,8 @@ public class RenamerTest {
 		String expected = "---- MODULE test ----\n"
 				+ "x == 1\n"
 				+ "foo(x_1) == x_1 = 1\n"
-				+ "ASSUME x = 1 /\\ foo(1)\n"
+				+ "ASSUME foo(1)\n"
 				+ "====";
-		System.out.println(expected);
 		compare(expected, machine);
 	}
 	
@@ -93,7 +91,7 @@ public class RenamerTest {
 				+ "PROPERTIES x = 1 & #x.(x = 1) \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "x == 1\n"
-				+ "ASSUME x = 1 /\\ (\\E x_1 \\in {1} : x_1 = 1)\n"
+				+ "ASSUME (\\E x_1 \\in {1} : TRUE)\n"
 				+ "====";
 		compare(expected, machine);
 	}

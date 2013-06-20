@@ -172,6 +172,19 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	 */
 
 	@Override
+	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
+			List<PDefinition> copy = new ArrayList<PDefinition>(
+					node.getDefinitions());
+			for (PDefinition e : copy) {
+				setType(e, new UntypedType());
+			}
+			
+			for (PDefinition e : copy) {
+				e.apply(this);
+			}
+	}
+	
+	@Override
 	// d(a) == 1
 	public void caseAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
@@ -181,9 +194,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			UntypedType u = new UntypedType();
 			setType(e, u);
 		}
-		UntypedType u = new UntypedType();
-		setType(node, u);
-		setType(node.getRhs(), u);
+		setType(node.getRhs(), getType(node));
 		node.getRhs().apply(this);
 	}
 
@@ -264,6 +275,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			}
 		}
 	}
+
 
 	@Override
 	public void caseAPropertiesMachineClause(final APropertiesMachineClause node) {

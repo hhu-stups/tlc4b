@@ -50,7 +50,7 @@ public class TLCOutputInfo {
 		for (Iterator<String> iter = identifiers.keySet().iterator(); iter.hasNext();) {
 			String name = iter.next();
 			Node node = identifiers.get(name);
-			String newName = renamer.getName(node);
+			String newName = renamer.getNameOfRef(node);
 			namesMapping.put(newName, name);
 			typesTable.put(newName, types.get(node));
 		}

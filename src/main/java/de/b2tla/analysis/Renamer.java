@@ -1,7 +1,6 @@
 package de.b2tla.analysis;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -12,6 +11,7 @@ import java.util.Set;
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
+import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
@@ -25,6 +25,7 @@ import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
 import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 
 public class Renamer extends DepthFirstAdapter {
@@ -63,7 +64,7 @@ public class Renamer extends DepthFirstAdapter {
 		KEYWORDS.add("WF_");
 		KEYWORDS.add("WITH");
 		KEYWORDS.add("STATE");
-		
+
 		KEYWORDS.add("Init");
 		KEYWORDS.add("Next");
 		KEYWORDS.add("INVARIANT");
@@ -117,7 +118,35 @@ public class Renamer extends DepthFirstAdapter {
 		eval(machineContext.getConstants());
 		eval(machineContext.getVariables());
 		eval(machineContext.getOperations());
+		evalDefinitions();
 		machineContext.getTree().apply(this);
+	}
+
+	private void evalDefinitions() {
+		ADefinitionsMachineClause node = machineContext.getDefinitionMachineClause();
+		if (null == node){
+			return;
+		}
+		
+		List<PDefinition> copy = new ArrayList<PDefinition>(
+				node.getDefinitions());
+		for (PDefinition e : copy) {
+			String name = null;
+			if (e instanceof AExpressionDefinitionDefinition){
+				name = ((AExpressionDefinitionDefinition) e).getName().getText();
+			}else if (e instanceof APredicateDefinitionDefinition){
+				name = ((APredicateDefinitionDefinition) e).getName().getText();
+			}else if (e instanceof ASubstitutionDefinitionDefinition){
+				name = ((ASubstitutionDefinitionDefinition) e).getName().getText();
+			}
+			String newName = incName(name);
+			namesTable.put(e, newName);
+			globalNames.add(newName);
+		}
+		
+		for (PDefinition e : copy) {
+			e.apply(this);
+		}
 	}
 
 	public void eval(LinkedHashMap<String, Node> map) {
@@ -130,7 +159,7 @@ public class Renamer extends DepthFirstAdapter {
 		}
 	}
 
-	public String getName(Node node) {
+	public String getNameOfRef(Node node) {
 		Node refNode = machineContext.getReferences().get(node);
 		if (refNode == null) {
 			refNode = node;
@@ -138,12 +167,8 @@ public class Renamer extends DepthFirstAdapter {
 		return namesTable.get(refNode);
 	}
 
-	private String getName(String name) {
-		String res = name;
-		for (int i = 1; KEYWORDS.contains(res); i++) {
-			res = name + "_" + i;
-		}
-		return res;
+	public String getName(Node node) {
+		return namesTable.get(node);
 	}
 
 	private String incName(String name) {
@@ -172,9 +197,7 @@ public class Renamer extends DepthFirstAdapter {
 		namesTable.put(id, newName);
 	}
 
-	private void evalDefinition(Node node, String name, List<PExpression> params) {
-		String newName = incName(name);
-		namesTable.put(node, newName);
+	private void evalDefinition(List<PExpression> params) {
 		for (PExpression e : params) {
 			renameIdentifier(e);
 		}
@@ -183,19 +206,19 @@ public class Renamer extends DepthFirstAdapter {
 	@Override
 	public void inAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
-		evalDefinition(node, node.getName().getText(), node.getParameters());
+		evalDefinition(node.getParameters());
 	}
 
 	@Override
 	public void inAPredicateDefinitionDefinition(
 			APredicateDefinitionDefinition node) {
-		evalDefinition(node, node.getName().getText(), node.getParameters());
+		evalDefinition(node.getParameters());
 	}
 
 	@Override
 	public void inASubstitutionDefinitionDefinition(
 			ASubstitutionDefinitionDefinition node) {
-		evalDefinition(node, node.getName().getText(), node.getParameters());
+		evalDefinition(node.getParameters());
 	}
 
 	public void inAForallPredicate(AForallPredicate node) {

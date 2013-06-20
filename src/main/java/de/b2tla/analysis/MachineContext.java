@@ -62,6 +62,7 @@ import de.be4.classicalb.core.parser.node.POperation;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.PSet;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.node.TDefLiteralPredicate;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class MachineContext extends DepthFirstAdapter {
@@ -85,6 +86,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private final LinkedHashMap<String, AIdentifierExpression> seenMachines;
 
 	// machine clauses
+	private AAbstractMachineParseUnit abstractMachineParseUnit;
 	private AConstraintsMachineClause constraintMachineClause;
 	private ASeesMachineClause seesMachineClause;
 	private ASetsContextClause setsMachineClause; // TODO
@@ -165,22 +167,21 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAbstractMachineParseUnit(AAbstractMachineParseUnit node) {
+		this.abstractMachineParseUnit = node;
 		if (node.getVariant() != null) {
 			node.getVariant().apply(this);
 		}
 		if (node.getHeader() != null) {
 			node.getHeader().apply(this);
 		}
-		{
-			List<PMachineClause> copy = new ArrayList<PMachineClause>(
-					node.getMachineClauses());
-			PMachineClauseComparator comperator = new PMachineClauseComparator();
-			// Sort the machine clauses: declarations clauses first, then
-			// properties clauses
-			Collections.sort(copy, comperator);
-			for (PMachineClause e : copy) {
-				e.apply(this);
-			}
+		List<PMachineClause> copy = new ArrayList<PMachineClause>(
+				node.getMachineClauses());
+		PMachineClauseComparator comperator = new PMachineClauseComparator();
+		// Sort the machine clauses: declarations clauses first, then
+		// properties clauses
+		Collections.sort(copy, comperator);
+		for (PMachineClause e : copy) {
+			e.apply(this);
 		}
 	}
 
@@ -215,8 +216,25 @@ public class MachineContext extends DepthFirstAdapter {
 		List<PDefinition> copy = new ArrayList<PDefinition>(
 				node.getDefinitions());
 
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		/*
+		 * The definitions are not in a predefined order. In particular
+		 * definitions can depend on each other. First all definitions are added
+		 * to the definitions context table. Then all definitions are visited.
+		 */
+		for (PDefinition e : copy) {
+			if (e instanceof AExpressionDefinitionDefinition) {
+				evalDefinitionName(((AExpressionDefinitionDefinition) e)
+						.getName().getText().toString(), e);
+			} else if (e instanceof APredicateDefinitionDefinition) {
+				evalDefinitionName(((APredicateDefinitionDefinition) e)
+						.getName().getText().toString(), e);
+			} else if (e instanceof ASubstitutionDefinitionDefinition) {
+				evalDefinitionName(((ASubstitutionDefinitionDefinition) e)
+						.getName().getText().toString(), e);
+			}
+		}
 
+		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 		ArrayList<MachineContext> list = lookupExtendedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
@@ -231,6 +249,14 @@ public class MachineContext extends DepthFirstAdapter {
 		for (PDefinition e : copy) {
 			e.apply(this);
 		}
+	}
+
+	private void evalDefinitionName(String name, Node node) {
+		if (name.equals("ASSERT_LTL")) {
+			return;
+		}
+		existString(name);
+		definitions.put(name, node);
 	}
 
 	@Override
@@ -258,12 +284,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	public void visitBDefinition(Node node, String name,
 			List<PExpression> copy, Node rightSide) {
-		if (name.equals("ASSERT_LTL")) {
+		if (!this.definitions.containsValue(node)) {
 			return;
 		}
-
-		existString(name);
-		definitions.put(name, node);
 
 		contextTable.add(new LinkedHashMap<String, Node>());
 		for (PExpression e : copy) {
@@ -901,6 +924,10 @@ public class MachineContext extends DepthFirstAdapter {
 	 * machine clauses getter
 	 */
 
+	public AAbstractMachineParseUnit getAbstractMachineParseUnit(){
+		return abstractMachineParseUnit;
+	}
+	
 	public AConstraintsMachineClause getConstraintMachineClause() {
 		return constraintMachineClause;
 	}
@@ -919,6 +946,10 @@ public class MachineContext extends DepthFirstAdapter {
 
 	public APropertiesMachineClause getPropertiesMachineClause() {
 		return propertiesMachineClause;
+	}
+	
+	public void setPropertiesMachineClaus(APropertiesMachineClause propertiesMachineClause){
+		this.propertiesMachineClause = propertiesMachineClause;
 	}
 
 	public AVariablesMachineClause getVariablesMachineClause() {
@@ -939,6 +970,10 @@ public class MachineContext extends DepthFirstAdapter {
 
 	public ADefinitionsMachineClause getDefinitionMachineClause() {
 		return definitionMachineClause;
+	}
+	
+	public void setDefinitionsMachineClause(ADefinitionsMachineClause definitionMachineClause){
+		this.definitionMachineClause = definitionMachineClause;
 	}
 
 }
