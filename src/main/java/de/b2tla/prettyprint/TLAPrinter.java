@@ -1509,7 +1509,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			node.getRight().apply(this);
 			tlaModuleString.append("]");
 		} else {
-			if (node.parent() instanceof AMemberPredicate) {
+			if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
 				tlaModuleString.append(REL_TOTAL_FUNCTION_ELEMENT_OF);
 			} else {
 				tlaModuleString.append(REL_TOTAL_FUNCTION);
@@ -1529,7 +1529,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (subtype instanceof FunctionType) {
 			tlaModuleString.append(funcName);
 		} else {
-			if (node.parent() instanceof AMemberPredicate) {
+			if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
 				tlaModuleString.append(relEleOfName);
 			} else {
 				tlaModuleString.append(relName);
@@ -2146,7 +2146,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIseqExpression(AIseqExpression node) {
-		if (node.parent() instanceof AMemberPredicate) {
+		if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
 			tlaModuleString.append(INJECTIVE_SEQUENCE_ELEMENT_OF);
 		} else {
 			tlaModuleString.append(INJECTIVE_SEQUENCE);
@@ -2158,7 +2158,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIseq1Expression(AIseq1Expression node) {
-		if (node.parent() instanceof AMemberPredicate) {
+		if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
 			tlaModuleString.append(INJECTIVE_SEQUENCE_1_ELEMENT_OF);
 		} else {
 			tlaModuleString.append(INJECTIVE_SEQUENCE_1);

@@ -8,6 +8,6 @@ public class Globals {
 	public static boolean translate = true;
 	public static boolean invariant = true;
 	public static boolean tool = false;
-	public static boolean deleteOnExit = true;
+	public static boolean deleteOnExit = false;
 	
 }
