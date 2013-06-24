@@ -150,6 +150,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 		for (String key : constants.keySet()) {
 			if (constants.get(key) == id) {
 				constantName = key;
+				break;
 			}
 		}
 		constants.remove(constantName);
@@ -169,6 +170,12 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			Node parentParent = conjunction.parent();
 			if (parentParent instanceof APropertiesMachineClause) {
 				((APropertiesMachineClause) parentParent).setPredicates(other);
+			}else if (parentParent instanceof AConjunctPredicate){
+				if (((AConjunctPredicate) parentParent).getLeft() == parent){
+					((AConjunctPredicate) parentParent).setLeft(other);
+				}else{
+					((AConjunctPredicate) parentParent).setRight(other);
+				}
 			}
 		} else if (parent instanceof APropertiesMachineClause) {
 			machineContext.setPropertiesMachineClaus(null);

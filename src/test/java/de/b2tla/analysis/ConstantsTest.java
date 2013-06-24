@@ -103,4 +103,19 @@ public class ConstantsTest {
 		compare(expected, machine);
 	}
 	
+	
+	@Test
+	public void testConstants2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS N \n" 
+				+ "PROPERTIES N <: NATURAL & N={1,2,3,4}\n"
+				+ "END";
+		
+		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
+				+ "N == {1,2,3,4}\n"
+				+ "ASSUME N \\subseteq Nat \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
 }

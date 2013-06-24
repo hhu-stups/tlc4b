@@ -238,6 +238,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			PExpression left = node.getLeft();
 			Node left_ref = machineContext.getReferences().get(left);
 			PExpression right = node.getRight();
+			System.out.println(node.getStartPos());
 			Node right_ref = machineContext.getReferences().get(right);
 
 			if (left instanceof ACardExpression) {
