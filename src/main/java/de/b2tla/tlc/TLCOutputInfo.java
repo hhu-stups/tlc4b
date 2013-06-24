@@ -15,6 +15,7 @@ public class TLCOutputInfo {
 	Hashtable<String, String> namesMapping;
 	Hashtable<String, BType> typesTable;
 	Set<String> constants;
+	boolean constantSetup= false;
 	
 	public String getBName(String tlaName){
 		return namesMapping.get(tlaName);
@@ -28,12 +29,16 @@ public class TLCOutputInfo {
 		return typesTable;
 	}
 	
+	public void setConstantSetup(){
+		this.constantSetup = true;
+	}
+	
 	public boolean isAConstant(String tlaName){
 		return constants.contains(getBName(tlaName));
 	}
 	
 	public boolean hasConstants(){
-		return constants.size()>0;
+		return constants.size()>0 || constantSetup;
 	}
 	
 	public TLCOutputInfo(MachineContext machineContext, Renamer renamer,
@@ -42,6 +47,10 @@ public class TLCOutputInfo {
 		namesMapping = new Hashtable<String, String>();
 		typesTable = new Hashtable<String, BType>();
 		constants = machineContext.getConstants().keySet();
+		
+		if(machineContext.getConstantsMachineClause() != null){
+			this.constantSetup = true;
+		}
 		
 		LinkedHashMap<String, Node> identifiers = new LinkedHashMap<String, Node>();
 		identifiers.putAll(machineContext.getConstants());
