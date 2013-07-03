@@ -2,10 +2,18 @@
 
 EXTENDS Integers, FiniteSets, TLC
 
-RECURSIVE SIGMA(_) 
-SIGMA(S) == LET e == CHOOSE e \in S: TRUE
-            IN IF  S = {} THEN 0 ELSE e + SIGMA(S \ {e}) 
-            
+RECURSIVE Sigma(_) 
+Sigma(S) == LET e == CHOOSE e \in S: TRUE
+            IN IF  S = {} THEN 0 ELSE e + Sigma(S \ {e}) 
+
+RECURSIVE Pi(_) 
+Pi(S) == LET e == CHOOSE e \in S: TRUE
+         IN IF  S = {} THEN 0 ELSE e + Pi(S \ {e}) 
+
+Max == CHOOSE x \in {1} : \A p \in {1} : x >= p
+
+Min == CHOOSE x \in {1} : \A p \in {1} : x =< p
+
 succ[x \in Int] == x + 1
 
 pred[x \in Int] == x - 1

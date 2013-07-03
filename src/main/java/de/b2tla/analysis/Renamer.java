@@ -179,6 +179,8 @@ public class Renamer extends DepthFirstAdapter {
 		return res;
 	}
 
+	private ArrayList<HashSet<String>> localContexts = new ArrayList<HashSet<String>>();
+	
 	private boolean exist(String name) {
 		if (KEYWORDS.contains(name))
 			return true;
@@ -186,15 +188,21 @@ public class Renamer extends DepthFirstAdapter {
 			return true;
 		if (SequencesKeywords.contains(name))
 			return true;
+		
+		for (int i = 0; i < localContexts.size(); i++) {
+			if(localContexts.get(i).contains(name))
+				return true;
+		}
 
 		return false;
 	}
 
-	private void renameIdentifier(Node node) {
+	private String renameIdentifier(Node node) {
 		AIdentifierExpression id = (AIdentifierExpression) node;
 		String name = Utils.getIdentifierAsString(id.getIdentifier());
 		String newName = incName(name);
 		namesTable.put(id, newName);
+		return newName;
 	}
 
 	private void evalDefinition(List<PExpression> params) {
@@ -221,20 +229,39 @@ public class Renamer extends DepthFirstAdapter {
 		evalDefinition(node.getParameters());
 	}
 
+	
+	// local variables
+	
 	public void inAForallPredicate(AForallPredicate node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+	}
+	
+	public void outAForallPredicate(AForallPredicate node) {
+		removeLastContext();
 	}
 
 	public void inAExistsPredicate(AExistsPredicate node) {
 		evalBoundedVariables(node, node.getIdentifiers());
 	}
-
+	
+	public void outAExistsPredicate(AExistsPredicate node) {
+		removeLastContext();
+	}
+	
 	public void inALambdaExpression(ALambdaExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+	}
+	
+	public void outALambdaExpression(ALambdaExpression node) {
+		removeLastContext();
 	}
 
 	public void inAComprehensionSetExpression(AComprehensionSetExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+	}
+	
+	public void outAComprehensionSetExpression(AComprehensionSetExpression node) {
+		removeLastContext();
 	}
 
 	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
@@ -247,7 +274,6 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
-
 		evalBoundedVariables(node, node.getIdentifiers());
 	}
 
@@ -261,9 +287,16 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private void evalBoundedVariables(Node node, List<PExpression> params) {
+		HashSet<String> context = new HashSet<String>();
 		for (PExpression e : params) {
-			renameIdentifier(e);
+			String newName = renameIdentifier(e);
+			context.add(newName);
 		}
+		localContexts.add(context);
 	}
 
+	public void removeLastContext(){
+		localContexts.remove(localContexts.size()-1);
+	}
+	
 }

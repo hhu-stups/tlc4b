@@ -41,6 +41,10 @@ public class TLCOutput {
 		parseTrace();
 		return trace;
 	}
+	
+	public String getModuleName(){
+		return moduleName;
+	}
 
 	public boolean hasTrace() {
 		return states.size() > 0;

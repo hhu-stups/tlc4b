@@ -85,71 +85,100 @@ public class BBuildInsTest {
 				+ "====";
 		compareEquals(expected, machine);
 	}
-	
-	@Ignore
-	@Test
-	public void testPartialFunction() throws Exception {
-		String machine = "MACHINE test\n" + "CONSTANTS k\n"
-				+ "PROPERTIES k = {1,2} +-> {1,2}\n" + "END";
-		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS Integers\n"
-				+ "CONSTANTS k\n"
-				+ "ASSUME k = [<<a, b>> \\in { <<a, b>> \\in (Int \\times Int) : a = b} |-> a + b][2, 2]\n"
-				+ "====";
-		// TODO partial function
-		compare(expected, machine);
-	}
 
-	// TODO include Standard module BBuiltIns
 	@Test
 	public void testSigma() throws Exception {
 		String machine = "MACHINE test\n"
-				+ "PROPERTIES SIGMA(z).(z : {1,2,3}| z) = 6 \n" + "END";
+				+ "PROPERTIES SIGMA(z).(z : {1,2,3}| z+z) = 12 \n" + "END";
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS Integers, BBuiltIns\n"
-				+ "ASSUME SIGMA({z : z \\in { z \\in Int : z \\in {1, 2, 3}}}) = 6\n"
+				+ "EXTENDS Naturals, BBuiltIns\n"
+				+ "ASSUME Sigma({z + z : z \\in {1, 2, 3}}) = 12\n"
+				+ "====";
+		compareEquals(expected, machine);
+	}
+	
+	@Test
+	public void testSigma2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES SIGMA(z).(z : {1,2,3} & 1=1| z+z) = 12\n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals, BBuiltIns\n"
+				+ "ASSUME Sigma({z + z : z \\in {z \\in {1, 2, 3} : 1 = 1}}) = 12\n"
 				+ "====";
 		compareEquals(expected, machine);
 	}
 
-	@Ignore
 	@Test
-	public void testPI() throws Exception {
+	public void testPi() throws Exception {
 		String machine = "MACHINE test\n"
-				+ "PROPERTIES PI(z).(z : {1,2,3}| z) = 6 \n" + "END";
-		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME PI() = 1\n" + "======";
-		compare(expected, machine);
+				+ "PROPERTIES PI(z).(z : {1,2,3}| z+z) = 12 \n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals, BBuiltIns\n"
+				+ "ASSUME Pi({z + z : z \\in {1, 2, 3}}) = 12\n"
+				+ "====";
+		compareEquals(expected, machine);
 	}
-
-	@Ignore
+	
 	@Test
-	public void testSucc() throws Exception {
-		String machine = "MACHINE test\n" + "PROPERTIES succ(3) = 4 \n" + "END";
-		String expected = "---- MODULE test----\n" + "EXTENDS BBuiltIns\n"
-				+ "ASSUME succ(3) = 4\n" + "======";
+	public void testPi2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES PI(z).(z : {1,2,3} & 1=1| z+z) = 12\n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals, BBuiltIns\n"
+				+ "ASSUME Pi({z + z : z \\in {z \\in {1, 2, 3} : 1 = 1}}) = 12\n"
+				+ "====";
 		compareEquals(expected, machine);
 	}
 
-	@Ignore
+	@Test
+	public void testSucc() throws Exception {
+		String machine = "MACHINE test\n" + "PROPERTIES succ(3) = 4 \n" + "END";
+		String expected = "---- MODULE test ----\n" + "EXTENDS BBuiltIns\n"
+				+ "ASSUME succ[3] = 4\n" + "====";
+		compareEquals(expected, machine);
+	}
+
 	@Test
 	public void testPred() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES pred(2) = 1 \n" + "END";
-		String expected = "---- MODULE test----\n" + "EXTENDS BBuiltIns\n"
-				+ "ASSUME pred(2) = 1\n" + "======";
+		String expected = "---- MODULE test ----\n" + "EXTENDS BBuiltIns\n"
+				+ "ASSUME pred[2] = 1\n" + "====";
+		compareEquals(expected, machine);
+	}
+
+	@Test
+	public void testMin() throws Exception {
+		String machine = "MACHINE test\n" + "PROPERTIES min({1}) = 1 \n" + "END";
+		String expected = "---- MODULE test ----\n" + "EXTENDS BBuiltIns\n"
+				+ "ASSUME Min({1}) = 1\n" + "====";
+		compareEquals(expected, machine);
+	}
+	
+	@Test
+	public void testMax() throws Exception {
+		String machine = "MACHINE test\n" + "PROPERTIES max({1}) = 1 \n" + "END";
+		String expected = "---- MODULE test ----\n" + "EXTENDS BBuiltIns\n"
+				+ "ASSUME Max({1}) = 1\n" + "====";
+		compareEquals(expected, machine);
+	}
+	
+	@Test
+	public void testMaxInt() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "PROPERTIES MAXINT = MAXINT \n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "ASSUME 4 = 4\n" + "====";
 		compare(expected, machine);
 	}
 
-	@Ignore
 	@Test
 	public void testMinInt() throws Exception {
-		// TODO read MinInt and MaxInt from Configuration file
+		String machine = "MACHINE test\n" 
+				+ "PROPERTIES MININT = MININT \n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Integers\n"
+				+ "ASSUME -1 = -1\n" + "====";
+		compare(expected, machine);
 	}
-
-	@Ignore
-	@Test
-	public void testMaxInt() throws Exception {
-
-	}
-
+	
 }

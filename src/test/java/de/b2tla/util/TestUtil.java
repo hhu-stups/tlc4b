@@ -43,6 +43,17 @@ public class TestUtil {
 		}
 		// assertEquals(sb2.toString(), sb1.toString());
 	}
+	
+	public static void checkMachine(String machine)
+			throws Exception {
+		B2TlaTranslator b2tlaTranslator = new B2TlaTranslator(machine);
+		b2tlaTranslator.translate();
+		System.out.println(b2tlaTranslator.getModuleString());
+
+		String name = b2tlaTranslator.getMachineName();
+		de.tla2b.translation.Tla2BTranslator
+				.translateString(name, b2tlaTranslator.getModuleString(), null);
+	}
 
 	public static void print(Start start) {
 		final Ast2String ast2String2 = new Ast2String();

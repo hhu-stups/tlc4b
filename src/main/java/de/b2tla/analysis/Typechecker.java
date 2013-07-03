@@ -173,17 +173,17 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
-			List<PDefinition> copy = new ArrayList<PDefinition>(
-					node.getDefinitions());
-			for (PDefinition e : copy) {
-				setType(e, new UntypedType());
-			}
-			
-			for (PDefinition e : copy) {
-				e.apply(this);
-			}
+		List<PDefinition> copy = new ArrayList<PDefinition>(
+				node.getDefinitions());
+		for (PDefinition e : copy) {
+			setType(e, new UntypedType());
+		}
+
+		for (PDefinition e : copy) {
+			e.apply(this);
+		}
 	}
-	
+
 	@Override
 	// d(a) == 1
 	public void caseAExpressionDefinitionDefinition(
@@ -275,7 +275,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			}
 		}
 	}
-
 
 	@Override
 	public void caseAPropertiesMachineClause(final APropertiesMachineClause node) {
@@ -679,22 +678,12 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	@Override
 	public void caseAMaxIntExpression(AMaxIntExpression node) {
-		try {
-			IntegerType.getInstance().unify(getType(node), this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'INTEGER' in 'MAXINT'");
-		}
+		unify(getType(node), IntegerType.getInstance(), node);
 	}
 
 	@Override
 	public void caseAMinIntExpression(AMinIntExpression node) {
-		try {
-			IntegerType.getInstance().unify(getType(node), this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'INTEGER' in 'MININT'");
-		}
+		unify(getType(node), IntegerType.getInstance(), node);
 	}
 
 	@Override
@@ -913,26 +902,16 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	@Override
 	public void caseASuccessorExpression(ASuccessorExpression node) {
-		SetType found = new SetType(new PairType(IntegerType.getInstance(),
-				IntegerType.getInstance()));
-		try {
-			found.unify(getType(node), this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'POW(INTEGER*INTEGER)' in ' succ '");
-		}
+		FunctionType found = new FunctionType(IntegerType.getInstance(),
+				IntegerType.getInstance());
+		unify(getType(node), found, node);
 	}
 
 	@Override
 	public void caseAPredecessorExpression(APredecessorExpression node) {
-		SetType found = new SetType(new PairType(IntegerType.getInstance(),
-				IntegerType.getInstance()));
-		try {
-			found.unify(getType(node), this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'POW(INTEGER*INTEGER)' in ' pred '");
-		}
+		FunctionType found = new FunctionType(IntegerType.getInstance(),
+				IntegerType.getInstance());
+		unify(getType(node), found, node);
 	}
 
 	@Override

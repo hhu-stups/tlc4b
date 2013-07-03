@@ -1,8 +1,8 @@
 package de.b2tla.analysis;
 
 import static de.b2tla.util.TestUtil.compare;
+import static de.b2tla.util.TestUtil.compareEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.b2tla.exceptions.SubstitutionException;
@@ -40,9 +40,8 @@ public class UnchangedVariablesTest {
 	}
 	
 	
-	@Ignore
 	@Test
-	public void testFunction() throws Exception {
+	public void testFunctionAssignment() throws Exception {
 		String machine = "MACHINE test\n" 
 				+ "VARIABLES x\n"
 				+ "INVARIANT x = %p.(p: {1}| 1)\n" 
@@ -51,15 +50,33 @@ public class UnchangedVariablesTest {
 				+ "END";
 
 		String expected = "---- MODULE test ----\n"
-				+ "VARIABLES x, y \n"
-				+ "Inv == x = 1 /\\ y = 1\n"
-				+ "Init == x = 1 /\\ y = 1\n"
-				+ "foo ==  IF x = 1 THEN x' = 2 /\\ UNCHANGED <<y>> ELSE y' = 2 /\\ UNCHANGED <<x>>\n"
+				+ "VARIABLES x \n"
+				+ "Invariant == x = [p \\in {1} |-> 1] \n"
+				+ "Init == x = [p \\in {1} |-> 1] \n"
+				+ "foo ==  x' = [x EXCEPT ![1] = 2] \n"
 				+ "Next == foo\n" + "====";
 		compare(expected, machine);
 	}
 	
-	@Ignore
+	@Test
+	public void testRelationAssignment() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES x\n"
+				+ "INVARIANT x = {(1,2)}\n" 
+				+ "INITIALISATION x := {(1,2)}\n"
+				+ "OPERATIONS foo = x(1):= 2 \n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Relations\n"
+				+ "VARIABLES x\n"
+				+ "Invariant == x = {<<1, 2>>}\n"
+				+ "Init == x = {<<1, 2>>}\n"
+				+ "foo == x' = RelOverride(x, {<<1, 2>>})\n\n"
+				+ "Next == \\/ foo\n" + "====";
+		compareEquals(expected, machine);
+	}
+	
 	@Test
 	public void testIfThenElse() throws Exception {
 		String machine = "MACHINE test\n" + "VARIABLES x,y\n"
@@ -76,7 +93,6 @@ public class UnchangedVariablesTest {
 		compare(expected, machine);
 	}
 	
-	@Ignore
 	@Test
 	public void testChoice() throws Exception {
 		String machine = "MACHINE test\n" + "VARIABLES x,y\n"

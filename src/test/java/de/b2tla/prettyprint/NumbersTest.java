@@ -142,31 +142,6 @@ public class NumbersTest {
 	}
 	
 	@Test
-	public void testMin() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "PROPERTIES 1 = min({1,2,3})\n"
-				+ "END";
-		String expected = "---- MODULE test----\n"
-				+ "EXTENDS Naturals \n"
-				+ "ASSUME 1 = CHOOSE min \\in {1,2,3}: \\A p \\in {1,2,3}: min =< p \n"
-				+ "======";
-		compare(expected, machine);
-	}
-	
-	@Test
-	public void testMax() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "PROPERTIES 3 = max({1,2,3})\n"
-				+ "END";
-		String expected = "---- MODULE test----\n"
-				+ "EXTENDS Naturals \n"
-				+ "ASSUME 3 = CHOOSE max \\in {1,2,3}: \\A p \\in {1,2,3}: max >= p \n"
-				+ "======";
-		compare(expected, machine);
-	}
-	
-	
-	@Test
 	public void testAdd() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES 2 = 1 + 1\n"

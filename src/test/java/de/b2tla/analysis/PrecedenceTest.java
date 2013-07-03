@@ -47,6 +47,19 @@ public class PrecedenceTest {
 	}
 	
 	@Test
+	public void testMult() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "PROPERTIES 1 * 2 * 3 = 6 \n"
+				+ "END";
+		
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Integers\n"
+				+ "ASSUME 1 * 2 * 3 = 6\n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
 	public void testAndOr() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES 1 = 1 & 1 = 1 or 1 = 1 \n"

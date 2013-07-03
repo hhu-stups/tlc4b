@@ -17,7 +17,6 @@ import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.b2tla.exceptions.B2TLAIOException;
 import de.b2tla.exceptions.B2tlaException;
-import de.b2tla.exceptions.TypeErrorException;
 import de.b2tla.tlc.TLCOutput;
 import de.b2tla.tlc.TLCOutputInfo;
 import de.b2tla.tlc.TLCOutput.ERROR;

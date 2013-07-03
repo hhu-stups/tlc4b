@@ -6,16 +6,9 @@ import java.util.Hashtable;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.IntegerType;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.AAddExpression;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
-import de.be4.classicalb.core.parser.node.AEqualPredicate;
-import de.be4.classicalb.core.parser.node.AExistsPredicate;
-import de.be4.classicalb.core.parser.node.AForallPredicate;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
-import de.be4.classicalb.core.parser.node.ANotEqualPredicate;
-import de.be4.classicalb.core.parser.node.ASetSubtractionExpression;
-import de.be4.classicalb.core.parser.node.AUnionExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 

@@ -3,7 +3,6 @@ package de.b2tla.analysis;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -62,7 +61,6 @@ import de.be4.classicalb.core.parser.node.POperation;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.PSet;
 import de.be4.classicalb.core.parser.node.Start;
-import de.be4.classicalb.core.parser.node.TDefLiteralPredicate;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class MachineContext extends DepthFirstAdapter {
@@ -924,10 +922,10 @@ public class MachineContext extends DepthFirstAdapter {
 	 * machine clauses getter
 	 */
 
-	public AAbstractMachineParseUnit getAbstractMachineParseUnit(){
+	public AAbstractMachineParseUnit getAbstractMachineParseUnit() {
 		return abstractMachineParseUnit;
 	}
-	
+
 	public AConstraintsMachineClause getConstraintMachineClause() {
 		return constraintMachineClause;
 	}
@@ -947,8 +945,13 @@ public class MachineContext extends DepthFirstAdapter {
 	public APropertiesMachineClause getPropertiesMachineClause() {
 		return propertiesMachineClause;
 	}
-	
-	public void setPropertiesMachineClaus(APropertiesMachineClause propertiesMachineClause){
+
+	public AAssertionsMachineClause getAssertionMachineClause() {
+		return assertionMachineClause;
+	}
+
+	public void setPropertiesMachineClaus(
+			APropertiesMachineClause propertiesMachineClause) {
 		this.propertiesMachineClause = propertiesMachineClause;
 	}
 
@@ -971,8 +974,9 @@ public class MachineContext extends DepthFirstAdapter {
 	public ADefinitionsMachineClause getDefinitionMachineClause() {
 		return definitionMachineClause;
 	}
-	
-	public void setDefinitionsMachineClause(ADefinitionsMachineClause definitionMachineClause){
+
+	public void setDefinitionsMachineClause(
+			ADefinitionsMachineClause definitionMachineClause) {
 		this.definitionMachineClause = definitionMachineClause;
 	}
 

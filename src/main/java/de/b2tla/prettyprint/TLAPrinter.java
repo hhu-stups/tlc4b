@@ -2,11 +2,11 @@ package de.b2tla.prettyprint;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.b2tla.Globals;
 import de.b2tla.analysis.MachineContext;
 import de.b2tla.analysis.PrecedenceCollector;
 import de.b2tla.analysis.PrimedNodesMarker;
@@ -742,6 +742,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAOperation(AOperation node) {
 		String name = renamer.getNameOfRef(node);
 		tlaModuleString.append(name);
+		
 		List<PExpression> output = new ArrayList<PExpression>(
 				node.getReturnValues());
 		List<PExpression> params = new ArrayList<PExpression>(
@@ -949,6 +950,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		 */
 		inAExistsPredicate(node);
 		tlaModuleString.append("\\E ");
+		
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (int i = 0; i < copy.size(); i++) {
@@ -1172,24 +1174,18 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAMinExpression(AMinExpression node) {
-		inAMinExpression(node);
-		tlaModuleString.append("CHOOSE min \\in ");
+		tlaModuleString.append(MIN);
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
-		tlaModuleString.append(" : \\A p \\in ");
-		node.getExpression().apply(this);
-		tlaModuleString.append(" : min =< p");
-		outAMinExpression(node);
+		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseAMaxExpression(AMaxExpression node) {
-		inAMaxExpression(node);
-		tlaModuleString.append("(CHOOSE max \\in ");
+		tlaModuleString.append(MAX);
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
-		tlaModuleString.append(" : \\A p \\in ");
-		node.getExpression().apply(this);
-		tlaModuleString.append(" : max >= p)");
-		outAMaxExpression(node);
+		tlaModuleString.append(")");
 	}
 
 	@Override
@@ -1241,53 +1237,54 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralProductExpression(AGeneralProductExpression node) {
-		inAGeneralProductExpression(node);
-		tlaModuleString.append("PI({");
-
+		tlaModuleString.append("Pi(");
+		tlaModuleString.append("{");
 		node.getExpression().apply(this);
 		tlaModuleString.append(" : ");
 
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		printIdentifierList(copy);
-
-		tlaModuleString.append(" \\in { ");
-
-		printIdentifierList(copy);
-
 		tlaModuleString.append(" \\in ");
-		printTypesOfIdentifierList(copy);
-		tlaModuleString.append(" : ");
-		node.getPredicates().apply(this);
+		if (typeRestrictor.removeNode(node.getPredicates())) {
+			printTypesOfIdentifierList(copy);
+		} else {
+			tlaModuleString.append("{");
+			printIdentifierList(copy);
+			tlaModuleString.append(" \\in ");
+			printTypesOfIdentifierList(copy);
+			tlaModuleString.append(" : ");
+			node.getPredicates().apply(this);
+			tlaModuleString.append("}");
+		}
 		tlaModuleString.append("}");
-
-		tlaModuleString.append("}");
-		outAGeneralProductExpression(node);
+		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseAGeneralSumExpression(AGeneralSumExpression node) {
-		inAGeneralSumExpression(node);
-		tlaModuleString.append("SIGMA({");
-
+		tlaModuleString.append("Sigma(");
+		tlaModuleString.append("{");
 		node.getExpression().apply(this);
 		tlaModuleString.append(" : ");
 
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		printIdentifierList(copy);
-
-		tlaModuleString.append(" \\in { ");
-
-		printIdentifierList(copy);
-
 		tlaModuleString.append(" \\in ");
-		printTypesOfIdentifierList(copy);
-		tlaModuleString.append(" : ");
-		node.getPredicates().apply(this);
+		if (typeRestrictor.removeNode(node.getPredicates())) {
+			printTypesOfIdentifierList(copy);
+		} else {
+			tlaModuleString.append("{");
+			printIdentifierList(copy);
+			tlaModuleString.append(" \\in ");
+			printTypesOfIdentifierList(copy);
+			tlaModuleString.append(" : ");
+			node.getPredicates().apply(this);
+			tlaModuleString.append("}");
+		}
 		tlaModuleString.append("}");
-		tlaModuleString.append("})");
-		outAGeneralSumExpression(node);
+		tlaModuleString.append(")");
 	}
 
 	@Override
@@ -1302,6 +1299,16 @@ public class TLAPrinter extends DepthFirstAdapter {
 		inAPredecessorExpression(node);
 		tlaModuleString.append("pred");
 		outAPredecessorExpression(node);
+	}
+
+	@Override
+	public void caseAMaxIntExpression(AMaxIntExpression node) {
+		tlaModuleString.append(Globals.MAX_INT);
+	}
+
+	@Override
+	public void caseAMinIntExpression(AMinIntExpression node) {
+		tlaModuleString.append(Globals.MIN_INT);
 	}
 
 	/**
@@ -1509,7 +1516,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 			node.getRight().apply(this);
 			tlaModuleString.append("]");
 		} else {
-			if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
+			if (node.parent() instanceof AMemberPredicate
+					&& !typeRestrictor.removeNode(node.parent())) {
 				tlaModuleString.append(REL_TOTAL_FUNCTION_ELEMENT_OF);
 			} else {
 				tlaModuleString.append(REL_TOTAL_FUNCTION);
@@ -1529,7 +1537,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (subtype instanceof FunctionType) {
 			tlaModuleString.append(funcName);
 		} else {
-			if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
+			if (node.parent() instanceof AMemberPredicate
+					&& !typeRestrictor.removeNode(node.parent())) {
 				tlaModuleString.append(relEleOfName);
 			} else {
 				tlaModuleString.append(relName);
@@ -2146,7 +2155,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIseqExpression(AIseqExpression node) {
-		if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
+		if (node.parent() instanceof AMemberPredicate
+				&& !typeRestrictor.removeNode(node.parent())) {
 			tlaModuleString.append(INJECTIVE_SEQUENCE_ELEMENT_OF);
 		} else {
 			tlaModuleString.append(INJECTIVE_SEQUENCE);
@@ -2158,7 +2168,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIseq1Expression(AIseq1Expression node) {
-		if (node.parent() instanceof AMemberPredicate && !typeRestrictor.removeNode(node.parent())) {
+		if (node.parent() instanceof AMemberPredicate
+				&& !typeRestrictor.removeNode(node.parent())) {
 			tlaModuleString.append(INJECTIVE_SEQUENCE_1_ELEMENT_OF);
 		} else {
 			tlaModuleString.append(INJECTIVE_SEQUENCE_1);

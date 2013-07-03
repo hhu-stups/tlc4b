@@ -1,12 +1,7 @@
 package de.b2tla.prettyprint;
 
 import static de.b2tla.util.TestUtil.*;
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Ignore;
 import org.junit.Test;
-
-import de.b2tla.B2TLA;
 
 public class RelationTest {
 

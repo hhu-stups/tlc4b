@@ -315,7 +315,7 @@ public class ArithmeticOperatorTest {
 		String machine = "MACHINE test\n" + "CONSTANTS k \n"
 				+ "PROPERTIES k = succ \n" + "END";
 		TestTypechecker t = new TestTypechecker(machine);
-		assertEquals("POW(INTEGER*INTEGER)", t.constants.get("k").toString());
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k").toString());
 	}
 
 	@Test(expected = TypeErrorException.class)
@@ -330,7 +330,7 @@ public class ArithmeticOperatorTest {
 		String machine = "MACHINE test\n" + "CONSTANTS k \n"
 				+ "PROPERTIES k = pred \n" + "END";
 		TestTypechecker t = new TestTypechecker(machine);
-		assertEquals("POW(INTEGER*INTEGER)", t.constants.get("k").toString());
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k").toString());
 	}
 
 	@Test(expected = TypeErrorException.class)

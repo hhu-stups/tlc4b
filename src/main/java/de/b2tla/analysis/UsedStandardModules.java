@@ -3,12 +3,10 @@ package de.b2tla.analysis;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.Collections;
 
-import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
@@ -56,6 +54,7 @@ import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
 import de.be4.classicalb.core.parser.node.ALessPredicate;
 import de.be4.classicalb.core.parser.node.AMaxExpression;
 import de.be4.classicalb.core.parser.node.AMinExpression;
+import de.be4.classicalb.core.parser.node.AMinIntExpression;
 import de.be4.classicalb.core.parser.node.AMinusExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AModuloExpression;
@@ -91,7 +90,6 @@ import de.be4.classicalb.core.parser.node.ASecondProjectionExpression;
 import de.be4.classicalb.core.parser.node.ASeq1Expression;
 import de.be4.classicalb.core.parser.node.ASeqExpression;
 import de.be4.classicalb.core.parser.node.ASizeExpression;
-import de.be4.classicalb.core.parser.node.ASubsetStrictPredicate;
 import de.be4.classicalb.core.parser.node.ASuccessorExpression;
 import de.be4.classicalb.core.parser.node.ATailExpression;
 import de.be4.classicalb.core.parser.node.ATotalBijectionExpression;
@@ -177,21 +175,18 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 	}
 
-    public void inAExistsPredicate(AExistsPredicate node)
-    {
-    	searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-    }
+	public void inAExistsPredicate(AExistsPredicate node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
+	}
 
-    public void inALambdaExpression(ALambdaExpression node)
-    {
-    	searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-    }
-    
-    public void inAComprehensionSetExpression(AComprehensionSetExpression node)
-    {
-    	searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-    }
-    
+	public void inALambdaExpression(ALambdaExpression node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
+	}
+
+	public void inAComprehensionSetExpression(AComprehensionSetExpression node) {
+		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
+	}
+
 	/**
 	 * Naturals
 	 */
@@ -245,14 +240,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
-	public void inAMinExpression(AMinExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
-	}
-
-	public void inAMaxExpression(AMaxExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
-	}
-
 	public void inADivExpression(ADivExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
@@ -298,6 +285,10 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.Integers);
 	}
 
+	public void inAMinIntExpression(AMinIntExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.Integers);
+	}
+
 	/**
 	 * FiniteSets
 	 */
@@ -308,6 +299,15 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	/**
 	 * BBuiltIns
 	 */
+
+	public void inAMinExpression(AMinExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+	}
+
+	public void inAMaxExpression(AMaxExpression node) {
+		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+	}
+
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
 		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
@@ -431,10 +431,13 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	// Function call
 	public void inAFunctionExpression(AFunctionExpression node) {
-		BType type = typechecker.getType(node.getIdentifier());
-		if (type instanceof SetType) {
-			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+		if (!(node.parent() instanceof AAssignSubstitution)) {
+			BType type = typechecker.getType(node.getIdentifier());
+			if (type instanceof SetType) {
+				usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+			}
 		}
+
 	}
 
 	public void inATotalFunctionExpression(ATotalFunctionExpression node) {
@@ -491,7 +494,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 				node.getLhsExpression());
 		for (PExpression e : copy) {
 			if (e instanceof AFunctionExpression) {
-				usedStandardModules.add(STANDARD_MODULES.Relations);
+				BType type = typechecker.getType(((AFunctionExpression) e)
+						.getIdentifier());
+				if (type instanceof SetType) {
+					usedStandardModules.add(STANDARD_MODULES.Relations);
+				}
 			}
 		}
 	}

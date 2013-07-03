@@ -2,21 +2,16 @@ package de.b2tla.analysis.transformation;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import de.b2tla.analysis.DefinitionCollector;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.ADefinitionExpression;
 import de.be4.classicalb.core.parser.node.ADefinitionPredicate;
-import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
-import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
 
 /**
@@ -26,7 +21,7 @@ import de.be4.classicalb.core.parser.node.Start;
  * 
  * Note: All parameters of a definition are replaced before calls of
  * sub-definitions are resolved. This behavior is similar to what ProB does by
- * eliminatingall definitions.
+ * eliminating all definitions.
  * 
  */
 public class DefinitionsEliminator extends DepthFirstAdapter {

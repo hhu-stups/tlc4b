@@ -1,15 +1,13 @@
 package de.b2tla.analysis;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class StandardMadules {
 
 	// Functions
 	public static final String RANGE = "Range";
 	public static final String IMAGE = "Image";
-	
+
 	public static final String TOTAL_INJECTIVE_FUNCTION = "TotalInjFunc";
 	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
 	public static final String TOTAL_BIJECTIVE_FUNCTION = "TotalBijFunc";
@@ -18,7 +16,7 @@ public class StandardMadules {
 	public static final String PARTIAL_INJECTIVE_FUNCTION = "ParInjFunc";
 	public static final String PARTIAL_SURJECTIVE_FUNCTION = "ParSurFunc";
 	public static final String PARITAL_BIJECTIVE_FUNCTION = "ParBijFunc";
-	
+
 	// Relations
 	public static final String RELATION = "Relation";
 	public static final String REL_DOMAIN = "RelDomain";
@@ -41,38 +39,34 @@ public class StandardMadules {
 	public static final String REL_CLOSURE = "RelClosure";
 	public static final String REL_FNC = "RelFnc";
 	public static final String REL_REL = "RelRel";
-	
-	
-	
+
 	// FunctionsAsRelations
 	public static final String REL_CALL = "RelCall";
-	
+
 	public static final String REL_TOTAL_FUNCTION = "RelTotalFunc";
 	public static final String REL_TOTAL_FUNCTION_ELEMENT_OF = "RelTotalFuncEleOf";
-	
+
 	public static final String REL_TOTAL_INJECTIVE_FUNCTION = "RelTotalInjFunc";
 	public static final String REL_TOTAL_INJECTIVE_FUNCTION_ELEMENT_OF = "RelTotalInjFuncEleOf";
-	
+
 	public static final String REL_TOTAL_SURJECTIVE_FUNCTION = "RelTotalSurFunc";
 	public static final String REL_TOTAL_SURJECTIVE_FUNCTION_ELEMENT_OF = "RelTotalSurFuncEleOf";
-	
+
 	public static final String REL_TOTAL_BIJECTIVE_FUNCTION = "RelTotalBijFunc";
 	public static final String REL_TOTAL_BIJECTIVE_FUNCTION_ELEMENT_OF = "RelTotalBijFuncEleOf";
-	
+
 	public static final String REL_PARTIAL_FUNCTION = "RelParFunc";
 	public static final String REL_PARTIAL_FUNCTION_ELEMENT_OF = "RelParFuncEleOf";
-	
+
 	public static final String REL_PARTIAL_INJECTIVE_FUNCTION = "RelParInjFunc";
 	public static final String REL_PARTIAL_INJECTIVE_FUNCTION_ELEMENT_OF = "RelParInjFuncEleOf";
-	
+
 	public static final String REL_PARTIAL_SURJECTIVE_FUNCTION = "RelParSurFunc";
 	public static final String REL_PARTIAL_SURJECTIVE_FUNCTION_ELEMENT_OF = "RelParSurFuncEleOf";
-	
+
 	public static final String REL_PARTIAL_BIJECTIVE_FUNCTION = "RelParBijFunc";
 	public static final String REL_PARTIAL_BIJECTIVE_FUNCTION_ELEMENT_OF = "RelParBijFuncEleOf";
-	
-	
-	
+
 	// SequencesExtended
 	public static final String SEQUENCE_LAST_ELEMENT = "Last";
 	public static final String SEQUENCE_PREPEND_ELEMENT = "Prepend";
@@ -85,15 +79,22 @@ public class StandardMadules {
 	public static final String SEQUENCE_PERMUTATION = "Perm";
 	public static final String SEQUENCE_REVERSE = "Rev";
 	public static final String SEQUENCE_GENERAL_CONCATINATION = "Conc";
-	
+
 	public static final String SEQUENCE_TAKE_FIRST_ELEMENTS = "TakeFirstElements";
 	public static final String SEQUENCE_DROP_FIRST_ELEMENTS = "DropFirstElements";
-	
-	
+
 	public static final String REL_INJECTIVE_SEQUENCES = "RelISeq";
 	public static final String REL_NOT_EMPTY_INJECTIVE_SEQUENCES = "RelISeq1";
-	
-	
+
+	/*
+	 * BBuiltIns
+	 */
+
+	public static final String MIN = "Min";
+	public static final String MAX = "Max";
+	public static final String GENERAL_SUMMATION = "Sigma";
+	public static final String GENERAL_PRODUCT = "Pi";
+
 	public static final ArrayList<String> Relations = new ArrayList<String>();
 
 	static {

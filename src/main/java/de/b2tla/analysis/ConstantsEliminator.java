@@ -8,10 +8,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
-import tla2sany.modanalyzer.ModuleContext;
-
-import de.b2tla.analysis.ConstantsEvaluator.ConstantsInTreeFinder;
-import de.b2tla.analysis.ConstantsEvaluator.ValuesOfIdentifierFinder;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;

@@ -9,6 +9,7 @@ public class PrimeTest {
 	
 	@Test
 	public void testOperationParameter() throws Exception {
-		//TODO
+		
+	
 	}
 }

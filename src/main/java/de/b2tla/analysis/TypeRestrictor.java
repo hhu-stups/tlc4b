@@ -17,6 +17,8 @@ import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
+import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
+import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
 import de.be4.classicalb.core.parser.node.AImplicationPredicate;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
@@ -41,14 +43,13 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	private Hashtable<Node, ArrayList<NodeType>> restrictedTypesSet;
 	private HashSet<Node> removedNodes;
-	
-	
+
 	public TypeRestrictor(Start start, MachineContext machineContext,
 			Typechecker typechecker) {
 		this.machineContext = machineContext;
 		this.restrictedTypesSet = new Hashtable<Node, ArrayList<NodeType>>();
 		this.removedNodes = new HashSet<Node>();
-		
+
 		cEF = new ConstantExpressionFinder(start, machineContext);
 
 		start.apply(this);
@@ -63,10 +64,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		return restrictedTypesSet.containsKey(node);
 	}
 
-	public boolean removeNode(Node node){
+	public boolean removeNode(Node node) {
 		return this.removedNodes.contains(node);
 	}
-	
+
 	private void putRestrictedType(Node identifier, NodeType expression) {
 		ArrayList<NodeType> list = restrictedTypesSet.get(identifier);
 
@@ -156,7 +157,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAForallPredicate(AForallPredicate node) {
+	public void inAForallPredicate(AForallPredicate node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -164,16 +165,13 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			// e.apply(this);
 			list.add(e);
 		}
-		// TODO test if the expression is really a implication, currently a
-		// class cast exception is thrown
 		AImplicationPredicate implication = (AImplicationPredicate) node
 				.getImplication();
 		analysePredicate(implication.getLeft(), list);
-		node.getImplication().apply(this);
 	}
 
 	@Override
-	public void caseAExistsPredicate(AExistsPredicate node) {
+	public void inAExistsPredicate(AExistsPredicate node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -181,13 +179,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		analysePredicate(node.getPredicate(), list);
-		if (node.getPredicate() != null) {
-			node.getPredicate().apply(this);
-		}
 	}
 
 	@Override
-	public void caseAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
+	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -195,12 +190,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		analysePredicate(node.getPredicates(), list);
-		node.getPredicates().apply(this);
-		node.getExpression().apply(this);
 	}
 
 	@Override
-	public void caseAQuantifiedIntersectionExpression(
+	public void inAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
@@ -209,12 +202,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		analysePredicate(node.getPredicates(), list);
-		node.getPredicates().apply(this);
-		node.getExpression().apply(this);
 	}
 
 	@Override
-	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
+	public void inAComprehensionSetExpression(AComprehensionSetExpression node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -223,11 +214,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			// e.apply(this);
 		}
 		analysePredicate(node.getPredicates(), list);
-		node.getPredicates().apply(this);
 	}
 
 	@Override
-	public void caseALambdaExpression(ALambdaExpression node) {
+	public void inALambdaExpression(ALambdaExpression node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -235,9 +225,29 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		analysePredicate(node.getPredicate(), list);
-		node.getPredicate().apply(this);
-		node.getExpression().apply(this);
 	}
+
+	public void inAGeneralSumExpression(AGeneralSumExpression node) {
+		HashSet<Node> list = new HashSet<Node>();
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			list.add(e);
+		}
+		analysePredicate(node.getPredicates(), list);
+	}
+	
+	public void inAGeneralProductExpression(AGeneralProductExpression node)
+    {
+		HashSet<Node> list = new HashSet<Node>();
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			list.add(e);
+		}
+		analysePredicate(node.getPredicates(), list);
+    }
+	
 
 	private Hashtable<Node, HashSet<Node>> expectedIdentifieListTable = new Hashtable<Node, HashSet<Node>>();
 

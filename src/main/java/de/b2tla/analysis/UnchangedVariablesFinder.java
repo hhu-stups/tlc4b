@@ -5,7 +5,6 @@ import java.util.Hashtable;
 
 
 import de.be4.classicalb.core.parser.node.Node;
-import de.be4.classicalb.core.parser.node.Start;
 
 /**
  * 
@@ -25,7 +24,7 @@ public class UnchangedVariablesFinder {
 	}
 
 	public UnchangedVariablesFinder(MachineContext c) {
-		Start start = c.getTree();
+//		Start start = c.getTree();
 
 		AssignedVariablesFinder aVF = new AssignedVariablesFinder(c);
 		//start.apply(aVF);
