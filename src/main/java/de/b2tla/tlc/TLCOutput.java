@@ -22,7 +22,7 @@ public class TLCOutput {
 	String parseError;
 
 	public static enum ERROR {
-		Deadlock, Goal, Invariant, ParseError, NoError, Assertion, PropertiesError, EnumerateError, TLCError
+		Deadlock, Goal, Invariant, ParseError, NoError, Assertion, PropertiesError, EnumerateError, TLCError, TemporalProperty
 	}
 
 	public long getRunningTime() {
@@ -31,8 +31,10 @@ public class TLCOutput {
 	}
 
 	public String getError() {
-		if(error == ERROR.Invariant){
+		if (error == ERROR.Invariant) {
 			return "Invariant Violation";
+		}else if(error == ERROR.TemporalProperty){
+			return "Temporal Property Violation";
 		}
 		return error.toString();
 	}
@@ -41,8 +43,8 @@ public class TLCOutput {
 		parseTrace();
 		return trace;
 	}
-	
-	public String getModuleName(){
+
+	public String getModuleName() {
 		return moduleName;
 	}
 
@@ -121,13 +123,16 @@ public class TLCOutput {
 		for (int i = 0; i < states.size(); i++) {
 			String m = states.get(i);
 			// System.out.println(m);
-			String location = m.substring(0, m.indexOf("\n"));
+			// String location = m.substring(0, m.indexOf("\n"));
 			// String operationName = moduleMatcher.getName(location);
-
+			int pos = m.indexOf("\n");
+			if (pos == -1)
+				break; // e.g. 'State 10: Stuttering'
 			String predicate = m.substring(m.indexOf("\n") + 1);
-			//String res = TLCExpressionParser.parseLine(predicate);
-			//TODO OUTPUT
-			String res = TLCExpressionParser.parseLine(predicate, tlcOutputInfo.getTypes());
+			// String res = TLCExpressionParser.parseLine(predicate);
+			// TODO OUTPUT
+			String res = TLCExpressionParser.parseLine(predicate,
+					tlcOutputInfo.getTypes());
 			trace.append(res);
 			trace.append("\n");
 		}
@@ -159,9 +164,13 @@ public class TLCOutput {
 			}
 		} else if (res[1].equals("Assumption")) {
 			return ERROR.PropertiesError;
+		} else if (res[1].equals("Temporal")) {
+			return ERROR.TemporalProperty;
 		} else if (m.equals("Error: TLC threw an unexpected exception.")) {
 			return ERROR.ParseError;
 		} else if (m.startsWith("Error: The behavior up to")) {
+			return null;
+		} else if (m.startsWith("Error: The following behavior constitutes a counter-example:")) {
 			return null;
 		}
 		System.out.println(m);

@@ -101,7 +101,7 @@ public class ScopeTest {
 		checkMachine(machine);
 	}
 
-	@Ignore //TODO
+	@Ignore //TODO machineContext line 657
 	@Test(expected = ScopeException.class)
 	public void testConstantSubstitution() throws Exception {
 		String machine = "MACHINE test\n" + "CONSTANTS x \n"

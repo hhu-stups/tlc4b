@@ -14,6 +14,13 @@ import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 
+/**
+ * A BDefinitions can depend on another BDefinitions. For the translation to
+ * TLA+ the definitions must be sorted.
+ * 
+ * @author hansen
+ */
+
 public class DefinitionsOrder extends DepthFirstAdapter {
 	private MachineContext machineContext;
 	private Hashtable<Node, HashSet<Node>> dependenciesTable;
@@ -25,7 +32,6 @@ public class DefinitionsOrder extends DepthFirstAdapter {
 		return allDefinitions;
 	}
 
-
 	public DefinitionsOrder(MachineContext machineContext,
 			ArrayList<PDefinition> allDefinitions) {
 		this.machineContext = machineContext;
@@ -35,9 +41,8 @@ public class DefinitionsOrder extends DepthFirstAdapter {
 			def.apply(this);
 		}
 
-		
 		this.allDefinitions = sort(new ArrayList<PDefinition>(allDefinitions));
-		
+
 	}
 
 	private ArrayList<PDefinition> sort(ArrayList<PDefinition> list) {
@@ -70,7 +75,7 @@ public class DefinitionsOrder extends DepthFirstAdapter {
 				}
 			}
 		}
-		
+
 		if (result.size() != list.size()) {
 			throw new RuntimeException("Found cyclic Definitions.");
 		}
@@ -118,32 +123,32 @@ public class DefinitionsOrder extends DepthFirstAdapter {
 	}
 
 	public void inADefinitionExpression(ADefinitionExpression node) {
-		
+
 		Node refNode = machineContext.getReferences().get(node);
 		/*
-		 * If refNode is null, then the whole branch was cloned when a constant assignment was generated 
+		 * If refNode is null, then the whole branch was cloned when a constant
+		 * assignment was generated
 		 */
-		
-		if(null != refNode){
+
+		if (null != refNode) {
 			current.add(refNode);
 		}
-		
+
 	}
 
 	public void inAIdentifierExpression(AIdentifierExpression node) {
 		Node identifierRef = machineContext.getReferences().get(node);
-		if(identifierRef == null)
+		if (identifierRef == null)
 			return;
-		
-		if(machineContext.getConstants().containsValue(identifierRef)){
+
+		if (machineContext.getConstants().containsValue(identifierRef)) {
 			current.add(identifierRef);
 			return;
 		}
-		
-		if (machineContext.getReferences().get(identifierRef) instanceof PDefinition){
+
+		if (machineContext.getReferences().get(identifierRef) instanceof PDefinition) {
 			current.add(identifierRef);
 		}
-		
-		
+
 	}
 }

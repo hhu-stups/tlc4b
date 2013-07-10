@@ -1,6 +1,7 @@
 package de.b2tla.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -23,6 +24,8 @@ import de.b2tla.btypes.StructType;
 import de.b2tla.btypes.UntypedType;
 import de.b2tla.exceptions.TypeErrorException;
 import de.b2tla.exceptions.UnificationException;
+import de.b2tla.ltl.LTLBPredicate;
+import de.b2tla.ltl.LTLFormulaVisitor;
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
@@ -36,12 +39,12 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	private final Hashtable<Node, BType> types;
 	private final Hashtable<Node, Node> referenceTable;
-	private final MachineContext context;
+	private final MachineContext machineContext;
 
 	public Typechecker(MachineContext machineContext,
 			Hashtable<String, MachineContext> contextTable,
 			Hashtable<String, Typechecker> typecheckerTable) {
-		this.context = machineContext;
+		this.machineContext = machineContext;
 		this.types = new Hashtable<Node, BType>();
 		this.referenceTable = machineContext.getReferences();
 	}
@@ -49,8 +52,32 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public Typechecker(MachineContext c) {
 		this.types = new Hashtable<Node, BType>();
 		this.referenceTable = c.getReferences();
-		this.context = c;
+		this.machineContext = c;
 		c.getTree().apply(this);
+
+		checkLTLFormulas();
+	}
+
+	private void checkLTLFormulas() {
+		ArrayList<LTLFormulaVisitor> visitors = machineContext.getLTLFormulas();
+		for (int i = 0; i < visitors.size(); i++) {
+			LTLFormulaVisitor visitor = visitors.get(i);
+			Collection<AIdentifierExpression> parameter = visitor.getParameter();
+			for (AIdentifierExpression param : parameter) {
+				setType(param, new UntypedType());
+			}
+			for (int j = 0; j < visitor.getBPredicates().size(); j++) {
+				LTLBPredicate ltlBPredicate = visitor.getBPredicates().get(j);
+				ltlBPredicate.getBFormula().apply(this);
+			}
+		}
+
+	}
+
+	@Override
+	public void caseAPredicateParseUnit(APredicateParseUnit node) {
+		setType(node.getPredicate(), BoolType.getInstance());
+		node.getPredicate().apply(this);
 	}
 
 	public Hashtable<Node, BType> getTypes() {
@@ -58,7 +85,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	public MachineContext getContext() {
-		return context;
+		return machineContext;
 	}
 
 	public void setType(Node node, BType t) {
@@ -266,7 +293,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		LinkedHashMap<String, Node> parameter = context.getScalarParameter();
+		LinkedHashMap<String, Node> parameter = machineContext
+				.getScalarParameter();
 		for (String c : parameter.keySet()) {
 			Node n = parameter.get(c);
 			if (getType(n).isUntyped()) {
@@ -282,7 +310,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		LinkedHashMap<String, Node> constants = context.getConstants();
+		LinkedHashMap<String, Node> constants = machineContext.getConstants();
 		for (String c : constants.keySet()) {
 			Node n = constants.get(c);
 			if (getType(n).isUntyped()) {
@@ -296,7 +324,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
 		setType(node.getPredicates(), BoolType.getInstance());
 		node.getPredicates().apply(this);
-		LinkedHashMap<String, Node> variables = context.getVariables();
+		LinkedHashMap<String, Node> variables = machineContext.getVariables();
 		for (String c : variables.keySet()) {
 			Node n = variables.get(c);
 			if (getType(n).isUntyped()) {

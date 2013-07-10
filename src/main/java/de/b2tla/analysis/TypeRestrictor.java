@@ -9,6 +9,8 @@ import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.analysis.nodes.SubsetNode;
+import de.b2tla.ltl.LTLBPredicate;
+import de.b2tla.ltl.LTLFormulaVisitor;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
@@ -26,6 +28,7 @@ import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AMemberPredicate;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.APreconditionSubstitution;
+import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
@@ -35,6 +38,8 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PSubstitution;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.ltl.core.parser.node.AExistsLtl;
+import de.be4.ltl.core.parser.node.AForallLtl;
 
 public class TypeRestrictor extends DepthFirstAdapter {
 
@@ -54,6 +59,31 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 		start.apply(this);
 
+		checkLTLFormulas();
+	}
+
+	private void checkLTLFormulas() {
+		for (LTLFormulaVisitor visitor : machineContext.getLTLFormulas()) {
+
+			for (de.be4.ltl.core.parser.node.Node ltlNode : visitor
+					.getUnparsedHashTable().keySet()) {
+				Node bNode = visitor.getBAst(ltlNode);
+				
+				if(ltlNode instanceof AExistsLtl){
+					Node id = visitor.getLTLIdentifier(((AExistsLtl) ltlNode).getExistsIdentifier().getText());
+					HashSet<Node> list = new HashSet<Node>();
+					list.add(id);
+					analysePredicate(bNode, list);
+				}else if (ltlNode instanceof AForallLtl){
+					Node id = visitor.getLTLIdentifier(((AForallLtl) ltlNode).getForallIdentifier().getText());
+					HashSet<Node> list = new HashSet<Node>();
+					list.add(id);
+					analysePredicate(bNode, list);
+				}
+				bNode.apply(this);
+			}
+
+		}
 	}
 
 	public ArrayList<NodeType> getRestrictedTypesSet(Node node) {
@@ -153,7 +183,15 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			analysePredicate(((AConjunctPredicate) n).getRight(), list);
 			return;
 		}
-
+		
+		if(n instanceof Start){
+			analysePredicate(((Start) n).getPParseUnit(), list);
+		}
+		
+		if(n instanceof APredicateParseUnit){
+			analysePredicate(((APredicateParseUnit) n).getPredicate(), list);
+			return;
+		}
 	}
 
 	@Override
@@ -236,9 +274,8 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicates(), list);
 	}
-	
-	public void inAGeneralProductExpression(AGeneralProductExpression node)
-    {
+
+	public void inAGeneralProductExpression(AGeneralProductExpression node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -246,8 +283,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		analysePredicate(node.getPredicates(), list);
-    }
-	
+	}
 
 	private Hashtable<Node, HashSet<Node>> expectedIdentifieListTable = new Hashtable<Node, HashSet<Node>>();
 

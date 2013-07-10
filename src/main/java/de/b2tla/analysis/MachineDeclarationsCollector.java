@@ -1,3 +1,7 @@
+
+/*
+ * currently not used
+ */
 package de.b2tla.analysis;
 
 import java.util.ArrayList;

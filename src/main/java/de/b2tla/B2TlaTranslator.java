@@ -9,14 +9,15 @@ import de.b2tla.analysis.ConstantsEliminator;
 import de.b2tla.analysis.ConstantsEvaluator;
 import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
+import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.PrecedenceCollector;
 import de.b2tla.analysis.PrimedNodesMarker;
 import de.b2tla.analysis.Renamer;
 import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
-import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
+import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
 import de.b2tla.tlc.TLCOutputInfo;
@@ -31,6 +32,7 @@ public class B2TlaTranslator {
 	private String moduleString;
 	private String configString;
 	private String machineName;
+	private String ltlFormula;
 	private ArrayList<STANDARD_MODULES> usedStandardModules;
 	private TLCOutputInfo tlcOutputInfo;
 
@@ -42,9 +44,20 @@ public class B2TlaTranslator {
 		start.apply(ast2String2);
 		System.out.println(ast2String2.toString());
 	}
+	
+	public B2TlaTranslator(String machineString, String ltlFormula) throws BException {
+		this.machineString = machineString;
+		this.ltlFormula = ltlFormula;
+		BParser parser = new BParser("Testing");
+		start = parser.parse(machineString, false);
+		final Ast2String ast2String2 = new Ast2String();
+		start.apply(ast2String2);
+		System.out.println(ast2String2.toString());
+	}
 
-	public B2TlaTranslator(String machineName, File machineFile)
+	public B2TlaTranslator(String machineName, File machineFile, String ltlFormula)
 			throws IOException, BException {
+		this.ltlFormula = ltlFormula;
 		BParser parser = new BParser(machineName);
 		start = parser.parseFile(machineFile, false);
 		final Ast2String ast2String2 = new Ast2String();
@@ -53,13 +66,15 @@ public class B2TlaTranslator {
 	}
 
 	public void translate() {
-
-		MachineContext machineContext = new MachineContext(start);
+		
+		MachineContext machineContext = new MachineContext(start, ltlFormula);
 		this.machineName = machineContext.getMachineName();
 
+		
 		Typechecker typechecker = new Typechecker(machineContext);
-		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
-				machineContext);
+		
+		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(machineContext);
+		
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
 				start, typechecker.getTypes());
 

@@ -9,6 +9,7 @@ public class ConfigFile {
 
 	private final ArrayList<ConfigFileAssignment> assignments;
 	private boolean invariant;
+	private boolean spec;
 	private boolean init;
 	private boolean next;
 	private int assertionsSize;
@@ -25,6 +26,10 @@ public class ConfigFile {
 		return assignments;
 	}
 
+	public boolean isSpec(){
+		return spec;
+	}
+	
 
 	public boolean isInvariant() {
 		return invariant;
@@ -68,6 +73,9 @@ public class ConfigFile {
 		return assertionsSize;
 	}
 	
+	public void setSpec(){
+		this.spec = true;
+	}
 	
 	public void setGoal(){
 		this.goal = true;

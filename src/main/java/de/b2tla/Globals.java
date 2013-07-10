@@ -10,6 +10,7 @@ public class Globals {
 	public static boolean runTLC = true;
 	public static boolean translate = true;
 	public static boolean invariant = true;
+	public static boolean checkltl = true;
 	public static boolean tool = false;
 	public static boolean deleteOnExit = false;
 	

@@ -44,6 +44,18 @@ public class TestUtil {
 		// assertEquals(sb2.toString(), sb1.toString());
 	}
 	
+	
+	public static void compareLTL(String expectedModule, String machine, String ltlFormula)
+			throws Exception {
+		B2TlaTranslator b2tlaTranslator = new B2TlaTranslator(machine, ltlFormula);
+		b2tlaTranslator.translate();
+		System.out.println(b2tlaTranslator.getModuleString());
+		String name = b2tlaTranslator.getMachineName();
+		de.tla2b.translation.Tla2BTranslator
+		.translateString(name, b2tlaTranslator.getModuleString(), null);
+		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
+	}
+	
 	public static void checkMachine(String machine)
 			throws Exception {
 		B2TlaTranslator b2tlaTranslator = new B2TlaTranslator(machine);
@@ -61,6 +73,23 @@ public class TestUtil {
 		System.out.println(ast2String2.toString());
 	}
 
+	public static void compareEqualsConfig(String expectedModule,
+			String expectedConfig, String machine) throws Exception {
+		B2TlaTranslator b2tlaTranslator = new B2TlaTranslator(machine);
+		b2tlaTranslator.translate();
+		// print(b2tlaTranslator.getStart());
+		System.out.println(b2tlaTranslator.getModuleString());
+		System.out.println(b2tlaTranslator.getConfigString());
+
+		String name = b2tlaTranslator.getMachineName();
+		de.tla2b.translation.Tla2BTranslator
+				.translateString(name, b2tlaTranslator.getModuleString(),
+						b2tlaTranslator.getConfigString());
+		
+		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
+		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
+	}
+	
 	public static void compareConfig(String expectedModule,
 			String expectedConfig, String machine) throws Exception {
 		B2TlaTranslator b2tlaTranslator = new B2TlaTranslator(machine);

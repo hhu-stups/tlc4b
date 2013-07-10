@@ -64,6 +64,15 @@ public class Generator extends DepthFirstAdapter {
 		evalOperations();
 		evalGoal();
 		machineContext.getTree().apply(this);
+
+		evalSpec();
+	}
+
+	private void evalSpec() {
+		if (this.configFile.isInit() && this.configFile.isNext()
+				&& machineContext.getLTLFormulas().size() > 0) {
+			this.configFile.setSpec();
+		}
 	}
 
 	private void evalGoal() {
@@ -175,7 +184,8 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	private void evalDefinitions() {
-		ADefinitionsMachineClause node = machineContext.getDefinitionMachineClause();
+		ADefinitionsMachineClause node = machineContext
+				.getDefinitionMachineClause();
 		if (node != null) {
 			for (PDefinition def : node.getDefinitions()) {
 				this.tlaModule.addToAllDefinitions(def);
@@ -212,7 +222,6 @@ public class Generator extends DepthFirstAdapter {
 					(PExpression) value.clone());
 			machineContext.getReferences().put(exprDef, con);
 
-			
 			this.tlaModule.addToAllDefinitions(exprDef);
 		}
 

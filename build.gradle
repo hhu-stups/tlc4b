@@ -30,6 +30,7 @@ dependencies {
 	releaseJars (group: 'de.prob', name: 'prologlib', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'parserbase', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'bparser', version: parser_version)
+	releaseJars (group: 'de.prob', name: 'ltlparser', version: parser_version)
 }
 
 

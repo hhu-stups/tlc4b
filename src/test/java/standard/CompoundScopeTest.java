@@ -56,8 +56,8 @@ public class CompoundScopeTest {
 			start.apply(ast2String2);
 			System.out.println(ast2String2.toString());
 			
-			MachineContext c = new MachineContext(start, machineContextsTable);
-			machineContextsTable.put(name, c);
+			//MachineContext c = new MachineContext(start, machineContextsTable);
+			//machineContextsTable.put(name, c);
 			
 		}
 		

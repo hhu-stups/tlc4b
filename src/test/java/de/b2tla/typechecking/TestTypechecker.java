@@ -26,7 +26,7 @@ public class TestTypechecker {
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
 		System.out.println(ast2String2.toString());
-		MachineContext c = new MachineContext(start);
+		MachineContext c = new MachineContext(start, null);
 		Typechecker t = new Typechecker(c);
 
 		for (String name : c.getSetParamter().keySet()) {

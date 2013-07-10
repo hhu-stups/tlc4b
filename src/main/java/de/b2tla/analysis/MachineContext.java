@@ -1,14 +1,18 @@
 package de.b2tla.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.b2tla.exceptions.ScopeException;
+import de.b2tla.ltl.LTLBPredicate;
+import de.b2tla.ltl.LTLFormulaVisitor;
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
@@ -41,6 +45,7 @@ import de.be4.classicalb.core.parser.node.AOpSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
+import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.APrimedIdentifierExpression;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
@@ -50,6 +55,7 @@ import de.be4.classicalb.core.parser.node.ARecordFieldExpression;
 import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.ASetsContextClause;
 import de.be4.classicalb.core.parser.node.ASetsMachineClause;
+import de.be4.classicalb.core.parser.node.AStringExpression;
 import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
@@ -69,6 +75,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private PMachineHeader header;
 	private final Start start;
 	private final Hashtable<String, MachineContext> machineContextsTable;
+	private ArrayList<LTLFormulaVisitor> ltlVisitors;
 
 	// machine identifier
 	private final LinkedHashMap<String, Node> setParameter;
@@ -87,7 +94,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private AAbstractMachineParseUnit abstractMachineParseUnit;
 	private AConstraintsMachineClause constraintMachineClause;
 	private ASeesMachineClause seesMachineClause;
-	private ASetsContextClause setsMachineClause; // TODO
+	private ASetsContextClause setsMachineClause;
 	private AConstantsMachineClause constantsMachineClause;
 	private ADefinitionsMachineClause definitionMachineClause;
 	private APropertiesMachineClause propertiesMachineClause;
@@ -101,31 +108,39 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private final Hashtable<Node, Node> referencesTable;
 
-	public MachineContext(Start start,
-			Hashtable<String, MachineContext> machineContextsTable) {
+	// public MachineContext(Start start,
+	// Hashtable<String, MachineContext> machineContextsTable) {
+	// this.start = start;
+	// this.ltlVisitors = new ArrayList<LTLFormulaVisitor>();
+	// this.referencesTable = new Hashtable<Node, Node>();
+	//
+	// this.setParameter = new LinkedHashMap<String, Node>();
+	// this.scalarParameter = new LinkedHashMap<String, Node>();
+	//
+	// this.deferredSets = new LinkedHashMap<String, Node>();
+	// this.enumeratedSets = new LinkedHashMap<String, Node>();
+	// this.enumValues = new LinkedHashMap<String, Node>();
+	// this.constants = new LinkedHashMap<String, Node>();
+	// this.definitions = new LinkedHashMap<String, Node>();
+	// this.variables = new LinkedHashMap<String, Node>();
+	// this.operations = new LinkedHashMap<String, Node>();
+	// this.seenMachines = new LinkedHashMap<String, AIdentifierExpression>();
+	//
+	// this.machineContextsTable = machineContextsTable;
+	//
+	// start.apply(this);
+	// }
+
+	public MachineContext(Start start, String ltlFormula) {
 		this.start = start;
 		this.referencesTable = new Hashtable<Node, Node>();
+		this.ltlVisitors = new ArrayList<LTLFormulaVisitor>();
 
-		this.setParameter = new LinkedHashMap<String, Node>();
-		this.scalarParameter = new LinkedHashMap<String, Node>();
-
-		this.deferredSets = new LinkedHashMap<String, Node>();
-		this.enumeratedSets = new LinkedHashMap<String, Node>();
-		this.enumValues = new LinkedHashMap<String, Node>();
-		this.constants = new LinkedHashMap<String, Node>();
-		this.definitions = new LinkedHashMap<String, Node>();
-		this.variables = new LinkedHashMap<String, Node>();
-		this.operations = new LinkedHashMap<String, Node>();
-		this.seenMachines = new LinkedHashMap<String, AIdentifierExpression>();
-
-		this.machineContextsTable = machineContextsTable;
-
-		start.apply(this);
-	}
-
-	public MachineContext(Start start) {
-		this.start = start;
-		this.referencesTable = new Hashtable<Node, Node>();
+		LTLFormulaVisitor ltlVisitor = null;
+		if (null != ltlFormula) {
+			ltlVisitor = new LTLFormulaVisitor("ltl", ltlFormula, this);
+			this.ltlVisitors.add(ltlVisitor);
+		}
 
 		this.setParameter = new LinkedHashMap<String, Node>();
 		this.scalarParameter = new LinkedHashMap<String, Node>();
@@ -141,6 +156,34 @@ public class MachineContext extends DepthFirstAdapter {
 
 		this.machineContextsTable = new Hashtable<String, MachineContext>();
 		start.apply(this);
+
+		checkLTLFormulas();
+	}
+
+	private void checkLTLFormulas() {
+		for (int i = 0; i < ltlVisitors.size(); i++) {
+			LTLFormulaVisitor visitor = ltlVisitors.get(i);
+			visitor.start();
+		}
+	}
+
+	public void checkLTLBPredicate(LTLBPredicate ltlbPredicate) {
+		contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		contextTable.add(getDeferredSets());
+		contextTable.add(getEnumeratedSets());
+		contextTable.add(getEnumValues());
+		contextTable.add(getConstants());
+		contextTable.add(getVariables());
+		contextTable.add(getDefinitions());
+
+		LinkedHashMap<String, Node> identifierHashTable = ltlbPredicate
+				.getIdentifierList();
+		if (identifierHashTable.size() > 0) {
+			LinkedHashMap<String, Node> currentContext = new LinkedHashMap<String, Node>();
+			currentContext.putAll(identifierHashTable);
+			contextTable.add(currentContext);
+		}
+		ltlbPredicate.getBFormula().apply(this);
 	}
 
 	private void exist(LinkedList<TIdentifierLiteral> list) {
@@ -204,6 +247,12 @@ public class MachineContext extends DepthFirstAdapter {
 		}
 	}
 
+	@Override
+	public void caseAPredicateParseUnit(APredicateParseUnit node) {
+
+		node.getPredicate().apply(this);
+	}
+
 	/**
 	 * Definitions
 	 */
@@ -211,16 +260,32 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
 		definitionMachineClause = node;
-		List<PDefinition> copy = new ArrayList<PDefinition>(
-				node.getDefinitions());
+		List<PDefinition> copy = node.getDefinitions();
 
 		/*
 		 * The definitions are not in a predefined order. In particular
 		 * definitions can depend on each other. First all definitions are added
 		 * to the definitions context table. Then all definitions are visited.
 		 */
+		Collection<PDefinition> definitionsToRemove = new HashSet<PDefinition>();
+
 		for (PDefinition e : copy) {
 			if (e instanceof AExpressionDefinitionDefinition) {
+				AExpressionDefinitionDefinition def = (AExpressionDefinitionDefinition) e;
+				String name = def.getName().getText();
+				if (name.startsWith("ASSERT_LTL")) {
+					try {
+						AStringExpression stringNode = (AStringExpression) def
+								.getRhs();
+						LTLFormulaVisitor visitor = new LTLFormulaVisitor(name,
+								stringNode.getContent().getText(), this);
+						this.ltlVisitors.add(visitor);
+					} catch (ClassCastException castException) {
+						throw new ScopeException(
+								"Error: LTL formula is not in a string representation.");
+					}
+					definitionsToRemove.add(def);
+				}
 				evalDefinitionName(((AExpressionDefinitionDefinition) e)
 						.getName().getText().toString(), e);
 			} else if (e instanceof APredicateDefinitionDefinition) {
@@ -231,7 +296,12 @@ public class MachineContext extends DepthFirstAdapter {
 						.getName().getText().toString(), e);
 			}
 		}
-
+		/*
+		 * At this point all ASSERT_LTL formulas of the definitions are removed.
+		 * LTL formulas are stored in the Arraylist {@value #ltlVisitors}.
+		 */
+		copy.removeAll(definitionsToRemove);
+		
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 		ArrayList<MachineContext> list = lookupExtendedMachines();
 		for (int i = 0; i < list.size(); i++) {
@@ -250,7 +320,7 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	private void evalDefinitionName(String name, Node node) {
-		if (name.equals("ASSERT_LTL")) {
+		if (name.startsWith("ASSERT_LTL")) {
 			return;
 		}
 		existString(name);
@@ -646,8 +716,11 @@ public class MachineContext extends DepthFirstAdapter {
 				if (e instanceof AFunctionExpression) {
 					contextTable = varTable;
 					((AFunctionExpression) e).getIdentifier().apply(this);
+
+					// full context table
+					contextTable = temp;
 					for (Node n : ((AFunctionExpression) e).getParameters()) {
-						contextTable = temp;
+
 						n.apply(this);
 					}
 				} else {
@@ -916,6 +989,10 @@ public class MachineContext extends DepthFirstAdapter {
 
 	public Hashtable<Node, Node> getReferences() {
 		return referencesTable;
+	}
+
+	public ArrayList<LTLFormulaVisitor> getLTLFormulas() {
+		return ltlVisitors;
 	}
 
 	/*

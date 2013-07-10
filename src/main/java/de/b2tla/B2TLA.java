@@ -33,7 +33,8 @@ public class B2TLA {
 	private String config;
 	private B2TlaTranslator translator;
 	private TLCOutputInfo tlcOutputInfo;
-
+	private String ltlFormula;
+	
 	public static void main(String[] args) throws IOException {
 		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
@@ -85,7 +86,7 @@ public class B2TLA {
 		tlcOutput.parseTLCOutput();
 		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
 				+ " sec");
-		
+
 		System.out.println("Result: " + tlcOutput.getError());
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
@@ -110,6 +111,15 @@ public class B2TLA {
 				Globals.invariant = false;
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				Globals.tool = true;
+			} else if (args[index].toLowerCase().equals("-noltl")) {
+				Globals.checkltl = false;
+			} else if (args[index].toLowerCase().equals("-ltlformula")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new B2TLAIOException(
+							"Error: LTL formula requiered after option '-ltlformula'.");
+				}
+				ltlFormula = args[index];
 			} else if (args[index].charAt(0) == '-') {
 				throw new B2TLAIOException("Error: unrecognized option: "
 						+ args[index]);
@@ -134,7 +144,7 @@ public class B2TLA {
 
 		handleMainFileName();
 		if (Globals.translate) {
-			translator = new B2TlaTranslator(machineName, getFile());
+			translator = new B2TlaTranslator(machineName, getFile(), this.ltlFormula);
 			translator.translate();
 
 			this.tlaModule = translator.getModuleString();
@@ -189,7 +199,7 @@ public class B2TLA {
 				STANDARD_MODULES.BBuiltIns)) {
 			createStandardModule(path, STANDARD_MODULES.BBuiltIns.toString());
 		}
-		
+
 		if (translator.getUsedStandardModule().contains(
 				STANDARD_MODULES.FunctionsAsRelations)) {
 			createStandardModule(path,

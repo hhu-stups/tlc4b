@@ -88,8 +88,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 				getVariableList(node.getSubstitutions()));
 
 		/*
-		 * In the INITIALISATION clause all variables must be assigned. TODO
-		 * ouput parameter must be assigned too?
+		 * In the INITIALISATION clause all variables must be assigned.
 		 */
 		HashSet<Node> allVariables = new HashSet<Node>(machineContext
 				.getVariables().values());

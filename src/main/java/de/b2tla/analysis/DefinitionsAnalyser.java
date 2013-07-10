@@ -13,6 +13,14 @@ import de.be4.classicalb.core.parser.node.AIntegerExpression;
 import de.be4.classicalb.core.parser.node.AIntervalExpression;
 import de.be4.classicalb.core.parser.node.Node;
 
+/**
+ * 
+ * 
+ * 
+ * @author hansen
+ *
+ */
+
 public class DefinitionsAnalyser extends DepthFirstAdapter{
 	private MachineContext machineContext;
 	private HashMap<Node, Integer> deferredSetSizeTable;
@@ -60,6 +68,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter{
 
 	@Override
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
+		//TODO never reached
 		Node ref_node = machineContext.getReferences().get(node);
 		if(deferredSetSizeTable.containsKey(ref_node)){
 			try {

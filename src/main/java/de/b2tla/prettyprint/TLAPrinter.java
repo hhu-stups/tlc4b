@@ -8,12 +8,12 @@ import java.util.List;
 
 import de.b2tla.Globals;
 import de.b2tla.analysis.MachineContext;
+import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.PrecedenceCollector;
 import de.b2tla.analysis.PrimedNodesMarker;
 import de.b2tla.analysis.Renamer;
 import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
-import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
@@ -22,6 +22,7 @@ import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
 import de.b2tla.btypes.SetType;
+import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.tla.ConfigFile;
 import de.b2tla.tla.TLADefinition;
 import de.b2tla.tla.TLAModule;
@@ -46,7 +47,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private MachineContext machineContext;
 	private Typechecker typechecker;
-	private UnchangedVariablesFinder unchangedVariablesFinder;
+	private UnchangedVariablesFinder missingVariableFinder;
 	private PrecedenceCollector precedenceCollector;
 	private UsedStandardModules usedStandardModules;
 	private TypeRestrictor typeRestrictor;
@@ -64,7 +65,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			Renamer renamer) {
 		this.typechecker = typechecker;
 		this.machineContext = machineContext;
-		this.unchangedVariablesFinder = unchangedVariablesFinder;
+		this.missingVariableFinder = unchangedVariablesFinder;
 		this.precedenceCollector = precedenceCollector;
 		this.usedStandardModules = usedStandardModules;
 		this.typeRestrictor = typeRestrictor;
@@ -75,9 +76,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		this.tlaModuleString = new StringBuilder();
 		this.configFileString = new StringBuilder();
-
-		// Start start = machineContext.getTree();
-		// start.apply(this);
 	}
 
 	public void start() {
@@ -91,18 +89,93 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printAssertions();
 		printInit();
 		printOperations();
+		printSpecFormula();
+		printLTLFormulas();
 
 		tlaModuleString.append("====");
 
 		printConfig();
 	}
 
-	private void printConfig() {
-		if (this.configFile.isInit()) {
-			this.configFileString.append("INIT Init\n");
+	private void printSpecFormula() {
+
+		if (this.configFile.isSpec()) {
+			tlaModuleString.append("vars == ");
+			printVarsAsTuple();
+			tlaModuleString.append("\n");
+
+			tlaModuleString.append("VWF == ");
+			printWeakFairness("Next");
+			tlaModuleString.append("\n");
+			tlaModuleString.append("Spec == Init /\\ [][Next]_vars /\\ VWF\n");
 		}
-		if (this.configFile.isInit()) {
-			this.configFileString.append("NEXT Next\n");
+
+	}
+
+	public void printStrongFairness(String s) {
+		tlaModuleString
+				.append(String
+						.format("([]<><<%s>>_vars \\/  <>[]~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
+								s, s, s));
+		printVarsStuttering();
+		tlaModuleString.append("))");
+
+	}
+	
+	public void printWeakFairness(String s) {
+		tlaModuleString
+				.append(String
+						.format("([]<><<%s>>_vars \\/  []<>~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
+								s, s, s));
+		printVarsStuttering();
+		tlaModuleString.append("))");
+
+	}
+
+	private void printVarsStuttering() {
+		ArrayList<Node> vars = this.tlaModule.getVariables();
+		for (int i = 0; i < vars.size(); i++) {
+			vars.get(i).apply(this);
+			tlaModuleString.append("' = ");
+			vars.get(i).apply(this);
+			if (i < vars.size() - 1)
+				tlaModuleString.append(",");
+		}
+	}
+
+	private void printVarsAsTuple() {
+		ArrayList<Node> vars = this.tlaModule.getVariables();
+		if (vars.size() == 0)
+			return;
+		tlaModuleString.append("<<");
+		for (int i = 0; i < vars.size(); i++) {
+			vars.get(i).apply(this);
+			if (i < vars.size() - 1)
+				tlaModuleString.append(",");
+		}
+		tlaModuleString.append(">>");
+	}
+
+	private void printLTLFormulas() {
+		ArrayList<LTLFormulaVisitor> visitors = machineContext.getLTLFormulas();
+		for (int i = 0; i < visitors.size(); i++) {
+			LTLFormulaVisitor visitor = visitors.get(i);
+			tlaModuleString.append(visitor.getName() + " == ");
+			visitor.printLTLFormula(this);
+			tlaModuleString.append("\n");
+		}
+	}
+
+	private void printConfig() {
+		if (this.configFile.isSpec()) {
+			this.configFileString.append("SPECIFICATION Spec\n");
+		} else {
+			if (this.configFile.isInit()) {
+				this.configFileString.append("INIT Init\n");
+			}
+			if (this.configFile.isInit()) {
+				this.configFileString.append("NEXT Next\n");
+			}
 		}
 		if (configFile.isInvariant()) {
 			this.configFileString.append("INVARIANT Invariant\n");
@@ -120,8 +193,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		}
 
-		// CONSTANTS
+		for (int i = 0; i < machineContext.getLTLFormulas().size(); i++) {
+			LTLFormulaVisitor ltlVisitor = machineContext.getLTLFormulas().get(
+					i);
+			this.configFileString.append("PROPERTIES " + ltlVisitor.getName()
+					+ "\n");
+		}
 
+		// CONSTANTS
 		ArrayList<ConfigFileAssignment> assignments = configFile
 				.getAssignments();
 		if (assignments.size() != 0) {
@@ -130,6 +209,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 				configFileString.append(assignments.get(i).getString());
 			}
 		}
+	}
+
+	public void moduleStringAppend(String str) {
+		this.tlaModuleString.append(str);
 	}
 
 	private void printHeader() {
@@ -365,28 +448,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAEnumeratedSetSet(AEnumeratedSetSet node) {
-		inAEnumeratedSetSet(node);
-		{
-			List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(
-					node.getIdentifier());
-
-			String setName = Utils.getIdentifierAsString(copy);
-
-			tlaModuleString.append(renamer.getNameOfRef(node) + " == {");
-		}
-		{
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getElements());
-			for (int i = 0; i < copy.size(); i++) {
-				copy.get(i).apply(this);
-				if (i < copy.size() - 1) {
-					tlaModuleString.append(", ");
-				}
+		List<PExpression> copy = new ArrayList<PExpression>(node.getElements());
+		tlaModuleString.append(renamer.getNameOfRef(node) + " == {");
+		for (int i = 0; i < copy.size(); i++) {
+			copy.get(i).apply(this);
+			if (i < copy.size() - 1) {
+				tlaModuleString.append(", ");
 			}
 		}
 		tlaModuleString.append("}\n");
-		outAEnumeratedSetSet(node);
-
 	}
 
 	@Override
@@ -517,8 +587,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	public void printUnchangedVariables(Node node, boolean printAnd) {
-		HashSet<Node> unchangedVariablesSet = unchangedVariablesFinder
-				.getUnchangedVariablesTable().get(node);
+		HashSet<Node> unchangedVariablesSet = missingVariableFinder
+				.getUnchangedVariables(node);
 		if (null != unchangedVariablesSet) {
 			ArrayList<Node> unchangedVariables = new ArrayList<Node>(
 					unchangedVariablesSet);
@@ -589,8 +659,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	public void printUnchangedVariablesNull(Node node, boolean printAnd) {
-		HashSet<Node> unchangedVariablesSet = unchangedVariablesFinder
-				.getUnchangedVariablesNull().get(node);
+		HashSet<Node> unchangedVariablesSet = missingVariableFinder
+				.getUnchangedVariablesNull(node);
 		if (null != unchangedVariablesSet) {
 			ArrayList<Node> unchangedVariables = new ArrayList<Node>(
 					unchangedVariablesSet);
@@ -742,9 +812,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAOperation(AOperation node) {
 		String name = renamer.getNameOfRef(node);
 		tlaModuleString.append(name);
-		
-		List<PExpression> output = new ArrayList<PExpression>(
-				node.getReturnValues());
+
+		// TODO handle output parameter of a operation
+		// List<PExpression> output = new ArrayList<PExpression>(
+		// node.getReturnValues());
 		List<PExpression> params = new ArrayList<PExpression>(
 				node.getParameters());
 		List<PExpression> newList = new ArrayList<PExpression>();
@@ -950,7 +1021,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		 */
 		inAExistsPredicate(node);
 		tlaModuleString.append("\\E ");
-		
+
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (int i = 0; i < copy.size(); i++) {
@@ -1329,7 +1400,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 	}
 
-	private void printTypeOfIdentifier(PExpression e) {
+	public void printTypeOfIdentifier(PExpression e) {
 		// NodeType n = typeRestrictor.getRestrictedTypes().get(e);
 		ArrayList<NodeType> list = typeRestrictor.getRestrictedTypesSet(e);
 		if (list != null) {
