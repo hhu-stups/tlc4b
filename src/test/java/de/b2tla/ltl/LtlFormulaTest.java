@@ -282,9 +282,9 @@ public class LtlFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\E p \\in {1}: p = 1 /\\ TRUE\n"
+				+ "ltl == \\E p \\in {1}: p = 1 /\\ p = 1\n"
 				+ "====";
-		compareLTL(expected, machine, "#p.({p=1} & true)");
+		compareLTL(expected, machine, "#p.({p=1} & {p = 1})");
 	}
 	
 	@Test 
@@ -292,9 +292,9 @@ public class LtlFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\A p \\in {1}: p = 1 /\\ TRUE\n"
+				+ "ltl == \\A p \\in {1}: p = 1 /\\ p = 1\n"
 				+ "====";
-		compareLTL(expected, machine, "!p.({p=1} => true)");
+		compareLTL(expected, machine, "!p.({p=1} => {p = 1})");
 	}
 	
 	@Ignore

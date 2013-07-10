@@ -128,8 +128,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 		ltlNodeToBNodeTable.put(node, start);
 
-		LTLBPredicate ltlBPredicate = new LTLBPredicate(
-				new LinkedHashMap<String, Node>(), start);
+		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(), start);
 		this.bPredicates.add(ltlBPredicate);
 
 		machineContext.checkLTLBPredicate(ltlBPredicate);
