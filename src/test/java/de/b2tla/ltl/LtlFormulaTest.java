@@ -210,6 +210,13 @@ public class LtlFormulaTest {
 		compareLTL("", machine, "true T false");
 	}
 	
+	@Test (expected = ScopeException.class)
+	public void testAction() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "END";
+		compareLTL("", machine, "[foo]");
+	}
+	
 	@Ignore
 	@Test 
 	public void testEnabled() throws Exception {

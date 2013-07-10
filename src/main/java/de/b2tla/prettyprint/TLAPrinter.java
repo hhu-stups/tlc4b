@@ -139,7 +139,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			tlaModuleString.append("' = ");
 			vars.get(i).apply(this);
 			if (i < vars.size() - 1)
-				tlaModuleString.append(",");
+				tlaModuleString.append(" /\\ ");
 		}
 	}
 

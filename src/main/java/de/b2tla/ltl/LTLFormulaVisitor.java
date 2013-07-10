@@ -23,6 +23,7 @@ import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.internal.LtlLexer;
 import de.be4.ltl.core.parser.lexer.Lexer;
 import de.be4.ltl.core.parser.lexer.LexerException;
+import de.be4.ltl.core.parser.node.AActionLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
@@ -128,7 +129,8 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 		ltlNodeToBNodeTable.put(node, start);
 
-		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(), start);
+		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(),
+				start);
 		this.bPredicates.add(ltlBPredicate);
 
 		machineContext.checkLTLBPredicate(ltlBPredicate);
@@ -264,6 +266,12 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	public void inAYesterdayLtl(AYesterdayLtl node) {
 		throw new ScopeException(
 				"The 'yesterday' operator is not supported by TLC.");
+	}
+
+	@Override
+	public void caseAActionLtl(AActionLtl node) {
+		throw new ScopeException(
+				"The '[...]' operator is not supported by TLC.");
 	}
 
 }
