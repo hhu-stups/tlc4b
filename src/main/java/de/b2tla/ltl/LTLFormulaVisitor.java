@@ -1,11 +1,9 @@
 package de.b2tla.ltl;
 
-import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,7 +20,6 @@ import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.internal.LtlLexer;
 import de.be4.ltl.core.parser.lexer.Lexer;
-import de.be4.ltl.core.parser.lexer.LexerException;
 import de.be4.ltl.core.parser.node.AActionLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;

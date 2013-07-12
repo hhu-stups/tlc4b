@@ -1,4 +1,4 @@
-package de.b2tla.tlc.integration;
+ package de.b2tla.tlc.integration;
 
 import static org.junit.Assert.assertEquals;
 

@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.b2tla.Globals;
+import de.b2tla.B2TLAGlobals;
 
 public class TLCOutput {
 	private final String moduleName;

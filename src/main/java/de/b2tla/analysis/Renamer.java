@@ -20,6 +20,7 @@ import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
 import de.be4.classicalb.core.parser.node.AOperation;
+import de.be4.classicalb.core.parser.node.AOperationCallSubstitution;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
@@ -27,6 +28,7 @@ import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class Renamer extends DepthFirstAdapter {
 	private final MachineContext machineContext;
@@ -86,9 +88,6 @@ public class Renamer extends DepthFirstAdapter {
 		RelationsKeywords.add("relational_overriding");
 		RelationsKeywords.add("direct");
 		RelationsKeywords.add("Seq");
-		RelationsKeywords.add("Seq");
-		RelationsKeywords.add("Seq");
-		RelationsKeywords.add("Seq");
 
 	}
 
@@ -101,7 +100,24 @@ public class Renamer extends DepthFirstAdapter {
 		SequencesKeywords.add("Tail");
 		SequencesKeywords.add("Subseq");
 		SequencesKeywords.add("SelectSeq");
+	}
 
+	private final static Set<String> SequencesExtendedKeywords = new HashSet<String>();
+	static {
+		SequencesKeywords.add("Last");
+		SequencesKeywords.add("Front");
+		SequencesKeywords.add("Prepend");
+		SequencesKeywords.add("BoundedSeq");
+		SequencesKeywords.add("Seq1");
+		SequencesKeywords.add("ISeq");
+		SequencesKeywords.add("ISeqEleOf");
+		SequencesKeywords.add("ISeq1");
+		SequencesKeywords.add("ISeq1EleOf");
+		SequencesKeywords.add("Perm");
+		SequencesKeywords.add("Rev");
+		SequencesKeywords.add("Conc");
+		SequencesKeywords.add("TakeFirstElements");
+		SequencesKeywords.add("DropFirstElements");
 	}
 
 	public Renamer(MachineContext machineContext) {
@@ -113,43 +129,46 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	public void start() {
-		eval(machineContext.getDeferredSets());
-		eval(machineContext.getEnumeratedSets());
-		eval(machineContext.getConstants());
-		eval(machineContext.getVariables());
-		eval(machineContext.getOperations());
+		evalGlobalNames(machineContext.getDeferredSets());
+		evalGlobalNames(machineContext.getEnumeratedSets());
+		evalGlobalNames(machineContext.getConstants());
+		evalGlobalNames(machineContext.getVariables());
+		evalGlobalNames(machineContext.getOperations());
 		evalDefinitions();
 		machineContext.getTree().apply(this);
 	}
 
 	private void evalDefinitions() {
-		ADefinitionsMachineClause node = machineContext.getDefinitionMachineClause();
-		if (null == node){
+		ADefinitionsMachineClause node = machineContext
+				.getDefinitionMachineClause();
+		if (null == node) {
 			return;
 		}
-		
+
 		List<PDefinition> copy = new ArrayList<PDefinition>(
 				node.getDefinitions());
 		for (PDefinition e : copy) {
 			String name = null;
-			if (e instanceof AExpressionDefinitionDefinition){
-				name = ((AExpressionDefinitionDefinition) e).getName().getText();
-			}else if (e instanceof APredicateDefinitionDefinition){
+			if (e instanceof AExpressionDefinitionDefinition) {
+				name = ((AExpressionDefinitionDefinition) e).getName()
+						.getText();
+			} else if (e instanceof APredicateDefinitionDefinition) {
 				name = ((APredicateDefinitionDefinition) e).getName().getText();
-			}else if (e instanceof ASubstitutionDefinitionDefinition){
-				name = ((ASubstitutionDefinitionDefinition) e).getName().getText();
+			} else if (e instanceof ASubstitutionDefinitionDefinition) {
+				name = ((ASubstitutionDefinitionDefinition) e).getName()
+						.getText();
 			}
 			String newName = incName(name);
 			namesTable.put(e, newName);
 			globalNames.add(newName);
 		}
-		
+
 		for (PDefinition e : copy) {
 			e.apply(this);
 		}
 	}
 
-	public void eval(LinkedHashMap<String, Node> map) {
+	public void evalGlobalNames(LinkedHashMap<String, Node> map) {
 		Iterator<String> iter = map.keySet().iterator();
 		while (iter.hasNext()) {
 			String name = iter.next();
@@ -180,17 +199,20 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private ArrayList<HashSet<String>> localContexts = new ArrayList<HashSet<String>>();
-	
+
 	private boolean exist(String name) {
 		if (KEYWORDS.contains(name))
 			return true;
 		if (globalNames.contains(name))
 			return true;
+		// TODO check only if the standard module is extended
 		if (SequencesKeywords.contains(name))
 			return true;
-		
+		if (SequencesExtendedKeywords.contains(name))
+			return true;
+
 		for (int i = 0; i < localContexts.size(); i++) {
-			if(localContexts.get(i).contains(name))
+			if (localContexts.get(i).contains(name))
 				return true;
 		}
 
@@ -229,61 +251,83 @@ public class Renamer extends DepthFirstAdapter {
 		evalDefinition(node.getParameters());
 	}
 
-	
 	// local variables
-	
-	public void inAForallPredicate(AForallPredicate node) {
+
+	@Override
+	public void caseAForallPredicate(AForallPredicate node) {
 		evalBoundedVariables(node, node.getIdentifiers());
-	}
-	
-	public void outAForallPredicate(AForallPredicate node) {
+		node.getImplication().apply(this);
 		removeLastContext();
 	}
 
-	public void inAExistsPredicate(AExistsPredicate node) {
+	@Override
+	public void caseAExistsPredicate(AExistsPredicate node) {
 		evalBoundedVariables(node, node.getIdentifiers());
-	}
-	
-	public void outAExistsPredicate(AExistsPredicate node) {
-		removeLastContext();
-	}
-	
-	public void inALambdaExpression(ALambdaExpression node) {
-		evalBoundedVariables(node, node.getIdentifiers());
-	}
-	
-	public void outALambdaExpression(ALambdaExpression node) {
+		node.getPredicate().apply(this);
 		removeLastContext();
 	}
 
-	public void inAComprehensionSetExpression(AComprehensionSetExpression node) {
+	@Override
+	public void caseALambdaExpression(ALambdaExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
-	}
-	
-	public void outAComprehensionSetExpression(AComprehensionSetExpression node) {
+		node.getPredicate().apply(this);
+		node.getExpression().apply(this);
 		removeLastContext();
 	}
 
-	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
+	@Override
+	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+		node.getPredicates().apply(this);
+		removeLastContext();
 	}
 
-	public void inAQuantifiedIntersectionExpression(
+	@Override
+	public void caseAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
+		evalBoundedVariables(node, node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
+		node.getPredicates().apply(this);
+		node.getExpression().apply(this);
+		removeLastContext();
+	}
+
+	@Override
+	public void caseAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+		node.getPredicates().apply(this);
+		node.getExpression().apply(this);
+		removeLastContext();
 	}
 
-	public void inAGeneralProductExpression(AGeneralProductExpression node) {
+	@Override
+	public void caseAGeneralSumExpression(AGeneralSumExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+		node.getPredicates().apply(this);
+		node.getExpression().apply(this);
+		removeLastContext();
 	}
 
-	public void inAGeneralSumExpression(AGeneralSumExpression node) {
+	@Override
+	public void caseAGeneralProductExpression(AGeneralProductExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
+		node.getPredicates().apply(this);
+		node.getExpression().apply(this);
+		removeLastContext();
 	}
 
-	public void inAOperation(AOperation node) {
-		evalBoundedVariables(node, node.getParameters());
-		evalBoundedVariables(node, node.getReturnValues());
+	@Override
+	public void caseAOperation(AOperation node) {
+		List<PExpression> list = new ArrayList<PExpression>();
+		list.addAll(node.getParameters());
+		list.addAll(node.getReturnValues());
+		evalBoundedVariables(node, list);
+		node.getOperationBody().apply(this);
+		removeLastContext();
 	}
 
 	private void evalBoundedVariables(Node node, List<PExpression> params) {
@@ -295,8 +339,8 @@ public class Renamer extends DepthFirstAdapter {
 		localContexts.add(context);
 	}
 
-	public void removeLastContext(){
-		localContexts.remove(localContexts.size()-1);
+	public void removeLastContext() {
+		localContexts.remove(localContexts.size() - 1);
 	}
-	
+
 }

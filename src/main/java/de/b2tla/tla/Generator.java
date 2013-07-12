@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.b2tla.Globals;
+import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.ConstantsEvaluator;
 import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
@@ -76,7 +76,7 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	private void evalGoal() {
-		if (Globals.GOAL) {
+		if (B2TLAGlobals.isGOAL()) {
 			if (machineContext.getDefinitions().keySet().contains("GOAL")) {
 				this.configFile.setGoal();
 			}
@@ -273,7 +273,7 @@ public class Generator extends DepthFirstAdapter {
 	@Override
 	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
 		this.tlaModule.invariant = node.getPredicates();
-		if (Globals.invariant) {
+		if (B2TLAGlobals.isInvariant()) {
 			this.configFile.setInvariant();
 		}
 

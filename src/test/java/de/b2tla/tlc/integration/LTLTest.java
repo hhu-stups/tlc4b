@@ -10,10 +10,10 @@ import de.b2tla.tlc.TLCOutput;
 public class LTLTest {
 
 	@Test
-	public void testRelations() throws Exception {
+	public void testCounterLTL() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\CounterLTL.mch"};
 		B2TLA.main(a);
-		//assertEquals(TLCOutput.ERROR.TemporalProperty, B2TLA.test(a));
+		assertEquals(TLCOutput.ERROR.NoError, B2TLA.test(a));
 	}
 	
 }

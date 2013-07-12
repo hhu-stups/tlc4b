@@ -60,7 +60,7 @@ public class TLCRunner {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(path);
 		list.add(machineName);
-		if (!Globals.deadlockCheck) {
+		if (!B2TLAGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
 		// list.add("-coverage");
@@ -85,7 +85,7 @@ public class TLCRunner {
 
 	public static ArrayList<String> runTLC(String machineName, String path) {
 		ArrayList<String> list = new ArrayList<String>();
-		if (!Globals.deadlockCheck) {
+		if (!B2TLAGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
 		list.add("-config");

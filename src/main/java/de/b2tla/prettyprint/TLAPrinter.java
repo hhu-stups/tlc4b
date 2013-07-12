@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.b2tla.Globals;
+import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.MachineContext;
 import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.PrecedenceCollector;
@@ -1374,12 +1374,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAMaxIntExpression(AMaxIntExpression node) {
-		tlaModuleString.append(Globals.MAX_INT);
+		tlaModuleString.append(B2TLAGlobals.getMAX_INT());
 	}
 
 	@Override
 	public void caseAMinIntExpression(AMinIntExpression node) {
-		tlaModuleString.append(Globals.MIN_INT);
+		tlaModuleString.append(B2TLAGlobals.getMIN_INT());
 	}
 
 	/**

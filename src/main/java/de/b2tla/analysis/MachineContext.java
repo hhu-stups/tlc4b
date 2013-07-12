@@ -161,10 +161,21 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	private void checkLTLFormulas() {
+		if (ltlVisitors.size() == 1) {
+			ltlVisitors.get(0).start();
+			return;
+		}
+
+		ArrayList<LTLFormulaVisitor> notSupportedLTLFormulas = new ArrayList<LTLFormulaVisitor>();
 		for (int i = 0; i < ltlVisitors.size(); i++) {
 			LTLFormulaVisitor visitor = ltlVisitors.get(i);
-			visitor.start();
+			try {
+				visitor.start();
+			} catch (ScopeException e) {
+				notSupportedLTLFormulas.add(visitor);
+			}
 		}
+		ltlVisitors.removeAll(notSupportedLTLFormulas);
 	}
 
 	public void checkLTLBPredicate(LTLBPredicate ltlbPredicate) {
@@ -285,6 +296,8 @@ public class MachineContext extends DepthFirstAdapter {
 								"Error: LTL formula is not in a string representation.");
 					}
 					definitionsToRemove.add(def);
+				}else if (name.startsWith("ANIMATION_")){
+					definitionsToRemove.add(def);
 				}
 				evalDefinitionName(((AExpressionDefinitionDefinition) e)
 						.getName().getText().toString(), e);
@@ -301,7 +314,7 @@ public class MachineContext extends DepthFirstAdapter {
 		 * LTL formulas are stored in the Arraylist {@value #ltlVisitors}.
 		 */
 		copy.removeAll(definitionsToRemove);
-		
+
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 		ArrayList<MachineContext> list = lookupExtendedMachines();
 		for (int i = 0; i < list.size(); i++) {
@@ -320,9 +333,6 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	private void evalDefinitionName(String name, Node node) {
-		if (name.startsWith("ASSERT_LTL")) {
-			return;
-		}
 		existString(name);
 		definitions.put(name, node);
 	}

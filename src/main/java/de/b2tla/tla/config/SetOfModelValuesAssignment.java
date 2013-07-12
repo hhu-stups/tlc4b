@@ -2,7 +2,7 @@ package de.b2tla.tla.config;
 
 import java.util.List;
 
-import de.b2tla.Globals;
+import de.b2tla.B2TLAGlobals;
 import de.be4.classicalb.core.parser.node.ADeferredSetSet;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.Node;
@@ -21,7 +21,7 @@ public class SetOfModelValuesAssignment extends ConfigFileAssignment{
 	public SetOfModelValuesAssignment(Node node, Integer size) {
 		this.node = node;
 		if(size == null){
-			this.size = Globals.DEFERRED_SET_SIZE;
+			this.size = B2TLAGlobals.getDEFERRED_SET_SIZE();
 		}else{
 			this.size = size;
 		}

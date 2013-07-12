@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 
-import de.b2tla.Globals;
+import com.sun.j3d.utils.behaviors.vp.WandViewBehavior.ResetViewListener;
+
+import de.b2tla.B2TLAGlobals;
 
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
@@ -35,6 +37,11 @@ public class B2TLA {
 	private TLCOutputInfo tlcOutputInfo;
 	private String ltlFormula;
 	
+	
+	public B2TLA(){
+		B2TLAGlobals.resetGlobals();
+	}
+	
 	public static void main(String[] args) throws IOException {
 		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
@@ -52,7 +59,7 @@ public class B2TLA {
 		}
 		StopWatch.stop("Translation");
 
-		if (Globals.runTLC) {
+		if (B2TLAGlobals.isRunTLC()) {
 			ArrayList<String> output = TLCRunner.runTLC(b2tla.machineName,
 					b2tla.path);
 			b2tla.evalOutput(output, true);
@@ -70,7 +77,7 @@ public class B2TLA {
 			return null;
 		}
 
-		if (Globals.runTLC) {
+		if (B2TLAGlobals.isRunTLC()) {
 			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
 					b2tla.machineName, b2tla.path);
 			ERROR error = TLCOutput.findError(output);
@@ -100,19 +107,19 @@ public class B2TLA {
 		int index = 0;
 		while (index < args.length) {
 			if (args[index].toLowerCase().equals("-nodead")) {
-				Globals.deadlockCheck = false;
+				B2TLAGlobals.setDeadlockCheck(false);
 			} else if (args[index].toLowerCase().equals("-notlc")) {
-				Globals.runTLC = false;
+				B2TLAGlobals.setRunTLC(false);
 			} else if (args[index].toLowerCase().equals("-notranslation")) {
-				Globals.translate = false;
+				B2TLAGlobals.setTranslate(false);
 			} else if (args[index].toLowerCase().equals("-nogoal")) {
-				Globals.GOAL = false;
+				B2TLAGlobals.setGOAL(false);
 			} else if (args[index].toLowerCase().equals("-noinv")) {
-				Globals.invariant = false;
+				B2TLAGlobals.setInvariant(false);
 			} else if (args[index].toLowerCase().equals("-tool")) {
-				Globals.tool = true;
+				B2TLAGlobals.setTool(false);
 			} else if (args[index].toLowerCase().equals("-noltl")) {
-				Globals.checkltl = false;
+				B2TLAGlobals.setCheckltl(false);
 			} else if (args[index].toLowerCase().equals("-ltlformula")) {
 				index = index + 1;
 				if (index == args.length) {
@@ -143,7 +150,7 @@ public class B2TLA {
 		handleParameter(args);
 
 		handleMainFileName();
-		if (Globals.translate) {
+		if (B2TLAGlobals.isTranslate()) {
 			translator = new B2TlaTranslator(machineName, getFile(), this.ltlFormula);
 			translator.translate();
 
@@ -177,9 +184,9 @@ public class B2TLA {
 
 	private void createFiles() {
 		createFile(path, machineName + ".tla", tlaModule, "TLA+ module '"
-				+ pathAndName + ".tla' created.", Globals.deleteOnExit);
+				+ pathAndName + ".tla' created.", B2TLAGlobals.isDeleteOnExit());
 		createFile(path, machineName + ".cfg", config, "Configuration file '"
-				+ pathAndName + ".cfg' created.", Globals.deleteOnExit);
+				+ pathAndName + ".cfg' created.", B2TLAGlobals.isDeleteOnExit());
 
 		createStandardModules();
 	}
@@ -253,7 +260,7 @@ public class B2TLA {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			if (Globals.deleteOnExit) {
+			if (B2TLAGlobals.isDeleteOnExit()) {
 				file.deleteOnExit();
 			}
 			try {

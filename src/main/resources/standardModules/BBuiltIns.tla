@@ -10,9 +10,9 @@ RECURSIVE Pi(_)
 Pi(S) == LET e == CHOOSE e \in S: TRUE
          IN IF  S = {} THEN 0 ELSE e + Pi(S \ {e}) 
 
-Max == CHOOSE x \in {1} : \A p \in {1} : x >= p
+Max(S) == CHOOSE x \in S : \A p \in S : x >= p
 
-Min == CHOOSE x \in {1} : \A p \in {1} : x =< p
+Min(S) == CHOOSE x \in S : \A p \in S : x =< p
 
 succ[x \in Int] == x + 1
 

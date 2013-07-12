@@ -4,7 +4,7 @@ import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import de.b2tla.Globals;
+import de.b2tla.B2TLAGlobals;
 
 
 public class BTLCPrintStream extends PrintStream {
@@ -32,7 +32,7 @@ public class BTLCPrintStream extends PrintStream {
 	@Override
 	public void println(String str){
 		synchronized (BTLCPrintStream.class){
-			if(!Globals.tool){
+			if(!B2TLAGlobals.isTool()){
 				console.println("" + str);
 			}
 			array.add(str);
