@@ -11,8 +11,6 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 
-import com.sun.j3d.utils.behaviors.vp.WandViewBehavior.ResetViewListener;
-
 import de.b2tla.B2TLAGlobals;
 
 import de.b2tla.analysis.UsedStandardModules;

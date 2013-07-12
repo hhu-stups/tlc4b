@@ -52,7 +52,9 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 		this.dependsOnIdentifierTable = new Hashtable<Node, HashSet<Node>>();
 		this.integerValueTable = new HashMap<Node, Integer>();
 		this.machineContext = machineContext;
-
+	}
+	
+	public void start() {
 		ConstantsInTreeFinder constantInTreeFinder = new ConstantsInTreeFinder();
 
 		APropertiesMachineClause properties = machineContext

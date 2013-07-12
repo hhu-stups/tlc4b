@@ -17,7 +17,6 @@ import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
-import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
 import de.b2tla.tlc.TLCOutputInfo;
@@ -79,6 +78,7 @@ public class B2TlaTranslator {
 				start, typechecker.getTypes());
 
 		ConstantsEliminator constantsEliminator  = new ConstantsEliminator(machineContext);
+		constantsEliminator.start();
 		
 		ConstantsEvaluator constantsEvaluator = new ConstantsEvaluator(
 				machineContext);
