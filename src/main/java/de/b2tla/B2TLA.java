@@ -38,10 +38,6 @@ public class B2TLA {
 	private String ltlFormula;
 	
 	
-	public B2TLA(){
-		B2TLAGlobals.resetGlobals();
-	}
-	
 	public static void main(String[] args) throws IOException {
 		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
