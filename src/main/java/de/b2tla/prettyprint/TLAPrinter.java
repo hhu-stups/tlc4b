@@ -121,7 +121,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append("))");
 
 	}
-	
+
 	public void printWeakFairness(String s) {
 		tlaModuleString
 				.append(String
@@ -1813,23 +1813,23 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseASubsetPredicate(ASubsetPredicate node) {
 		inASubsetPredicate(node);
 		node.getLeft().apply(this);
-		tlaModuleString.append(" \\subseteq ");
+		tlaModuleString.append(" \\in SUBSET(");
+		// tlaModuleString.append(" \\subseteq ");
 		node.getRight().apply(this);
+		tlaModuleString.append(")");
+		
 		outASubsetPredicate(node);
 	}
 
 	@Override
 	public void caseASubsetStrictPredicate(ASubsetStrictPredicate node) {
 		inASubsetStrictPredicate(node);
-		tlaModuleString.append("(");
 		node.getLeft().apply(this);
-		tlaModuleString.append(" \\subseteq  ");
+		tlaModuleString.append(" \\in (SUBSET(");
 		node.getRight().apply(this);
-		tlaModuleString.append(" /\\ ");
-		node.getLeft().apply(this);
-		tlaModuleString.append(" # ");
+		tlaModuleString.append(") \\ {");
 		node.getRight().apply(this);
-		tlaModuleString.append(")");
+		tlaModuleString.append("})");
 		outASubsetStrictPredicate(node);
 	}
 

@@ -15,9 +15,7 @@ public class DefinitionsOrderTest {
 				+ "PROPERTIES def2 = 1 \n" + "END";
 		
 		String expected = "---- MODULE test----\n"
-				+ "def1 == 1\n"
-				+ "def2 == def1 \n"
-				+ "ASSUME def2 = 1 \n"
+				+ "ASSUME 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -30,9 +28,7 @@ public class DefinitionsOrderTest {
 				+ "PROPERTIES def1 = 1 \n" + "END";
 		
 		String expected = "---- MODULE test----\n"
-				+ "def2 == 1\n"
-				+ "def1 == def2 \n"
-				+ "ASSUME def1 = 1 \n"
+				+ "ASSUME 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -46,8 +42,7 @@ public class DefinitionsOrderTest {
 				+ "PROPERTIES k = def \n" + "END";
 		
 		String expected = "---- MODULE test----\n"
-				+ "def == 1\n"
-				+ "k == def \n"
+				+ "k == 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -61,8 +56,7 @@ public class DefinitionsOrderTest {
 		
 		String expected = "---- MODULE test----\n"
 				+ "k == 1\n"
-				+ "def == k = 1 \n"
-				+ "ASSUME def \n"
+				+ "ASSUME k = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}

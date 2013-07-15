@@ -1,4 +1,4 @@
-package de.b2tla.analysis;
+package de.b2tla.analysis.transformation;
 
 import java.util.Hashtable;
 
@@ -40,19 +40,19 @@ public class DefinitionCollector extends DepthFirstAdapter {
 	@Override
 	public void caseAPredicateDefinitionDefinition(
 			APredicateDefinitionDefinition node) {
-		definitionsTable.put(node.getName().getText(), node);
+		definitionsTable.put(node.getName().getText().toString(), node);
 	}
 
 	@Override
 	public void caseASubstitutionDefinitionDefinition(
 			ASubstitutionDefinitionDefinition node) {
-		definitionsTable.put(node.getName().getText(), node);
+		definitionsTable.put(node.getName().getText().toString(), node);
 	}
 
 	@Override
 	public void caseAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
-		definitionsTable.put(node.getName().getText(), node);
+		definitionsTable.put(node.getName().getText().toString(), node);
 	}
 
 	/***************************************************************************

@@ -63,8 +63,7 @@ public class RenamerTest {
 				+ "END";
 
 		String expected = "---- MODULE test ----\n"
-				+ "WITH_1 == 1 \n"
-				+ "ASSUME WITH_1 = 1\n"
+				+ "ASSUME 1 = 1\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -78,8 +77,7 @@ public class RenamerTest {
 				+ "PROPERTIES x = 1 & foo(1) \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "x == 1\n"
-				+ "foo(x_1) == x_1 = 1\n"
-				+ "ASSUME foo(1)\n"
+				+ "ASSUME 1 = 1\n"
 				+ "====";
 		compare(expected, machine);
 	}

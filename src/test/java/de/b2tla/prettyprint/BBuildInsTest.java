@@ -7,8 +7,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class BBuildInsTest {
-
-	
 	
 	/*
 	 * Set BuiltIns
@@ -19,7 +17,7 @@ public class BBuildInsTest {
 		String machine = "MACHINE test\n" + "PROPERTIES {1} <<: {1,2} \n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "ASSUME ({1} \\subseteq  {1, 2} /\\ {1} # {1, 2})\n" + "====";
+				+ "ASSUME {1} \\in (SUBSET({1, 2}) \\ {{1, 2}})\n" + "====";
 		compareEquals(expected, machine);
 	}
 

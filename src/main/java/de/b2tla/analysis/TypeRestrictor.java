@@ -9,7 +9,6 @@ import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.analysis.nodes.SubsetNode;
-import de.b2tla.ltl.LTLBPredicate;
 import de.b2tla.ltl.LTLFormulaVisitor;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
@@ -36,7 +35,6 @@ import de.be4.classicalb.core.parser.node.ASelectSubstitution;
 import de.be4.classicalb.core.parser.node.ASubsetPredicate;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.be4.classicalb.core.parser.node.PSubstitution;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
@@ -111,22 +109,18 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAConstraintsMachineClause(AConstraintsMachineClause node) {
-		inAConstraintsMachineClause(node);
+	public void inAConstraintsMachineClause(AConstraintsMachineClause node) {
 		HashSet<Node> list = new HashSet<Node>();
 		list.addAll(machineContext.getSetParamter().values());
 		list.addAll(machineContext.getScalarParameter().values());
 		analysePredicate(node.getPredicates(), list);
-
-		if (node.getPredicates() != null) {
-			node.getPredicates().apply(this);
-		}
-		outAConstraintsMachineClause(node);
 	}
 
 	@Override
-	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
-		node.getPredicates().apply(this);
+	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
+		HashSet<Node> list = new HashSet<Node>();
+		list.addAll(machineContext.getConstants().values());
+		//analysePredicate(node.getPredicates(), list);
 	}
 
 	private void analysePredicate(Node n, HashSet<Node> list) {
@@ -154,7 +148,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			Node r_left = machineContext.getReferences().get(left);
 			PExpression right = ((AMemberPredicate) n).getRight();
 			Node r_right = machineContext.getReferences().get(right);
-
 			if (list.contains(r_left) && cEF.isconstant(right)) {
 				putRestrictedType(r_left, new ElementOfNode(right));
 				removedNodes.add(n);
@@ -200,7 +193,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
-			// e.apply(this);
 			list.add(e);
 		}
 		AImplicationPredicate implication = (AImplicationPredicate) node
@@ -319,12 +311,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAPreconditionSubstitution(APreconditionSubstitution node) {
+	public void inAPreconditionSubstitution(APreconditionSubstitution node) {
 		HashSet<Node> list = getExpectedIdentifier(node);
 		analysePredicate(node.getPredicate(), list);
-
-		node.getPredicate().apply(this);
-		node.getSubstitution().apply(this);
 	}
 
 	private HashSet<Node> getExpectedIdentifier(Node node) {
@@ -335,25 +324,13 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseASelectSubstitution(ASelectSubstitution node) {
+	public void inASelectSubstitution(ASelectSubstitution node) {
 		HashSet<Node> list = getExpectedIdentifier(node);
 		analysePredicate(node.getCondition(), list);
-		node.getCondition().apply(this);
-		node.getThen().apply(this);
-		{
-			List<PSubstitution> copy = new ArrayList<PSubstitution>(
-					node.getWhenSubstitutions());
-			for (PSubstitution e : copy) {
-				e.apply(this);
-			}
-		}
-		if (node.getElse() != null) {
-			node.getElse().apply(this);
-		}
 	}
 
 	@Override
-	public void caseAAnySubstitution(AAnySubstitution node) {
+	public void inAAnySubstitution(AAnySubstitution node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -362,13 +339,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		list.addAll(getExpectedIdentifier(node));
 		analysePredicate(node.getWhere(), list);
-
-		node.getWhere().apply(this);
-		node.getThen().apply(this);
 	}
 
 	@Override
-	public void caseALetSubstitution(ALetSubstitution node) {
+	public void inALetSubstitution(ALetSubstitution node) {
 		HashSet<Node> list = new HashSet<Node>();
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -377,9 +351,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		list.addAll(getExpectedIdentifier(node));
 		analysePredicate(node.getPredicate(), list);
-
-		node.getPredicate().apply(this);
-		node.getSubstitution().apply(this);
 	}
 
 }

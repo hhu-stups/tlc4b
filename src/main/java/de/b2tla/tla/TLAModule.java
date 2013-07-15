@@ -1,11 +1,9 @@
 package de.b2tla.tla;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import de.b2tla.analysis.DefinitionsOrder;
 import de.b2tla.analysis.MachineContext;
-import de.b2tla.analysis.PrimedNodesMarker;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.POperation;

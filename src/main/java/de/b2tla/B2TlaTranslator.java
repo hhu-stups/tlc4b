@@ -17,6 +17,7 @@ import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
+import de.b2tla.analysis.transformation.DefinitionsEliminator;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
 import de.b2tla.tlc.TLCOutputInfo;
@@ -65,13 +66,12 @@ public class B2TlaTranslator {
 	}
 
 	public void translate() {
+		DefinitionsEliminator defEliminator = new DefinitionsEliminator(start);
 		
 		MachineContext machineContext = new MachineContext(start, ltlFormula);
 		this.machineName = machineContext.getMachineName();
-
 		
 		Typechecker typechecker = new Typechecker(machineContext);
-		
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(machineContext);
 		
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
@@ -79,7 +79,7 @@ public class B2TlaTranslator {
 
 		ConstantsEliminator constantsEliminator  = new ConstantsEliminator(machineContext);
 		constantsEliminator.start();
-		
+
 		ConstantsEvaluator constantsEvaluator = new ConstantsEvaluator(
 				machineContext);
 
@@ -89,18 +89,20 @@ public class B2TlaTranslator {
 				typeRestrictor);
 		start.apply(usedModules);
 		usedStandardModules = usedModules.getUsedModules();
-
+		
 		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
 				machineContext);
 
 		Generator generator = new Generator(machineContext, typeRestrictor,
 				constantsEvaluator, deferredSetSizeCalculator);
 		generator.generate();
+
 		generator.getTlaModule().sortAllDefinitions(machineContext);
-		
+
 		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator
 				.getTlaModule().getOperations(), machineContext);
 		primedNodesMarker.start();
+		
 		Renamer renamer = new Renamer(machineContext);
 		TLAPrinter printer = new TLAPrinter(machineContext, typechecker,
 				unchangedVariablesFinder, precedenceCollector, usedModules,

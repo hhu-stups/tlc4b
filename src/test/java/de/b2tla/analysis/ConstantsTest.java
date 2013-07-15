@@ -112,7 +112,22 @@ public class ConstantsTest {
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "N == {1,2,3,4}\n"
-				+ "ASSUME N \\subseteq Nat \n"
+				+ "ASSUME N \\in SUBSET(Nat) \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testConstants3() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS n\n" 
+				+ "PROPERTIES n <: {1,2,3}\n"
+				+ "END";
+		
+		String expected = "---- MODULE test----\n"
+				+ "VARIABLES n\n"
+				+ "Init == n \\in SUBSET({1, 2, 3})\n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<n>>\n"
 				+ "======";
 		compare(expected, machine);
 	}
