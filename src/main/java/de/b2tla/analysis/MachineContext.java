@@ -172,7 +172,7 @@ public class MachineContext extends DepthFirstAdapter {
 			try {
 				visitor.start();
 			} catch (ScopeException e) {
-				System.out.println("Warning: LTL formula '" + visitor.getName() + "' can not be checked by TLC.");
+				System.out.println("Warning: LTL formula '" + visitor.getName() + "' cannot be checked by TLC.");
 				notSupportedLTLFormulas.add(visitor);
 			}
 		}
@@ -717,7 +717,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
-		// TODO maybe give better feedback to the user, e.g. can not assign a
+		// TODO maybe give better feedback to the user, e.g. cannot assign a
 		// value to constant 'c'
 		ArrayList<LinkedHashMap<String, Node>> temp = contextTable;
 		{

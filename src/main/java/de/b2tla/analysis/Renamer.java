@@ -131,6 +131,7 @@ public class Renamer extends DepthFirstAdapter {
 	public void start() {
 		evalGlobalNames(machineContext.getDeferredSets());
 		evalGlobalNames(machineContext.getEnumeratedSets());
+		evalGlobalNames(machineContext.getEnumValues());
 		evalGlobalNames(machineContext.getConstants());
 		evalGlobalNames(machineContext.getVariables());
 		evalGlobalNames(machineContext.getOperations());

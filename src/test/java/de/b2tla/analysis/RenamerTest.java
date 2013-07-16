@@ -1,6 +1,6 @@
 package de.b2tla.analysis;
 
-import static de.b2tla.util.TestUtil.compare;
+import static de.b2tla.util.TestUtil.*;
 
 import org.junit.Test;
 
@@ -92,6 +92,19 @@ public class RenamerTest {
 				+ "ASSUME (\\E x_1 \\in {1} : TRUE)\n"
 				+ "====";
 		compare(expected, machine);
+	}
+	
+	@Test
+	public void testBoundedVariableHasSameNameAsElementOfEnumeratedSet() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "SETS S={aa} \n"
+				+ "PROPERTIES  #aa.(aa = 1)\n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "CONSTANTS aa\n"
+				+ "S == {aa}\n"
+				+ "ASSUME \\E aa_1 \\in {1} : TRUE\n"
+				+ "====";
+		compareEquals(expected, machine);
 	}
 	
 }

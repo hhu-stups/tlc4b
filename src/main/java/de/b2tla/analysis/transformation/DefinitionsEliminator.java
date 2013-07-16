@@ -52,7 +52,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 				defClause = (ADefinitionsMachineClause) e;
 			}
 		}
-		if(defClause!= null && defClause.getDefinitions().size() == 0){
+		if (defClause != null && defClause.getDefinitions().size() == 0) {
 			defClause.replaceBy(null);
 		}
 	}
@@ -65,13 +65,17 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			e.apply(this);
 		}
 		for (PDefinition e : copy) {
-			if(e instanceof AExpressionDefinitionDefinition){
-				String name = ((AExpressionDefinitionDefinition) e).getName().getText().toString();
-				if(name.startsWith("ASSERT_LTL") || name.startsWith("scope_"))
+			if (e instanceof AExpressionDefinitionDefinition) {
+				String name = ((AExpressionDefinitionDefinition) e).getName()
+						.getText().toString();
+				if (name.startsWith("ASSERT_LTL") || name.startsWith("scope_"))
 					continue;
-			}else{
-				e.replaceBy(null);
+			} else if (e instanceof APredicateDefinitionDefinition) {
+				String name = ((APredicateDefinitionDefinition) e).getName().getText().toString();
+				if (name.equals("GOAL"))
+					continue;
 			}
+			e.replaceBy(null);
 		}
 	}
 

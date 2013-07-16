@@ -17,13 +17,13 @@ import de.b2tla.tlc.TLCOutput;
 
 
 @RunWith(PolySuite.class)
-public class RunTLC extends AbstractParseMachineTest{
+public class NoError extends AbstractParseMachineTest{
 
-	private static final String PATH = "../probprivate/public_examples/TLC";
+	private static final String PATH = "../probprivate/public_examples/TLC/NoError";
 	
 	private final File machine;
 	
-	public RunTLC(File machine){
+	public NoError(File machine){
 		this.machine = machine;
 	}
 	
@@ -31,10 +31,10 @@ public class RunTLC extends AbstractParseMachineTest{
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] {machine.getPath()};
 		B2TLAGlobals.setDeleteOnExit(true);
-		assertNotEquals(TLCOutput.ERROR.TLCError, B2TLA.test(a));
-		assertNotEquals(TLCOutput.ERROR.ParseError, B2TLA.test(a));
+		assertEquals(TLCOutput.ERROR.NoError, B2TLA.test(a));
 	}
 	
+
 	@Config
 	public static Configuration getConfig() {
 		final File[] machines = getMachines(PATH);
@@ -53,6 +53,5 @@ public class RunTLC extends AbstractParseMachineTest{
 			}
 		};
 	}
-	
 	
 }

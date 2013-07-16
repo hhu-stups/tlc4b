@@ -3,9 +3,11 @@ package de.b2tla.util;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import de.b2tla.util.PolySuite.Config;
+import de.b2tla.util.PolySuite.Configuration;
+
 public abstract class AbstractParseMachineTest {
 	
-
 	private static final class MachineFilenameFilter implements FilenameFilter {
 		private static final String[] MACHINE_SUFFIX = { ".mch", ".imp", ".ref" };
 
@@ -24,5 +26,4 @@ public abstract class AbstractParseMachineTest {
 		return dir.listFiles(new MachineFilenameFilter());
 	}
 
-	
 }
