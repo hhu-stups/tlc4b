@@ -28,21 +28,32 @@ public class BTLCPrintStream extends PrintStream {
 		return array;
 	}
 	
-
 	@Override
 	public void println(String str){
 		synchronized (BTLCPrintStream.class){
 			if(!B2TLAGlobals.isTool()){
-				console.println("" + str);
+				console.println(str);
 			}
 			array.add(str);
 		}
 	}
+	
 	@Override
 	public void print(String str){
 		synchronized (BTLCPrintStream.class){
-			console.println("> " +str);
+			if(!B2TLAGlobals.isTool()){
+				console.println(str);
+			}
+			console.println(str);
 			array.add(str);
+		}
+	}
+	
+	@Override
+	public void print(Object obj){
+		synchronized (BTLCPrintStream.class){
+			console.println(obj.toString());
+			array.add(obj.toString());
 		}
 	}
 	

@@ -57,6 +57,7 @@ public class B2TlaTranslator {
 
 	public B2TlaTranslator(String machineName, File machineFile, String ltlFormula)
 			throws IOException, BException {
+		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
 		BParser parser = new BParser(machineName);
 		start = parser.parseFile(machineFile, false);
@@ -68,7 +69,7 @@ public class B2TlaTranslator {
 	public void translate() {
 		DefinitionsEliminator defEliminator = new DefinitionsEliminator(start);
 		
-		MachineContext machineContext = new MachineContext(start, ltlFormula);
+		MachineContext machineContext = new MachineContext(machineName, start, ltlFormula);
 		this.machineName = machineContext.getMachineName();
 		
 		Typechecker typechecker = new Typechecker(machineContext);

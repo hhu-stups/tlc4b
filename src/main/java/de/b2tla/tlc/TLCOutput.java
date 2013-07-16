@@ -173,7 +173,6 @@ public class TLCOutput {
 		} else if (m.startsWith("Error: The following behavior constitutes a counter-example:")) {
 			return null;
 		}
-		System.out.println(m);
 		return ERROR.TLCError;
 	}
 

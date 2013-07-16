@@ -131,8 +131,9 @@ public class MachineContext extends DepthFirstAdapter {
 	// start.apply(this);
 	// }
 
-	public MachineContext(Start start, String ltlFormula) {
+	public MachineContext(String machineName, Start start, String ltlFormula) {
 		this.start = start;
+		this.machineName = machineName;
 		this.referencesTable = new Hashtable<Node, Node>();
 		this.ltlVisitors = new ArrayList<LTLFormulaVisitor>();
 
@@ -156,7 +157,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 		this.machineContextsTable = new Hashtable<String, MachineContext>();
 		start.apply(this);
-
+		
 		checkLTLFormulas();
 	}
 
@@ -165,13 +166,13 @@ public class MachineContext extends DepthFirstAdapter {
 			ltlVisitors.get(0).start();
 			return;
 		}
-
 		ArrayList<LTLFormulaVisitor> notSupportedLTLFormulas = new ArrayList<LTLFormulaVisitor>();
 		for (int i = 0; i < ltlVisitors.size(); i++) {
 			LTLFormulaVisitor visitor = ltlVisitors.get(i);
 			try {
 				visitor.start();
 			} catch (ScopeException e) {
+				System.out.println("Warning: LTL formula '" + visitor.getName() + "' can not be checked by TLC.");
 				notSupportedLTLFormulas.add(visitor);
 			}
 		}
@@ -240,9 +241,11 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAMachineHeader(AMachineHeader node) {
 		this.header = node;
-		List<TIdentifierLiteral> nameList = new ArrayList<TIdentifierLiteral>(
-				node.getName());
-		machineName = Utils.getIdentifierAsString(nameList);
+		if(machineName == null){
+			List<TIdentifierLiteral> nameList = new ArrayList<TIdentifierLiteral>(
+					node.getName());
+			this.machineName = Utils.getIdentifierAsString(nameList);
+		}
 
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getParameters());

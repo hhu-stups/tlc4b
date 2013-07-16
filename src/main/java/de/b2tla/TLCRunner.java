@@ -1,6 +1,7 @@
 package de.b2tla;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,8 +23,8 @@ import tlc2.TLC;
 public class TLCRunner {
 
 	public static void main(String[] args) {
-		//System.setProperty("apple.awt.UIElement", "true");
 		// this method will be executed in a separate JVM
+		System.setProperty("apple.awt.UIElement", "true");
 		System.out.println("Starting TLC...");
 		String path = args[0];
 		ToolIO.setUserDir(path);
@@ -71,6 +72,7 @@ public class TLCRunner {
 		System.out.println("Starting JVM...");
 		Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
 
+		
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
 		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
@@ -85,6 +87,14 @@ public class TLCRunner {
 	}
 
 	public static ArrayList<String> runTLC(String machineName, String path) {
+		System.out.println("--------------------------------");
+		
+		BTLCPrintStream btlcStream = new BTLCPrintStream();
+		PrintStream systemOut = System.out;
+		//System.setErr(btlcStream);
+		System.setOut(btlcStream);
+		ToolIO.setMode(ToolIO.SYSTEM);
+		
 		ArrayList<String> list = new ArrayList<String>();
 		if (!B2TLAGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
@@ -95,42 +105,36 @@ public class TLCRunner {
 		ToolIO.setUserDir(path);
 		String[] args = list.toArray(new String[list.size()]);
 
-		// ByteArrayOutputStream os = new ByteArrayOutputStream();
-		// PrintStream ps = new PrintStream(os);
-		BTLCPrintStream btlcStream = new BTLCPrintStream();
-		PrintStream systemOut = System.out;
-		System.setOut(btlcStream);
-		ToolIO.setMode(ToolIO.SYSTEM);
+
 
 		TLC tlc = new TLC();
 		// handle parameters
 		if (tlc.handleParameters(args)) {
 			tlc.setResolver(new SimpleFilenameToStream());
 			// call the actual processing method
-			tlc.process();
+			try {
+				tlc.process();	
+			} catch (Exception e) {
+				System.out.println("hallo");
+			}
+			
 		}
+		
+		
 		System.setOut(systemOut);
 
-		ArrayList<String> messages = btlcStream.getArrayList();
-		String[] ms = ToolIO.getAllMessages();
-		System.out.println("--------------------------------");
-		for (int i = 0; i < ms.length; i++) {
-			System.out.println(">> " + ms[i]);
+		
+		String [] a = ToolIO.getAllMessages();
+		for (int i = 0; i < a.length; i++) {
+			//System.out.println(a[i]);
 		}
-
+		//ToolIO.printAllMessages();
+		
+		ArrayList<String> messages = btlcStream.getArrayList();
+		
+		System.out.println("--------------------------------");
 		closeThreads();
-		// return new ArrayList<String>(Arrays.asList(ms));
 		return messages;
-
-		// TLCOutput tlcOutput = new TLCOutput(machineName, messages);
-		// tlcOutput.parseTLCOutput();
-		// TLCOutputEvaluator evaluator = new TLCOutputEvaluator(machineName,
-		// messages);
-		// System.out.println("ERROR: " + tlcOutput.getError());
-		// StringBuilder trace = tlcOutput.getErrorTrace();
-		// if (tlcOutput.hasTrace()) {
-		// createfile(path, machineName + ".tla.trace", trace.toString());
-		// }
 	}
 
 	private static void closeThreads() {

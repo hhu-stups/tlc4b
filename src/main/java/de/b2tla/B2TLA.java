@@ -26,7 +26,7 @@ import de.be4.classicalb.core.parser.exceptions.BException;
 public class B2TLA {
 
 	private String mainFileName;
-	private String machineName;
+	private String machineFileNameWithoutFileExtension;
 	private String pathAndName;
 	private String path;
 	private String tlaModule;
@@ -54,7 +54,7 @@ public class B2TLA {
 		StopWatch.stop("Translation");
 
 		if (B2TLAGlobals.isRunTLC()) {
-			ArrayList<String> output = TLCRunner.runTLC(b2tla.machineName,
+			ArrayList<String> output = TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
 					b2tla.path);
 			b2tla.evalOutput(output, true);
 		}
@@ -73,7 +73,7 @@ public class B2TLA {
 
 		if (B2TLAGlobals.isRunTLC()) {
 			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
-					b2tla.machineName, b2tla.path);
+					b2tla.machineFileNameWithoutFileExtension, b2tla.path);
 			ERROR error = TLCOutput.findError(output);
 			System.out.println(error);
 			return error;
@@ -82,7 +82,7 @@ public class B2TLA {
 	}
 
 	private void evalOutput(ArrayList<String> output, boolean createTraceFile) {
-		TLCOutput tlcOutput = new TLCOutput(machineName,
+		TLCOutput tlcOutput = new TLCOutput(machineFileNameWithoutFileExtension,
 				output.toArray(new String[output.size()]), tlcOutputInfo);
 		tlcOutput.parseTLCOutput();
 		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
@@ -91,7 +91,7 @@ public class B2TLA {
 		System.out.println("Result: " + tlcOutput.getError());
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
-			String tracefileName = machineName + ".tla.trace";
+			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
 			createFile(path, tracefileName, trace.toString(), "Trace file '"
 					+ path + tracefileName + "'created.", false);
 		}
@@ -145,7 +145,7 @@ public class B2TLA {
 
 		handleMainFileName();
 		if (B2TLAGlobals.isTranslate()) {
-			translator = new B2TlaTranslator(machineName, getFile(), this.ltlFormula);
+			translator = new B2TlaTranslator(machineFileNameWithoutFileExtension, getFile(), this.ltlFormula);
 			translator.translate();
 
 			this.tlaModule = translator.getModuleString();
@@ -173,13 +173,13 @@ public class B2TLA {
 			path = "." + File.separator;
 		}
 
-		machineName = name.substring(name.lastIndexOf(File.separator) + 1);
+		machineFileNameWithoutFileExtension = name.substring(name.lastIndexOf(File.separator) + 1);
 	}
 
 	private void createFiles() {
-		createFile(path, machineName + ".tla", tlaModule, "TLA+ module '"
+		createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, "TLA+ module '"
 				+ pathAndName + ".tla' created.", B2TLAGlobals.isDeleteOnExit());
-		createFile(path, machineName + ".cfg", config, "Configuration file '"
+		createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, "Configuration file '"
 				+ pathAndName + ".cfg' created.", B2TLAGlobals.isDeleteOnExit());
 
 		createStandardModules();
