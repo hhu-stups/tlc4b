@@ -11,7 +11,7 @@ public class BBuildInsTest {
 	/*
 	 * Set BuiltIns
 	 */
-	
+	@Ignore
 	@Test
 	public void testStrictSubset() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES {1} <<: {1,2} \n"
@@ -21,6 +21,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testNotSubset() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES {1} /<: {2} \n" + "END";
@@ -29,6 +30,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testPowerSet1() throws Exception {
 		String machine = "MACHINE test\n"
@@ -40,6 +42,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testFin() throws Exception {
 		String machine = "MACHINE test\n"
@@ -51,6 +54,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testFin1() throws Exception {
 		String machine = "MACHINE test\n"
@@ -62,6 +66,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testNotStrictSubset() throws Exception {
 		String machine = "MACHINE test\n"
@@ -73,6 +78,7 @@ public class BBuildInsTest {
 		assertEquals(expected, translate(machine));
 	}
 
+	@Ignore
 	@Test
 	public void testQuantifiedIntersection() throws Exception {
 		String machine = "MACHINE test\n"
@@ -84,6 +90,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testSigma() throws Exception {
 		String machine = "MACHINE test\n"
@@ -95,6 +102,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testSigma2() throws Exception {
 		String machine = "MACHINE test\n"
@@ -106,6 +114,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testPi() throws Exception {
 		String machine = "MACHINE test\n"
@@ -117,6 +126,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testPi2() throws Exception {
 		String machine = "MACHINE test\n"
@@ -127,7 +137,8 @@ public class BBuildInsTest {
 				+ "====";
 		compareEquals(expected, machine);
 	}
-
+	
+	@Ignore
 	@Test
 	public void testSucc() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES succ(3) = 4 \n" + "END";
@@ -136,6 +147,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testPred() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES pred(2) = 1 \n" + "END";
@@ -144,6 +156,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testMin() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES min({1}) = 1 \n" + "END";
@@ -152,6 +165,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testMax() throws Exception {
 		String machine = "MACHINE test\n" + "PROPERTIES max({1}) = 1 \n" + "END";
@@ -160,6 +174,7 @@ public class BBuildInsTest {
 		compareEquals(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testMaxInt() throws Exception {
 		String machine = "MACHINE test\n" 
@@ -169,6 +184,7 @@ public class BBuildInsTest {
 		compare(expected, machine);
 	}
 
+	@Ignore
 	@Test
 	public void testMinInt() throws Exception {
 		String machine = "MACHINE test\n" 

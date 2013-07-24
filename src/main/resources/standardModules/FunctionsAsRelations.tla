@@ -4,10 +4,11 @@ EXTENDS FiniteSets, Functions, TLC, Sequences
 LOCAL RelDom(r) == { x[1] :x \in r} 
 LOCAL RelRan(r) == { x[2] :x \in r} 
 
-RelCall(r, x) == 
-    IF Assert(Cardinality(r) = Cardinality(RelDom(r)), "Applied a function call to the relation: " \o ToString(r))
-    THEN (CHOOSE y \in r: y[1] = x)[2]
-    ELSE FALSE
+RelCall(r, x) ==  IF Cardinality(r) = Cardinality(RelDom(r)) /\ x \in RelDom(r)
+	THEN (CHOOSE y \in r: y[1] = x)[2]
+	ELSE PrintT("Error: Invalid function call to relation " \o ToString(r) \o " and value " \o ToString(x) \o "." )
+		/\ Assert(Cardinality(r) = Cardinality(RelDom(r)), "Applied a function call to the relation: " \o ToString(r))
+		/\ Assert(x \in RelDom(r), "Function applied outside domain. Domain: " \o ToString(r) \o ", Value: " \o ToString(x))
                  
 LOCAL MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f}    
 LOCAL Rel(S, S2) == SUBSET (S \times S2)    

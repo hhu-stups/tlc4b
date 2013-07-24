@@ -4,9 +4,6 @@ import de.b2tla.exceptions.UnificationException;
 
 public class IntegerOrSetType extends AbstractHasFollowers {
 
-	public IntegerOrSetType() {
-	}
-
 	public BType unify(BType other, ITypechecker typechecker) {
 		if (!this.compare(other))
 			throw new UnificationException();
@@ -20,6 +17,14 @@ public class IntegerOrSetType extends AbstractHasFollowers {
 			return this;
 		}
 		if (other instanceof SetType) {
+			this.setFollowersTo(other, typechecker);
+			return other;
+		}
+		if (other instanceof IntegerOrSetType) {
+			((IntegerOrSetType) other).setFollowersTo(this, typechecker);
+			return this;
+		}
+		if (other instanceof IntegerOrSetOfPairType) {
 			this.setFollowersTo(other, typechecker);
 			return other;
 		}

@@ -19,7 +19,7 @@ import de.b2tla.exceptions.B2TLAIOException;
 import de.b2tla.exceptions.B2tlaException;
 import de.b2tla.tlc.TLCOutput;
 import de.b2tla.tlc.TLCOutputInfo;
-import de.b2tla.tlc.TLCOutput.ERROR;
+import de.b2tla.tlc.TLCOutput.TLCResult;
 import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.exceptions.BException;
 
@@ -61,7 +61,7 @@ public class B2TLA {
 
 	}
 
-	public static ERROR test(String[] args) throws IOException {
+	public static TLCResult test(String[] args) throws IOException {
 		B2TLA b2tla = new B2TLA();
 		try {
 			b2tla.progress(args);
@@ -74,7 +74,7 @@ public class B2TLA {
 		if (B2TLAGlobals.isRunTLC()) {
 			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
 					b2tla.machineFileNameWithoutFileExtension, b2tla.path);
-			ERROR error = TLCOutput.findError(output);
+			TLCResult error = TLCOutput.findError(output);
 			System.out.println(error);
 			return error;
 		}

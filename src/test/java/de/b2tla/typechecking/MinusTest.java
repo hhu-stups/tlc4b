@@ -77,4 +77,25 @@ public class MinusTest {
 		assertEquals("POW(INTEGER)", t.constants.get("k3").toString());
 	}
 	
+	@Test
+	public void testSetSubstraction4() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k,k2,k3 \n"
+				+ "PROPERTIES k = k2 - k3 - {1} \n" + "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k3").toString());
+	}
+	
+	@Test
+	public void testSetSubstraction5() throws BException {
+		String machine = "MACHINE test\n" + "CONSTANTS k,k2,k3,k4 \n"
+				+ "PROPERTIES k - k2 - k3 = k4 - {1} \n" + "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k3").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k4").toString());
+	}
+	
 }

@@ -30,12 +30,12 @@ public class PairType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType) {
+		
 		if (this.first == oldType)
 			setFirst(newType);
 		if (this.second == oldType)
 			setSecond(newType);
 	}
-
 	public PairType(BType first, BType second) {
 		setFirst(first);
 		setSecond(second);
@@ -106,7 +106,7 @@ public class PairType extends AbstractHasFollowers {
 	}
 
 	public String getTlaType() {
-		String res = first.getTlaType() + "*";
+		String res = first.getTlaType() + " \\times ";
 		if (second instanceof PairType) {
 			res += "(" + second.getTlaType() + ")";
 		} else

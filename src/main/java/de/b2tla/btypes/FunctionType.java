@@ -48,6 +48,12 @@ public class FunctionType extends AbstractHasFollowers {
 		} else if (other instanceof SetType
 				|| other instanceof IntegerOrSetType
 				|| other instanceof IntegerOrSetOfPairType) {
+			if(domain instanceof AbstractHasFollowers){
+				((AbstractHasFollowers) domain).deleteFollower(this);
+			}
+			if (range instanceof AbstractHasFollowers){
+				((AbstractHasFollowers) range).deleteFollower(this);
+			}
 			SetType s = new SetType(new PairType(domain, range));
 			this.setFollowersTo(s, typechecker);
 			return s.unify(other, typechecker);
@@ -82,8 +88,13 @@ public class FunctionType extends AbstractHasFollowers {
 				|| other instanceof IntegerOrSetType) {
 			return true;
 		} else if (other instanceof SetType) {
-			return new PairType(domain, range).compare(((SetType) other)
-					.getSubtype());
+			BType t = ((SetType) other).getSubtype();
+			if(t instanceof PairType){
+				return ((PairType) t).getFirst().compare(domain) &&  ((PairType) t).getSecond().compare(range);
+			}else if (t instanceof UntypedType) {
+				return true;
+			} else 
+				return false;
 		}
 		return false;
 	}

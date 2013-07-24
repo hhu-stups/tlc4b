@@ -35,6 +35,7 @@ public class PolySuite extends Suite {
 	  public static interface Configuration {
 	    int size();
 	    Object getTestValue(int index);
+	    Object getExpectedValue(int index);
 	    String getTestName(int index);
 	  }
 
@@ -58,7 +59,7 @@ public class PolySuite extends Suite {
 	    Configuration configuration = getConfiguration(testClass);
 	    List<Runner> runners = new ArrayList<Runner>();
 	    for (int i = 0, size = configuration.size(); i < size; i++) {
-	      SingleRunner runner = new SingleRunner(jTestClass, configuration.getTestValue(i), configuration.getTestName(i));
+	      SingleRunner runner = new SingleRunner(jTestClass, configuration.getTestValue(i), configuration.getTestName(i), configuration.getExpectedValue(i));
 	      runners.add(runner);
 	    }
 	    this.runners = runners;
@@ -101,17 +102,19 @@ public class PolySuite extends Suite {
 	  private static class SingleRunner extends BlockJUnit4ClassRunner {
 
 	    private final Object testVal;
+	    private final Object expectedVal;
 	    private final String testName;
 
-	    SingleRunner(Class<?> testClass, Object testVal, String testName) throws InitializationError {
+	    SingleRunner(Class<?> testClass, Object testVal, String testName, Object expectedVal) throws InitializationError {
 	      super(testClass);
 	      this.testVal = testVal;
+	      this.expectedVal = expectedVal;
 	      this.testName = testName;
 	    }
 
 	    @Override
 	    protected Object createTest() throws Exception {
-	      return getTestClass().getOnlyConstructor().newInstance(testVal);
+	      return getTestClass().getOnlyConstructor().newInstance(testVal, expectedVal);
 	    }
 
 	    @Override

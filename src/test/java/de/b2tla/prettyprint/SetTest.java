@@ -3,6 +3,7 @@ package de.b2tla.prettyprint;
 import static de.b2tla.util.TestUtil.*;
 import static org.junit.Assert.*;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SetTest {
@@ -47,6 +48,16 @@ public class SetTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore
+	@Test
+	public void testSetComprehension3() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES (1,TRUE,2) : {a,b,c | (a,b,c) : {1} * {TRUE} * {2} } \n" + "END";
+		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
+				+ "ASSUME {1} = {x \\in {1}: 1 = 1 } \n"
+				+ "======";
+	}
+	
 	
 	@Test
 	public void testPowerSet() throws Exception {
@@ -75,6 +86,16 @@ public class SetTest {
 				+ "PROPERTIES {1}*{2} = {(1,2)} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME {1} \\times {2} = {<<1, 2>>}\n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testCartesianProduct2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {1}*{2}*{3} = {(1,2,3)} \n" + "END";
+		String expected = "---- MODULE test ----\n"
+				+ "ASSUME ({1} \\times {2}) \\times {3} = {<<<<1, 2>>, 3>>}\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -179,7 +200,7 @@ public class SetTest {
 				+ "PROPERTIES UNION(z).(z: {1,2} & 1 = 1| {z}) = {1,2} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME Union({{z}: z \\in {z \\in {1, 2}: 1 = 1}}) = {1, 2}\n"
+				+ "ASSUME Union({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {1, 2}\n"
 				+ "====";
 		//TODO ERROR in TLA2B
 		compareEquals(expected, machine);
@@ -191,7 +212,7 @@ public class SetTest {
 				+ "PROPERTIES INTER(z).(z: {1,2} & 1 = 1| {z}) = {} \n" + "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME Inter({{z}: z \\in {z \\in {1, 2}: 1 = 1}}) = {}\n"
+				+ "ASSUME Inter({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {}\n"
 				+ "====";
 		System.out.println(expected);
 		compareEquals(expected, machine);

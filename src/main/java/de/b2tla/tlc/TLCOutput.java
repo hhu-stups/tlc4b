@@ -16,13 +16,13 @@ public class TLCOutput {
 
 	Date startingTime;
 	Date finishingTime;
-	ERROR error;
+	TLCResult error;
 	ArrayList<String> states = new ArrayList<String>();
 	StringBuilder trace;
 	String parseError;
 
-	public static enum ERROR {
-		Deadlock, Goal, Invariant, ParseError, NoError, Assertion, PropertiesError, EnumerateError, TLCError, TemporalProperty
+	public static enum TLCResult {
+		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerateError, TLCError, TemporalProperty
 	}
 
 	public long getRunningTime() {
@@ -31,9 +31,9 @@ public class TLCOutput {
 	}
 
 	public String getError() {
-		if (error == ERROR.Invariant) {
+		if (error == TLCResult.InvariantViolation) {
 			return "Invariant Violation";
-		}else if(error == ERROR.TemporalProperty){
+		}else if(error == TLCResult.TemporalProperty){
 			return "Temporal Property Violation";
 		}
 		return error.toString();
@@ -67,7 +67,7 @@ public class TLCOutput {
 			} else if (m.startsWith("Finished.")) {
 				finishingTime = parseTime(m);
 			} else if (m.startsWith("Error:")) {
-				ERROR e = findError(m);
+				TLCResult e = findError(m);
 				if (e != null) {
 					this.error = e;
 				}
@@ -79,7 +79,7 @@ public class TLCOutput {
 		}
 
 		if (error == null) {
-			this.error = ERROR.NoError;
+			this.error = TLCResult.NoError;
 		}
 
 	}
@@ -139,41 +139,41 @@ public class TLCOutput {
 
 	}
 
-	public static ERROR findError(ArrayList<String> list) {
+	public static TLCResult findError(ArrayList<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			String m = list.get(i);
 			if (m.startsWith("Error:")) {
 				return findError(m);
 			}
 		}
-		return ERROR.NoError;
+		return TLCResult.NoError;
 	}
 
-	private static ERROR findError(String m) {
+	private static TLCResult findError(String m) {
 		String[] res = m.split(" ");
 		if (res[1].equals("Deadlock")) {
-			return ERROR.Deadlock;
+			return TLCResult.Deadlock;
 		} else if (res[1].equals("Invariant")) {
 			String invName = res[2];
 			if (invName.equals("Invariant")) {
-				return ERROR.Invariant;
+				return TLCResult.InvariantViolation;
 			} else if (invName.equals("NotGoal")) {
-				return ERROR.Goal;
+				return TLCResult.Goal;
 			} else if (invName.startsWith("Assertion")) {
-				return ERROR.Assertion;
+				return TLCResult.AssertionError;
 			}
 		} else if (res[1].equals("Assumption")) {
-			return ERROR.PropertiesError;
+			return TLCResult.PropertiesError;
 		} else if (res[1].equals("Temporal")) {
-			return ERROR.TemporalProperty;
+			return TLCResult.TemporalProperty;
 		} else if (m.equals("Error: TLC threw an unexpected exception.")) {
-			return ERROR.ParseError;
+			return TLCResult.ParseError;
 		} else if (m.startsWith("Error: The behavior up to")) {
 			return null;
 		} else if (m.startsWith("Error: The following behavior constitutes a counter-example:")) {
 			return null;
 		}
-		return ERROR.TLCError;
+		return TLCResult.TLCError;
 	}
 
 	private static Date parseTime(String m) {

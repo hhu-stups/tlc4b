@@ -22,9 +22,9 @@ public class SetType extends AbstractHasFollowers {
 	}
 
 	public SetType unify(BType other, ITypechecker typechecker) {
-		if(!this.compare(other) || this.contains(other))
+		if (!this.compare(other) || this.contains(other))
 			throw new UnificationException();
-		
+
 		if (other instanceof UntypedType) {
 			((UntypedType) other).setFollowersTo(this, typechecker);
 			return this;
@@ -35,25 +35,25 @@ public class SetType extends AbstractHasFollowers {
 					typechecker);
 			return this;
 		}
-		
-		if(other instanceof IntegerOrSetType){
-			return (SetType)other.unify(this, typechecker);
-		}
-		
-		if(other instanceof IntegerOrSetOfPairType){
+
+		if (other instanceof IntegerOrSetType) {
 			return (SetType) other.unify(this, typechecker);
 		}
-		
-		if(other instanceof FunctionType){
+
+		if (other instanceof IntegerOrSetOfPairType) {
 			return (SetType) other.unify(this, typechecker);
 		}
-		
+
+		if (other instanceof FunctionType) {
+			return (SetType) other.unify(this, typechecker);
+		}
+
 		throw new UnificationException();
 	}
 
 	@Override
 	public String toString() {
-		return "POW("+ subtype + ")";
+		return "POW(" + subtype + ")";
 	}
 
 	public boolean isUntyped() {
@@ -61,15 +61,16 @@ public class SetType extends AbstractHasFollowers {
 	}
 
 	public boolean compare(BType other) {
-		if(other instanceof SetType){
+		if (other instanceof SetType) {
 			return this.subtype.compare(((SetType) other).subtype);
 		}
-		
-		if(other instanceof UntypedType)
+
+		if (other instanceof UntypedType)
 			return true;
-		if(other instanceof IntegerOrSetType || other instanceof IntegerOrSetOfPairType){
+		if (other instanceof IntegerOrSetType
+				|| other instanceof IntegerOrSetOfPairType) {
 			return true;
-		}else if(other instanceof FunctionType){
+		} else if (other instanceof FunctionType) {
 			return other.compare(this);
 		}
 		return false;
@@ -77,17 +78,17 @@ public class SetType extends AbstractHasFollowers {
 
 	@Override
 	public boolean contains(BType other) {
-		if(this.subtype.equals(other)){
+		if (this.subtype.equals(other)) {
 			return true;
 		}
-		if(this.subtype instanceof AbstractHasFollowers){
+		if (this.subtype instanceof AbstractHasFollowers) {
 			return ((AbstractHasFollowers) subtype).contains(other);
 		}
 		return false;
 	}
 
 	public String getTlaType() {
-		return "SUBSET("+ subtype.getTlaType() + ")";
+		return "SUBSET(" + subtype.getTlaType() + ")";
 	}
 
 	public boolean containsIntegerType() {

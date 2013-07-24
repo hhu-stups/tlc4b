@@ -104,7 +104,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			p = new Precedence("AMultOrCartExpression", 13, 13, true);
 		} else {
 			// \times
-			p = new Precedence("AMultOrCartExpression", 10, 13, true);
+			p = new Precedence("AMultOrCartExpression", 10, 13, false);
 		}
 		precedenceTable.put(node, p);
 

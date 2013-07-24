@@ -2,6 +2,7 @@ package de.b2tla.btypes;
 
 import de.b2tla.exceptions.TypeErrorException;
 import de.b2tla.exceptions.UnificationException;
+import de.hhu.stups.sablecc.patch.SourcePosition;
 
 public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 
@@ -16,97 +17,133 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		return second;
 	}
 
-	public IntegerOrSetOfPairType() {
+	public IntegerOrSetOfPairType(SourcePosition sourcePosition,
+			SourcePosition sourcePosition2) {
+
 		IntegerOrSetType i1 = new IntegerOrSetType();
 		this.first = i1;
-		i1.addFollower(this);
-		
+		first.addFollower(this);
+
 		IntegerOrSetType i2 = new IntegerOrSetType();
 		this.second = i2;
-		i2.addFollower(this);
+		second.addFollower(this);
 	}
 
 	public void update(BType oldType, BType newType, ITypechecker typechecker) {
-		
-
+		if(second.followers.contains(first)){
+			System.out.println("integerOrsetOfPair");
+			throw new RuntimeException();
+		}
 		if (newType instanceof IntegerType) {
-			// if newType is an Integer then both arguments and the result are Integers
-			
-			first.deleteFollower(this); // 'this' is to be evaluated only once
-			first.unify(IntegerType.getInstance(), typechecker);
+			// if newType is an Integer then both arguments and the result are
+			// Integers
 
-			second.deleteFollower(this); // 'this' is to be evaluated only once
-			second.unify(IntegerType.getInstance(), typechecker);
+			if (this.first == oldType) {
+				// do nothing
+			} else {
+				first.deleteFollower(this); // we do not want to update this
+											// node twice
+				first.unify(newType, typechecker);
+			}
+			if (this.second == oldType) {
+				// do nothing
+			} else {
+				second.deleteFollower(this);
+				second.unify(newType, typechecker);
+			}
+			this.setFollowersTo(IntegerType.getInstance(), typechecker);
 
-			this.setFollowersTo(IntegerType.getInstance(), typechecker); // evaluate 'this'
 			return;
 		} else if (newType instanceof SetType) {
 			SetType newFirst;
 			SetType newSecond;
-			if (this.first == oldType) {
-				newFirst = (SetType) newType;
-			} else {
-				newFirst = new SetType(new UntypedType()).unify(this.first,
-						typechecker);
+			
+			
+			if (first == second && first != oldType){
+				first.deleteFollower(this);
+				newFirst = new SetType(new UntypedType());
+				newSecond = newFirst;
+				newFirst.addFollower(this);
+			}else {
+				if (this.first == oldType) {
+					first.deleteFollower(this);
+					newFirst = (SetType) newType;
+				} else {
+					first.deleteFollower(this);
+					newFirst = new SetType(new UntypedType());
+					first.setFollowersTo(newFirst, typechecker);
+				}
+
+				if (this.second == oldType) {
+					first.deleteFollower(this);
+					newSecond = (SetType) newType;
+				} else {
+					second.deleteFollower(this);
+					newSecond = new SetType(new UntypedType());
+					this.second.setFollowersTo(newSecond, typechecker);
+				}
 			}
-			if (this.second == oldType) {
-				newSecond = (SetType) newType;
+			
+			if (oldType == this) {
+				this.setFollowersTo(newType, typechecker);
+
+				PairType pair = new PairType(newFirst, newSecond);
+				((SetType) newType).getSubtype().unify(pair, typechecker);
 			} else {
-				SetType set = new SetType(new UntypedType());
-				second.deleteFollower(this);
-				second.setFollowersTo(set, typechecker);
-				newSecond = set;
-			}
-			SetType set = new SetType(new PairType(newFirst.getSubtype(),
-					newSecond.getSubtype()));
-			this.setFollowersTo(set, typechecker);
-			return;
-		} else if (newType instanceof UntypedType) {
-			((UntypedType) newType).addFollower(this);
-			if (this.first == oldType) {
-				// first.deleteFollower(this);
-				// first.setFollowersTo(newType, typechecker);
-				first = (UntypedType) newType;
-			} else if (this.second == oldType) {
-				// second.deleteFollower(this);
-				// second.setFollowersTo(newType, typechecker);
-				second = (UntypedType) newType;
-			} else {
-				throw new RuntimeException();
+				SetType setOfPairSetType = new SetType(new PairType(
+						newFirst.getSubtype(), newSecond.getSubtype()));
+				setOfPairSetType.unify(this, typechecker);
 			}
 			return;
 		} else if (newType instanceof IntegerOrSetOfPairType) {
-			((IntegerOrSetOfPairType) newType).addFollower(this);
 			if (this.first == oldType) {
+				first.deleteFollower(this);
 				first = (AbstractHasFollowers) newType;
-			} else if (this.second == oldType) {
+				first.addFollower(this);
+			}
+			if (this.second == oldType) {
+				second.deleteFollower(this);
+				second = (AbstractHasFollowers) newType;
+				second.addFollower(this);
+			}
+		} else if (newType instanceof IntegerOrSetType) {
+			if (this.first == oldType) {
+				first.deleteFollower(this);
 				first = (AbstractHasFollowers) newType;
+				first.addFollower(this);
+			}
+			if (this.second == oldType) {
+				second.deleteFollower(this);
+				second = (AbstractHasFollowers) newType;
+				second.addFollower(this);
 			}
 		} else {
-			throw new TypeErrorException("Expected 'INTEGER' or 'POW(_A)', found " + newType);
+			throw new TypeErrorException(
+					"Expected 'INTEGER' or 'POW(_A)', found " + newType);
 		}
+
 	}
 
 	public BType unify(BType other, ITypechecker typechecker) {
-		if(!this.compare(other) || this.contains(other))
+		if (!this.compare(other) || this.contains(other)){
 			throw new UnificationException();
+		}
 			
+		
 		if (other instanceof UntypedType) {
 			((UntypedType) other).setFollowersTo(this, typechecker);
 			return this;
 		}
+		
 		if (other instanceof IntegerType) {
 			this.setFollowersTo(IntegerType.getInstance(), typechecker);
 			this.getFirst().deleteFollower(this);
 			this.getSecond().deleteFollower(this);
 			first.unify(IntegerType.getInstance(), typechecker);
 			second.unify(IntegerType.getInstance(), typechecker);
-			// this.getFirst().setFollowersTo(IntegerType.getInstance(),
-			// typechecker);
-			// this.getSecond().setFollowersTo(IntegerType.getInstance(),
-			// typechecker);
 			return IntegerType.getInstance();
 		}
+		
 		if (other instanceof IntegerOrSetType) {
 			((IntegerOrSetType) other).setFollowersTo(this, typechecker);
 			return this;
@@ -116,22 +153,35 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 			first.deleteFollower(this);
 			second.deleteFollower(this);
 			
-			first = (SetType) first.unify(new SetType(new UntypedType()), typechecker);
-			second = (SetType) second.unify(new SetType(new UntypedType()), typechecker);
+			SetType newFirst = new SetType(new UntypedType()).unify(first, typechecker);
+			SetType newSecond =  new SetType(new UntypedType()).unify(second, typechecker);
 			
-			SetType found = new SetType(new PairType(this.first,
-					this.second));
+			SetType found = new SetType(new PairType(newFirst.getSubtype(),
+					newSecond.getSubtype()));
 			
 			this.setFollowersTo(found, typechecker);
 
 			return found.unify(other, typechecker);
 		}
-		
 		if(other instanceof FunctionType){
 			return other.unify(this, typechecker);
 		}
-		
-		throw new UnificationException();
+		if(other instanceof IntegerOrSetOfPairType){
+			IntegerOrSetOfPairType o = (IntegerOrSetOfPairType) other;
+			o.first.deleteFollower(o);
+			o.second.deleteFollower(o);
+			first = (AbstractHasFollowers) this.first.unify(((IntegerOrSetOfPairType) other).first, typechecker);
+			second = (AbstractHasFollowers) this.second.unify(((IntegerOrSetOfPairType) other).second, typechecker);
+			((IntegerOrSetOfPairType) other).setFollowersTo(this, typechecker);
+			return this;
+		}
+		throw new RuntimeException();
+	}
+
+	@Override
+	public String toString() {
+		return "IntegerOrSetOfPairType" + this.hashCode() + "("
+				+ this.getFirst() + "," + this.getSecond() + ")";
 	}
 
 	public boolean isUntyped() {
@@ -139,29 +189,33 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		return true;
 	}
 
-
 	public boolean compare(BType other) {
 		if (other instanceof UntypedType || other instanceof IntegerType
-				|| other instanceof SetType
 				|| other instanceof IntegerOrSetType
 				|| other instanceof IntegerOrSetOfPairType
 				|| other instanceof FunctionType)
 			return true;
-		else
+		else if (other instanceof SetType) {
+			BType subType = ((SetType) other).getSubtype();
+			if (subType instanceof UntypedType || subType instanceof PairType)
+				return true;
+			else
+				return false;
+		} else
 			return false;
 	}
 
 	@Override
 	public boolean contains(BType other) {
-		if(this.first.equals(other)|| this.second.equals(other)){
+		if (this.first.equals(other) || this.second.equals(other)) {
 			return true;
 		}
-		if(first instanceof AbstractHasFollowers){
-			if(((AbstractHasFollowers) first).contains(other))
+		if (first instanceof AbstractHasFollowers) {
+			if (((AbstractHasFollowers) first).contains(other))
 				return true;
 		}
-		if(second instanceof AbstractHasFollowers){
-			if(((AbstractHasFollowers) second).contains(other))
+		if (second instanceof AbstractHasFollowers) {
+			if (((AbstractHasFollowers) second).contains(other))
 				return true;
 		}
 		return false;

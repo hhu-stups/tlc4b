@@ -305,14 +305,18 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append("\n");
 	}
 
+	private boolean isInvariant = true;
+
 	private void printInvariant() {
 		PPredicate node = this.tlaModule.getInvariant();
 		if (node == null)
 			return;
+		isInvariant = true;
 
 		tlaModuleString.append("Invariant == ");
 		node.apply(this);
 		tlaModuleString.append("\n");
+		isInvariant = false;
 	}
 
 	private void printAssertions() {
@@ -938,6 +942,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 			inAConjunctPredicate(node);
 			node.getLeft().apply(this);
 			tlaModuleString.append(" /\\ ");
+			if (isInvariant) {
+				tlaModuleString.append("\n");
+			}
 			node.getRight().apply(this);
 			outAConjunctPredicate(node);
 			break;
@@ -1387,17 +1394,18 @@ public class TLAPrinter extends DepthFirstAdapter {
 	 */
 
 	private void printIdentifierList(List<PExpression> copy) {
-		if (copy.size() > 1) {
-			tlaModuleString.append("<<");
+		if (copy.size() == 1) {
+			copy.get(0).apply(this);
+			return;
 		}
+		tlaModuleString.append("<<");
 		for (int i = 0; i < copy.size(); i++) {
-			copy.get(i).apply(this);
-			if (i < copy.size() - 1)
+			if (i != 0) {
 				tlaModuleString.append(", ");
+			}
+			copy.get(i).apply(this);
 		}
-		if (copy.size() > 1) {
-			tlaModuleString.append(">>");
-		}
+		tlaModuleString.append(">>");
 	}
 
 	public void printTypeOfIdentifier(PExpression e) {
@@ -1435,8 +1443,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 			tlaModuleString.append("(");
 		}
 		for (int i = 0; i < copy.size(); i++) {
+			tlaModuleString.append("(");
 			printTypeOfIdentifier(copy.get(i));
-
+			tlaModuleString.append(")");
 			if (i < copy.size() - 1)
 				tlaModuleString.append(" \\times ");
 		}
@@ -1727,20 +1736,59 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
 		inAComprehensionSetExpression(node);
-		tlaModuleString.append("{");
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
-		printIdentifierList(copy);
-		tlaModuleString.append(" \\in ");
-		printTypesOfIdentifierList(copy);
-		tlaModuleString.append(": ");
-		if (typeRestrictor.removeNode(node.getPredicates())) {
-			tlaModuleString.append("TRUE");
+		if (copy.size() < 3) {
+			tlaModuleString.append("{");
+			printIdentifierList(copy);
+			tlaModuleString.append(" \\in ");
+			printTypesOfIdentifierList(copy);
+			tlaModuleString.append(": ");
+			if (typeRestrictor.removeNode(node.getPredicates())) {
+				tlaModuleString.append("TRUE");
+			} else {
+				node.getPredicates().apply(this);
+			}
+			tlaModuleString.append("}");
+
 		} else {
-			node.getPredicates().apply(this);
+			tlaModuleString.append("{");
+			printAuxiliaryVariables(copy.size());
+			tlaModuleString.append(": t_ \\in ");
+			tlaModuleString.append("{");
+			printIdentifierList(copy);
+			tlaModuleString.append(" \\in ");
+			for (int i = 0; i < copy.size(); i++) {
+				printTypeOfIdentifier(copy.get(i));
+				if (i < copy.size() - 1)
+					tlaModuleString.append(" \\times ");
+			}
+			tlaModuleString.append(": ");
+			if (typeRestrictor.removeNode(node.getPredicates())) {
+				tlaModuleString.append("TRUE");
+			} else {
+				node.getPredicates().apply(this);
+			}
+			tlaModuleString.append("}");
+			tlaModuleString.append("}");
 		}
-		tlaModuleString.append("}");
+
 		outAComprehensionSetExpression(node);
+	}
+
+	private void printAuxiliaryVariables(int size) {
+		for (int i = 0; i < size - 1; i++) {
+			tlaModuleString.append("<<");
+		}
+		for (int i = 0; i < size; i++) {
+			if (i != 0) {
+				tlaModuleString.append(", ");
+			}
+			tlaModuleString.append("t_[" + (i+1) + "]");
+			if (i != 0) {
+				tlaModuleString.append(">>");
+			}
+		}
 	}
 
 	@Override
@@ -1817,7 +1865,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		// tlaModuleString.append(" \\subseteq ");
 		node.getRight().apply(this);
 		tlaModuleString.append(")");
-		
+
 		outASubsetPredicate(node);
 	}
 

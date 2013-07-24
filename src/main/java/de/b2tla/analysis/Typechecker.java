@@ -62,7 +62,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		ArrayList<LTLFormulaVisitor> visitors = machineContext.getLTLFormulas();
 		for (int i = 0; i < visitors.size(); i++) {
 			LTLFormulaVisitor visitor = visitors.get(i);
-			Collection<AIdentifierExpression> parameter = visitor.getParameter();
+			Collection<AIdentifierExpression> parameter = visitor
+					.getParameter();
 			for (AIdentifierExpression param : parameter) {
 				setType(param, new UntypedType());
 			}
@@ -92,6 +93,15 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		this.types.put(node, t);
 		if (t instanceof AbstractHasFollowers) {
 			((AbstractHasFollowers) t).addFollower(node);
+		}
+	}
+
+	public void updateType(Node node, AbstractHasFollowers oldType,
+			BType newType) {
+		oldType.deleteFollower(node);
+		this.types.put(node, newType);
+		if (newType instanceof AbstractHasFollowers) {
+			((AbstractHasFollowers) newType).addFollower(node);
 		}
 	}
 
@@ -315,7 +325,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			Node n = constants.get(c);
 			if (getType(n).isUntyped()) {
 				throw new TypeErrorException("Can not infer type of constant '"
-						+ c + "'");
+						+ c + "': " + getType(n));
 			}
 		}
 	}
@@ -390,7 +400,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 					+ node.parent().getClass());
 			throw new RuntimeException(node + " Pos: " + node.getStartPos());
 		}
-
 		BType found = getType(originalIdentifier);
 		try {
 			expected.unify(found, this);
@@ -813,75 +822,56 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			AMinusOrSetSubtractExpression node) {
 		BType expected = getType(node);
 
-		if (expected instanceof IntegerType) {
-			setType(node.getLeft(), IntegerType.getInstance());
-			setType(node.getRight(), IntegerType.getInstance());
-		} else if (expected instanceof UntypedType) {
-			IntegerOrSetType t = new IntegerOrSetType();
+		BType found = new IntegerOrSetType();
+		unify(expected, found, node);
 
-			IntegerOrSetType res = (IntegerOrSetType) t.unify(expected, this);
-			setType(node.getRight(), res);
-			setType(node.getLeft(), res);
-		} else if (expected instanceof SetType) {
-			setType(node.getLeft(), expected);
-			setType(node.getRight(), expected);
-		} else if (expected instanceof IntegerOrSetOfPairType) {
-			setType(node.getLeft(), expected);
-			setType(node.getRight(), expected);
-		} else if (expected instanceof IntegerOrSetType) {
-			setType(node.getLeft(), expected);
-			setType(node.getRight(), expected);
-		} else {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'POW(_A)' or 'INTEGER' in ' - '");
-		}
+		setType(node.getLeft(), getType(node));
+		setType(node.getRight(), getType(node));
 
-		if (node.getLeft() != null) {
-			node.getLeft().apply(this);
-		}
-		if (node.getRight() != null) {
-			node.getRight().apply(this);
-		}
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
 	}
 
 	@Override
 	public void caseAMultOrCartExpression(AMultOrCartExpression node) {
 		BType expected = getType(node);
-		if (expected instanceof UntypedType) {
-			IntegerOrSetOfPairType t = new IntegerOrSetOfPairType();
-			IntegerOrSetOfPairType res = (IntegerOrSetOfPairType) expected
-					.unify(t, this);
-			setType(node, res);
-			setType(node.getLeft(), res.getFirst());
-			setType(node.getRight(), res.getSecond());
-		} else if (expected instanceof IntegerType) {
-			setType(node.getLeft(), IntegerType.getInstance());
-			setType(node.getRight(), IntegerType.getInstance());
-		} else if (expected instanceof SetType
-				|| expected instanceof FunctionType) {
-			SetType set = new SetType(new PairType(new UntypedType(),
-					new UntypedType()));
-			SetType res = (SetType) expected.unify(set, this);
-			PairType pair = (PairType) res.getSubtype();
+		IntegerOrSetOfPairType found = new IntegerOrSetOfPairType(node.getStartPos(), node.getEndPos());
+		//setType(node.getLeft(), found.getFirst());
+		//setType(node.getRight(), found.getSecond());
+		BType result = null;
+		try {
+			result = expected.unify(found, this);
+		} catch (UnificationException e) {
+			throw new TypeErrorException("Excepted '" + expected + "' , found "
+					+ found + "' at " + node.getClass().getSimpleName() + "\n "
+					+ node.getStartPos());
+		}
+//		
+//		BType res2 = getType(node);
+//		if(res2 != result){
+//			AbstractHasFollowers a = (AbstractHasFollowers) res2;
+//			throw new RuntimeException();
+//		}
+//		
+		
+		if (result instanceof IntegerOrSetOfPairType) {
+			setType(node.getLeft(),
+					((IntegerOrSetOfPairType) result).getFirst());
+			setType(node.getRight(),
+					((IntegerOrSetOfPairType) result).getSecond());
+		} else if (result instanceof IntegerType) {
+			setType(node.getLeft(), result);
+			setType(node.getRight(), result);
+		} else if (result instanceof SetType) {
+			PairType pair = (PairType) ((SetType) result).getSubtype();
 			setType(node.getLeft(), new SetType(pair.getFirst()));
 			setType(node.getRight(), new SetType(pair.getSecond()));
-		} else if (expected instanceof IntegerOrSetOfPairType) {
-			setType(node.getLeft(),
-					((IntegerOrSetOfPairType) expected).getFirst());
-			setType(node.getRight(),
-					((IntegerOrSetOfPairType) expected).getSecond());
-
-		} else if (expected instanceof IntegerOrSetType) {
-			IntegerOrSetOfPairType t = new IntegerOrSetOfPairType();
-			t = (IntegerOrSetOfPairType) t.unify(expected, this);
-			setType(node, t);
-			setType(node.getLeft(), t.getFirst());
-			setType(node.getRight(), t.getSecond());
 		} else {
-			throw new TypeErrorException("Excepted '" + getType(node)
-					+ "' , found 'POW(_A*_B)' or 'INTEGER' in ' * '");
+			System.out.println(result);
+			throw new RuntimeException();
 		}
-
+		
+		
 		node.getLeft().apply(this);
 		node.getRight().apply(this);
 	}
@@ -1496,7 +1486,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			domainFound = p.getFirst();
 			rangeFound = p.getSecond();
 		}
-
 		BType expected = getType(node);
 		try {
 			rangeFound.unify(expected, this);
@@ -1516,13 +1505,14 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		for (PExpression e : copy) {
 			foundList.add(getType(e));
 		}
+		
+		BType p = makePair(foundList);
 		try {
-			domainFound.unify(makePair(foundList), this);
+			domainFound.unify(p, this);
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + domainFound
 					+ "' , found '" + makePair(foundList) + "'");
 		}
-
 	}
 
 	@Override

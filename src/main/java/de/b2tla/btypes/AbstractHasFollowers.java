@@ -12,20 +12,21 @@ public abstract class AbstractHasFollowers implements BType{
 	public ArrayList<Object> followers = new ArrayList<Object>();
 
 	public void addFollower(Object obj){
-		if(!followers.contains(obj)){
+		if(!followers.contains(obj))
 			followers.add(obj);
-		}
-		
 	}
 	
 	public String printFollower(){
 		String res = "[";
 		for (Object o : followers) {
-			res+= o;
-			res+= o.hashCode();
-			if(o instanceof Node)
-				res+= ((Node) o).getStartPos();
-			res += ", ";
+			if(!(o instanceof Node)){
+				res+= o.hashCode();
+				res+= o.getClass();
+				IntegerOrSetOfPairType i = (IntegerOrSetOfPairType) o;
+				res += " ";
+			}
+			
+			
 		}
 		res+= "]";
 		return res;
@@ -38,12 +39,17 @@ public abstract class AbstractHasFollowers implements BType{
 	
 	
 	public void setFollowersTo(BType newType, ITypechecker typechecker){
-		for (Object obj: followers) {
+		if (this == newType){
+			return;
+		}
+		ArrayList<Object> list	= new ArrayList<Object>(followers);	
+		for (Object obj: list) {
 			if(obj instanceof Node){
 				typechecker.setType((Node) obj, newType);
 			}else if(obj instanceof SetType){
 				((SetType) obj).setSubtype(newType);
 			}else if(obj instanceof IntegerOrSetOfPairType){
+				//System.out.println("this " +this + " old " + obj + "  new " + newType);
 				((IntegerOrSetOfPairType) obj).update(this, newType, typechecker);
 			}else if(obj instanceof PairType){
 				((PairType) obj).update(this, newType);
@@ -56,5 +62,7 @@ public abstract class AbstractHasFollowers implements BType{
 				throw new RuntimeException("Missing follower type: "+ obj.getClass());
 			}
 		}
+		this.followers.clear();
+		
 	}
 }

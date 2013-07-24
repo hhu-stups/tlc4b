@@ -55,6 +55,19 @@ public class MultTest{
 		assertEquals("INTEGER", t.constants.get("k3").toString());
 	}
 	
+	@Test
+	public void testMult5() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k, k2, k3, k4 \n"
+				+ "PROPERTIES k * k2 * k3 = k4 * 1 \n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("INTEGER", t.constants.get("k").toString());
+		assertEquals("INTEGER", t.constants.get("k2").toString());
+		assertEquals("INTEGER", t.constants.get("k3").toString());
+		assertEquals("INTEGER", t.constants.get("k4").toString());
+	}
+	
 	@Test (expected = TypeErrorException.class)
 	public void testMultException() throws BException {
 		String machine = "MACHINE test\n"
@@ -74,7 +87,19 @@ public class MultTest{
 	}
 	
 	@Test
-	public void testCard1() throws BException {
+	public void testCart1() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k, k2, k3 \n"
+				+ "PROPERTIES k = k2 * k3 & k2 = {1} & k3 = {TRUE} \n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("POW(INTEGER*BOOL)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+		assertEquals("POW(BOOL)", t.constants.get("k3").toString());
+	}
+	
+	@Test
+	public void testCart2() throws BException {
 		String machine = "MACHINE test\n"
 				+ "CONSTANTS k, k2 \n"
 				+ "PROPERTIES k * k2 = {1} * {TRUE} \n"
@@ -85,7 +110,7 @@ public class MultTest{
 	}
 	
 	@Test
-	public void testCard2() throws BException {
+	public void testCart3() throws BException {
 		String machine = "MACHINE test\n"
 				+ "CONSTANTS k, k2, k3 \n"
 				+ "PROPERTIES k * k2 * k3 = {TRUE} * {1} * {TRUE} \n"
@@ -94,6 +119,54 @@ public class MultTest{
 		assertEquals("POW(BOOL)", t.constants.get("k").toString());
 		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
 		assertEquals("POW(BOOL)", t.constants.get("k3").toString());
+	}
+	
+	@Test
+	public void testCart4() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k, k2, k3 \n"
+				+ "PROPERTIES k * k2 * k3 = k2 * k3 * {1} \n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k3").toString());
+	}
+	
+	@Test
+	public void testCart5() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k, k2, k3, k4 \n"
+				+ "PROPERTIES k * k2 = k3 * k4 &  k4 = {1} & k = {1} \n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k3").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k4").toString());
+
+	}
+	
+	@Test
+	public void testCart6() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k, k2 \n"
+				+ "PROPERTIES k * k2 = k2 * {1} \n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
+	}
+	
+	@Test
+	public void testCart7() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k, k2 \n"
+				+ "PROPERTIES k2 * k = k * {1} \n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("POW(INTEGER)", t.constants.get("k").toString());
+		assertEquals("POW(INTEGER)", t.constants.get("k2").toString());
 	}
 	
 }
