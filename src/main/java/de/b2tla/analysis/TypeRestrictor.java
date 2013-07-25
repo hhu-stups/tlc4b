@@ -152,10 +152,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				putRestrictedType(r_left, new ElementOfNode(right));
 				removedNodes.add(n);
 			}
-			if (list.contains(r_right) && cEF.isconstant(left)) {
-				putRestrictedType(r_right, new ElementOfNode(left));
-				removedNodes.add(n);
-			}
 			return;
 		}
 

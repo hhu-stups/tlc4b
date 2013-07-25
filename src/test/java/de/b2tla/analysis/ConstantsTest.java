@@ -3,6 +3,7 @@ package de.b2tla.analysis;
 import static de.b2tla.util.TestUtil.compare;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ConstantsTest {
@@ -62,7 +63,7 @@ public class ConstantsTest {
 		compare(expected, machine);
 	}
 	
-	
+	@Ignore
 	@Test
 	public void testConstantGreaterThan() throws Exception {
 		String machine = "MACHINE test\n"
@@ -76,6 +77,7 @@ public class ConstantsTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testConstantGreaterThan2() throws Exception {
 		String machine = "MACHINE test\n"

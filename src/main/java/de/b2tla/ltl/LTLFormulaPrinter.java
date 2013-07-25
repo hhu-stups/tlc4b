@@ -113,7 +113,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend(" \\in ");
 		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node
 				.getExistsIdentifier().getText());
-		tlaPrinter.printTypeOfIdentifier((AIdentifierExpression) id);
+		tlaPrinter.printTypeOfIdentifier((AIdentifierExpression) id, false);
 		tlaPrinter.moduleStringAppend(": ");
 		ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(" /\\ ");
@@ -127,7 +127,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend(" \\in ");
 		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node
 				.getForallIdentifier().getText());
-		tlaPrinter.printTypeOfIdentifier((AIdentifierExpression) id);
+		tlaPrinter.printTypeOfIdentifier((AIdentifierExpression) id, false);
 		tlaPrinter.moduleStringAppend(": ");
 		ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(" /\\ ");

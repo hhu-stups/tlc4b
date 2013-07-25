@@ -4,6 +4,8 @@ import static de.b2tla.util.TestUtil.compare;
 
 import org.junit.Test;
 
+import de.b2tla.exceptions.SubstitutionException;
+
 public class OperationsTest {
 
 	@Test
@@ -43,6 +45,17 @@ public class OperationsTest {
 		compare(expected, machine);
 	}
 	
+	
+	@Test (expected = SubstitutionException.class)
+	public void testParallelSubstitution() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES a,b,c\n"
+				+ "INVARIANT a = 1 & b = 1 & c = 1\n" 
+				+ "INITIALISATION a,b,c := 1,1,1 \n"
+				+ "OPERATIONS foo = a := 2 || a := 3 \n"
+				+ "END";
+		compare(null, machine);
+	}
 	
 	@Test
 	public void testBlockSubstitution() throws Exception {

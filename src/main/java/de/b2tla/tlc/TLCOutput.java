@@ -155,7 +155,7 @@ public class TLCOutput {
 			return TLCResult.Deadlock;
 		} else if (res[1].equals("Invariant")) {
 			String invName = res[2];
-			if (invName.equals("Invariant")) {
+			if (invName.startsWith("Invariant")) {
 				return TLCResult.InvariantViolation;
 			} else if (invName.equals("NotGoal")) {
 				return TLCResult.Goal;

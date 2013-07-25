@@ -21,6 +21,7 @@ import de.b2tla.analysis.nodes.SubsetNode;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
+import de.b2tla.btypes.PairType;
 import de.b2tla.btypes.SetType;
 import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.tla.ConfigFile;
@@ -177,8 +178,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 				this.configFileString.append("NEXT Next\n");
 			}
 		}
-		if (configFile.isInvariant()) {
-			this.configFileString.append("INVARIANT Invariant\n");
+		for (int i = 0; i < configFile.getInvariantNumber(); i++) {
+			this.configFileString
+					.append("INVARIANT Invariant" + (i + 1) + "\n");
 		}
 
 		if (configFile.isGoal()) {
@@ -305,18 +307,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append("\n");
 	}
 
-	private boolean isInvariant = true;
-
 	private void printInvariant() {
-		PPredicate node = this.tlaModule.getInvariant();
-		if (node == null)
-			return;
-		isInvariant = true;
-
-		tlaModuleString.append("Invariant == ");
-		node.apply(this);
-		tlaModuleString.append("\n");
-		isInvariant = false;
+		ArrayList<Node> invariants = this.tlaModule.getInvariantList();
+		for (int i = 0; i < invariants.size(); i++) {
+			tlaModuleString.append("Invariant" + (i + 1) + " == ");
+			invariants.get(i).apply(this);
+			tlaModuleString.append("\n");
+		}
 	}
 
 	private void printAssertions() {
@@ -388,7 +385,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				PExpression e = newList.get(i);
 				e.apply(this);
 				tlaModuleString.append(" \\in ");
-				printTypeOfIdentifier(e);
+				printTypeOfIdentifier(e, false);
 				if (i < newList.size() - 1) {
 					tlaModuleString.append(", ");
 				}
@@ -770,7 +767,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				PExpression e = copy.get(i);
 				e.apply(this);
 				tlaModuleString.append(" \\in ");
-				printTypeOfIdentifier(e);
+				printTypeOfIdentifier(e, false);
 				if (i < copy.size() - 1) {
 					tlaModuleString.append(", ");
 				}
@@ -796,7 +793,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				PExpression e = copy.get(i);
 				e.apply(this);
 				tlaModuleString.append(" \\in ");
-				printTypeOfIdentifier(e);
+				printTypeOfIdentifier(e, false);
 				if (i < copy.size() - 1) {
 					tlaModuleString.append(", ");
 				}
@@ -942,9 +939,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 			inAConjunctPredicate(node);
 			node.getLeft().apply(this);
 			tlaModuleString.append(" /\\ ");
-			if (isInvariant) {
-				tlaModuleString.append("\n");
-			}
 			node.getRight().apply(this);
 			outAConjunctPredicate(node);
 			break;
@@ -1011,7 +1005,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			PExpression e = copy.get(i);
 			e.apply(this);
 			tlaModuleString.append(" \\in ");
-			printTypeOfIdentifier(e);
+			printTypeOfIdentifier(e, false);
 			if (i < copy.size() - 1) {
 				tlaModuleString.append(", ");
 			}
@@ -1035,7 +1029,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			PExpression e = copy.get(i);
 			e.apply(this);
 			tlaModuleString.append(" \\in ");
-			printTypeOfIdentifier(e);
+			printTypeOfIdentifier(e, false);
 			if (i < copy.size() - 1) {
 				tlaModuleString.append(", ");
 			}
@@ -1408,7 +1402,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append(">>");
 	}
 
-	public void printTypeOfIdentifier(PExpression e) {
+	public void printTypeOfIdentifier(PExpression e, boolean childOfCart) {
 		// NodeType n = typeRestrictor.getRestrictedTypes().get(e);
 		ArrayList<NodeType> list = typeRestrictor.getRestrictedTypesSet(e);
 		if (list != null) {
@@ -1420,7 +1414,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 					tlaModuleString.append(")");
 			}
 		} else {
-			tlaModuleString.append(typechecker.getType(e).getTlaType());
+			BType t = typechecker.getType(e);
+			if(t instanceof PairType && childOfCart){
+				tlaModuleString.append("(");
+				tlaModuleString.append(t.getTlaType());
+				tlaModuleString.append(")");
+			}else{
+				tlaModuleString.append(typechecker.getType(e).getTlaType());
+			}
+			
 		}
 	}
 
@@ -1444,7 +1446,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 		for (int i = 0; i < copy.size(); i++) {
 			tlaModuleString.append("(");
-			printTypeOfIdentifier(copy.get(i));
+			printTypeOfIdentifier(copy.get(i), false);
 			tlaModuleString.append(")");
 			if (i < copy.size() - 1)
 				tlaModuleString.append(" \\times ");
@@ -1759,7 +1761,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			printIdentifierList(copy);
 			tlaModuleString.append(" \\in ");
 			for (int i = 0; i < copy.size(); i++) {
-				printTypeOfIdentifier(copy.get(i));
+				printTypeOfIdentifier(copy.get(i), true);
 				if (i < copy.size() - 1)
 					tlaModuleString.append(" \\times ");
 			}
@@ -1784,7 +1786,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			if (i != 0) {
 				tlaModuleString.append(", ");
 			}
-			tlaModuleString.append("t_[" + (i+1) + "]");
+			tlaModuleString.append("t_[" + (i + 1) + "]");
 			if (i != 0) {
 				tlaModuleString.append(">>");
 			}

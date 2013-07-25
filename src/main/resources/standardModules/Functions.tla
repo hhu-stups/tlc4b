@@ -14,6 +14,7 @@ TotalBijFunc(S, S2) == {f \in [S -> S2]: S2 = Range(f) /\
     Cardinality(DOMAIN f) = Cardinality(Range(f))}
     
 ParFunc(S, S2) ==  UNION{[x -> S2] :x \in SUBSET S} 
+isEleOfParFunc(f, S, S2) == DOMAIN f \subseteq S /\ Range(f) \subseteq S2 
 
 ParInjFunc(S, S2)== {f \in ParFunc(S, S2):
     Cardinality(DOMAIN f) = Cardinality(Range(f))}

@@ -43,7 +43,7 @@ RECURSIVE RelIterate(_,_)
 RelIterate(r, n) == CASE n < 0 -> Assert(FALSE, "ERROR")
         [] n = 0 -> RelId(RelDomain(r) \cup RelRange(r)) 
         [] n = 1 -> r 
-        [] OTHER -> RelIterate(RelComposition(r,r), n-1) 
+        [] OTHER -> RelComposition(r,RelIterate(r, n-1)) 
 
 RECURSIVE RelClosure1(_) 
 RelClosure1(R) == IF RelComposition(R,R) \ R # {} 

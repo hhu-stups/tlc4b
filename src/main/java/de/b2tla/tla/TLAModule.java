@@ -15,9 +15,9 @@ public class TLAModule {
 
 	protected final ArrayList<TLADefinition> definitions;
 	protected final ArrayList<Node> constants;
-	private final ArrayList<Node> assumes;
+	protected final ArrayList<Node> assumes;
 	protected final ArrayList<Node> variables;
-	protected PPredicate invariant;
+	protected final ArrayList<Node> invariants;
 	private final ArrayList<Node> initPredicates;
 	protected final ArrayList<POperation> operations;
 	private ArrayList<PDefinition> bDefinitions;
@@ -34,6 +34,7 @@ public class TLAModule {
 		this.operations = new ArrayList<POperation>();
 		this.bDefinitions = new ArrayList<PDefinition>();
 		this.assertions = new ArrayList<Node>();
+		this.invariants = new ArrayList<Node>();
 		
 		this.allDefinitions = new ArrayList<PDefinition>();
 	}
@@ -101,8 +102,8 @@ public class TLAModule {
 		return operations;
 	}
 
-	public PPredicate getInvariant() {
-		return invariant;
+	public ArrayList<Node> getInvariantList() {
+		return invariants;
 	}
 
 	public void setBDefinitions(ArrayList<PDefinition> defs){

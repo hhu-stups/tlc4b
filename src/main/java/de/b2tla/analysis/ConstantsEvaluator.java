@@ -1,5 +1,6 @@
 package de.b2tla.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,10 +16,12 @@ import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AGreaterPredicate;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AIntegerExpression;
+import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.node.PPredicate;
 
 /**
  * In the class the order of constants is determined. Constants can depend on
@@ -32,11 +35,21 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	private MachineContext machineContext;
 	private ValuesOfIdentifierFinder valuesOfConstantsFinder;
 	private HashMap<Node, Integer> integerValueTable;
-
+	private final ArrayList<Node> propertiesList;
+	private final ArrayList<Node> invariantList;
+	
 	private LinkedHashMap<Node, Node> valueOfIdentifier;
 
 	public Node getValueOfConstant(Node con) {
 		return valueOfIdentifier.get(con);
+	}
+
+	public ArrayList<Node> getInvariantList(){
+		return this.invariantList;
+	}
+	
+	public ArrayList<Node> getPropertiesList() {
+		return this.propertiesList;
 	}
 
 	public LinkedHashMap<Node, Node> getValueOfIdentifierMap() {
@@ -51,7 +64,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		this.dependsOnIdentifierTable = new Hashtable<Node, HashSet<Node>>();
 		this.integerValueTable = new HashMap<Node, Integer>();
 		this.machineContext = machineContext;
-
+		this.propertiesList = new ArrayList<Node>();
+		this.invariantList = new ArrayList<Node>();
+		
+		
 		ConstantsInTreeFinder constantInTreeFinder = new ConstantsInTreeFinder();
 
 		APropertiesMachineClause properties = machineContext
@@ -171,31 +187,52 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 
 			Node constraints = machineContext.getConstraintMachineClause();
 			if (constraints != null) {
-				analysePredicate(((AConstraintsMachineClause) constraints)
-						.getPredicates());
+				analysePredicate(
+						((AConstraintsMachineClause) constraints)
+								.getPredicates(), false);
 			}
 			Node properties = machineContext.getPropertiesMachineClause();
 			if (properties != null) {
-				analysePredicate(((APropertiesMachineClause) properties)
-						.getPredicates());
+				analysePredicate(
+						((APropertiesMachineClause) properties).getPredicates(), true);
 			}
 
+			
+			Node invariantClause = machineContext.getInvariantMachineClause();
+			if(invariantClause != null){
+				analyseInvariantPredicate(((AInvariantMachineClause) invariantClause).getPredicates());
+			}
 		}
-
-		private void analysePredicate(Node n) {
-			if (n instanceof AEqualPredicate) {
-				analyseEqualsPredicate((AEqualPredicate) n);
+		
+		
+		private void analyseInvariantPredicate(Node node){
+			if (node instanceof AConjunctPredicate) {
+				AConjunctPredicate conjunction = (AConjunctPredicate) node;
+				analyseInvariantPredicate(conjunction.getLeft());
+				analyseInvariantPredicate(conjunction.getRight());
 				return;
-			} else if (n instanceof AGreaterPredicate) {
-				analyseGreaterPredicate((AGreaterPredicate) n);
-			} else if (n instanceof ALessEqualPredicate) {
-				analyseLessEqualPredicate((ALessEqualPredicate) n);
-			} else if (n instanceof AConjunctPredicate) {
-				analysePredicate(((AConjunctPredicate) n).getLeft());
-				analysePredicate(((AConjunctPredicate) n).getRight());
+			}
+			
+			invariantList.add(node);
+		}
+		
+		private void analysePredicate(Node node, boolean isProperties) {
+			if (node instanceof AEqualPredicate) {
+				analyseEqualsPredicate((AEqualPredicate) node);
+			} else if (node instanceof AGreaterPredicate) {
+				analyseGreaterPredicate((AGreaterPredicate) node);
+			} else if (node instanceof ALessEqualPredicate) {
+				analyseLessEqualPredicate((ALessEqualPredicate) node);
+			} else if (node instanceof AConjunctPredicate) {
+				AConjunctPredicate conjunction = (AConjunctPredicate) node;
+				analysePredicate(conjunction.getLeft(), isProperties);
+				analysePredicate(conjunction.getRight(), isProperties);
 				return;
 			}
 
+			if (isProperties) {
+				propertiesList.add((PPredicate) node);
+			}
 		}
 
 		private void analyseLessEqualPredicate(ALessEqualPredicate node) {

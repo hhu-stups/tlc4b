@@ -61,11 +61,20 @@ public class Generator extends DepthFirstAdapter {
 		evalMachineSets();
 		evalConstants();
 		evalDefinitions();
+		evalInvariant();
 		evalOperations();
 		evalGoal();
 		machineContext.getTree().apply(this);
 
 		evalSpec();
+	}
+
+	private void evalInvariant() {
+		AInvariantMachineClause invariantClause = machineContext.getInvariantMachineClause();
+		if(invariantClause!= null){
+			this.tlaModule.invariants.addAll(constantsEvaluator.getInvariantList());
+			this.configFile.setInvariantNumber(tlaModule.invariants.size());
+		}
 	}
 
 	private void evalSpec() {
@@ -192,6 +201,10 @@ public class Generator extends DepthFirstAdapter {
 			}
 		}
 	}
+	
+	
+	
+	
 
 	private void evalOperations() {
 		AOperationsMachineClause node = machineContext
@@ -225,20 +238,20 @@ public class Generator extends DepthFirstAdapter {
 			this.tlaModule.addToAllDefinitions(exprDef);
 		}
 
-		ArrayList<Node> vars = new ArrayList<Node>();
-		vars.addAll(machineContext.getConstants().values());
-		vars.removeAll(conValueTable.keySet());
+		ArrayList<Node> remainingConstants = new ArrayList<Node>();
+		remainingConstants.addAll(machineContext.getConstants().values());
+		remainingConstants.removeAll(conValueTable.keySet());
 
 		Node propertiesPerdicate = machineContext.getPropertiesMachineClause()
 				.getPredicates();
-		if (vars.size() != 0) {
+		if (remainingConstants.size() != 0) {
 			boolean init = false;
-			for (int i = 0; i < vars.size(); i++) {
-				Node con = vars.get(i);
+			for (int i = 0; i < remainingConstants.size(); i++) {
+				Node con = remainingConstants.get(i);
 				Integer value = constantsEvaluator.getIntValue(con);
 				if (value == null) {
 					init = true;
-					this.tlaModule.variables.add(vars.get(i));
+					this.tlaModule.variables.add(remainingConstants.get(i));
 				} else {
 					tlaModule.definitions.add(new TLADefinition(con, value));
 				}
@@ -250,14 +263,15 @@ public class Generator extends DepthFirstAdapter {
 			}
 
 		} else {
-			tlaModule.addAssume(propertiesPerdicate);
+			tlaModule.assumes.addAll(constantsEvaluator.getPropertiesList());
+			//tlaModule.addAssume(propertiesPerdicate);
 		}
 	}
 
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		if (!tlaModule.isInitPredicate(node.getPredicates())) {
-			this.tlaModule.addAssume(node.getPredicates());
+			//this.tlaModule.addAssume(node.getPredicates());
 		}
 	}
 
@@ -270,14 +284,7 @@ public class Generator extends DepthFirstAdapter {
 		}
 	}
 
-	@Override
-	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
-		this.tlaModule.invariant = node.getPredicates();
-		if (B2TLAGlobals.isInvariant()) {
-			this.configFile.setInvariant();
-		}
 
-	}
 
 	@Override
 	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {

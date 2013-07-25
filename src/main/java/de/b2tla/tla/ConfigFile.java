@@ -8,7 +8,7 @@ import de.b2tla.tla.config.ConfigFileAssignment;
 public class ConfigFile {
 
 	private final ArrayList<ConfigFileAssignment> assignments;
-	private boolean invariant;
+	private int invariantNumber;
 	private boolean spec;
 	private boolean init;
 	private boolean next;
@@ -18,7 +18,7 @@ public class ConfigFile {
 	
 	public ConfigFile(){
 		this.assignments = new ArrayList<ConfigFileAssignment>();
-		this.invariant = false;
+		this.invariantNumber = 0;
 	}
 
 
@@ -31,8 +31,8 @@ public class ConfigFile {
 	}
 	
 
-	public boolean isInvariant() {
-		return invariant;
+	public void setInvariantNumber(int number) {
+		this.invariantNumber = number;
 	}
 
 
@@ -50,8 +50,8 @@ public class ConfigFile {
 	}
 
 
-	public void setInvariant() {
-		this.invariant = true;
+	public int getInvariantNumber() {
+		return this.invariantNumber;
 	}
 
 
