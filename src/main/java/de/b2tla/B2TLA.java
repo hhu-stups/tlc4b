@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 
+import tlc2.TLCGlobals;
+
 import de.b2tla.B2TLAGlobals;
 
 import de.b2tla.analysis.UsedStandardModules;
@@ -61,7 +63,9 @@ public class B2TLA {
 
 	}
 
-	public static TLCResult test(String[] args) throws IOException {
+	public static TLCResult test(String[] args, boolean deleteFiles) throws IOException {
+		B2TLAGlobals.resetGlobals();
+		B2TLAGlobals.setDeleteOnExit(deleteFiles);
 		B2TLA b2tla = new B2TLA();
 		try {
 			b2tla.progress(args);

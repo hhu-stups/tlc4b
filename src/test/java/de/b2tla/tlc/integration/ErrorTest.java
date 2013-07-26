@@ -19,37 +19,37 @@ public class ErrorTest {
 	@Test
 	public void testInvariantError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch" };
-		assertEquals(TLCOutput.TLCResult.InvariantViolation, B2TLA.test(a));
+		assertEquals(TLCOutput.TLCResult.InvariantViolation, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testDeadlock() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/Deadlock.mch" };
-		assertEquals(TLCOutput.TLCResult.Deadlock, B2TLA.test(a));
+		assertEquals(TLCOutput.TLCResult.Deadlock, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testPropertiesError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/PropertiesError.mch" };
-		assertEquals(TLCOutput.TLCResult.PropertiesError, B2TLA.test(a));
+		assertEquals(TLCOutput.TLCResult.PropertiesError, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testNoFile() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/NoFile.mch" };
-		assertEquals(null, B2TLA.test(a));
+		assertEquals(null, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testNoError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/NoError.mch" };
-		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a));
+		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testEnumerationError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/EnumerationError.mch" };
-		assertEquals(TLCOutput.TLCResult.TLCError, B2TLA.test(a));
+		assertEquals(TLCOutput.TLCResult.TLCError, B2TLA.test(a,true));
 	}
 
 }

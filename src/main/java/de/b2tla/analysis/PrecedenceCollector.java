@@ -7,8 +7,13 @@ import de.b2tla.btypes.BType;
 import de.b2tla.btypes.IntegerType;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
+import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;
+import de.be4.classicalb.core.parser.node.AGreaterPredicate;
+import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
+import de.be4.classicalb.core.parser.node.ALessPredicate;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
+import de.be4.classicalb.core.parser.node.APowerOfExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 
@@ -21,26 +26,33 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 	}
 
 	static {
-		put("AEqualPredicate", 5, 5, false);
-		put("AAddExpression", 10, 10, true);
-		put("ADisjunctPredicate", 3, 3, true);
-		put("AConjunctPredicate", 3, 3, true);
-		put("AGreaterPredicate", 5, 5, false);
-		// put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
-		put("APreconditionSubstitution", 3, 3, true);
-		put("AAssertionSubstitution", 3, 3, true);
-		put("AUnionExpression", 8, 8, true);
-		put("AIntervalExpression", 9, 9, true);
-		put("AUnionExpression", 8, 8, true);
-		put("AIntersectionExpression", 8, 8, true);
-		put("AEqualPredicate", 5, 5, false);
-		put("ANotEqualPredicate", 5, 5, false);
-		put("AEquivalencePredicate", 2, 2, false);
-		put("AAddExpression", 10, 10, true);
+
 		put("AImplicationPredicate", 1, 1, false);
-		put("ASetSubtractionExpression", 8, 8, false);
 		put("AExistsPredicate", 1, 1, false);
 		put("AForallPredicate", 1, 1, false);
+		put("AEquivalencePredicate", 2, 2, false);
+		put("ADisjunctPredicate", 3, 3, true);
+		put("AConjunctPredicate", 3, 3, true);
+		put("APreconditionSubstitution", 3, 3, true); // and
+		put("AAssertionSubstitution", 3, 3, true); // and
+		put("AEqualPredicate", 5, 5, false);
+		put("ALessPredicate", 5, 5, false);
+		put("AGreaterPredicate", 5, 5, false);
+		put("ALessEqualPredicate", 5, 5, false);
+		put("AGreaterEqualPredicate",5,5, false);
+		put("ANotEqualPredicate", 5, 5, false);
+		put("APowerOfExpression", 14, 14, false);
+		// put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
+
+		put("AUnionExpression", 8, 8, true);
+		put("AIntersectionExpression", 8, 8, true);
+		put("AUnionExpression", 8, 8, true);
+		put("ASetSubtractionExpression", 8, 8, false);
+		put("AIntervalExpression", 9, 9, true);
+
+		put("AAddExpression", 10, 10, true);
+		put("AAddExpression", 10, 10, true);
+
 		put("AModuloExpression", 10, 11, true);
 		put("AConcatExpression", 13, 13, true);
 

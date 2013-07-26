@@ -29,10 +29,10 @@ import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class ConstantsEliminator extends DepthFirstAdapter {
 
-	private Hashtable<Node, HashSet<Node>> dependsOnIdentifierTable;
+	private final Hashtable<Node, HashSet<Node>> dependsOnIdentifierTable;
 	private MachineContext machineContext;
 	private ValuesOfIdentifierFinder valuesOfConstantsFinder;
-	private HashMap<Node, Integer> integerValueTable;
+	private final HashMap<Node, Integer> integerValueTable;
 
 	private LinkedHashMap<Node, Node> valueOfIdentifier;
 

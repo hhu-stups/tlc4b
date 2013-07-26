@@ -3,43 +3,67 @@ package de.b2tla.tlc.integration;
 import static de.b2tla.tlc.TLCOutput.TLCResult.*;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
-import java.util.ArrayList;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import de.b2tla.B2TLA;
 import de.b2tla.B2TLAGlobals;
-import de.b2tla.tlc.TLCOutput.TLCResult;
-import de.b2tla.util.AbstractParseMachineTest;
-import de.b2tla.util.PolySuite;
-import de.b2tla.util.TestPair;
-import de.b2tla.util.PolySuite.Config;
-import de.b2tla.util.PolySuite.Configuration;
 
-@RunWith(PolySuite.class)
-public class LawsTest extends AbstractParseMachineTest {
+public class LawsTest {
 
-	private final File machine;
-	private final TLCResult error;
-
-	public LawsTest(File machine, TLCResult result) {
-		this.machine = machine;
-		this.error = result;
+	@Test
+	public void BoolLaws() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolLaws.mch"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void BoolWithArithLaws() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolWithArithLaws.mch", "-nodead"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void FunLaws() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/FunLaws.mch"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void FunLawsWithLambda() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/FunLawsWithLambda.mch"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void RelLaws_TLC() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/RelLaws_TLC.mch"};
+		assertEquals(Goal, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void BoolLaws_SetCompr() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolLaws_SetCompr.mch"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void BoolLaws_SetComprCLPFD() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolLaws_SetComprCLPFD.mch"};
+		assertEquals(NoError, B2TLA.test(a,true));
 	}
 
 	@Test
-	public void testRunTLC() throws Exception {
-		String[] a = new String[] { machine.getPath() };
+	public void CardinalityLaws_TLC() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		assertEquals(error, B2TLA.test(a));
-	}
-
-	@Config
-	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<TestPair>();
-		list.add(new TestPair(NoError, "./src/test/resources/laws"));
-		return getConfiguration(list);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/CardinalityLaws_TLC.mch", "-nodead"};
+		assertEquals(NoError, B2TLA.test(a,true));
 	}
 }

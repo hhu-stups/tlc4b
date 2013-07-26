@@ -20,7 +20,7 @@ public class LTLTest {
 	public void testCounterLTL() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\CounterLTL.mch"};
 		B2TLA.main(a);
-		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a));
+		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
 	}
 	
 }
