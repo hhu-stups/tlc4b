@@ -1,5 +1,7 @@
 package de.b2tla.btypes;
 
+import de.be4.classicalb.core.parser.node.PExpression;
+
 
 public class UntypedType extends AbstractHasFollowers {
 
@@ -27,6 +29,10 @@ public class UntypedType extends AbstractHasFollowers {
 
 	public boolean containsIntegerType() {
 		return false;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return null;
 	}
 	
 //	@Override

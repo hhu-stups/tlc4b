@@ -7,7 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class SetTest {
-
+	
 	@Test
 	public void testEmptySet() throws Exception {
 		String machine = "MACHINE test\n"

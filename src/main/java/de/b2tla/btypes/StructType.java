@@ -1,13 +1,18 @@
- package de.b2tla.btypes;
+package de.b2tla.btypes;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
 import de.b2tla.exceptions.UnificationException;
-
-
+import de.be4.classicalb.core.parser.node.AIdentifierExpression;
+import de.be4.classicalb.core.parser.node.ARecEntry;
+import de.be4.classicalb.core.parser.node.AStructExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.node.PRecEntry;
+import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class StructType extends AbstractHasFollowers {
 
@@ -22,22 +27,22 @@ public class StructType extends AbstractHasFollowers {
 		return types.get(fieldName);
 	}
 
-	public void setComplete(){
+	public void setComplete() {
 		complete = true;
 	}
-	
+
 	public void add(String name, BType type) {
 		if (type instanceof AbstractHasFollowers) {
 			((AbstractHasFollowers) type).addFollower(this);
 		}
 		types.put(name, type);
 	}
-	
+
 	@Override
 	public String toString() {
 		String res = "struct(";
 		Iterator<String> keys = types.keySet().iterator();
-		if(!keys.hasNext())
+		if (!keys.hasNext())
 			res += "...";
 		while (keys.hasNext()) {
 			String fieldName = (String) keys.next();
@@ -48,7 +53,7 @@ public class StructType extends AbstractHasFollowers {
 		res += ")";
 		return res;
 	}
-	
+
 	public void update(BType oldType, BType newType) {
 		Iterator<String> itr = this.types.keySet().iterator();
 		while (itr.hasNext()) {
@@ -166,7 +171,7 @@ public class StructType extends AbstractHasFollowers {
 	public String getTlaType() {
 		String res = "[";
 		Iterator<String> keys = types.keySet().iterator();
-		if(!keys.hasNext())
+		if (!keys.hasNext())
 			res += "...";
 		while (keys.hasNext()) {
 			String fieldName = (String) keys.next();
@@ -180,11 +185,25 @@ public class StructType extends AbstractHasFollowers {
 
 	public boolean containsIntegerType() {
 		Iterator<BType> iterator = this.types.values().iterator();
-		while (iterator.hasNext()){
-			if(iterator.next().containsIntegerType())
+		while (iterator.hasNext()) {
+			if (iterator.next().containsIntegerType())
 				return true;
 		}
 		return false;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		ArrayList<PRecEntry> list = new ArrayList<PRecEntry>();
+		for (String name : types.keySet()) {
+			TIdentifierLiteral literal = new TIdentifierLiteral(name);
+			ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
+			idList.add(literal);
+			AIdentifierExpression id = new AIdentifierExpression(idList);
+			ARecEntry entry = new ARecEntry(id, types.get(name)
+					.createSyntaxTreeNode());
+			list.add(entry);
+		}
+		return new AStructExpression(list);
 	}
 
 }

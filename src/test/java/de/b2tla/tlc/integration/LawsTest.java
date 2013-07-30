@@ -66,4 +66,18 @@ public class LawsTest {
 		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/CardinalityLaws_TLC.mch", "-nodead"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
+	
+	@Test
+	public void EqualityLaws() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/EqualityLaws.mch", "-nodead"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void SubsetLaws() throws Exception {
+		B2TLAGlobals.setDeleteOnExit(true);
+		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/SubsetLaws.mch", "-nodead"};
+		assertEquals(NoError, B2TLA.test(a,true));
+	}
 }

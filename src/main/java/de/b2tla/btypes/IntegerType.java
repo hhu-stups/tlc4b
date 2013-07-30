@@ -1,6 +1,9 @@
 package de.b2tla.btypes;
 
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.AIntegerExpression;
+import de.be4.classicalb.core.parser.node.AIntegerSetExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
 
 public class IntegerType implements BType {
 
@@ -55,5 +58,9 @@ public class IntegerType implements BType {
 
 	public boolean containsIntegerType() {
 		return true;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return new AIntegerSetExpression();
 	}
 }

@@ -2,6 +2,7 @@ package de.b2tla.btypes;
 
 import de.b2tla.exceptions.TypeErrorException;
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.PExpression;
 import de.hhu.stups.sablecc.patch.SourcePosition;
 
 public class IntegerOrSetOfPairType extends AbstractHasFollowers {
@@ -227,6 +228,10 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 
 	public boolean containsIntegerType() {
 		return false;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return null;
 	}
 
 }

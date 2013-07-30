@@ -12,6 +12,9 @@ import de.b2tla.analysis.ConstantsEvaluator;
 import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
 import de.b2tla.analysis.TypeRestrictor;
+import de.b2tla.analysis.Typechecker;
+import de.b2tla.analysis.nodes.NodeType;
+import de.b2tla.btypes.BType;
 import de.b2tla.tla.config.ModelValueAssignment;
 import de.b2tla.tla.config.SetOfModelValuesAssignment;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -23,6 +26,7 @@ import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
+import de.be4.classicalb.core.parser.node.AMemberPredicate;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
@@ -35,8 +39,10 @@ import de.be4.classicalb.core.parser.node.PPredicate;
 public class Generator extends DepthFirstAdapter {
 
 	private MachineContext machineContext;
+	private TypeRestrictor typeRestrictor;
 	private ConstantsEvaluator constantsEvaluator;
 	private DefinitionsAnalyser deferredSetSizeCalculator;
+	private Typechecker typechecker;
 
 	private TLAModule tlaModule;
 	private ConfigFile configFile;
@@ -44,10 +50,13 @@ public class Generator extends DepthFirstAdapter {
 	public Generator(MachineContext machineContext,
 			TypeRestrictor typeRestrictor,
 			ConstantsEvaluator constantsEvaluator,
-			DefinitionsAnalyser deferredSetSizeCalculator) {
+			DefinitionsAnalyser deferredSetSizeCalculator,
+			Typechecker typechecker) {
 		this.machineContext = machineContext;
+		this.typeRestrictor = typeRestrictor;
 		this.constantsEvaluator = constantsEvaluator;
 		this.deferredSetSizeCalculator = deferredSetSizeCalculator;
+		this.typechecker = typechecker;
 
 		this.tlaModule = new TLAModule();
 		this.configFile = new ConfigFile();
@@ -70,9 +79,11 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	private void evalInvariant() {
-		AInvariantMachineClause invariantClause = machineContext.getInvariantMachineClause();
-		if(invariantClause!= null){
-			this.tlaModule.invariants.addAll(constantsEvaluator.getInvariantList());
+		AInvariantMachineClause invariantClause = machineContext
+				.getInvariantMachineClause();
+		if (invariantClause != null) {
+			this.tlaModule.invariants.addAll(constantsEvaluator
+					.getInvariantList());
 			this.configFile.setInvariantNumber(tlaModule.invariants.size());
 		}
 	}
@@ -201,10 +212,6 @@ public class Generator extends DepthFirstAdapter {
 			}
 		}
 	}
-	
-	
-	
-	
 
 	private void evalOperations() {
 		AOperationsMachineClause node = machineContext
@@ -251,7 +258,20 @@ public class Generator extends DepthFirstAdapter {
 				Integer value = constantsEvaluator.getIntValue(con);
 				if (value == null) {
 					init = true;
-					this.tlaModule.variables.add(remainingConstants.get(i));
+					this.tlaModule.variables.add(con);
+					BType type = typechecker.getType(con);
+					AMemberPredicate member = new AMemberPredicate(
+							(PExpression) con.clone(),
+							type.createSyntaxTreeNode());
+					
+					ArrayList<NodeType> list = this.typeRestrictor.getRestrictedTypesSet(con);
+					if (list == null || list.size() == 0) {
+						System.out.println(con);
+						tlaModule.addInit(member);
+					}else{
+						
+					}
+					
 				} else {
 					tlaModule.definitions.add(new TLADefinition(con, value));
 				}
@@ -264,14 +284,14 @@ public class Generator extends DepthFirstAdapter {
 
 		} else {
 			tlaModule.assumes.addAll(constantsEvaluator.getPropertiesList());
-			//tlaModule.addAssume(propertiesPerdicate);
+			// tlaModule.addAssume(propertiesPerdicate);
 		}
 	}
 
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		if (!tlaModule.isInitPredicate(node.getPredicates())) {
-			//this.tlaModule.addAssume(node.getPredicates());
+			// this.tlaModule.addAssume(node.getPredicates());
 		}
 	}
 
@@ -283,8 +303,6 @@ public class Generator extends DepthFirstAdapter {
 			this.tlaModule.variables.add(e);
 		}
 	}
-
-
 
 	@Override
 	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {

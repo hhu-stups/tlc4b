@@ -571,12 +571,15 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			ABecomesElementOfSubstitution node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
-		BType x = new SetType(new UntypedType());
+		SetType set = new SetType(new UntypedType());
 
+		setType(node.getSet(), set);
 		for (PExpression e : copy) {
-			setType(e, x);
+			setType(e, set.getSubtype());
 		}
-		setType(node.getSet(), x);
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
 		node.getSet().apply(this);
 	}
 

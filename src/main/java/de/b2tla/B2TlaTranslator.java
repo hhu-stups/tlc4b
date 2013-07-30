@@ -24,6 +24,7 @@ import de.b2tla.tlc.TLCOutputInfo;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.ltl.core.parser.node.TYesterday;
 
 public class B2TlaTranslator {
 
@@ -95,7 +96,7 @@ public class B2TlaTranslator {
 				machineContext);
 
 		Generator generator = new Generator(machineContext, typeRestrictor,
-				constantsEvaluator, deferredSetSizeCalculator);
+				constantsEvaluator, deferredSetSizeCalculator, typechecker);
 		generator.generate();
 
 		generator.getTlaModule().sortAllDefinitions(machineContext);

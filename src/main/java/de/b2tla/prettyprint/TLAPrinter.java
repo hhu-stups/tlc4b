@@ -1415,14 +1415,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 		} else {
 			BType t = typechecker.getType(e);
-			if(t instanceof PairType && childOfCart){
+			if (t instanceof PairType && childOfCart) {
 				tlaModuleString.append("(");
 				tlaModuleString.append(t.getTlaType());
 				tlaModuleString.append(")");
-			}else{
+			} else {
 				tlaModuleString.append(typechecker.getType(e).getTlaType());
 			}
-			
+
 		}
 	}
 
@@ -1612,6 +1612,19 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 	}
 
+	private boolean isElementOf(Node node) {
+		Node parent = node.parent();
+		if (parent instanceof AMemberPredicate
+				&& !typeRestrictor.removeNode(parent)) {
+			return true;
+		} else {
+			if (parent instanceof ATotalFunctionExpression) {
+				return isElementOf(node.parent());
+			} else
+				return false;
+		}
+	}
+
 	private void setOfFuntions(Node node, String funcName, String relName,
 			String relEleOfName, Node left, Node right) {
 		BType type = this.typechecker.getType(node);
@@ -1619,14 +1632,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (subtype instanceof FunctionType) {
 			tlaModuleString.append(funcName);
 		} else {
-			if (node.parent() instanceof AMemberPredicate
-					&& !typeRestrictor.removeNode(node.parent())) {
+			if (isElementOf(node)) {
 				tlaModuleString.append(relEleOfName);
 			} else {
 				tlaModuleString.append(relName);
 			}
 		}
-
 		tlaModuleString.append("(");
 		left.apply(this);
 		tlaModuleString.append(", ");
@@ -1761,7 +1772,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 			printIdentifierList(copy);
 			tlaModuleString.append(" \\in ");
 			for (int i = 0; i < copy.size(); i++) {
+				tlaModuleString.append("(");
 				printTypeOfIdentifier(copy.get(i), true);
+				tlaModuleString.append(")");
 				if (i < copy.size() - 1)
 					tlaModuleString.append(" \\times ");
 			}

@@ -42,8 +42,8 @@ import de.be4.ltl.core.parser.node.AForallLtl;
 public class TypeRestrictor extends DepthFirstAdapter {
 
 	private MachineContext machineContext;
-	private ConstantExpressionFinder cEF;
-
+	private final IdentifierDependencies identifierDependencies;
+	
 	private Hashtable<Node, ArrayList<NodeType>> restrictedTypesSet;
 	private HashSet<Node> removedNodes;
 
@@ -52,9 +52,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		this.machineContext = machineContext;
 		this.restrictedTypesSet = new Hashtable<Node, ArrayList<NodeType>>();
 		this.removedNodes = new HashSet<Node>();
-
-		cEF = new ConstantExpressionFinder(start, machineContext);
-
+		
+		this.identifierDependencies = new IdentifierDependencies(machineContext);
+		
 		start.apply(this);
 
 		checkLTLFormulas();
@@ -120,7 +120,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
 		HashSet<Node> list = new HashSet<Node>();
 		list.addAll(machineContext.getConstants().values());
-		//analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list);
 	}
 
 	private void analysePredicate(Node n, HashSet<Node> list) {
@@ -130,15 +130,20 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			PExpression right = ((AEqualPredicate) n).getRight();
 			Node r_right = machineContext.getReferences().get(right);
 
-			if (list.contains(r_left) && cEF.isconstant(right)) {
+			if (list.contains(r_left) && !identifierDependencies.containsIdentifier(right, list)) {
 				EqualsNode setNode = new EqualsNode(right);
 				putRestrictedType(r_left, setNode);
-				removedNodes.add(n);
+				if(!machineContext.getConstants().containsValue(r_left)){
+					removedNodes.add(n);
+				}
+				
 			}
-			if (list.contains(r_right) && cEF.isconstant(left)) {
+			if (list.contains(r_right) && !identifierDependencies.containsIdentifier(left, list)) {
 				EqualsNode setNode = new EqualsNode(left);
 				putRestrictedType(r_right, setNode);
-				removedNodes.add(n);
+				if(!machineContext.getConstants().containsValue(r_left)){
+					removedNodes.add(n);
+				}
 			}
 			return;
 		}
@@ -147,10 +152,11 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			PExpression left = ((AMemberPredicate) n).getLeft();
 			Node r_left = machineContext.getReferences().get(left);
 			PExpression right = ((AMemberPredicate) n).getRight();
-			Node r_right = machineContext.getReferences().get(right);
-			if (list.contains(r_left) && cEF.isconstant(right)) {
+			if (list.contains(r_left) && !identifierDependencies.containsIdentifier(right, list)) {
 				putRestrictedType(r_left, new ElementOfNode(right));
-				removedNodes.add(n);
+				if(!machineContext.getConstants().containsValue(r_left)){
+					removedNodes.add(n);
+				}
 			}
 			return;
 		}
@@ -160,9 +166,11 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			Node r_left = machineContext.getReferences().get(left);
 			PExpression right = ((ASubsetPredicate) n).getRight();
 
-			if (list.contains(r_left) && cEF.isconstant(right)) {
+			if (list.contains(r_left) && !identifierDependencies.containsIdentifier(right, list)) {
 				putRestrictedType(r_left, new SubsetNode(right));
-				removedNodes.add(n);
+				if(!machineContext.getConstants().containsValue(r_left)){
+					removedNodes.add(n);
+				}
 			}
 			return;
 		}

@@ -1,6 +1,8 @@
 package de.b2tla.btypes;
 
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.APowSubsetExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
 
 public class SetType extends AbstractHasFollowers {
 
@@ -93,6 +95,10 @@ public class SetType extends AbstractHasFollowers {
 
 	public boolean containsIntegerType() {
 		return this.subtype.containsIntegerType();
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return new APowSubsetExpression(subtype.createSyntaxTreeNode());
 	}
 
 }

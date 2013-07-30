@@ -39,7 +39,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ALessPredicate", 5, 5, false);
 		put("AGreaterPredicate", 5, 5, false);
 		put("ALessEqualPredicate", 5, 5, false);
-		put("AGreaterEqualPredicate",5,5, false);
+		put("AGreaterEqualPredicate", 5, 5, false);
 		put("ANotEqualPredicate", 5, 5, false);
 		put("APowerOfExpression", 14, 14, false);
 		// put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
@@ -103,7 +103,9 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 	public void inAConvertBoolExpression(AConvertBoolExpression node) {
 		Precedence parent = PRECEDENCES.get(node.parent().getClass()
 				.getSimpleName());
-		precedenceTable.put(node, parent);
+		if (parent != null) {
+			precedenceTable.put(node, parent);
+		}
 	}
 
 	@Override

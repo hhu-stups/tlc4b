@@ -1,6 +1,11 @@
 package de.b2tla.btypes;
 
+import java.util.ArrayList;
+
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.AIdentifierExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class ModelValueType implements BType {
 	private String name;
@@ -57,5 +62,13 @@ public class ModelValueType implements BType {
 
 	public boolean containsIntegerType() {
 		return false;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		TIdentifierLiteral literal = new TIdentifierLiteral(name);
+		ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
+		idList.add(literal);
+		AIdentifierExpression id = new AIdentifierExpression(idList);
+		return id;
 	}
 }

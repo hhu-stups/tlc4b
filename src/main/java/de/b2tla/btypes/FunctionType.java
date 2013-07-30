@@ -1,6 +1,8 @@
 package de.b2tla.btypes;
 
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.ATotalFunctionExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
 
 public class FunctionType extends AbstractHasFollowers {
 	private BType domain;
@@ -48,10 +50,10 @@ public class FunctionType extends AbstractHasFollowers {
 		} else if (other instanceof SetType
 				|| other instanceof IntegerOrSetType
 				|| other instanceof IntegerOrSetOfPairType) {
-			if(domain instanceof AbstractHasFollowers){
+			if (domain instanceof AbstractHasFollowers) {
 				((AbstractHasFollowers) domain).deleteFollower(this);
 			}
-			if (range instanceof AbstractHasFollowers){
+			if (range instanceof AbstractHasFollowers) {
 				((AbstractHasFollowers) range).deleteFollower(this);
 			}
 			SetType s = new SetType(new PairType(domain, range));
@@ -89,11 +91,12 @@ public class FunctionType extends AbstractHasFollowers {
 			return true;
 		} else if (other instanceof SetType) {
 			BType t = ((SetType) other).getSubtype();
-			if(t instanceof PairType){
-				return ((PairType) t).getFirst().compare(domain) &&  ((PairType) t).getSecond().compare(range);
-			}else if (t instanceof UntypedType) {
+			if (t instanceof PairType) {
+				return ((PairType) t).getFirst().compare(domain)
+						&& ((PairType) t).getSecond().compare(range);
+			} else if (t instanceof UntypedType) {
 				return true;
-			} else 
+			} else
 				return false;
 		}
 		return false;
@@ -120,7 +123,13 @@ public class FunctionType extends AbstractHasFollowers {
 	}
 
 	public boolean containsIntegerType() {
-		return this.domain.containsIntegerType() || this.range.containsIntegerType();
+		return this.domain.containsIntegerType()
+				|| this.range.containsIntegerType();
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return new ATotalFunctionExpression(domain.createSyntaxTreeNode(),
+				range.createSyntaxTreeNode());
 	}
 
 }

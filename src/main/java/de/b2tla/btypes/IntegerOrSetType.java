@@ -1,6 +1,7 @@
 package de.b2tla.btypes;
 
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.PExpression;
 
 public class IntegerOrSetType extends AbstractHasFollowers {
 
@@ -59,5 +60,9 @@ public class IntegerOrSetType extends AbstractHasFollowers {
 
 	public boolean containsIntegerType() {
 		return false;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return null;
 	}
 }

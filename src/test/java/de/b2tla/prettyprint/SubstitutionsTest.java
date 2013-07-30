@@ -76,4 +76,22 @@ public class SubstitutionsTest {
 				+ "====";
 		compare(expected, machine);
 	}
+	
+	@Test
+	public void testNotDeterministicElementOf() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES x\n"
+				+ "INVARIANT x = 1\n" 
+				+ "INITIALISATION x :: {1} \n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals \n"
+				+ "VARIABLES x \n"
+				+ "Invariant == x = 1\n"
+				+ "Init == x \\in {1}\n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
+				+ "====";
+		compare(expected, machine);
+	}
 }

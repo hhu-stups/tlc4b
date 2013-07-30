@@ -1,6 +1,8 @@
 package de.b2tla.btypes;
 
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.ABoolSetExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
 
 public class BoolType implements BType {
 
@@ -46,6 +48,10 @@ public class BoolType implements BType {
 
 	public boolean containsIntegerType() {
 		return false;
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return new ABoolSetExpression();
 	}
 
 }

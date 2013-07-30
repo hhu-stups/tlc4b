@@ -18,6 +18,17 @@ public class LogicalPredicates {
 	}
 	
 	@Test
+	public void testConvert() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES TRUE = bool(1=1)" + "END";
+		
+		String expected = "---- MODULE test----\n" 
+				+ "ASSUME TRUE = (1=1) \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
 	public void testNotEquals() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES 1 /= 1" + "END";

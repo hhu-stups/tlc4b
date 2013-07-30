@@ -1,6 +1,8 @@
 package de.b2tla.btypes;
 
 import de.b2tla.exceptions.UnificationException;
+import de.be4.classicalb.core.parser.node.ACartesianProductExpression;
+import de.be4.classicalb.core.parser.node.PExpression;
 
 public class PairType extends AbstractHasFollowers {
 
@@ -30,21 +32,22 @@ public class PairType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType) {
-		
+
 		if (this.first == oldType)
 			setFirst(newType);
 		if (this.second == oldType)
 			setSecond(newType);
 	}
+
 	public PairType(BType first, BType second) {
 		setFirst(first);
 		setSecond(second);
 	}
 
 	public BType unify(BType other, ITypechecker typechecker) {
-		if(!this.compare(other) || this.contains(other))
+		if (!this.compare(other) || this.contains(other))
 			throw new UnificationException();
-		
+
 		if (other instanceof PairType) {
 			((PairType) other).setFollowersTo(this, typechecker);
 			setFirst(first.unify(((PairType) other).first, typechecker));
@@ -91,15 +94,15 @@ public class PairType extends AbstractHasFollowers {
 
 	@Override
 	public boolean contains(BType other) {
-		if(this.first.equals(other)|| this.second.equals(other)){
+		if (this.first.equals(other) || this.second.equals(other)) {
 			return true;
 		}
-		if(first instanceof AbstractHasFollowers){
-			if(((AbstractHasFollowers) first).contains(other))
+		if (first instanceof AbstractHasFollowers) {
+			if (((AbstractHasFollowers) first).contains(other))
 				return true;
 		}
-		if(second instanceof AbstractHasFollowers){
-			if(((AbstractHasFollowers) second).contains(other))
+		if (second instanceof AbstractHasFollowers) {
+			if (((AbstractHasFollowers) second).contains(other))
 				return true;
 		}
 		return false;
@@ -115,7 +118,13 @@ public class PairType extends AbstractHasFollowers {
 	}
 
 	public boolean containsIntegerType() {
-		return this.first.containsIntegerType() || this.second.containsIntegerType();
+		return this.first.containsIntegerType()
+				|| this.second.containsIntegerType();
+	}
+
+	public PExpression createSyntaxTreeNode() {
+		return new ACartesianProductExpression(first.createSyntaxTreeNode(),
+				second.createSyntaxTreeNode());
 	}
 
 }

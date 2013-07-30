@@ -22,7 +22,8 @@ public class TLCOutput {
 	String parseError;
 
 	public static enum TLCResult {
-		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerateError, TLCError, TemporalProperty
+		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError,
+		PropertiesError, EnumerateError, TLCError, TemporalProperty, WellDefinednessError
 	}
 
 	public long getRunningTime() {
@@ -33,7 +34,7 @@ public class TLCOutput {
 	public String getError() {
 		if (error == TLCResult.InvariantViolation) {
 			return "Invariant Violation";
-		}else if(error == TLCResult.TemporalProperty){
+		} else if (error == TLCResult.TemporalProperty) {
 			return "Temporal Property Violation";
 		}
 		return error.toString();
@@ -142,7 +143,7 @@ public class TLCOutput {
 	public static TLCResult findError(ArrayList<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			String m = list.get(i);
-			if (m.startsWith("Error:")) {
+			if (m.startsWith("Error:") || m.startsWith("\"Error:")) {
 				return findError(m);
 			}
 		}
@@ -167,10 +168,14 @@ public class TLCOutput {
 		} else if (res[1].equals("Temporal")) {
 			return TLCResult.TemporalProperty;
 		} else if (m.equals("Error: TLC threw an unexpected exception.")) {
-			return TLCResult.ParseError;
+			return TLCResult.TLCError;
+		} else if (m.startsWith("\"Error: Invalid function call to relation")){
+			return TLCResult.WellDefinednessError;
 		} else if (m.startsWith("Error: The behavior up to")) {
 			return null;
 		} else if (m.startsWith("Error: The following behavior constitutes a counter-example:")) {
+			return null;
+		}else if (m.startsWith("Error: The error occurred when TLC was evaluating the nested")) {
 			return null;
 		}
 		return TLCResult.TLCError;
