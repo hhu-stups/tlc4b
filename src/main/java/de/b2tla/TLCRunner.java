@@ -82,7 +82,6 @@ public class TLCRunner {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 		return stdOut.getLog();
 	}
 

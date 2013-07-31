@@ -1,4 +1,4 @@
-package de.b2tla.tlc.integration;
+package de.b2tla.tlc.integration.probprivate;
 
 import static de.b2tla.tlc.TLCOutput.TLCResult.*;
 import static org.junit.Assert.assertEquals;

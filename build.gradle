@@ -42,7 +42,7 @@ test {
 task integrationtests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
-	include('de/b2tla/tlc/integration/**')
+	include('de/b2tla/tlc/integration/probprivate/**')
 }
 
 jar { from sourceSets.main.allJava }

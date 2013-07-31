@@ -260,18 +260,19 @@ public class Generator extends DepthFirstAdapter {
 					init = true;
 					this.tlaModule.variables.add(con);
 					BType type = typechecker.getType(con);
+					
+					PExpression n = type.createSyntaxTreeNode();
 					AMemberPredicate member = new AMemberPredicate(
-							(PExpression) con.clone(),
-							type.createSyntaxTreeNode());
-					
-					ArrayList<NodeType> list = this.typeRestrictor.getRestrictedTypesSet(con);
+							(PExpression) con.clone(), n);
+
+					ArrayList<NodeType> list = this.typeRestrictor
+							.getRestrictedTypesSet(con);
 					if (list == null || list.size() == 0) {
-						System.out.println(con);
 						tlaModule.addInit(member);
-					}else{
-						
+					} else {
+
 					}
-					
+
 				} else {
 					tlaModule.definitions.add(new TLADefinition(con, value));
 				}

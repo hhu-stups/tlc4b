@@ -1,5 +1,6 @@
 package de.b2tla.tlc.integration;
 
+import static de.b2tla.tlc.TLCOutput.TLCResult.*;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
@@ -7,7 +8,6 @@ import org.junit.Test;
 
 import de.b2tla.B2TLA;
 import de.b2tla.B2TLAGlobals;
-import de.b2tla.tlc.TLCOutput;
 
 public class ErrorTest {
 
@@ -19,19 +19,19 @@ public class ErrorTest {
 	@Test
 	public void testInvariantError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch" };
-		assertEquals(TLCOutput.TLCResult.InvariantViolation, B2TLA.test(a,true));
+		assertEquals(InvariantViolation, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testDeadlock() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/Deadlock.mch" };
-		assertEquals(TLCOutput.TLCResult.Deadlock, B2TLA.test(a,true));
+		assertEquals(Deadlock, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testPropertiesError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/PropertiesError.mch" };
-		assertEquals(TLCOutput.TLCResult.PropertiesError, B2TLA.test(a,true));
+		assertEquals(PropertiesError, B2TLA.test(a,true));
 	}
 
 	@Test
@@ -43,13 +43,26 @@ public class ErrorTest {
 	@Test
 	public void testNoError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/NoError.mch" };
-		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
+		assertEquals(NoError, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void testEnumerationError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/EnumerationError.mch" };
-		assertEquals(TLCOutput.TLCResult.TLCError, B2TLA.test(a,true));
+		assertEquals(TLCError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testAssertionError() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/AssertionError.mch" };
+		assertEquals(AssertionError, B2TLA.test(a,true));
+	}
+	
+	
+	@Test
+	public void testConstantAssertionError() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/AssertionError2.mch" };
+		assertEquals(AssertionError, B2TLA.test(a,true));
 	}
 
 }

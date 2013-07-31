@@ -23,6 +23,7 @@ import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
 import de.b2tla.btypes.PairType;
 import de.b2tla.btypes.SetType;
+import de.b2tla.btypes.UntypedType;
 import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.tla.ConfigFile;
 import de.b2tla.tla.TLADefinition;
@@ -1590,6 +1591,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseATotalFunctionExpression(ATotalFunctionExpression node) {
 		BType type = this.typechecker.getType(node);
+		if(type == null){
+			type = new SetType(new FunctionType(new UntypedType(), new UntypedType()));
+		}
 		BType subtype = ((SetType) type).getSubtype();
 		if (subtype instanceof FunctionType) {
 			tlaModuleString.append("[");
