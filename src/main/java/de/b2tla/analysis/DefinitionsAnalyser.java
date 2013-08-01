@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.b2tla.B2TLAGlobals;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
@@ -18,10 +19,10 @@ import de.be4.classicalb.core.parser.node.Node;
  * 
  * 
  * @author hansen
- *
+ * 
  */
 
-public class DefinitionsAnalyser extends DepthFirstAdapter{
+public class DefinitionsAnalyser extends DepthFirstAdapter {
 	private MachineContext machineContext;
 	private HashMap<Node, Integer> deferredSetSizeTable;
 
@@ -34,50 +35,86 @@ public class DefinitionsAnalyser extends DepthFirstAdapter{
 		deferredSetSizeTable = new HashMap<Node, Integer>();
 		HashSet<Node> deferredSets = new HashSet<Node>(machineContext
 				.getDeferredSets().values());
+
+		findMaxMin();
+
 		if (deferredSets.size() == 0)
 			return;
 
 		Set<String> strings = machineContext.getDeferredSets().keySet();
 		for (String string : strings) {
-			String s = "scope_"+ string;
+			String s = "scope_" + string;
 			Node node = machineContext.getDefinitions().get(s);
-			if(null != node){
+			if (null != node) {
 				try {
 					AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-					AIntervalExpression interval = (AIntervalExpression) d.getRhs();
-					AIntegerExpression left = (AIntegerExpression) interval.getLeftBorder();
-					AIntegerExpression right = (AIntegerExpression) interval.getRightBorder();
+					AIntervalExpression interval = (AIntervalExpression) d
+							.getRhs();
+					AIntegerExpression left = (AIntegerExpression) interval
+							.getLeftBorder();
+					AIntegerExpression right = (AIntegerExpression) interval
+							.getRightBorder();
 					int l_int = Integer.parseInt(left.getLiteral().getText());
 					int r_int = Integer.parseInt(right.getLiteral().getText());
 					int size = r_int - l_int + 1;
-					deferredSetSizeTable.put(machineContext.getDeferredSets().get(string), size);
+					deferredSetSizeTable.put(machineContext.getDeferredSets()
+							.get(string), size);
 				} catch (ClassCastException e) {
 				}
 				try {
 					AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-					AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
-					int size = Integer.parseInt(sizeExpr.getLiteral().getText());
-					deferredSetSizeTable.put(machineContext.getDeferredSets().get(string), size);
+					AIntegerExpression sizeExpr = (AIntegerExpression) d
+							.getRhs();
+					int size = Integer
+							.parseInt(sizeExpr.getLiteral().getText());
+					deferredSetSizeTable.put(machineContext.getDeferredSets()
+							.get(string), size);
 				} catch (ClassCastException e) {
 				}
-				
-				
+
+			}
+		}
+	}
+
+	private void findMaxMin() {
+		Node node = machineContext.getDefinitions().get("SET_PREF_MAXINT");
+		if (null != node) {
+			try {
+				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
+				AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
+				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
+				B2TLAGlobals.setMAX_INT(value);
+			} catch (ClassCastException e) {
+
+			}
+		}
+
+		node = machineContext.getDefinitions().get("SET_PREF_MININT");
+		if (null != node) {
+			try {
+				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
+				AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
+				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
+				B2TLAGlobals.setMIN_INT(value);
+			} catch (ClassCastException e) {
+
 			}
 		}
 	}
 
 	@Override
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
-		//TODO never reached
+		// TODO never reached
 		Node ref_node = machineContext.getReferences().get(node);
-		if(deferredSetSizeTable.containsKey(ref_node)){
+		if (deferredSetSizeTable.containsKey(ref_node)) {
 			try {
 				ACardExpression cardNode = (ACardExpression) node.parent();
-				AEqualPredicate equalsNode = (AEqualPredicate)	cardNode.parent();
+				AEqualPredicate equalsNode = (AEqualPredicate) cardNode
+						.parent();
 				AIntegerExpression integer;
-				if(equalsNode.getLeft() == cardNode){
+				if (equalsNode.getLeft() == cardNode) {
 					integer = (AIntegerExpression) equalsNode.getRight();
-				}else{
+				} else {
 					integer = (AIntegerExpression) equalsNode.getLeft();
 				}
 				String intString = integer.getLiteral().getText();
@@ -85,7 +122,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter{
 			} catch (ClassCastException e) {
 				return;
 			}
-				
+
 		}
 	}
 }

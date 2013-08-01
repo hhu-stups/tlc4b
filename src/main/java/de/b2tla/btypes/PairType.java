@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.ACartesianProductExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -122,9 +123,11 @@ public class PairType extends AbstractHasFollowers {
 				|| this.second.containsIntegerType();
 	}
 
-	public PExpression createSyntaxTreeNode() {
-		return new ACartesianProductExpression(first.createSyntaxTreeNode(),
-				second.createSyntaxTreeNode());
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+		ACartesianProductExpression node = new ACartesianProductExpression(
+				first.createSyntaxTreeNode(typechecker),
+				second.createSyntaxTreeNode(typechecker));
+		typechecker.setType(node, new SetType(this));
+		return node;
 	}
-
 }

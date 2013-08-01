@@ -31,7 +31,7 @@ public class AssertionErrorTest extends AbstractParseMachineTest {
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(error, B2TLA.test(a, false));
+		assertEquals(error, B2TLA.test(a, true));
 	}
 
 	@Config

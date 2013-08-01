@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.analysis.Typechecker;
 import de.be4.classicalb.core.parser.node.PExpression;
 
 public interface BType extends ITypeConstants{
@@ -8,5 +9,5 @@ public interface BType extends ITypeConstants{
 	public boolean compare(BType other);
 	public String getTlaType();
 	public boolean containsIntegerType();
-	public PExpression createSyntaxTreeNode();
+	public PExpression createSyntaxTreeNode(Typechecker typechecker);
 }

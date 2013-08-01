@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.ATotalFunctionExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -127,9 +128,13 @@ public class FunctionType extends AbstractHasFollowers {
 				|| this.range.containsIntegerType();
 	}
 
-	public PExpression createSyntaxTreeNode() {
-		return new ATotalFunctionExpression(domain.createSyntaxTreeNode(),
-				range.createSyntaxTreeNode());
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+		ATotalFunctionExpression node = new ATotalFunctionExpression(
+				domain.createSyntaxTreeNode(typechecker),
+				range.createSyntaxTreeNode(typechecker));
+		typechecker.setType(node, new SetType(this));
+		
+		return node;
 	}
 
 }

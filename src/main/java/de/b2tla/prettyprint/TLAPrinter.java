@@ -1591,11 +1591,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseATotalFunctionExpression(ATotalFunctionExpression node) {
 		BType type = this.typechecker.getType(node);
-		if(type == null){
-			type = new SetType(new FunctionType(new UntypedType(), new UntypedType()));
-		}
 		BType subtype = ((SetType) type).getSubtype();
 		if (subtype instanceof FunctionType) {
+			System.out.println(node.getLeft().getClass());
 			tlaModuleString.append("[");
 			node.getLeft().apply(this);
 			tlaModuleString.append(" -> ");

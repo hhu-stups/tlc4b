@@ -17,9 +17,8 @@ import de.b2tla.util.PolySuite.Config;
 import de.b2tla.util.PolySuite.Configuration;
 
 @RunWith(PolySuite.class)
-public class GoalTest extends AbstractParseMachineTest{
+public class GoalTest extends AbstractParseMachineTest {
 
-	
 	private final File machine;
 	private final TLCResult error;
 
@@ -30,14 +29,15 @@ public class GoalTest extends AbstractParseMachineTest{
 
 	@Test
 	public void testRunTLC() throws Exception {
-		String[] a = new String[] { machine.getPath()};
-		assertEquals(error, B2TLA.test(a,false));
+		String[] a = new String[] { machine.getPath() };
+		assertEquals(error, B2TLA.test(a, true));
 	}
 
 	@Config
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
-		list.add(new TestPair(TLCResult.Goal, "../probprivate/public_examples/TLC/GOAL"));
+		list.add(new TestPair(TLCResult.Goal,
+				"../probprivate/public_examples/TLC/GOAL"));
 		return getConfiguration(list);
 	}
 }

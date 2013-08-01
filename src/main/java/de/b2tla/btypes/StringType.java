@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.AStringSetExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -55,8 +56,10 @@ public class StringType implements BType {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode() {
-		return new AStringSetExpression();
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+		AStringSetExpression node = new AStringSetExpression();
+		typechecker.setType(node, new SetType(this));
+		return node;
 	}
 
 }

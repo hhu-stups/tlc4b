@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.TypeErrorException;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -230,7 +231,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode() {
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
 		return null;
 	}
 

@@ -2,6 +2,7 @@ package de.b2tla.btypes;
 
 import java.util.ArrayList;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -64,11 +65,12 @@ public class ModelValueType implements BType {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode() {
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
 		TIdentifierLiteral literal = new TIdentifierLiteral(name);
 		ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
 		idList.add(literal);
 		AIdentifierExpression id = new AIdentifierExpression(idList);
+		typechecker.setType(id, new SetType(this));
 		return id;
 	}
 }

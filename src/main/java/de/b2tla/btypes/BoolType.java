@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.ABoolSetExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -50,8 +51,10 @@ public class BoolType implements BType {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode() {
-		return new ABoolSetExpression();
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+		ABoolSetExpression node = new ABoolSetExpression();
+		typechecker.setType(node, new SetType(this));
+		return node;
 	}
 
 }

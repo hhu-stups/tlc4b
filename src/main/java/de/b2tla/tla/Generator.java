@@ -15,6 +15,7 @@ import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.btypes.BType;
+import de.b2tla.btypes.SetType;
 import de.b2tla.tla.config.ModelValueAssignment;
 import de.b2tla.tla.config.SetOfModelValuesAssignment;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -259,18 +260,21 @@ public class Generator extends DepthFirstAdapter {
 				if (value == null) {
 					init = true;
 					this.tlaModule.variables.add(con);
-					BType type = typechecker.getType(con);
-					
-					PExpression n = type.createSyntaxTreeNode();
-					AMemberPredicate member = new AMemberPredicate(
-							(PExpression) con.clone(), n);
+					BType conType = typechecker.getType(con);
 
-					ArrayList<NodeType> list = this.typeRestrictor
-							.getRestrictedTypesSet(con);
-					if (list == null || list.size() == 0) {
-						tlaModule.addInit(member);
-					} else {
+					if (!conType.containsIntegerType()) {
+						PExpression n = conType
+								.createSyntaxTreeNode(typechecker);
+						AMemberPredicate member = new AMemberPredicate(
+								(PExpression) con.clone(), n);
 
+						ArrayList<NodeType> list = this.typeRestrictor
+								.getRestrictedTypesSet(con);
+						if (list == null || list.size() == 0) {
+							tlaModule.addInit(member);
+						} else {
+
+						}
 					}
 
 				} else {

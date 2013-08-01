@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ARecEntry;
@@ -192,7 +193,7 @@ public class StructType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode() {
+	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
 		ArrayList<PRecEntry> list = new ArrayList<PRecEntry>();
 		for (String name : types.keySet()) {
 			TIdentifierLiteral literal = new TIdentifierLiteral(name);
@@ -200,10 +201,12 @@ public class StructType extends AbstractHasFollowers {
 			idList.add(literal);
 			AIdentifierExpression id = new AIdentifierExpression(idList);
 			ARecEntry entry = new ARecEntry(id, types.get(name)
-					.createSyntaxTreeNode());
+					.createSyntaxTreeNode(typechecker));
 			list.add(entry);
 		}
-		return new AStructExpression(list);
+		AStructExpression node = new AStructExpression(list);
+		typechecker.setType(node, new SetType(this));
+		return node;
 	}
 
 }
