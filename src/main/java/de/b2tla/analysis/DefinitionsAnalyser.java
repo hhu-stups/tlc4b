@@ -12,6 +12,7 @@ import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AIntegerExpression;
 import de.be4.classicalb.core.parser.node.AIntervalExpression;
+import de.be4.classicalb.core.parser.node.AUnaryMinusExpression;
 import de.be4.classicalb.core.parser.node.Node;
 
 /**
@@ -93,11 +94,19 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 		if (null != node) {
 			try {
 				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-				AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
-				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
+				AIntegerExpression sizeExpr = null;
+				Integer value = null;
+				if (d.getRhs() instanceof AUnaryMinusExpression){
+					AUnaryMinusExpression minus = (AUnaryMinusExpression) d.getRhs();
+					sizeExpr = (AIntegerExpression) minus.getExpression();
+					value = - Integer.parseInt(sizeExpr.getLiteral().getText());
+				}else{
+					sizeExpr = (AIntegerExpression) d.getRhs();
+					value = Integer.parseInt(sizeExpr.getLiteral().getText());
+				}
 				B2TLAGlobals.setMIN_INT(value);
 			} catch (ClassCastException e) {
-
+				e.printStackTrace();
 			}
 		}
 	}

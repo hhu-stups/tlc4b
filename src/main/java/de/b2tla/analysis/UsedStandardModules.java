@@ -105,7 +105,8 @@ import de.be4.classicalb.core.parser.node.PExpression;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations
+		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations,
+		FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations,
 	}
 
 	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
@@ -569,64 +570,88 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAFirstExpression(AFirstExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Sequences);
+		evalSequenceOrRelation(node);
 	}
 
 	public void inATailExpression(ATailExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Sequences);
+		evalSequenceOrRelation(node);
 	}
 
 	/**
 	 * SequencesExtended
 	 */
 
+	private void evalSequenceExtendedOrRelation(Node node){
+		BType type = typechecker.getType(node);
+		if (type instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		}
+	}
+	
 	public void inAIseqExpression(AIseqExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		}
 	}
 
 	public void inASeq1Expression(ASeq1Expression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		}
 	}
 
+	public void inAIseq1Expression(AIseq1Expression node) {
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		}
+	}
+	
 	public void inAInsertFrontExpression(AInsertFrontExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 	public void inALastExpression(ALastExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 	public void inAFrontExpression(AFrontExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 	public void inAPermExpression(APermExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof SetType) {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		}
 	}
 
 	public void inARevExpression(ARevExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 	public void inAGeneralConcatExpression(AGeneralConcatExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 	public void inARestrictFrontExpression(ARestrictFrontExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 	public void inARestrictTailExpression(ARestrictTailExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
-	}
-
-	/**
-	 * sonst
-	 * 
-	 */
-
-	public void inAIseq1Expression(AIseq1Expression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalSequenceExtendedOrRelation(node);
 	}
 
 }

@@ -70,8 +70,7 @@ public class TLCRunner {
 
 		String[] args = list.toArray(new String[list.size()]);
 		System.out.println("Starting JVM...");
-		Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
-
+		final Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
 		
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();

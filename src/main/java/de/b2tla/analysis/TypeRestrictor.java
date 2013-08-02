@@ -43,7 +43,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	private MachineContext machineContext;
 	private final IdentifierDependencies identifierDependencies;
-	
+
 	private Hashtable<Node, ArrayList<NodeType>> restrictedTypesSet;
 	private HashSet<Node> removedNodes;
 
@@ -52,9 +52,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		this.machineContext = machineContext;
 		this.restrictedTypesSet = new Hashtable<Node, ArrayList<NodeType>>();
 		this.removedNodes = new HashSet<Node>();
-		
+
 		this.identifierDependencies = new IdentifierDependencies(machineContext);
-		
+
 		start.apply(this);
 
 		checkLTLFormulas();
@@ -66,17 +66,19 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			for (de.be4.ltl.core.parser.node.Node ltlNode : visitor
 					.getUnparsedHashTable().keySet()) {
 				Node bNode = visitor.getBAst(ltlNode);
-				
-				if(ltlNode instanceof AExistsLtl){
-					Node id = visitor.getLTLIdentifier(((AExistsLtl) ltlNode).getExistsIdentifier().getText());
+
+				if (ltlNode instanceof AExistsLtl) {
+					Node id = visitor.getLTLIdentifier(((AExistsLtl) ltlNode)
+							.getExistsIdentifier().getText());
 					HashSet<Node> list = new HashSet<Node>();
 					list.add(id);
-					analysePredicate(bNode, list);
-				}else if (ltlNode instanceof AForallLtl){
-					Node id = visitor.getLTLIdentifier(((AForallLtl) ltlNode).getForallIdentifier().getText());
+					analysePredicate(bNode, list, new HashSet<Node>());
+				} else if (ltlNode instanceof AForallLtl) {
+					Node id = visitor.getLTLIdentifier(((AForallLtl) ltlNode)
+							.getForallIdentifier().getText());
 					HashSet<Node> list = new HashSet<Node>();
 					list.add(id);
-					analysePredicate(bNode, list);
+					analysePredicate(bNode, list, new HashSet<Node>());
 				}
 				bNode.apply(this);
 			}
@@ -113,35 +115,37 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		HashSet<Node> list = new HashSet<Node>();
 		list.addAll(machineContext.getSetParamter().values());
 		list.addAll(machineContext.getScalarParameter().values());
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
 	@Override
 	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
 		HashSet<Node> list = new HashSet<Node>();
 		list.addAll(machineContext.getConstants().values());
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
-	private void analysePredicate(Node n, HashSet<Node> list) {
+	private void analysePredicate(Node n, HashSet<Node> list, HashSet<Node> ignoreList) {
 		if (n instanceof AEqualPredicate) {
 			PExpression left = ((AEqualPredicate) n).getLeft();
 			Node r_left = machineContext.getReferences().get(left);
 			PExpression right = ((AEqualPredicate) n).getRight();
 			Node r_right = machineContext.getReferences().get(right);
 
-			if (list.contains(r_left) && !identifierDependencies.containsIdentifier(right, list)) {
+			if (list.contains(r_left)
+					&& isAConstantExpression(right, list, ignoreList)) {
 				EqualsNode setNode = new EqualsNode(right);
 				putRestrictedType(r_left, setNode);
-				if(!machineContext.getConstants().containsValue(r_left)){
+				if (!machineContext.getConstants().containsValue(r_left)) {
 					removedNodes.add(n);
 				}
-				
+
 			}
-			if (list.contains(r_right) && !identifierDependencies.containsIdentifier(left, list)) {
+			if (list.contains(r_right)
+					&& isAConstantExpression(right, list, ignoreList)) {
 				EqualsNode setNode = new EqualsNode(left);
 				putRestrictedType(r_right, setNode);
-				if(!machineContext.getConstants().containsValue(r_left)){
+				if (!machineContext.getConstants().containsValue(r_left)) {
 					removedNodes.add(n);
 				}
 			}
@@ -152,9 +156,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			PExpression left = ((AMemberPredicate) n).getLeft();
 			Node r_left = machineContext.getReferences().get(left);
 			PExpression right = ((AMemberPredicate) n).getRight();
-			if (list.contains(r_left) && !identifierDependencies.containsIdentifier(right, list)) {
+			if (list.contains(r_left)
+					&& isAConstantExpression(right, list, ignoreList)) {
 				putRestrictedType(r_left, new ElementOfNode(right));
-				if(!machineContext.getConstants().containsValue(r_left)){
+				if (!machineContext.getConstants().containsValue(r_left)) {
 					removedNodes.add(n);
 				}
 			}
@@ -166,9 +171,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			Node r_left = machineContext.getReferences().get(left);
 			PExpression right = ((ASubsetPredicate) n).getRight();
 
-			if (list.contains(r_left) && !identifierDependencies.containsIdentifier(right, list)) {
+			if (list.contains(r_left)
+					&& isAConstantExpression(right, list, ignoreList)) {
 				putRestrictedType(r_left, new SubsetNode(right));
-				if(!machineContext.getConstants().containsValue(r_left)){
+				if (!machineContext.getConstants().containsValue(r_left)) {
 					removedNodes.add(n);
 				}
 			}
@@ -176,19 +182,38 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 
 		if (n instanceof AConjunctPredicate) {
-			analysePredicate(((AConjunctPredicate) n).getLeft(), list);
-			analysePredicate(((AConjunctPredicate) n).getRight(), list);
+			analysePredicate(((AConjunctPredicate) n).getLeft(), list, ignoreList);
+			analysePredicate(((AConjunctPredicate) n).getRight(), list, ignoreList);
 			return;
 		}
-		
-		if(n instanceof Start){
-			analysePredicate(((Start) n).getPParseUnit(), list);
+
+		if (n instanceof AExistsPredicate) {
+			HashSet<Node> set = new HashSet<Node>();
+			for (PExpression e : ((AExistsPredicate) n).getIdentifiers()) {
+				set.add(e);
+			}
+			set.addAll(ignoreList);
+			analysePredicate(((AExistsPredicate) n).getPredicate(), list, set);
 		}
-		
-		if(n instanceof APredicateParseUnit){
-			analysePredicate(((APredicateParseUnit) n).getPredicate(), list);
+
+		if (n instanceof Start) {
+			analysePredicate(((Start) n).getPParseUnit(), list, ignoreList);
+		}
+
+		if (n instanceof APredicateParseUnit) {
+			analysePredicate(((APredicateParseUnit) n).getPredicate(), list, ignoreList);
 			return;
 		}
+	}
+	
+	public boolean isAConstantExpression(Node node, HashSet<Node> list, HashSet<Node> ignoreList){
+		HashSet<Node> newList = new HashSet<Node>();
+		newList.addAll(list);
+		newList.addAll(ignoreList);
+		if(identifierDependencies.containsIdentifier(node, newList)){
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -201,7 +226,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		AImplicationPredicate implication = (AImplicationPredicate) node
 				.getImplication();
-		analysePredicate(implication.getLeft(), list);
+		analysePredicate(implication.getLeft(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -212,7 +237,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			list.add(e);
 		}
-		analysePredicate(node.getPredicate(), list);
+		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -223,7 +248,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			list.add(e);
 		}
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -235,7 +260,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			list.add(e);
 		}
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -247,7 +272,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 			// e.apply(this);
 		}
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -258,7 +283,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			list.add(e);
 		}
-		analysePredicate(node.getPredicate(), list);
+		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 	}
 
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
@@ -268,7 +293,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			list.add(e);
 		}
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
@@ -278,7 +303,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			list.add(e);
 		}
-		analysePredicate(node.getPredicates(), list);
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
 	private Hashtable<Node, HashSet<Node>> expectedIdentifieListTable = new Hashtable<Node, HashSet<Node>>();
@@ -317,7 +342,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	@Override
 	public void inAPreconditionSubstitution(APreconditionSubstitution node) {
 		HashSet<Node> list = getExpectedIdentifier(node);
-		analysePredicate(node.getPredicate(), list);
+		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 	}
 
 	private HashSet<Node> getExpectedIdentifier(Node node) {
@@ -330,7 +355,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	@Override
 	public void inASelectSubstitution(ASelectSubstitution node) {
 		HashSet<Node> list = getExpectedIdentifier(node);
-		analysePredicate(node.getCondition(), list);
+		analysePredicate(node.getCondition(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -342,7 +367,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		list.addAll(getExpectedIdentifier(node));
-		analysePredicate(node.getWhere(), list);
+		analysePredicate(node.getWhere(), list, new HashSet<Node>());
 	}
 
 	@Override
@@ -354,7 +379,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(e);
 		}
 		list.addAll(getExpectedIdentifier(node));
-		analysePredicate(node.getPredicate(), list);
+		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 	}
 
 }

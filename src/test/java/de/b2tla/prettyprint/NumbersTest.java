@@ -226,6 +226,41 @@ public class NumbersTest {
 		compare(expected, machine);
 	}
 	
+	@Test
+	public void testMinInt() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES MININT = MININT  \n"
+				+ "END";
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Integers\n"
+				+ "ASSUME -1 = -1\n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testMaxInt() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES MAXINT = MAXINT  \n"
+				+ "END";
+		String expected = "---- MODULE test----\n"
+				+ "ASSUME 4 = 4\n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testSetComprehensionInt() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {x| 1=1 => x = 1} = {} \n"
+				+ "END";
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Integers\n"
+				+ "ASSUME {x \\in (-1..4): 1 = 1 => x = 1} = {}\n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
 	
 	
 }

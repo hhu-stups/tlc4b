@@ -226,6 +226,24 @@ public class B2TLA {
 				STANDARD_MODULES.SequencesAsRelations)) {
 			createStandardModule(path,
 					STANDARD_MODULES.SequencesAsRelations.toString());
+			
+			if (!translator.getUsedStandardModule().contains(
+					STANDARD_MODULES.Relations)) {
+				createStandardModule(path,
+						STANDARD_MODULES.Relations.toString());
+			}
+			
+			if (!translator.getUsedStandardModule().contains(
+					STANDARD_MODULES.FunctionsAsRelations)) {
+				createStandardModule(path,
+						STANDARD_MODULES.FunctionsAsRelations.toString());
+			}
+			
+			if (!translator.getUsedStandardModule().contains(
+					STANDARD_MODULES.Functions)) {
+				createStandardModule(path,
+						STANDARD_MODULES.Functions.toString());
+			}
 		}
 	}
 

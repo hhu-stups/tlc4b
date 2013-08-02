@@ -83,9 +83,27 @@ public class StandardMadules {
 	public static final String SEQUENCE_TAKE_FIRST_ELEMENTS = "TakeFirstElements";
 	public static final String SEQUENCE_DROP_FIRST_ELEMENTS = "DropFirstElements";
 
-	public static final String REL_INJECTIVE_SEQUENCES = "RelISeq";
-	public static final String REL_NOT_EMPTY_INJECTIVE_SEQUENCES = "RelISeq1";
 
+	
+	// SequencesAsRelations
+	public static final String REL_SEQUENCE_SIZE = "RelSeqSize";
+	public static final String IS_REL_SEQUENCE = "isRelSeq";
+	public static final String IS_REL_SEQUENCE_1 = "isRelSeq1";
+	public static final String REL_INJECTIVE_SEQUENCE = "RelISeq";
+	public static final String REL_INJECTIVE_SEQUENCE_1 = "RelISeq1";
+	public static final String REL_SEQUENCE_Concat = "RelSeqConcat";
+	public static final String REL_SEQUENCE_PREPAND = "RelSeqPrepand";
+	public static final String REL_SEQUENCE_APPEND = "RelSeqAppend";
+	public static final String REL_SEQUENCE_REVERSE = "RelSeqRev";
+	public static final String REL_SEQUENCE_FIRST_ELEMENT = "RelSeqFirst";
+	public static final String REL_SEQUENCE_LAST_ELEMENT = "RelSeqLast";
+	public static final String REL_SEQUENCE_FRONT = "RelSeqFront";
+	public static final String REL_SEQUENCE_TAIL = "RelSeqTail";
+	public static final String REL_SEQUENCE_PERM = "RelSeqPerm";
+	public static final String REL_SEQUENCE_GENERAL_CONCATINATION = "RelSeqConc";
+	public static final String REL_SEQUENCE_TAKE_FIRST_ELEMENTS = "RelSeqTakeFirstElements";
+	public static final String REL_SEQUENCE_DROP_FIRST_ELEMENTS = "RelSeqDropFirstElements";
+	
 	/*
 	 * BBuiltIns
 	 */

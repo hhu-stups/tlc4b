@@ -1,4 +1,4 @@
-package de.b2tla.prettyprint;
+package de.b2tla.analysis;
 
 import static de.b2tla.util.TestUtil.compare;
 
@@ -50,7 +50,7 @@ public class ExpressionConstantTest {
 		
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers \n"
-				+ "ASSUME \\A x \\in Int, y \\in {1} : x = y => 1 = 1 \n"
+				+ "ASSUME \\A x \\in (-1..4), y \\in {1} : x = y => 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}

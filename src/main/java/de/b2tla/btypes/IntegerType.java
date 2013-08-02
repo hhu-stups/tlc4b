@@ -1,5 +1,6 @@
 package de.b2tla.btypes;
 
+import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
 import de.be4.classicalb.core.parser.node.AIntegerExpression;
@@ -41,9 +42,11 @@ public class IntegerType implements BType {
 	}
 	
 	public String getTlaType() {
-		return "Int";
+		return B2TLAGlobals.getMIN_INT() + ".." + B2TLAGlobals.getMAX_INT();
 	}
 
+	
+	
 	public boolean isUntyped() {
 		return false;
 	}

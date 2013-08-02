@@ -80,7 +80,7 @@ public class TypeRestrictionsTest {
 				+ "PROPERTIES #x,y.(x = 1 & x = y) \n" + "END";
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME \\E x \\in {1}, y \\in Int: x = y \n"
+				+ "ASSUME \\E x \\in {1}, y \\in -1..4: x = y \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -116,7 +116,19 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME \\E x \\in Int: \\E y \\in {x}: x = 1 \n"
+				+ "ASSUME \\E x \\in {1} : (\\E y \\in {x} : TRUE) \n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testQuantificationsInSetComprehension() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {1} = {x| #y.(x = 1 & y = x) & 1=1}\n" + "END";
+		
+		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
+				+ "k == 1 \n"
+				+ "ASSUME {1} = {x \\in ({1}): (\\E y \\in {x} : TRUE) /\\ 1 = 1}\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -193,7 +205,7 @@ public class TypeRestrictionsTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Integers \n"
-				+ "ASSUME \\E x \\in {1}, y \\in Int : y = x \n"
+				+ "ASSUME \\E x \\in {1}, y \\in -1..4 : y = x \n"
 				+ "====";
 		compare(expected, machine);
 	}

@@ -65,4 +65,10 @@ public class ErrorTest {
 		assertEquals(AssertionError, B2TLA.test(a,true));
 	}
 
+	@Test
+	public void testTemporalPropertyError() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/LTLError.mch" };
+		assertEquals(TemporalPropertyError, B2TLA.test(a,true));
+	}
+	
 }

@@ -15,7 +15,6 @@ import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.btypes.BType;
-import de.b2tla.btypes.SetType;
 import de.b2tla.tla.config.ModelValueAssignment;
 import de.b2tla.tla.config.SetOfModelValuesAssignment;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -91,6 +90,7 @@ public class Generator extends DepthFirstAdapter {
 
 	private void evalSpec() {
 		if (this.configFile.isInit() && this.configFile.isNext()
+				&& B2TLAGlobals.isCheckltl()
 				&& machineContext.getLTLFormulas().size() > 0) {
 			this.configFile.setSpec();
 		}
