@@ -88,7 +88,9 @@ public class StandardMadules {
 	// SequencesAsRelations
 	public static final String REL_SEQUENCE_SIZE = "RelSeqSize";
 	public static final String IS_REL_SEQUENCE = "isRelSeq";
+	public static final String REL_SEQUENCE_SET = "RelSeqSet";
 	public static final String IS_REL_SEQUENCE_1 = "isRelSeq1";
+	public static final String REL_SEQUENCE_1_SET = "RelSeqSet1";
 	public static final String REL_INJECTIVE_SEQUENCE = "RelISeq";
 	public static final String REL_INJECTIVE_SEQUENCE_1 = "RelISeq1";
 	public static final String REL_SEQUENCE_Concat = "RelSeqConcat";

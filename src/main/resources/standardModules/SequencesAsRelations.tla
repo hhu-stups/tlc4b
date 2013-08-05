@@ -3,8 +3,12 @@ EXTENDS FiniteSets, Naturals, Relations, FunctionsAsRelations
 
 isRelSeq(x, S) == \A n \in 1..Cardinality(x): RelCall(x,n) \in S
 
+RelSeqSet(x, S) == IF isRelSeq(x,S) THEN {x} ELSE {}
+
+
 isRelSeq1(x, S) == x # {} /\ \A n \in 1..Cardinality(x): RelCall(x,n) \in S
 
+RelSeqSet1(x, S) == IF isRelSeq1(x,S) THEN {x} ELSE {}
 
 LOCAL ISeq(S) == UNION { {x \in [(1..n) -> S]: Cardinality(Range(x)) = Cardinality(DOMAIN x)} 
                         : n \in 0..Cardinality(S)}

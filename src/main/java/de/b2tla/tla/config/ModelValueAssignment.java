@@ -1,5 +1,6 @@
 package de.b2tla.tla.config;
 
+import de.b2tla.analysis.Renamer;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.Node;
 
@@ -10,9 +11,10 @@ public class ModelValueAssignment extends ConfigFileAssignment{
 		this.node = node;
 	}
 
-	public String getString() {
+	public String getString(Renamer renamer) {
 		AIdentifierExpression id = (AIdentifierExpression) node;
 		String conString = getIdentifier(id);
+		conString = renamer.getNameOfRef(id);
 		return conString+ " = "+ conString +"\n";
 	}
 	

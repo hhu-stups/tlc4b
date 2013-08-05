@@ -549,11 +549,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 */
 
 	public void inASeqExpression(ASeqExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Sequences);
+		evalSequenceOrRelation(node);
 	}
 
 	public void inASizeExpression(ASizeExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Sequences);
+		evalSequenceOrRelation(node);
 	}
 
 	public void inAConcatExpression(AConcatExpression node) {

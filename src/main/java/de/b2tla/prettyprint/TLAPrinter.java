@@ -203,14 +203,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 						+ ltlVisitor.getName() + "\n");
 			}
 		}
-
 		// CONSTANTS
 		ArrayList<ConfigFileAssignment> assignments = configFile
 				.getAssignments();
 		if (assignments.size() != 0) {
 			configFileString.append("CONSTANTS\n");
 			for (int i = 0; i < assignments.size(); i++) {
-				configFileString.append(assignments.get(i).getString());
+				configFileString.append(assignments.get(i).getString(renamer));
 			}
 		}
 	}
@@ -276,7 +275,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 			return;
 		tlaModuleString.append("CONSTANTS ");
 		for (int i = 0; i < list.size(); i++) {
-			list.get(i).apply(this);
+			Node con = list.get(i);
+			con.apply(this);
+
+			
 			if (i < list.size() - 1)
 				tlaModuleString.append(", ");
 		}
@@ -464,16 +466,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseADeferredSetSet(ADeferredSetSet node) {
-		inADeferredSetSet(node);
-		{
-			List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(
-					node.getIdentifier());
-			for (TIdentifierLiteral e : copy) {
-				e.apply(this);
-				tlaModuleString.append(e.getText());
-			}
-		}
-		outADeferredSetSet(node);
+		String name = renamer.getName(node);
+		tlaModuleString.append(name);
 	}
 
 	/**
@@ -1594,7 +1588,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 		BType type = this.typechecker.getType(node);
 		BType subtype = ((SetType) type).getSubtype();
 		if (subtype instanceof FunctionType) {
-			System.out.println(node.getLeft().getClass());
 			tlaModuleString.append("[");
 			node.getLeft().apply(this);
 			tlaModuleString.append(" -> ");
@@ -2238,10 +2231,32 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseASeqExpression(ASeqExpression node) {
-		tlaModuleString.append("Seq");
-		tlaModuleString.append("(");
-		node.getExpression().apply(this);
-		tlaModuleString.append(")");
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof SetType){
+			if(node.parent() instanceof AMemberPredicate){
+				AMemberPredicate member = (AMemberPredicate) node.parent();
+				tlaModuleString.append(REL_SEQUENCE_SET);
+				tlaModuleString.append("(");
+				member.getLeft().apply(this);
+				tlaModuleString.append(", ");
+				node.getExpression().apply(this);
+				tlaModuleString.append(")");
+			}else if (node.parent() instanceof ANotMemberPredicate){
+				ANotMemberPredicate member = (ANotMemberPredicate) node.parent();
+				tlaModuleString.append(REL_SEQUENCE_SET);
+				tlaModuleString.append("(");
+				member.getLeft().apply(this);
+				tlaModuleString.append(", ");
+				node.getExpression().apply(this);
+				tlaModuleString.append(")");
+			}
+			
+		}else{
+			tlaModuleString.append("Seq");
+			tlaModuleString.append("(");
+			node.getExpression().apply(this);
+			tlaModuleString.append(")");
+		}
 	}
 
 	@Override
@@ -2330,7 +2345,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAIseq1Expression(AIseq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
-		System.out.println(set + " " + node.hashCode());
 		if (set.getSubtype() instanceof SetType) {
 			tlaModuleString.append(REL_INJECTIVE_SEQUENCE_1);
 		} else {
@@ -2348,10 +2362,32 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseASeq1Expression(ASeq1Expression node) {
-		tlaModuleString.append(SEQUENCE_1);
-		tlaModuleString.append("(");
-		node.getExpression().apply(this);
-		tlaModuleString.append(")");
+		SetType set = (SetType) typechecker.getType(node);
+		if (set.getSubtype() instanceof SetType){
+			if(node.parent() instanceof AMemberPredicate){
+				AMemberPredicate member = (AMemberPredicate) node.parent();
+				tlaModuleString.append(REL_SEQUENCE_1_SET);
+				tlaModuleString.append("(");
+				member.getLeft().apply(this);
+				tlaModuleString.append(", ");
+				node.getExpression().apply(this);
+				tlaModuleString.append(")");
+			}else if (node.parent() instanceof ANotMemberPredicate){
+				ANotMemberPredicate member = (ANotMemberPredicate) node.parent();
+				tlaModuleString.append(REL_SEQUENCE_1_SET);
+				tlaModuleString.append("(");
+				member.getLeft().apply(this);
+				tlaModuleString.append(", ");
+				node.getExpression().apply(this);
+				tlaModuleString.append(")");
+			}
+		}else{
+			
+			tlaModuleString.append(SEQUENCE_1);
+			tlaModuleString.append("(");
+			node.getExpression().apply(this);
+			tlaModuleString.append(")");
+		}
 	}
 
 	@Override

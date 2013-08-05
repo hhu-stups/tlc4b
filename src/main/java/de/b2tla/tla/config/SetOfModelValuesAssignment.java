@@ -3,6 +3,7 @@ package de.b2tla.tla.config;
 import java.util.List;
 
 import de.b2tla.B2TLAGlobals;
+import de.b2tla.analysis.Renamer;
 import de.be4.classicalb.core.parser.node.ADeferredSetSet;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.Node;
@@ -28,7 +29,7 @@ public class SetOfModelValuesAssignment extends ConfigFileAssignment{
 		
 	}
 
-	public String getString() {
+	public String getString(Renamer renamer) {
 		String res = "";
 		String conString;
 		if (node instanceof ADeferredSetSet) {
@@ -38,7 +39,7 @@ public class SetOfModelValuesAssignment extends ConfigFileAssignment{
 			for (TIdentifierLiteral e : copy) {
 				conString += e.getText();
 			}
-			
+			conString = renamer.getName(node);
 		}else{
 			AIdentifierExpression id = (AIdentifierExpression) node;
 			conString = getIdentifier(id);

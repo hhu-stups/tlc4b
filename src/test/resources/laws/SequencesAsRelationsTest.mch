@@ -3,11 +3,26 @@ PROPERTIES
  {} = []
 & {(1,1)} = [1]
 
-/* Set of injective Sequence */
+/* Set of sequences */
+& {(1,1)} : seq({1})
+& {(1,2)} /: seq({1})
+& not({(1,1)} /: seq({1}))
+& {} : seq({1})
+& {} : seq({})
+
+
+/* Set of sequences */
+& {(1,1)} : seq1({1})
+& {} /: seq1({})
+& {(1,2)} /: seq1({1}) 
+& not({} : seq1({1}))
+& not({} : seq1({}))
+
+/* Set of injective sequences */
 & iseq({}) = {{}}
 & iseq({1}) = {{},{(1,1)}}
 
-/* Set of non empty injective Sequence */
+/* Set of non empty injective sequences */
 & iseq1({}) = {}
 & iseq1({1}) = {{(1,1)}}
 

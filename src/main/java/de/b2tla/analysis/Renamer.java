@@ -20,7 +20,6 @@ import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
 import de.be4.classicalb.core.parser.node.AOperation;
-import de.be4.classicalb.core.parser.node.AOperationCallSubstitution;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
@@ -28,7 +27,6 @@ import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class Renamer extends DepthFirstAdapter {
 	private final MachineContext machineContext;
@@ -131,12 +129,41 @@ public class Renamer extends DepthFirstAdapter {
 	public void start() {
 		evalGlobalNames(machineContext.getDeferredSets());
 		evalGlobalNames(machineContext.getEnumeratedSets());
-		evalGlobalNames(machineContext.getEnumValues());
+		evalEnumValues();
 		evalGlobalNames(machineContext.getConstants());
 		evalGlobalNames(machineContext.getVariables());
 		evalGlobalNames(machineContext.getOperations());
+
 		evalDefinitions();
+
 		machineContext.getTree().apply(this);
+	}
+
+	private void evalEnumValues() {
+		LinkedHashMap<String, Node> map = machineContext.getEnumValues();
+		Iterator<String> iter = map.keySet().iterator();
+		while (iter.hasNext()) {
+			String name = iter.next();
+			Node node = map.get(name);
+
+			if (name.indexOf('_') == 1) {
+				name = name.replaceFirst("_", "1_");
+			}
+			String newName = incName(name);
+
+			namesTable.put(node, newName);
+			globalNames.add(newName);
+		}
+	}
+
+	public void evalGlobalNames(LinkedHashMap<String, Node> map) {
+		Iterator<String> iter = map.keySet().iterator();
+		while (iter.hasNext()) {
+			String name = iter.next();
+			String newName = incName(name);
+			namesTable.put(map.get(name), newName);
+			globalNames.add(newName);
+		}
 	}
 
 	private void evalDefinitions() {
@@ -166,16 +193,6 @@ public class Renamer extends DepthFirstAdapter {
 
 		for (PDefinition e : copy) {
 			e.apply(this);
-		}
-	}
-
-	public void evalGlobalNames(LinkedHashMap<String, Node> map) {
-		Iterator<String> iter = map.keySet().iterator();
-		while (iter.hasNext()) {
-			String name = iter.next();
-			String newName = incName(name);
-			namesTable.put(map.get(name), newName);
-			globalNames.add(newName);
 		}
 	}
 
