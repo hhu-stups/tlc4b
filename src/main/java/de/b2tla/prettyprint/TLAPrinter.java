@@ -2482,4 +2482,18 @@ public class TLAPrinter extends DepthFirstAdapter {
 		node.getRight().apply(this);
 		outAMultOrCartExpression(node);
 	}
+	
+	
+	 @Override
+	    public void caseAConvertBoolExpression(AConvertBoolExpression node)
+	    {
+	        inAConvertBoolExpression(node);
+	        tlaModuleString.append("(");
+	        if(node.getPredicate() != null)
+	        {
+	            node.getPredicate().apply(this);
+	        }
+	        tlaModuleString.append(")");
+	        outAConvertBoolExpression(node);
+	    }
 }
