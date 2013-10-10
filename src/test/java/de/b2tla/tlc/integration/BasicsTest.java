@@ -35,7 +35,6 @@ public class BasicsTest extends AbstractParseMachineTest{
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		B2TLAGlobals.setDeleteOnExit(true);
 		assertEquals(error, B2TLA.test(a,true));
 	}
 

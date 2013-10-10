@@ -92,7 +92,7 @@ public class TLCOutput {
 
 		if (tlcOutputInfo.hasConstants()) {
 			String m1 = states.get(0);
-			String[] a = m1.split("\n");
+			String[] a = m1.split("/\\\\");
 			Pattern pattern = Pattern.compile("\\w+");
 			String constantSetup = "";
 			for (int i = 1; i < a.length; i++) {
