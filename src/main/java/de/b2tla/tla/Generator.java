@@ -275,7 +275,7 @@ public class Generator extends DepthFirstAdapter {
 							tlaModule.addInit(member);
 						} else {
 							for (int j = 0; j < list.size(); j++) {
-								NodeType val = list.get(i);
+								NodeType val = list.get(j);
 								if(val instanceof ElementOfNode){
 									Node eleOfNode = val.getExpression().parent();
 									tlaModule.addInit(eleOfNode);
