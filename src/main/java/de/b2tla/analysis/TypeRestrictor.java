@@ -47,6 +47,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	private Hashtable<Node, ArrayList<NodeType>> restrictedTypesSet;
 	private HashSet<Node> removedNodes;
 
+	public void addRemoveNode(Node node){
+		this.removedNodes.add(node);
+	}
+	
 	public TypeRestrictor(Start start, MachineContext machineContext,
 			Typechecker typechecker) {
 		this.machineContext = machineContext;

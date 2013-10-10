@@ -13,6 +13,7 @@ import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
 import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
+import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.btypes.BType;
 import de.b2tla.tla.config.ModelValueAssignment;
@@ -256,10 +257,10 @@ public class Generator extends DepthFirstAdapter {
 			boolean init = false;
 			for (int i = 0; i < remainingConstants.size(); i++) {
 				Node con = remainingConstants.get(i);
+				this.tlaModule.variables.add(con);
 				Integer value = constantsEvaluator.getIntValue(con);
 				if (value == null) {
 					init = true;
-					this.tlaModule.variables.add(con);
 					BType conType = typechecker.getType(con);
 
 					if (!conType.containsIntegerType()) {
@@ -273,7 +274,14 @@ public class Generator extends DepthFirstAdapter {
 						if (list == null || list.size() == 0) {
 							tlaModule.addInit(member);
 						} else {
-
+							for (int j = 0; j < list.size(); j++) {
+								NodeType val = list.get(i);
+								if(val instanceof ElementOfNode){
+									Node eleOfNode = val.getExpression().parent();
+									tlaModule.addInit(eleOfNode);
+									this.typeRestrictor.addRemoveNode(eleOfNode);
+								}
+							}
 						}
 					}
 

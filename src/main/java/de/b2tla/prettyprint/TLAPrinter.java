@@ -278,7 +278,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 			Node con = list.get(i);
 			con.apply(this);
 
-			
 			if (i < list.size() - 1)
 				tlaModuleString.append(", ");
 		}
@@ -1611,7 +1610,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 	private boolean isElementOf(Node node) {
 		Node parent = node.parent();
 		if (parent instanceof AMemberPredicate
-				&& !typeRestrictor.removeNode(parent)) {
+				&& !typeRestrictor.removeNode(parent)
+				//&& !this.tlaModule.getInitPredicates().contains(parent)
+				) {
 			return true;
 		} else {
 			String clazz = parent.getClass().getName();
@@ -2232,8 +2233,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseASeqExpression(ASeqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
-		if (set.getSubtype() instanceof SetType){
-			if(node.parent() instanceof AMemberPredicate){
+		if (set.getSubtype() instanceof SetType) {
+			if (node.parent() instanceof AMemberPredicate) {
 				AMemberPredicate member = (AMemberPredicate) node.parent();
 				tlaModuleString.append(REL_SEQUENCE_SET);
 				tlaModuleString.append("(");
@@ -2241,8 +2242,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 				tlaModuleString.append(", ");
 				node.getExpression().apply(this);
 				tlaModuleString.append(")");
-			}else if (node.parent() instanceof ANotMemberPredicate){
-				ANotMemberPredicate member = (ANotMemberPredicate) node.parent();
+			} else if (node.parent() instanceof ANotMemberPredicate) {
+				ANotMemberPredicate member = (ANotMemberPredicate) node
+						.parent();
 				tlaModuleString.append(REL_SEQUENCE_SET);
 				tlaModuleString.append("(");
 				member.getLeft().apply(this);
@@ -2250,8 +2252,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 				node.getExpression().apply(this);
 				tlaModuleString.append(")");
 			}
-			
-		}else{
+
+		} else {
 			tlaModuleString.append("Seq");
 			tlaModuleString.append("(");
 			node.getExpression().apply(this);
@@ -2286,8 +2288,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAInsertTailExpression(AInsertTailExpression node) {
-		printSequenceOrRelation(node, "Append",
-				REL_SEQUENCE_APPEND, node.getLeft(), node.getRight());
+		printSequenceOrRelation(node, "Append", REL_SEQUENCE_APPEND,
+				node.getLeft(), node.getRight());
 	}
 
 	private void printSequenceOrRelation(Node node, String sequence,
@@ -2363,8 +2365,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseASeq1Expression(ASeq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
-		if (set.getSubtype() instanceof SetType){
-			if(node.parent() instanceof AMemberPredicate){
+		if (set.getSubtype() instanceof SetType) {
+			if (node.parent() instanceof AMemberPredicate) {
 				AMemberPredicate member = (AMemberPredicate) node.parent();
 				tlaModuleString.append(REL_SEQUENCE_1_SET);
 				tlaModuleString.append("(");
@@ -2372,8 +2374,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 				tlaModuleString.append(", ");
 				node.getExpression().apply(this);
 				tlaModuleString.append(")");
-			}else if (node.parent() instanceof ANotMemberPredicate){
-				ANotMemberPredicate member = (ANotMemberPredicate) node.parent();
+			} else if (node.parent() instanceof ANotMemberPredicate) {
+				ANotMemberPredicate member = (ANotMemberPredicate) node
+						.parent();
 				tlaModuleString.append(REL_SEQUENCE_1_SET);
 				tlaModuleString.append("(");
 				member.getLeft().apply(this);
@@ -2381,8 +2384,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 				node.getExpression().apply(this);
 				tlaModuleString.append(")");
 			}
-		}else{
-			
+		} else {
+
 			tlaModuleString.append(SEQUENCE_1);
 			tlaModuleString.append("(");
 			node.getExpression().apply(this);
@@ -2429,7 +2432,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralConcatExpression(AGeneralConcatExpression node) {
-		printSequenceOrRelation(node.getExpression(), SEQUENCE_GENERAL_CONCATINATION,
+		printSequenceOrRelation(node.getExpression(),
+				SEQUENCE_GENERAL_CONCATINATION,
 				REL_SEQUENCE_GENERAL_CONCATINATION, node.getExpression(), null);
 	}
 
@@ -2482,18 +2486,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 		node.getRight().apply(this);
 		outAMultOrCartExpression(node);
 	}
-	
-	
-	 @Override
-	    public void caseAConvertBoolExpression(AConvertBoolExpression node)
-	    {
-	        inAConvertBoolExpression(node);
-	        tlaModuleString.append("(");
-	        if(node.getPredicate() != null)
-	        {
-	            node.getPredicate().apply(this);
-	        }
-	        tlaModuleString.append(")");
-	        outAConvertBoolExpression(node);
-	    }
+
+	@Override
+	public void caseAConvertBoolExpression(AConvertBoolExpression node) {
+		inAConvertBoolExpression(node);
+		tlaModuleString.append("(");
+		if (node.getPredicate() != null) {
+			node.getPredicate().apply(this);
+		}
+		tlaModuleString.append(")");
+		outAConvertBoolExpression(node);
+	}
 }
