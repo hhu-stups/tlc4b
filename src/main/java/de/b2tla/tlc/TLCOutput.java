@@ -101,10 +101,13 @@ public class TLCOutput {
 				matcher.find();
 				String identifier = matcher.group();
 				if (tlcOutputInfo.isAConstant(identifier)) {
-					constantSetup += line + "\n";
+					if (!constantSetup.equals("")){
+						constantSetup += " /\\ "; 
+					}
+					constantSetup += line;
 				}
 			}
-
+			System.out.println(constantSetup);
 			if (constantSetup.equals("")) {
 				/**
 				 * There is only one possibility to setup the constants. As a
@@ -113,7 +116,7 @@ public class TLCOutput {
 				 */
 				trace.append("1 = 1 \n");
 			} else {
-				constantSetup = TLCExpressionParser.parseLine(constantSetup);
+				constantSetup = TLCExpressionParser.parseLine(constantSetup, tlcOutputInfo.getTypes());
 				trace.append(constantSetup);
 				trace.append("\n");
 			}
