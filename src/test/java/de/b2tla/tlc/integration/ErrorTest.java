@@ -71,4 +71,22 @@ public class ErrorTest {
 		assertEquals(TemporalPropertyError, B2TLA.test(a,true));
 	}
 	
+	@Test
+	public void testWelldefinednessError1() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/WelldefinednessError1.mch" };
+		assertEquals(WellDefinednessError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testWelldefinednessError2() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/WelldefinednessError2.mch" };
+		assertEquals(WellDefinednessError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testWelldefinednessError3() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/WelldefinednessError3.mch" };
+		assertEquals(WellDefinednessError, B2TLA.test(a,true));
+	}
+	
 }

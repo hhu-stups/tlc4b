@@ -101,8 +101,8 @@ public class TLCOutput {
 				matcher.find();
 				String identifier = matcher.group();
 				if (tlcOutputInfo.isAConstant(identifier)) {
-					if (!constantSetup.equals("")){
-						constantSetup += " /\\ "; 
+					if (!constantSetup.equals("")) {
+						constantSetup += " /\\ ";
 					}
 					constantSetup += line;
 				}
@@ -116,7 +116,8 @@ public class TLCOutput {
 				 */
 				trace.append("1 = 1 \n");
 			} else {
-				constantSetup = TLCExpressionParser.parseLine(constantSetup, tlcOutputInfo.getTypes());
+				constantSetup = TLCExpressionParser.parseLine(constantSetup,
+						tlcOutputInfo.getTypes());
 				trace.append(constantSetup);
 				trace.append("\n");
 			}
@@ -145,11 +146,14 @@ public class TLCOutput {
 	public static TLCResult findError(ArrayList<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			String m = list.get(i);
-			if (m.startsWith("Error:") || m.startsWith("\"Error:")
+			System.out.println(m);
+			if (m.startsWith("In applying the function")) {
+				return TLCResult.WellDefinednessError;
+			} else if (m.startsWith("Error:") || m.startsWith("\"Error:")
 					|| m.startsWith("The exception was a")) {
 				TLCResult res = findError(m);
 				if (res != null)
-					return findError(m);
+					return res;
 			}
 		}
 		return TLCResult.NoError;
@@ -176,15 +180,21 @@ public class TLCOutput {
 			return TLCResult.TemporalPropertyError;
 		} else if (m.equals("Error: TLC threw an unexpected exception.")) {
 			return null;
+		} else if (m.startsWith("Error: Attempted to apply function:")) {
+			return TLCResult.WellDefinednessError;
 		} else if (m.startsWith("\"Error: Invalid function call to relation")) {
 			return TLCResult.WellDefinednessError;
 		} else if (m.startsWith("Error: The behavior up to")) {
 			return null;
+		} else if (m.contains("In applying the function")) {
+			return TLCResult.WellDefinednessError;
 		} else if (m
 				.startsWith("Error: The following behavior constitutes a counter-example:")) {
 			return null;
 		} else if (m
 				.startsWith("Error: The error occurred when TLC was evaluating the nested")) {
+			return null;
+		} else if (m.startsWith("Error: Evaluating assumption")) {
 			return null;
 		}
 		return TLCResult.TLCError;
