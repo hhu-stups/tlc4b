@@ -76,7 +76,7 @@ public class TLCExpressionParser {
 		} else if (comes("{")) {
 			parseSet(type);
 		} else {
-			throw new RuntimeException("Error: " + string);
+			throw new RuntimeException("Error while parsing trace. Can not parse: " + string);
 		}
 		return;
 	}
@@ -142,7 +142,7 @@ public class TLCExpressionParser {
 	}
 
 	private boolean parseNumber() throws MatchException {
-		Pattern Number = Pattern.compile("(\\d)+");
+		Pattern Number = Pattern.compile("-?(\\d)+");
 		Matcher matcher = Number.matcher(string);
 		if (matcher.lookingAt()) {
 			String res = matcher.group();
