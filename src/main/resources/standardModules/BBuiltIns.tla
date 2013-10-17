@@ -4,11 +4,11 @@ EXTENDS Integers, FiniteSets, TLC
 
 RECURSIVE Sigma(_) 
 Sigma(S) == LET e == CHOOSE e \in S: TRUE
-            IN IF  S = {} THEN 0 ELSE e + Sigma(S \ {e}) 
+            IN IF  S = {} THEN 0 ELSE e[2] + Sigma(S \ {e}) 
 
 RECURSIVE Pi(_) 
 Pi(S) == LET e == CHOOSE e \in S: TRUE
-         IN IF  S = {} THEN 0 ELSE e + Pi(S \ {e}) 
+         IN IF  S = {} THEN 0 ELSE e[2] + Pi(S \ {e}) 
 
 Max(S) == CHOOSE x \in S : \A p \in S : x >= p
 

@@ -1304,13 +1304,20 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralProductExpression(AGeneralProductExpression node) {
-		tlaModuleString.append("Pi(");
-		tlaModuleString.append("{");
-		node.getExpression().apply(this);
-		tlaModuleString.append(" : ");
-
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
+		tlaModuleString.append("Pi(");
+		tlaModuleString.append("{");
+		tlaModuleString.append("<<");
+		tlaModuleString.append("<<");
+		printIdentifierList(copy);
+		tlaModuleString.append(">>");
+		tlaModuleString.append(", ");
+		node.getExpression().apply(this);
+		tlaModuleString.append(">>");
+		tlaModuleString.append(" : ");
+
+
 		printIdentifierList(copy);
 		tlaModuleString.append(" \\in ");
 		if (typeRestrictor.removeNode(node.getPredicates())) {
@@ -1330,13 +1337,19 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralSumExpression(AGeneralSumExpression node) {
-		tlaModuleString.append("Sigma(");
-		tlaModuleString.append("{");
-		node.getExpression().apply(this);
-		tlaModuleString.append(" : ");
-
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
+		tlaModuleString.append("Sigma(");
+		tlaModuleString.append("{");
+		tlaModuleString.append("<<");
+		tlaModuleString.append("<<");
+		printIdentifierList(copy);
+		tlaModuleString.append(">>");
+		tlaModuleString.append(", ");
+		node.getExpression().apply(this);
+		tlaModuleString.append(">>");
+		tlaModuleString.append(" : ");
+
 		printIdentifierList(copy);
 		tlaModuleString.append(" \\in ");
 		if (typeRestrictor.removeNode(node.getPredicates())) {
