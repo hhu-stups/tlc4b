@@ -18,7 +18,7 @@ public class ErrorTest {
 
 	@Test
 	public void testInvariantError() throws Exception {
-		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch" };
+		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch", "-tmp" };
 		assertEquals(InvariantViolation, B2TLA.test(a,true));
 	}
 
