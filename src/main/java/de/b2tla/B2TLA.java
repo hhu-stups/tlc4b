@@ -116,6 +116,18 @@ public class B2TLA {
 				B2TLAGlobals.setInvariant(false);
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				B2TLAGlobals.setTool(false);
+			}else if (args[index].toLowerCase().equals("-tmp")) {
+				try {
+					File f = File.createTempFile("tmp", ".kk");
+					String p1 = f.getAbsolutePath();
+					int i = p1.lastIndexOf(File.separator);
+					String p2 = p1.substring(0, i+1);
+					path = p2;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			} else if (args[index].toLowerCase().equals("-noltl")) {
 				B2TLAGlobals.setCheckltl(false);
 			} else if (args[index].toLowerCase().equals("-ltlformula")) {
@@ -171,11 +183,15 @@ public class B2TLA {
 			name = name.substring(0, name.length() - 4);
 		}
 		pathAndName = name;
-		if (name.contains(File.separator)) {
-			path = name.substring(0, name.lastIndexOf(File.separator) + 1);
-		} else {
-			path = "." + File.separator;
+		System.out.println(path);
+		if(path == null){
+			if (name.contains(File.separator)) {
+				path = name.substring(0, name.lastIndexOf(File.separator) + 1);
+			} else {
+				path = "." + File.separator;
+			}
 		}
+
 
 		machineFileNameWithoutFileExtension = name.substring(name.lastIndexOf(File.separator) + 1);
 	}
