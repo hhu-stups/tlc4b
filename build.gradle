@@ -59,7 +59,7 @@ task b2tla(dependsOn: build) << {
 		from('build/libs/')
 		into('build/b2tla')
 		include('b2tla-'+project.version+'.jar')
-		rename('(b2tla)-(.+)', 'B2TLA.jar')
+		rename('b2tla-(.+)', 'B2TLA.jar')
 	}
 }
 

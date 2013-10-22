@@ -56,9 +56,13 @@ public class B2TLA {
 		StopWatch.stop("Translation");
 
 		if (B2TLAGlobals.isRunTLC()) {
-			ArrayList<String> output = TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
-					b2tla.path);
-			b2tla.evalOutput(output, true);
+			try {
+				ArrayList<String> output = TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
+						b2tla.path);
+				b2tla.evalOutput(output, true);
+			} catch (NoClassDefFoundError e) {
+			}
+
 		}
 
 	}
@@ -186,11 +190,17 @@ public class B2TLA {
 	}
 
 	private void createFiles() {
-		createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, "TLA+ module '"
+		File moduleFile = createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, "TLA+ module '"
 				+ path + machineFileNameWithoutFileExtension+ ".tla' created.", B2TLAGlobals.isDeleteOnExit());
-		createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, "Configuration file '"
+		if(moduleFile != null){
+			System.out.println("TLA+ module '"+ moduleFile.getAbsolutePath() +"' created.");
+		}
+		
+		File configFile = createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, "Configuration file '"
 				+ path + machineFileNameWithoutFileExtension+".cfg' created.", B2TLAGlobals.isDeleteOnExit());
-
+		if(configFile != null){
+			System.out.println("Configuration file '"+ configFile.getAbsolutePath() +"' created.");
+		}
 		createStandardModules();
 	}
 
@@ -362,19 +372,18 @@ public class B2TLA {
 		return res.toString();
 	}
 
-	public static void createFile(String dir, String fileName, String text,
+	public static File createFile(String dir, String fileName, String text,
 			String message, boolean deleteOnExit) {
 		File d = new File(dir);
 		d.mkdirs();
 		File file = new File(dir + File.separator + fileName);
-		System.out.println("path: " +file.getAbsolutePath());
 		try {
 			file.createNewFile();
 			FileWriter fw;
 			fw = new FileWriter(file);
 			fw.write(text);
 			fw.close();
-			System.out.println(message);
+			return file;
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new B2TLAIOException(e.getMessage());
