@@ -53,7 +53,6 @@ jar	{
 manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
 manifest.mainAttributes("Class-Path": './tla/ tla2tools.jar')
 
-
 task b2tla(dependsOn: build) << {
 	copy {
 		from('build/libs/')
@@ -62,4 +61,9 @@ task b2tla(dependsOn: build) << {
 		rename('b2tla-(.+)', 'B2TLA.jar')
 	}
 }
+
+task all(dependsOn: b2tla) <<{
+	ant.get(src: 'http://tla.msr-inria.inria.fr/tlatoolbox/dist/tla2tools.jar', verbose:true, dest: 'build/b2tla/')
+}
+
 
