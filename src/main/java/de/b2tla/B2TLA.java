@@ -61,6 +61,7 @@ public class B2TLA {
 						b2tla.path);
 				b2tla.evalOutput(output, true);
 			} catch (NoClassDefFoundError e) {
+				System.out.println("Can not find TLC. The tla2tools must be included in the classpath.");
 			}
 
 		}
