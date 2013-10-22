@@ -366,7 +366,7 @@ public class B2TLA {
 			String message, boolean deleteOnExit) {
 		File d = new File(dir);
 		d.mkdirs();
-		File file = new File(dir + File.separator + fileName);
+		File file = new File(dir, fileName);
 		try {
 			file.createNewFile();
 			FileWriter fw;
