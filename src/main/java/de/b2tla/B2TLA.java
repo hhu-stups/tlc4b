@@ -117,17 +117,7 @@ public class B2TLA {
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				B2TLAGlobals.setTool(false);
 			}else if (args[index].toLowerCase().equals("-tmp")) {
-				try {
-					File f = File.createTempFile("tmp", ".kk");
-					String p1 = f.getAbsolutePath();
-					int i = p1.lastIndexOf(File.separator);
-					String p2 = p1.substring(0, i+1);
-					path = p2;
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+					path =  System.getProperty("java.io.tmpdir");
 			} else if (args[index].toLowerCase().equals("-noltl")) {
 				B2TLAGlobals.setCheckltl(false);
 			} else if (args[index].toLowerCase().equals("-ltlformula")) {
@@ -183,7 +173,6 @@ public class B2TLA {
 			name = name.substring(0, name.length() - 4);
 		}
 		pathAndName = name;
-		System.out.println(path);
 		if(path == null){
 			if (name.contains(File.separator)) {
 				path = name.substring(0, name.lastIndexOf(File.separator) + 1);
@@ -198,9 +187,9 @@ public class B2TLA {
 
 	private void createFiles() {
 		createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, "TLA+ module '"
-				+ pathAndName + ".tla' created.", B2TLAGlobals.isDeleteOnExit());
+				+ path + machineFileNameWithoutFileExtension+ ".tla' created.", B2TLAGlobals.isDeleteOnExit());
 		createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, "Configuration file '"
-				+ pathAndName + ".cfg' created.", B2TLAGlobals.isDeleteOnExit());
+				+ path + machineFileNameWithoutFileExtension+".cfg' created.", B2TLAGlobals.isDeleteOnExit());
 
 		createStandardModules();
 	}
