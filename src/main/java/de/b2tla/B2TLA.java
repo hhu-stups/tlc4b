@@ -366,7 +366,8 @@ public class B2TLA {
 			String message, boolean deleteOnExit) {
 		File d = new File(dir);
 		d.mkdirs();
-		File file = new File(dir, fileName);
+		File file = new File(d + File.pathSeparator+ fileName);
+		System.out.println("paht: " +file.getAbsolutePath());
 		try {
 			file.createNewFile();
 			FileWriter fw;
