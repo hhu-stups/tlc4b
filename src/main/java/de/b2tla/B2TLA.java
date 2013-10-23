@@ -102,8 +102,10 @@ public class B2TLA {
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
 			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
-			createFile(path, tracefileName, trace.toString(), "Trace file '"
-					+ path + tracefileName + "'created.", false);
+			File traceFile = createFile(path, tracefileName, trace.toString(), false);
+			if(traceFile != null){
+				System.out.println("Trace file '"+ traceFile.getAbsolutePath() + "'created.");
+			}
 		}
 	}
 
@@ -192,14 +194,12 @@ public class B2TLA {
 	}
 
 	private void createFiles() {
-		File moduleFile = createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, "TLA+ module '"
-				+ path + machineFileNameWithoutFileExtension+ ".tla' created.", B2TLAGlobals.isDeleteOnExit());
+		File moduleFile = createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, B2TLAGlobals.isDeleteOnExit());
 		if(moduleFile != null){
 			System.out.println("TLA+ module '"+ moduleFile.getAbsolutePath() +"' created.");
 		}
 		
-		File configFile = createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, "Configuration file '"
-				+ path + machineFileNameWithoutFileExtension+".cfg' created.", B2TLAGlobals.isDeleteOnExit());
+		File configFile = createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, B2TLAGlobals.isDeleteOnExit());
 		if(configFile != null){
 			System.out.println("Configuration file '"+ configFile.getAbsolutePath() +"' created.");
 		}
@@ -268,7 +268,7 @@ public class B2TLA {
 		// standard modules are copied from the standardModules folder to the
 		// current directory
 
-		File file = new File(path + name + ".tla");
+		File file = new File(path + File.separator + name + ".tla");
 		InputStream is = null;
 		FileOutputStream fos = null;
 		try {
@@ -374,8 +374,7 @@ public class B2TLA {
 		return res.toString();
 	}
 
-	public static File createFile(String dir, String fileName, String text,
-			String message, boolean deleteOnExit) {
+	public static File createFile(String dir, String fileName, String text, boolean deleteOnExit) {
 		File d = new File(dir);
 		d.mkdirs();
 		File file = new File(dir + File.separator + fileName);
