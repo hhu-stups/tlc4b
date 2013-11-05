@@ -92,6 +92,7 @@ public class ConstantsTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testScalarParameter() throws Exception {
 		String machine = "MACHINE test(t)\n"
