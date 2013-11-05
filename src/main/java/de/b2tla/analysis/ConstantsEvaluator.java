@@ -219,11 +219,14 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		private void analysePredicate(Node node, boolean isProperties) {
 			if (node instanceof AEqualPredicate) {
 				analyseEqualsPredicate((AEqualPredicate) node);
-			} else if (node instanceof AGreaterPredicate) {
-				analyseGreaterPredicate((AGreaterPredicate) node);
-			} else if (node instanceof ALessEqualPredicate) {
-				analyseLessEqualPredicate((ALessEqualPredicate) node);
-			} else if (node instanceof AConjunctPredicate) {
+			} 
+//			else if (node instanceof AGreaterPredicate) {
+//				analyseGreaterPredicate((AGreaterPredicate) node);
+//			}
+//			else if (node instanceof ALessEqualPredicate) {
+//				analyseLessEqualPredicate((ALessEqualPredicate) node);
+//			}
+			else if (node instanceof AConjunctPredicate) {
 				AConjunctPredicate conjunction = (AConjunctPredicate) node;
 				analysePredicate(conjunction.getLeft(), isProperties);
 				analysePredicate(conjunction.getRight(), isProperties);
