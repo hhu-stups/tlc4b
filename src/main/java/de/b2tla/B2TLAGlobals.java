@@ -9,12 +9,13 @@ public class B2TLAGlobals {
 	private static boolean checkDeadlock;
 	private static boolean checkInvariant;
 	private static boolean checkLTL;
-	
+
 	private static boolean deleteFilesOnExit;
-	
+
 	private static boolean runTLC;
 	private static boolean translate;
 	private static boolean hideTLCConsoleOutput;
+	private static boolean createTraceFile;
 
 	private static boolean runTestscript;
 
@@ -37,14 +38,22 @@ public class B2TLAGlobals {
 		translate = true;
 		hideTLCConsoleOutput = false; // is mapped to TOOLIO.tool
 		deleteFilesOnExit = false; // if enabled: deletes all created '.tla',
-									// '.cfg' files on exit of the JVM. This includes
+									// '.cfg' files on exit of the JVM. This
+									// includes
 									// the created B2TLA standard modules (e.g.
 									// Relation, but not Naturals etc.).
 		runTestscript = false;
+		createTraceFile = true;
 	}
 
-	
-	
+	public static boolean isCreateTraceFile() {
+		return createTraceFile;
+	}
+
+	public static void setCreateTraceFile(boolean createTraceFile) {
+		B2TLAGlobals.createTraceFile = createTraceFile;
+	}
+
 	public static boolean isRunTestscript() {
 		return runTestscript;
 	}

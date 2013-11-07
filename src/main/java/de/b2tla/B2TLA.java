@@ -36,8 +36,7 @@ public class B2TLA {
 	private B2TlaTranslator translator;
 	private TLCOutputInfo tlcOutputInfo;
 	private String ltlFormula;
-	
-	
+
 	public static void main(String[] args) throws IOException {
 		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
@@ -57,11 +56,12 @@ public class B2TLA {
 
 		if (B2TLAGlobals.isRunTLC()) {
 			try {
-				ArrayList<String> output = TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
-						b2tla.path);
-				b2tla.evalOutput(output, true);
+				ArrayList<String> output = TLCRunner.runTLC(
+						b2tla.machineFileNameWithoutFileExtension, b2tla.path);
+				b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
 			} catch (NoClassDefFoundError e) {
-				System.out.println("Can not find TLC. The tla2tools must be included in the classpath.");
+				System.out
+						.println("Can not find TLC. The tla2tools must be included in the classpath.");
 				System.out.println(e.getMessage());
 			}
 
@@ -69,7 +69,8 @@ public class B2TLA {
 
 	}
 
-	public static TLCResult test(String[] args, boolean deleteFiles) throws IOException {
+	public static TLCResult test(String[] args, boolean deleteFiles)
+			throws IOException {
 		B2TLAGlobals.resetGlobals();
 		B2TLAGlobals.setDeleteOnExit(deleteFiles);
 		B2TLA b2tla = new B2TLA();
@@ -92,34 +93,38 @@ public class B2TLA {
 	}
 
 	private void evalOutput(ArrayList<String> output, boolean createTraceFile) {
-		TLCOutput tlcOutput = new TLCOutput(machineFileNameWithoutFileExtension,
+		TLCOutput tlcOutput = new TLCOutput(
+				machineFileNameWithoutFileExtension,
 				output.toArray(new String[output.size()]), tlcOutputInfo);
 		tlcOutput.parseTLCOutput();
-		if (B2TLAGlobals.isRunTestscript()){
+		if (B2TLAGlobals.isRunTestscript()) {
 			System.out.println("------------- Results -------------");
-			System.out.println("Model Checking Time: " + (tlcOutput.getRunningTime()* 1000) + " ms");
-			System.out.println("States analysed: " + tlcOutput.getDistinctStates() );
-			System.out.println("Transitions fired: " + tlcOutput.getTransitions());
-			if(tlcOutput.getResult() != TLCResult.NoError){
+			System.out.println("Model Checking Time: "
+					+ (tlcOutput.getRunningTime() * 1000) + " ms");
+			System.out.println("States analysed: "
+					+ tlcOutput.getDistinctStates());
+			System.out.println("Transitions fired: "
+					+ tlcOutput.getTransitions());
+			if (tlcOutput.getResult() != TLCResult.NoError) {
 				System.err.println("@@");
 				System.err.println("12" + tlcOutput.getResultString());
 			}
 			return;
 		}
-		
-		
-		
-		
+
 		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
 				+ " sec");
 
 		System.out.println("Result: " + tlcOutput.getResultString());
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
-			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
-			File traceFile = createFile(path, tracefileName, trace.toString(), false);
-			if(traceFile != null){
-				System.out.println("Trace file '"+ traceFile.getAbsolutePath() + "'created.");
+			String tracefileName = machineFileNameWithoutFileExtension
+					+ ".tla.trace";
+			File traceFile = createFile(path, tracefileName, trace.toString(),
+					false);
+			if (traceFile != null) {
+				System.out.println("Trace file '" + traceFile.getAbsolutePath()
+						+ "'created.");
 			}
 		}
 	}
@@ -139,14 +144,17 @@ public class B2TLA {
 				B2TLAGlobals.setInvariant(false);
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				B2TLAGlobals.setTool(false);
-			}else if (args[index].toLowerCase().equals("-tmp")) {
-					path =  System.getProperty("java.io.tmpdir");
+			} else if (args[index].toLowerCase().equals("-tmp")) {
+				path = System.getProperty("java.io.tmpdir");
 			} else if (args[index].toLowerCase().equals("-noltl")) {
 				B2TLAGlobals.setCheckltl(false);
-			}else if (args[index].toLowerCase().equals("-testscript")) {
+			} else if (args[index].toLowerCase().equals("-testscript")) {
 				B2TLAGlobals.setRunTestscript(true);
-			}			
-			else if (args[index].toLowerCase().equals("-ltlformula")) {
+			} else if (args[index].toLowerCase().equals("-notrace")) {
+				
+			} else if (args[index].toLowerCase().equals("-del")) {
+				B2TLAGlobals.setDeleteOnExit(true);
+			} else if (args[index].toLowerCase().equals("-ltlformula")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new B2TLAIOException(
@@ -177,7 +185,9 @@ public class B2TLA {
 
 		handleMainFileName();
 		if (B2TLAGlobals.isTranslate()) {
-			translator = new B2TlaTranslator(machineFileNameWithoutFileExtension, getFile(), this.ltlFormula);
+			translator = new B2TlaTranslator(
+					machineFileNameWithoutFileExtension, getFile(),
+					this.ltlFormula);
 			translator.translate();
 
 			this.tlaModule = translator.getModuleString();
@@ -199,7 +209,7 @@ public class B2TLA {
 			name = name.substring(0, name.length() - 4);
 		}
 		pathAndName = name;
-		if(path == null){
+		if (path == null) {
 			if (name.contains(File.separator)) {
 				path = name.substring(0, name.lastIndexOf(File.separator) + 1);
 			} else {
@@ -207,19 +217,23 @@ public class B2TLA {
 			}
 		}
 
-
-		machineFileNameWithoutFileExtension = name.substring(name.lastIndexOf(File.separator) + 1);
+		machineFileNameWithoutFileExtension = name.substring(name
+				.lastIndexOf(File.separator) + 1);
 	}
 
 	private void createFiles() {
-		File moduleFile = createFile(path, machineFileNameWithoutFileExtension + ".tla", tlaModule, B2TLAGlobals.isDeleteOnExit());
-		if(moduleFile != null){
-			System.out.println("TLA+ module '"+ moduleFile.getAbsolutePath() +"' created.");
+		File moduleFile = createFile(path, machineFileNameWithoutFileExtension
+				+ ".tla", tlaModule, B2TLAGlobals.isDeleteOnExit());
+		if (moduleFile != null) {
+			System.out.println("TLA+ module '" + moduleFile.getAbsolutePath()
+					+ "' created.");
 		}
-		
-		File configFile = createFile(path, machineFileNameWithoutFileExtension + ".cfg", config, B2TLAGlobals.isDeleteOnExit());
-		if(configFile != null){
-			System.out.println("Configuration file '"+ configFile.getAbsolutePath() +"' created.");
+
+		File configFile = createFile(path, machineFileNameWithoutFileExtension
+				+ ".cfg", config, B2TLAGlobals.isDeleteOnExit());
+		if (configFile != null) {
+			System.out.println("Configuration file '"
+					+ configFile.getAbsolutePath() + "' created.");
 		}
 		createStandardModules();
 	}
@@ -261,19 +275,19 @@ public class B2TLA {
 				STANDARD_MODULES.SequencesAsRelations)) {
 			createStandardModule(path,
 					STANDARD_MODULES.SequencesAsRelations.toString());
-			
+
 			if (!translator.getUsedStandardModule().contains(
 					STANDARD_MODULES.Relations)) {
 				createStandardModule(path,
 						STANDARD_MODULES.Relations.toString());
 			}
-			
+
 			if (!translator.getUsedStandardModule().contains(
 					STANDARD_MODULES.FunctionsAsRelations)) {
 				createStandardModule(path,
 						STANDARD_MODULES.FunctionsAsRelations.toString());
 			}
-			
+
 			if (!translator.getUsedStandardModule().contains(
 					STANDARD_MODULES.Functions)) {
 				createStandardModule(path,
@@ -392,7 +406,8 @@ public class B2TLA {
 		return res.toString();
 	}
 
-	public static File createFile(String dir, String fileName, String text, boolean deleteOnExit) {
+	public static File createFile(String dir, String fileName, String text,
+			boolean deleteOnExit) {
 		File d = new File(dir);
 		d.mkdirs();
 		File file = new File(dir + File.separator + fileName);
