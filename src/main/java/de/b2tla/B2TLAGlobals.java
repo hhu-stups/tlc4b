@@ -16,6 +16,7 @@ public class B2TLAGlobals {
 	private static boolean translate;
 	private static boolean hideTLCConsoleOutput;
 
+	private static boolean runTestscript;
 
 	static {
 		resetGlobals();
@@ -39,6 +40,17 @@ public class B2TLAGlobals {
 									// '.cfg' files on exit of the JVM. This includes
 									// the created B2TLA standard modules (e.g.
 									// Relation, but not Naturals etc.).
+		runTestscript = false;
+	}
+
+	
+	
+	public static boolean isRunTestscript() {
+		return runTestscript;
+	}
+
+	public static void setRunTestscript(boolean runTestscript) {
+		B2TLAGlobals.runTestscript = runTestscript;
 	}
 
 	public static int getDEFERRED_SET_SIZE() {

@@ -3,6 +3,7 @@ package de.b2tla.tlc;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,13 +17,23 @@ public class TLCOutput {
 
 	Date startingTime;
 	Date finishingTime;
-	TLCResult error;
+	TLCResult restult;
 	ArrayList<String> states = new ArrayList<String>();
 	StringBuilder trace;
 	String parseError;
+	int transitions = -1;
+	int distinctStates= -1;
 
 	public static enum TLCResult {
 		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerateError, TLCError, TemporalPropertyError, WellDefinednessError
+	}
+
+	public int getTransitions() {
+		return transitions;
+	}
+
+	public int getDistinctStates() {
+		return distinctStates;
 	}
 
 	public long getRunningTime() {
@@ -30,13 +41,17 @@ public class TLCOutput {
 		return time;
 	}
 
-	public String getError() {
-		if (error == TLCResult.InvariantViolation) {
+	public TLCResult getResult(){
+		return restult;
+	}
+	
+	public String getResultString() {
+		if (restult == TLCResult.InvariantViolation) {
 			return "Invariant Violation";
-		} else if (error == TLCResult.TemporalPropertyError) {
+		} else if (restult == TLCResult.TemporalPropertyError) {
 			return "Temporal Property Violation";
 		}
-		return error.toString();
+		return restult.toString();
 	}
 
 	public StringBuilder getErrorTrace() {
@@ -69,19 +84,35 @@ public class TLCOutput {
 			} else if (m.startsWith("Error:")) {
 				TLCResult e = findError(m);
 				if (e != null) {
-					this.error = e;
+					this.restult = e;
 				}
-			} else if (m.startsWith("State")) {
+			}else if(m.endsWith("states left on queue.")){
+				parseStates(m);
+			}
+			
+			else if (m.startsWith("State")) {
 				states.add(m);
 			} else if (m.startsWith("*** Errors:")) {
 				parseError = m;
 			}
 		}
 
-		if (error == null) {
-			this.error = TLCResult.NoError;
+		if (restult == null) {
+			this.restult = TLCResult.NoError;
 		}
 
+	}
+	
+	private void parseStates(String m) {
+		final Pattern pattern = Pattern.compile("\\d+");
+		final Matcher matcher = pattern.matcher(m);
+
+		final ArrayList<Integer> ints = new ArrayList<Integer>();
+		while (matcher.find()) {
+		    ints.add(Integer.parseInt(matcher.group()));
+		}
+		transitions = ints.get(0);
+		distinctStates = ints.get(1);
 	}
 
 	private void parseTrace() {

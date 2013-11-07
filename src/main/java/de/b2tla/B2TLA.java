@@ -95,10 +95,25 @@ public class B2TLA {
 		TLCOutput tlcOutput = new TLCOutput(machineFileNameWithoutFileExtension,
 				output.toArray(new String[output.size()]), tlcOutputInfo);
 		tlcOutput.parseTLCOutput();
+		if (B2TLAGlobals.isRunTestscript()){
+			System.out.println("------------- Results -------------");
+			System.out.println("Model Checking Time: " + (tlcOutput.getRunningTime()* 1000) + " ms");
+			System.out.println("States analysed: " + tlcOutput.getDistinctStates() );
+			System.out.println("Transitions fired: " + tlcOutput.getTransitions());
+			if(tlcOutput.getResult() != TLCResult.NoError){
+				System.err.println("@@");
+				System.err.println("12" + tlcOutput.getResultString());
+			}
+			return;
+		}
+		
+		
+		
+		
 		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
 				+ " sec");
 
-		System.out.println("Result: " + tlcOutput.getError());
+		System.out.println("Result: " + tlcOutput.getResultString());
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
 			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
@@ -128,7 +143,10 @@ public class B2TLA {
 					path =  System.getProperty("java.io.tmpdir");
 			} else if (args[index].toLowerCase().equals("-noltl")) {
 				B2TLAGlobals.setCheckltl(false);
-			} else if (args[index].toLowerCase().equals("-ltlformula")) {
+			}else if (args[index].toLowerCase().equals("-testscript")) {
+				B2TLAGlobals.setRunTestscript(true);
+			}			
+			else if (args[index].toLowerCase().equals("-ltlformula")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new B2TLAIOException(

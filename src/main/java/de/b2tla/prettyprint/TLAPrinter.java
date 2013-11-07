@@ -178,10 +178,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 				this.configFileString.append("NEXT Next\n");
 			}
 		}
-		for (int i = 0; i < configFile.getInvariantNumber(); i++) {
-			this.configFileString
-					.append("INVARIANT Invariant" + (i + 1) + "\n");
+		if (B2TLAGlobals.isInvariant()){
+			for (int i = 0; i < configFile.getInvariantNumber(); i++) {
+				this.configFileString
+						.append("INVARIANT Invariant" + (i + 1) + "\n");
+			}
 		}
+
 
 		if (configFile.isGoal()) {
 			this.configFileString.append("INVARIANT NotGoal\n");

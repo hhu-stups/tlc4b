@@ -11,15 +11,10 @@ import de.b2tla.B2TLAGlobals;
 
 public class ErrorTest {
 
-	@BeforeClass
-	public static void onlyOnce() {
-		B2TLAGlobals.setDeleteOnExit(true);
-	}
-
 	@Test
 	public void testInvariantError() throws Exception {
-		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch", "-tmp" };
-		assertEquals(InvariantViolation, B2TLA.test(a,true));
+		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch" };
+		assertEquals(InvariantViolation, B2TLA.test(a,false));
 	}
 
 	@Test
