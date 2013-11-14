@@ -21,6 +21,7 @@ import de.b2tla.analysis.transformation.DefinitionsEliminator;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
 import de.b2tla.tlc.TLCOutputInfo;
+import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;

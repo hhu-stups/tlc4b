@@ -38,7 +38,6 @@ public class B2TLA {
 	private String ltlFormula;
 
 	public static void main(String[] args) throws IOException {
-		StopWatch.start("Translation");
 		B2TLA b2tla = new B2TLA();
 
 		try {
@@ -52,7 +51,6 @@ public class B2TLA {
 			System.out.println("Result: " + e.getError());
 			return;
 		}
-		StopWatch.stop("Translation");
 
 		if (B2TLAGlobals.isRunTLC()) {
 			try {
@@ -98,23 +96,18 @@ public class B2TLA {
 				output.toArray(new String[output.size()]), tlcOutputInfo);
 		tlcOutput.parseTLCOutput();
 		if (B2TLAGlobals.isRunTestscript()) {
-			System.out.println("------------- Results -------------");
-			System.out.println("Model Checking Time: "
-					+ (tlcOutput.getRunningTime() * 1000) + " ms");
-			System.out.println("States analysed: "
-					+ tlcOutput.getDistinctStates());
-			System.out.println("Transitions fired: "
-					+ tlcOutput.getTransitions());
-			if (tlcOutput.getResult() != TLCResult.NoError) {
-				System.err.println("@@");
-				System.err.println("12" + tlcOutput.getResultString());
-			}
+			printTestResultsForTestscript(tlcOutput);
 			return;
 		}
 
+		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing") + " ms");
+		System.out.println("Translation time: " + StopWatch.getRunTime("Pure"));
 		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
 				+ " sec");
-
+		System.out.println("States analysed: "
+				+ tlcOutput.getDistinctStates());
+		System.out.println("Transitions fired: "
+				+ tlcOutput.getTransitions());
 		System.out.println("Result: " + tlcOutput.getResultString());
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
@@ -127,6 +120,22 @@ public class B2TLA {
 						+ "'created.");
 			}
 		}
+	}
+
+	private void printTestResultsForTestscript(TLCOutput tlcOutput) {
+		// This output is adapted to Ivo's testscript
+		System.out.println("------------- Results -------------");
+		System.out.println("Model Checking Time: "
+				+ (tlcOutput.getRunningTime() * 1000) + " ms");
+		System.out.println("States analysed: "
+				+ tlcOutput.getDistinctStates());
+		System.out.println("Transitions fired: "
+				+ tlcOutput.getTransitions());
+		if (tlcOutput.getResult() != TLCResult.NoError) {
+			System.err.println("@@");
+			System.err.println("12" + tlcOutput.getResultString());
+		}
+		
 	}
 
 	private void handleParameter(String[] args) {
@@ -185,15 +194,18 @@ public class B2TLA {
 
 		handleMainFileName();
 		if (B2TLAGlobals.isTranslate()) {
+			StopWatch.start("Parsing");
 			translator = new B2TlaTranslator(
 					machineFileNameWithoutFileExtension, getFile(),
 					this.ltlFormula);
+			StopWatch.stop("Parsing");
+			StopWatch.start("Pure");
 			translator.translate();
-
 			this.tlaModule = translator.getModuleString();
 			this.config = translator.getConfigString();
 			this.tlcOutputInfo = translator.getTLCOutputInfo();
 			createFiles();
+			StopWatch.stop("Pure");
 		}
 
 	}

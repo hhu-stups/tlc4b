@@ -15,6 +15,7 @@ import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
+import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
@@ -93,7 +94,10 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
 			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
-			context.put(paramName, arguments.get(i));
+			
+			Node arg = arguments.get(i);
+			arg.apply(this);
+			context.put(paramName, node.getParameters().get(i));
 		}
 		contextStack.add(context);
 		clone.getRhs().apply(this);
@@ -115,9 +119,12 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
 			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
-			context.put(paramName, arguments.get(i));
+			Node arg = arguments.get(i);
+			arg.apply(this);
+			context.put(paramName, node.getParameters().get(i));
 		}
 		contextStack.add(context);
+		
 		clone.getRhs().apply(this);
 		node.replaceBy(clone.getRhs());
 		contextStack.remove(context);
@@ -137,12 +144,16 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
 			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
-			context.put(paramName, arguments.get(i));
+			
+			Node arg = arguments.get(i);
+			arg.apply(this);
+			context.put(paramName, node.getParameters().get(i));
+			//context.put(paramName, arguments.get(i));
 		}
 		contextStack.add(context);
 		clone.getRhs().apply(this);
-
 		node.replaceBy(clone.getRhs());
+		
 
 		contextStack.remove(context);
 	}

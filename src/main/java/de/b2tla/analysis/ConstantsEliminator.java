@@ -271,9 +271,9 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 				analyseEqualsPredicate((AEqualPredicate) n);
 				return;
 			} else if (n instanceof AGreaterPredicate) {
-				analyseGreaterPredicate((AGreaterPredicate) n);
+				//analyseGreaterPredicate((AGreaterPredicate) n);
 			} else if (n instanceof ALessEqualPredicate) {
-				analyseLessEqualPredicate((ALessEqualPredicate) n);
+				//analyseLessEqualPredicate((ALessEqualPredicate) n);
 			} else if (n instanceof AConjunctPredicate) {
 				analysePredicate(((AConjunctPredicate) n).getLeft());
 				analysePredicate(((AConjunctPredicate) n).getRight());
