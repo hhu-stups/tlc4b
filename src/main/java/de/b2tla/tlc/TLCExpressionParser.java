@@ -147,6 +147,15 @@ public class TLCExpressionParser {
 		if (matcher.lookingAt()) {
 			String res = matcher.group();
 			sb.append(res);
+			
+			// detects intervals e.g. 1..8 TODO
+			String interval = string.substring(matcher.end());
+			if (interval.startsWith("..")) {
+				sb.append("..");
+				matcher.find();
+				sb.append(matcher.group());
+			}
+			
 			string = string.substring(matcher.end());
 			return true;
 		} else {
