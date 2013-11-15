@@ -261,6 +261,21 @@ public class Generator extends DepthFirstAdapter {
 				Integer value = constantsEvaluator.getIntValue(con);
 				if (value == null) {
 					init = true;
+					
+					ArrayList<NodeType> a = typeRestrictor.getRestrictedTypesSet(con);
+					if(a != null && a.size() > 0 ){
+						for (int j = 0; j < a.size(); j++) {
+							NodeType type = a.get(j);
+							if(type instanceof ElementOfNode){
+								Node parent = type.getExpression().parent();
+								typeRestrictor.addRemoveNode(parent);
+								tlaModule.addInit(parent);
+							}
+							continue;
+						}
+						
+					}
+					
 					BType conType = typechecker.getType(con);
 
 					if (!conType.containsIntegerType()) {

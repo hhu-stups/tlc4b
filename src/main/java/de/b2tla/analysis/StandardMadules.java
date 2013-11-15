@@ -29,6 +29,7 @@ public class StandardMadules {
 	public static final String REL_INVERSE = "RelInverse";
 	public static final String REL_IMAGE = "RelImage";
 	public static final String REL_OVERRIDING = "RelOverride";
+	public static final String REL_OVERRIDING_FUNC = "RelOverrideFunc";
 	public static final String REL_DIRECT_PRODUCT = "RelDirectProduct";
 	public static final String REL_PARALLEL_PRODUCT = "RelParallelProduct";
 	public static final String REL_COMPOSITION = "RelComposition";

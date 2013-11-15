@@ -561,7 +561,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 		} else {
 			var.apply(this);
 			tlaModuleString.append("' = ");
-			tlaModuleString.append(REL_OVERRIDING + "(");
+			tlaModuleString.append(REL_OVERRIDING_FUNC + "(");
+			//tlaModuleString.append(REL_OVERRIDING + "(");
 			var.apply(this);
 			tlaModuleString.append(", {<<");
 

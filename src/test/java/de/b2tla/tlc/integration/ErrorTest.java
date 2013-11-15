@@ -14,7 +14,7 @@ public class ErrorTest {
 	@Test
 	public void testInvariantError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch" };
-		assertEquals(InvariantViolation, B2TLA.test(a,false));
+		assertEquals(InvariantViolation, B2TLA.test(a,true));
 	}
 
 	@Test
@@ -81,6 +81,12 @@ public class ErrorTest {
 	@Test
 	public void testWelldefinednessError3() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/WelldefinednessError3.mch" };
+		assertEquals(WellDefinednessError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testWellDefinednessErrorFunctionAssignment() throws Exception {
+		String[] a = new String[] { "./src/test/resources/errors/WellDefinednessErrorFunctionAssignment.mch" };
 		assertEquals(WellDefinednessError, B2TLA.test(a,true));
 	}
 	

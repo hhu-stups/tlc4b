@@ -17,12 +17,12 @@ public class TLCOutput {
 
 	Date startingTime;
 	Date finishingTime;
-	TLCResult restult;
+	TLCResult result;
 	ArrayList<String> states = new ArrayList<String>();
 	StringBuilder trace;
 	String parseError;
 	int transitions = -1;
-	int distinctStates= -1;
+	int distinctStates = -1;
 
 	public static enum TLCResult {
 		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerateError, TLCError, TemporalPropertyError, WellDefinednessError
@@ -41,17 +41,17 @@ public class TLCOutput {
 		return time;
 	}
 
-	public TLCResult getResult(){
-		return restult;
+	public TLCResult getResult() {
+		return result;
 	}
-	
+
 	public String getResultString() {
-		if (restult == TLCResult.InvariantViolation) {
+		if (result == TLCResult.InvariantViolation) {
 			return "Invariant Violation";
-		} else if (restult == TLCResult.TemporalPropertyError) {
+		} else if (result == TLCResult.TemporalPropertyError) {
 			return "Temporal Property Violation";
 		}
-		return restult.toString();
+		return result.toString();
 	}
 
 	public StringBuilder getErrorTrace() {
@@ -84,32 +84,30 @@ public class TLCOutput {
 			} else if (m.startsWith("Error:")) {
 				TLCResult e = findError(m);
 				if (e != null) {
-					this.restult = e;
+					this.result = e;
 				}
-			}else if(m.endsWith("states left on queue.")){
+			} else if (m.endsWith("states left on queue.")) {
 				parseStates(m);
-			}
-			
-			else if (m.startsWith("State")) {
+			} else if (m.startsWith("State")) {
 				states.add(m);
 			} else if (m.startsWith("*** Errors:")) {
 				parseError = m;
 			}
 		}
-
-		if (restult == null) {
-			this.restult = TLCResult.NoError;
+		if (result == null) {
+			ArrayList<String> list = new ArrayList<String>(Arrays.asList(messages));
+			this.result = findError(list);
 		}
 
 	}
-	
+
 	private void parseStates(String m) {
 		final Pattern pattern = Pattern.compile("\\d+");
 		final Matcher matcher = pattern.matcher(m);
 
 		final ArrayList<Integer> ints = new ArrayList<Integer>();
 		while (matcher.find()) {
-		    ints.add(Integer.parseInt(matcher.group()));
+			ints.add(Integer.parseInt(matcher.group()));
 		}
 		transitions = ints.get(0);
 		distinctStates = ints.get(1);
@@ -177,8 +175,9 @@ public class TLCOutput {
 	public static TLCResult findError(ArrayList<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			String m = list.get(i);
-			System.out.println(m);
 			if (m.startsWith("In applying the function")) {
+				return TLCResult.WellDefinednessError;
+			} else if (m.contains("tlc2.module.TLC.Assert")) {
 				return TLCResult.WellDefinednessError;
 			} else if (m.startsWith("Error:") || m.startsWith("\"Error:")
 					|| m.startsWith("The exception was a")) {
@@ -219,6 +218,8 @@ public class TLCOutput {
 			return null;
 		} else if (m.contains("In applying the function")) {
 			return TLCResult.WellDefinednessError;
+		} else if (m.startsWith("\"Error: Function assignment")) {
+			return TLCResult.WellDefinednessError;
 		} else if (m
 				.startsWith("Error: The following behavior constitutes a counter-example:")) {
 			return null;
@@ -227,7 +228,10 @@ public class TLCOutput {
 			return null;
 		} else if (m.startsWith("Error: Evaluating assumption")) {
 			return null;
+		} else if (m.contains("tlc2.tool.EvalException")) {
+			return null;
 		}
+
 		return TLCResult.TLCError;
 	}
 

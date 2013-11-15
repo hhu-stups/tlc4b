@@ -1,5 +1,5 @@
 ---------------------------- MODULE Relations ----------------------------
-EXTENDS FiniteSets, Naturals, TLC
+EXTENDS FiniteSets, Naturals, Sequences, TLC
 
 Relation(x,y) == SUBSET (x \times y) (*Set of Relations*)
 
@@ -22,6 +22,12 @@ RelInverse(r) == {<<x[2],x[1]>>: x \in r}
 RelImage(r, S) =={y[2] :y \in {x \in r: x[1] \in S}}
 
 RelOverride(r, r2) == {x \in r: x[1] \notin RelDomain(r2)} \cup r2 
+
+RelOverrideFunc(r, r2) == LET e == CHOOSE x \in r2: TRUE
+						  IN IF e[1] \in RelDomain(r)
+						     THEN RelOverride(r,r2)
+						     ELSE Assert(FALSE,"Error: Function assignment outside domain. Function: " \o ToString(r) \o ", Value: " \o ToString(e))
+             
 
 RelDirectProduct(r1, r2) == {<<x, u>> \in RelDomain(r1) \times (RelRange(r1) \times RelRange(r2) ): 
     /\ <<x,u[1]>> \in r1 
