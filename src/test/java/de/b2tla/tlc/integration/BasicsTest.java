@@ -18,12 +18,9 @@ import de.b2tla.util.TestPair;
 import de.b2tla.util.PolySuite.Config;
 import de.b2tla.util.PolySuite.Configuration;
 
-
-
 @RunWith(PolySuite.class)
-public class BasicsTest extends AbstractParseMachineTest{
+public class BasicsTest extends AbstractParseMachineTest {
 
-	
 	private final File machine;
 	private final TLCResult error;
 
@@ -35,7 +32,7 @@ public class BasicsTest extends AbstractParseMachineTest{
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(error, B2TLA.test(a,true));
+		assertEquals(error, B2TLA.test(a, true));
 	}
 
 	@Config

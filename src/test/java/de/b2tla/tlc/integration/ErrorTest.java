@@ -1,9 +1,10 @@
 package de.b2tla.tlc.integration;
 
 import static de.b2tla.tlc.TLCOutput.TLCResult.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.b2tla.B2TLA;
@@ -84,6 +85,7 @@ public class ErrorTest {
 		assertEquals(WellDefinednessError, B2TLA.test(a,true));
 	}
 	
+	@Ignore
 	@Test
 	public void testWellDefinednessErrorFunctionAssignment() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/WellDefinednessErrorFunctionAssignment.mch" };

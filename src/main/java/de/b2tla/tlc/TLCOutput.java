@@ -136,7 +136,7 @@ public class TLCOutput {
 					constantSetup += line;
 				}
 			}
-			System.out.println(constantSetup);
+			//System.out.println(constantSetup);
 			if (constantSetup.equals("")) {
 				/**
 				 * There is only one possibility to setup the constants. As a

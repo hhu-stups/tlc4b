@@ -318,6 +318,7 @@ public class B2TLA {
 		try {
 			is = this.getClass().getClassLoader()
 					.getResourceAsStream("standardModules/" + name + ".tla");
+			is = null;
 			if (is == null) {
 				is = new FileInputStream("src/main/resources/standardModules/"
 						+ name + ".tla");

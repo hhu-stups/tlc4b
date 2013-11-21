@@ -74,7 +74,7 @@ public class RelationsTest {
 				+ "PROPERTIES k = id({1,2}) \n"
 				+ "END";
 		TestTypechecker t = new TestTypechecker(machine);
-		assertEquals("POW(INTEGER*INTEGER)", t.constants.get("k").toString());
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k").toString());
 	}
 	
 	@Test 

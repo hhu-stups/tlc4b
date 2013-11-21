@@ -105,8 +105,7 @@ import de.be4.classicalb.core.parser.node.PExpression;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations,
-		FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations,
+		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations,
 	}
 
 	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
@@ -370,25 +369,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	/**
 	 * Functions
 	 */
-
-	public void inARangeExpression(ARangeExpression node) {
-		BType type = typechecker.getType(node.getExpression());
-		if (type instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.Functions);
-		} else {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
-		}
-	}
-
-	public void inAImageExpression(AImageExpression node) {
-		BType type = typechecker.getType(node.getLeft());
-		if (type instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.Functions);
-		} else {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
-		}
-	}
-
 	private void setOfFunctions(Node node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof FunctionType) {
@@ -451,6 +431,16 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	/**
 	 * Relations
 	 */
+
+	private void evalFunctionOrRelation(Node node) {
+		BType t = typechecker.getType(node);
+		if (t instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.Functions);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.Relations);
+		}
+	}
+
 	public void inARelationsExpression(ARelationsExpression node) {
 		usedStandardModules.add(STANDARD_MODULES.Relations);
 	}
@@ -462,32 +452,40 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		}
 	}
 
+	public void inARangeExpression(ARangeExpression node) {
+		evalFunctionOrRelation(node.getExpression());
+	}
+
+	public void inAImageExpression(AImageExpression node) {
+		evalFunctionOrRelation(node.getLeft());
+	}
+
 	public void inAIdentityExpression(AIdentityExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inADomainRestrictionExpression(ADomainRestrictionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inADomainSubtractionExpression(ADomainSubtractionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inARangeRestrictionExpression(ARangeRestrictionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inARangeSubtractionExpression(ARangeSubtractionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inAReverseExpression(AReverseExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inAOverwriteExpression(AOverwriteExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		evalFunctionOrRelation(node);
 	}
 
 	public void inAAssignSubstitution(AAssignSubstitution node) {
@@ -581,7 +579,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 * SequencesExtended
 	 */
 
-	private void evalSequenceExtendedOrRelation(Node node){
+	private void evalSequenceExtendedOrRelation(Node node) {
 		BType type = typechecker.getType(node);
 		if (type instanceof FunctionType) {
 			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
@@ -589,7 +587,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
-	
+
 	public void inAIseqExpression(AIseqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof FunctionType) {
@@ -616,7 +614,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
-	
+
 	public void inAInsertFrontExpression(AInsertFrontExpression node) {
 		evalSequenceExtendedOrRelation(node);
 	}

@@ -5,6 +5,20 @@ Range(f) == {f[x] : x \in DOMAIN f}
 
 Image(f,S) == {f[x] : x \in S}
 
+Id(S) == [x \in S|-> x]
+
+DomRes(S, f) == [x \in (S \cap DOMAIN f) |-> f[x]] 
+
+DomSub(S, f) == [x \in DOMAIN f \ S |-> f[x]] 
+
+RanRes(f, S) == [x \in {y \in DOMAIN f: f[y] \in S} |-> f[x]] 
+
+RanSub(f, S) == [x \in {y \in DOMAIN f: f[y] \notin S} |-> f[x]] 
+
+Inverse(f) == {<<f[x],x>>: x \in DOMAIN f}
+
+Override(f,g) == [x \in (DOMAIN f) \cup DOMAIN g |-> IF x \in DOMAIN g THEN g[x] ELSE f[x]] 
+
 TotalInjFunc(S, S2) == {f \in [S -> S2]: 
     Cardinality(DOMAIN f) = Cardinality(Range(f))}
 

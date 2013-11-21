@@ -5,9 +5,16 @@ import java.util.ArrayList;
 public class StandardMadules {
 
 	// Functions
-	public static final String RANGE = "Range";
-	public static final String IMAGE = "Image";
-
+	public static final String FUNC_RANGE = "Range";
+	public static final String FUNC_IMAGE = "Image";
+	public static final String FUNC_ID = "Id";
+	public static final String FUNC_INVERSE = "Inverse";
+	public static final String FUNC_DOMAIN_RESTRICTION = "DomRes";
+	public static final String FUNC_DOMAIN_SUBSTRACTION = "DomSub";
+	public static final String FUNC_RANGE_RESTRICTION = "RanRes";
+	public static final String FUNC_RANGE_SUBSTRACTION = "RanSub";
+	public static final String FUNC_OVERRIDE = "Override";
+	
 	public static final String TOTAL_INJECTIVE_FUNCTION = "TotalInjFunc";
 	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
 	public static final String TOTAL_BIJECTIVE_FUNCTION = "TotalBijFunc";

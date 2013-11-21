@@ -561,8 +561,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		} else {
 			var.apply(this);
 			tlaModuleString.append("' = ");
-			tlaModuleString.append(REL_OVERRIDING_FUNC + "(");
-			//tlaModuleString.append(REL_OVERRIDING + "(");
+			tlaModuleString.append(REL_OVERRIDING + "(");
 			var.apply(this);
 			tlaModuleString.append(", {<<");
 
@@ -1576,7 +1575,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseARangeExpression(ARangeExpression node) {
 		if (typechecker.getType(node.getExpression()) instanceof FunctionType) {
-			tlaModuleString.append(RANGE);
+			tlaModuleString.append(FUNC_RANGE);
 		} else {
 			tlaModuleString.append(REL_RANGE);
 		}
@@ -1588,7 +1587,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAImageExpression(AImageExpression node) {
 		if (typechecker.getType(node.getLeft()) instanceof FunctionType) {
-			tlaModuleString.append(IMAGE);
+			tlaModuleString.append(FUNC_IMAGE);
 		} else {
 			tlaModuleString.append(REL_IMAGE);
 		}
@@ -2040,7 +2039,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAIdentityExpression(AIdentityExpression node) {
 		inAIdentityExpression(node);
-		tlaModuleString.append(REL_ID + "(");
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_ID);
+		} else {
+			tlaModuleString.append(REL_ID);
+		}
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 		outAIdentityExpression(node);
@@ -2049,7 +2053,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseADomainRestrictionExpression(
 			ADomainRestrictionExpression node) {
-		tlaModuleString.append(REL_DOMAIN_RESTRICTION);
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_DOMAIN_RESTRICTION);
+		} else {
+			tlaModuleString.append(REL_DOMAIN_RESTRICTION);
+		}
 		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
@@ -2060,7 +2068,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseADomainSubtractionExpression(
 			ADomainSubtractionExpression node) {
-		tlaModuleString.append(REL_DOMAIN_SUBSTRACTION);
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_DOMAIN_SUBSTRACTION);
+		} else {
+			tlaModuleString.append(REL_DOMAIN_SUBSTRACTION);
+		}
 		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
@@ -2070,7 +2082,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseARangeRestrictionExpression(ARangeRestrictionExpression node) {
-		tlaModuleString.append(REL_RANGE_RESTRICTION);
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_RANGE_RESTRICTION);
+		} else {
+			tlaModuleString.append(REL_RANGE_RESTRICTION);
+		}
 		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
@@ -2080,7 +2096,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseARangeSubtractionExpression(ARangeSubtractionExpression node) {
-		tlaModuleString.append(REL_RANGE_SUBSTRACTION);
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_RANGE_SUBSTRACTION);
+		} else {
+			tlaModuleString.append(REL_RANGE_SUBSTRACTION);
+		}
 		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
@@ -2090,7 +2110,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAReverseExpression(AReverseExpression node) {
-		tlaModuleString.append(REL_INVERSE);
+		if (typechecker.getType(node.getExpression()) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_INVERSE);
+		} else {
+			tlaModuleString.append(REL_INVERSE);
+		}
 		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
@@ -2098,7 +2122,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAOverwriteExpression(AOverwriteExpression node) {
-		tlaModuleString.append(REL_OVERRIDING);
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append(FUNC_OVERRIDE);
+		} else {
+			tlaModuleString.append(REL_OVERRIDING);
+		}
 		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");

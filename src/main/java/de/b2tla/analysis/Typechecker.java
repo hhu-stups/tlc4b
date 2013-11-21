@@ -1679,122 +1679,116 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 		s = (SetType) getType(node.getExpression());
 
-		BType found = new SetType(new PairType(s.getSubtype(), s.getSubtype()));
+		//BType found = new SetType(new PairType(s.getSubtype(), s.getSubtype()));
+		BType found = new FunctionType(s.getSubtype(), s.getSubtype());
 		BType expected = getType(node);
 
-		try {
-			expected.unify(found, this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "'");
-		}
-	}
-
-	private void evalRelationResSub(Node node, Node set, Node rel,
-			boolean domainResOrSub) {
-		UntypedType u = new UntypedType();
-		SetType setType = new SetType(u);
-		SetType relType = null;
-		if (domainResOrSub) {
-			relType = new SetType(new PairType(u, new UntypedType()));
-		} else {
-			relType = new SetType(new PairType(new UntypedType(), u));
-		}
-
-		setType(set, setType);
-		setType(rel, relType);
-		set.apply(this);
-		rel.apply(this);
-
-		BType found = getType(rel);
-		BType expected = getType(node);
-		try {
-			expected.unify(found, this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "'");
-		}
+		unify(expected, found, node);
 	}
 
 	@Override
 	public void caseADomainRestrictionExpression(
 			ADomainRestrictionExpression node) {
-		evalRelationResSub(node, node.getLeft(), node.getRight(), true);
+		UntypedType u = new UntypedType();
+		SetType setType = new SetType(u);
+		FunctionType f = new FunctionType(u, new UntypedType());
+		setType(node.getLeft(), setType);
+		setType(node.getRight(), f);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
+		
+		BType found = getType(node.getRight());
+		BType expected = getType(node);
+		unify(expected, found, node);
 	}
 
 	@Override
 	public void caseADomainSubtractionExpression(
 			ADomainSubtractionExpression node) {
-		evalRelationResSub(node, node.getLeft(), node.getRight(), true);
+		UntypedType u = new UntypedType();
+		SetType setType = new SetType(u);
+		FunctionType f = new FunctionType(u, new UntypedType());
+		setType(node.getLeft(), setType);
+		setType(node.getRight(), f);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
+		
+		BType found = getType(node.getRight());
+		BType expected = getType(node);
+		unify(expected, found, node);
 	}
 
 	@Override
 	public void caseARangeRestrictionExpression(ARangeRestrictionExpression node) {
-		evalRelationResSub(node, node.getRight(), node.getLeft(), false);
+		UntypedType u = new UntypedType();
+		SetType setType = new SetType(u);
+		FunctionType f = new FunctionType(new UntypedType(), u);
+		setType(node.getLeft(), f);
+		setType(node.getRight(), setType);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
+		
+		BType found = getType(node.getLeft());
+		BType expected = getType(node);
+		unify(expected, found, node);
 	}
 
 	@Override
 	public void caseARangeSubtractionExpression(ARangeSubtractionExpression node) {
-		evalRelationResSub(node, node.getRight(), node.getLeft(), false);
+		UntypedType u = new UntypedType();
+		SetType setType = new SetType(u);
+		FunctionType f = new FunctionType(new UntypedType(), u);
+		setType(node.getLeft(), f);
+		setType(node.getRight(), setType);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
+		
+		BType found = getType(node.getLeft());
+		BType expected = getType(node);
+		unify(expected, found, node);
 	}
 
 	@Override
 	public void caseAImageExpression(AImageExpression node) {
 		BType expected = getType(node);
-		BType rel = new SetType(new PairType(new UntypedType(),
-				new UntypedType()));
-		setType(node.getLeft(), rel);
-		node.getLeft().apply(this);
+		BType dom = new UntypedType();
+		BType ran = new UntypedType();
+		BType found = new SetType(ran);
+		BType left = new FunctionType(dom, ran);
+		BType right = new SetType(dom);
+		setType(node.getLeft(), left);
+		setType(node.getRight(), right);
+		unify(expected, found, node);
 
-		PairType res = (PairType) ((SetType) getType(node.getLeft()))
-				.getSubtype();
-		setType(node.getRight(), new SetType(res.getFirst()));
+		node.getLeft().apply(this);
 		node.getRight().apply(this);
-		BType found = new SetType(res.getSecond());
-		try {
-			expected.unify(found, this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "'");
-		}
 	}
 
 	@Override
 	public void caseAReverseExpression(AReverseExpression node) {
+		BType left = new UntypedType();
+		BType right = new UntypedType();
+		
+		BType found = new SetType(new PairType(left,
+				right));
+		
+		BType expr = new FunctionType(right, left);
+		setType(node.getExpression(), expr);
 		BType expected = getType(node);
-		BType rel = new SetType(new PairType(new UntypedType(),
-				new UntypedType()));
-		setType(node.getExpression(), rel);
+		
+		unify(expected, found, node);
 		node.getExpression().apply(this);
-		SetType set = (SetType) getType(node.getExpression());
-		PairType pair = (PairType) set.getSubtype();
-		BType found = new SetType(new PairType(pair.getSecond(),
-				pair.getFirst()));
-		try {
-			expected.unify(found, this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "'");
-		}
 	}
 
 	@Override
 	public void caseAOverwriteExpression(AOverwriteExpression node) {
 		BType expected = getType(node);
-		BType found = new SetType(new PairType(new UntypedType(),
-				new UntypedType()));
+		BType found = new FunctionType(new UntypedType(), new UntypedType());
 		setType(node.getLeft(), found);
 		setType(node.getRight(), found);
+		unify(expected, found, node);
 		node.getLeft().apply(this);
 		node.getRight().apply(this);
-
-		found = getType(node.getRight());
-		try {
-			expected.unify(found, this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "'");
-		}
 	}
 
 	@Override
