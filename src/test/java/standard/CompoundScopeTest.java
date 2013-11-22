@@ -8,7 +8,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
+
 
 
 import de.b2tla.analysis.Ast2String;
@@ -21,6 +23,7 @@ import de.be4.classicalb.core.parser.node.Start;
 
 public class CompoundScopeTest {
 
+	@Ignore
 	@Test
 	public void test() throws BException, IOException {
 		String filename = "src/test/resources/M1.mch";

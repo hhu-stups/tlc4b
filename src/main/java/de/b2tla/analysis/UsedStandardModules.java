@@ -497,6 +497,8 @@ public class UsedStandardModules extends DepthFirstAdapter {
 						.getIdentifier());
 				if (type instanceof SetType) {
 					usedStandardModules.add(STANDARD_MODULES.Relations);
+				}else{
+					usedStandardModules.add(STANDARD_MODULES.Functions);
 				}
 			}
 		}

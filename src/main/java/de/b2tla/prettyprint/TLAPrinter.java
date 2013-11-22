@@ -23,6 +23,7 @@ import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
 import de.b2tla.btypes.PairType;
 import de.b2tla.btypes.SetType;
+import de.b2tla.btypes.StructType;
 import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.tla.ConfigFile;
 import de.b2tla.tla.TLADefinition;
@@ -178,13 +179,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 				this.configFileString.append("NEXT Next\n");
 			}
 		}
-		if (B2TLAGlobals.isInvariant()){
+		if (B2TLAGlobals.isInvariant()) {
 			for (int i = 0; i < configFile.getInvariantNumber(); i++) {
-				this.configFileString
-						.append("INVARIANT Invariant" + (i + 1) + "\n");
+				this.configFileString.append("INVARIANT Invariant" + (i + 1)
+						+ "\n");
 			}
 		}
-
 
 		if (configFile.isGoal()) {
 			this.configFileString.append("INVARIANT NotGoal\n");
@@ -544,9 +544,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 		BType type = typechecker.getType(var);
 		if (type instanceof FunctionType) {
 			var.apply(this);
-			tlaModuleString.append("' = [");
+			tlaModuleString.append("' = ");
+			tlaModuleString.append(FUNC_ASSIGN);
+			tlaModuleString.append("(");
 			var.apply(this);
-			tlaModuleString.append(" EXCEPT ![");
+			tlaModuleString.append(", ");
+			if (params.size() > 1) {
+				tlaModuleString.append("<<");
+			}
 			for (Iterator<PExpression> iterator = params.iterator(); iterator
 					.hasNext();) {
 				PExpression pExpression = (PExpression) iterator.next();
@@ -555,9 +560,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 					tlaModuleString.append(", ");
 				}
 			}
-			tlaModuleString.append("] = ");
+			if (params.size() > 1) {
+				tlaModuleString.append(">>");
+			}
+			tlaModuleString.append(", ");
 			right.apply(this);
-			tlaModuleString.append("]");
+			tlaModuleString.append(")");
 		} else {
 			var.apply(this);
 			tlaModuleString.append("' = ");
@@ -1320,7 +1328,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append(">>");
 		tlaModuleString.append(" : ");
 
-
 		printIdentifierList(copy);
 		tlaModuleString.append(" \\in ");
 		if (typeRestrictor.removeNode(node.getPredicates())) {
@@ -1627,8 +1634,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 		Node parent = node.parent();
 		if (parent instanceof AMemberPredicate
 				&& !typeRestrictor.removeNode(parent)
-				//&& !this.tlaModule.getInitPredicates().contains(parent)
-				) {
+		// && !this.tlaModule.getInitPredicates().contains(parent)
+		) {
 			return true;
 		} else {
 			String clazz = parent.getClass().getName();
@@ -2542,4 +2549,54 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append(")");
 		outAConvertBoolExpression(node);
 	}
+
+	// Records
+
+	@Override
+	public void caseARecExpression(ARecExpression node) {
+		tlaModuleString.append("[");
+		List<PRecEntry> copy = new ArrayList<PRecEntry>(node.getEntries());
+		for (int i = 0; i < copy.size(); i++) {
+			copy.get(i).apply(this);
+			if (i < copy.size() - 1) {
+				tlaModuleString.append(", ");
+			}
+		}
+		tlaModuleString.append("]");
+	}
+
+	@Override
+	public void caseARecEntry(ARecEntry node) {
+		node.getIdentifier().apply(this);
+		if(typechecker.getType(node.parent()) instanceof StructType){
+			tlaModuleString.append(" |-> ");
+		}else {
+			tlaModuleString.append(" : ");
+		}
+		
+		node.getValue().apply(this);
+	}
+
+	@Override
+	public void caseARecordFieldExpression(ARecordFieldExpression node) {
+		inARecordFieldExpression(node);
+		node.getRecord().apply(this);
+		tlaModuleString.append(".");
+		node.getIdentifier().apply(this);
+		outARecordFieldExpression(node);
+	}
+
+	@Override
+	public void caseAStructExpression(AStructExpression node) {
+		tlaModuleString.append("[");
+		List<PRecEntry> copy = new ArrayList<PRecEntry>(node.getEntries());
+		for (int i = 0; i < copy.size(); i++) {
+			copy.get(i).apply(this);
+			if (i < copy.size() - 1) {
+				tlaModuleString.append(", ");
+			}
+		}
+		tlaModuleString.append("]");
+	}
+
 }

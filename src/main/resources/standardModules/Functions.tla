@@ -3,7 +3,7 @@ EXTENDS FiniteSets
 
 Range(f) == {f[x] : x \in DOMAIN f}
 
-Image(f,S) == {f[x] : x \in S}
+Image(f,S) == {f[x] : x \in S \cap DOMAIN f}
 
 Id(S) == [x \in S|-> x]
 
@@ -17,7 +17,9 @@ RanSub(f, S) == [x \in {y \in DOMAIN f: f[y] \notin S} |-> f[x]]
 
 Inverse(f) == {<<f[x],x>>: x \in DOMAIN f}
 
-Override(f,g) == [x \in (DOMAIN f) \cup DOMAIN g |-> IF x \in DOMAIN g THEN g[x] ELSE f[x]] 
+Override(f, g) == [x \in (DOMAIN f) \cup DOMAIN g |-> IF x \in DOMAIN g THEN g[x] ELSE f[x]] 
+
+FuncAssign(f, d, e) == Override(f, [x \in {d} |-> e])
 
 TotalInjFunc(S, S2) == {f \in [S -> S2]: 
     Cardinality(DOMAIN f) = Cardinality(Range(f))}

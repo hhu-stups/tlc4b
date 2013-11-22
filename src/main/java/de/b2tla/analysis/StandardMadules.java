@@ -14,6 +14,7 @@ public class StandardMadules {
 	public static final String FUNC_RANGE_RESTRICTION = "RanRes";
 	public static final String FUNC_RANGE_SUBSTRACTION = "RanSub";
 	public static final String FUNC_OVERRIDE = "Override";
+	public static final String FUNC_ASSIGN = "FuncAssign";
 	
 	public static final String TOTAL_INJECTIVE_FUNCTION = "TotalInjFunc";
 	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
