@@ -89,6 +89,7 @@ import de.be4.classicalb.core.parser.node.AReverseExpression;
 import de.be4.classicalb.core.parser.node.ASecondProjectionExpression;
 import de.be4.classicalb.core.parser.node.ASeq1Expression;
 import de.be4.classicalb.core.parser.node.ASeqExpression;
+import de.be4.classicalb.core.parser.node.ASetExtensionExpression;
 import de.be4.classicalb.core.parser.node.ASizeExpression;
 import de.be4.classicalb.core.parser.node.ASuccessorExpression;
 import de.be4.classicalb.core.parser.node.ATailExpression;
@@ -452,6 +453,13 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		}
 	}
 
+	public void inASetExtensionExpression(ASetExtensionExpression node) {
+		BType t = typechecker.getType(node);
+		if (t instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.TLC);
+		}
+	}
+
 	public void inARangeExpression(ARangeExpression node) {
 		evalFunctionOrRelation(node.getExpression());
 	}
@@ -481,7 +489,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAReverseExpression(AReverseExpression node) {
-		evalFunctionOrRelation(node);
+		evalFunctionOrRelation(node.getExpression());
 	}
 
 	public void inAOverwriteExpression(AOverwriteExpression node) {
@@ -497,7 +505,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 						.getIdentifier());
 				if (type instanceof SetType) {
 					usedStandardModules.add(STANDARD_MODULES.Relations);
-				}else{
+				} else {
 					usedStandardModules.add(STANDARD_MODULES.Functions);
 				}
 			}
@@ -622,7 +630,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inALastExpression(ALastExpression node) {
-		evalSequenceExtendedOrRelation(node);
+		evalSequenceExtendedOrRelation(node.getExpression());
 	}
 
 	public void inAFrontExpression(AFrontExpression node) {

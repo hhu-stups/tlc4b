@@ -43,16 +43,4 @@ public class DataTypesTest {
 		compare(expected, machine);
 	}
 	
-	@Test
-	public void testSequenceVsPair() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "PROPERTIES [3,4] = {(3,4)} \n"
-				+ "END";
-		
-		String expected = "---- MODULE test----\n" 
-				+ "ASSUME {<<1, 3>>, <<2, 4>>} = {<<3, 4>>} \n"
-				+ "======";
-		compare(expected, machine);
-	}
-	
 }

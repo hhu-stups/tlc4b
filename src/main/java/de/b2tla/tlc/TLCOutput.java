@@ -181,6 +181,7 @@ public class TLCOutput {
 				return TLCResult.WellDefinednessError;
 			} else if (m.startsWith("Error:") || m.startsWith("\"Error:")
 					|| m.startsWith("The exception was a")) {
+				System.out.println(m);
 				TLCResult res = findError(m);
 				if (res != null)
 					return res;
@@ -220,7 +221,10 @@ public class TLCOutput {
 			return TLCResult.WellDefinednessError;
 		} else if (m.startsWith("\"Error: Function assignment")) {
 			return TLCResult.WellDefinednessError;
-		} else if (m
+		} else if(m.startsWith("Error: Evaluating assumption")){
+			return TLCResult.WellDefinednessError;
+		}
+		else if (m
 				.startsWith("Error: The following behavior constitutes a counter-example:")) {
 			return null;
 		} else if (m

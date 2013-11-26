@@ -60,7 +60,7 @@ public class SequenceTest {
 		String machine = "MACHINE test\n" + "CONSTANTS k \n"
 				+ "PROPERTIES k = [3] ^ {(1,4)} \n" + "END";
 		TestTypechecker t = new TestTypechecker(machine);
-		assertEquals("POW(INTEGER*INTEGER)", t.constants.get("k").toString());
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k").toString());
 	}
 
 	@Test

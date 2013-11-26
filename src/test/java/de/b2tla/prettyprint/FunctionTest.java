@@ -55,19 +55,6 @@ public class FunctionTest {
 	}
 	
 	
-	
-	@Test
-	public void testFunctionVsRelation() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "PROPERTIES {(1|->1)} = %x.(x = 1 | 1)\n"
-				+ "END";
-		String expected = "---- MODULE test----\n"
-				+ "EXTENDS Integers\n"
-				+ "ASSUME {<<1,1>>} = {<<x, 1>> : x \\in {1}}\n"
-				+ "======";
-		compare(expected, machine);
-	}
-
 	@Test
 	public void testFunctionVsRelation2() throws Exception {
 		String machine = "MACHINE test\n"

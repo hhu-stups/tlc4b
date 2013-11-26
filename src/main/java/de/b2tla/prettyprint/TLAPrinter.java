@@ -1692,6 +1692,26 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAPartialFunctionExpression(APartialFunctionExpression node) {
+		BType type = this.typechecker.getType(node);
+		BType subtype = ((SetType) type).getSubtype();
+		if (subtype instanceof FunctionType) {
+			Node parent = node.parent();
+			if (parent instanceof AMemberPredicate
+					&& !typeRestrictor.removeNode(parent)
+			// && !this.tlaModule.getInitPredicates().contains(parent)
+			) {
+				AMemberPredicate member = (AMemberPredicate) parent;
+				tlaModuleString.append("isParFunc(");
+				member.getLeft().apply(this);
+				tlaModuleString.append(",");
+				node.getLeft().apply(this);
+				tlaModuleString.append(",");
+				node.getRight().apply(this);
+				tlaModuleString.append(")");
+				return;
+			}
+		}
+
 		setOfFuntions(node, PARTIAL_FUNCTION, REL_PARTIAL_FUNCTION,
 				REL_PARTIAL_FUNCTION_ELEMENT_OF, node.getLeft(),
 				node.getRight());
@@ -1728,7 +1748,27 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseASetExtensionExpression(ASetExtensionExpression node) {
-		inASetExtensionExpression(node);
+		if (typechecker.getType(node) instanceof FunctionType) {
+			// 1 :> 2 @@ 2 :> 2
+			tlaModuleString.append("(");
+			for (int i = 0; i < node.getExpressions().size(); i++) {
+				ACoupleExpression couple = (ACoupleExpression) node
+						.getExpressions().get(i);
+				Node left = couple.getList().get(0);
+				Node right = couple.getList().get(1);
+				left.apply(this);
+				tlaModuleString.append(":>");
+				right.apply(this);
+
+				if (i < node.getExpressions().size() - 1) {
+					tlaModuleString.append(" @@ ");
+				}
+			}
+			tlaModuleString.append(")");
+			return;
+
+		}
+
 		tlaModuleString.append("{");
 		{
 			List<PExpression> copy = new ArrayList<PExpression>(
@@ -1741,12 +1781,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 		}
 		tlaModuleString.append("}");
-		outASetExtensionExpression(node);
 	}
 
 	@Override
 	public void caseAEmptySetExpression(AEmptySetExpression node) {
-		tlaModuleString.append("{}");
+		if (typechecker.getType(node) instanceof FunctionType) {
+			tlaModuleString.append("<< >>");
+		} else {
+			tlaModuleString.append("{}");
+		}
 	}
 
 	@Override
@@ -2540,6 +2583,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
+	public void caseACartesianProductExpression(ACartesianProductExpression node) {
+		inACartesianProductExpression(node); //TODO cartesianproduct vs AMultOrCartExpression
+		node.getLeft().apply(this);
+		tlaModuleString.append(" \\times ");
+		node.getRight().apply(this);
+		outACartesianProductExpression(node);
+	}
+
+	@Override
 	public void caseAConvertBoolExpression(AConvertBoolExpression node) {
 		inAConvertBoolExpression(node);
 		tlaModuleString.append("(");
@@ -2568,12 +2620,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseARecEntry(ARecEntry node) {
 		node.getIdentifier().apply(this);
-		if(typechecker.getType(node.parent()) instanceof StructType){
+		if (typechecker.getType(node.parent()) instanceof StructType) {
 			tlaModuleString.append(" |-> ");
-		}else {
+		} else {
 			tlaModuleString.append(" : ");
 		}
-		
+
 		node.getValue().apply(this);
 	}
 
