@@ -1645,6 +1645,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		BType expected = getType(node);
 		BType found = new SetType(new SetType(new PairType(dom, ran)));
 		unify(expected, found, node);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
 		//evalFunction(node, node.getLeft(), node.getRight());
 	}
 
@@ -1664,6 +1666,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		BType expected = getType(node);
 		BType found = new SetType(new SetType(new PairType(dom, ran)));
 		unify(expected, found, node);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
 	}
 
 	@Override
@@ -1681,6 +1685,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		BType expected = getType(node);
 		BType found = new SetType(new SetType(new PairType(dom, ran)));
 		unify(expected, found, node);
+		node.getLeft().apply(this);
+		node.getRight().apply(this);
 	}
 
 	public void evalFunction(Node node, Node left, Node right) {
