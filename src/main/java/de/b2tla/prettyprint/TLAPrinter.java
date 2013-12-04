@@ -24,6 +24,7 @@ import de.b2tla.btypes.IntegerType;
 import de.b2tla.btypes.PairType;
 import de.b2tla.btypes.SetType;
 import de.b2tla.btypes.StructType;
+import de.b2tla.btypes.UntypedType;
 import de.b2tla.ltl.LTLFormulaVisitor;
 import de.b2tla.tla.ConfigFile;
 import de.b2tla.tla.TLADefinition;
@@ -1908,21 +1909,24 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAPow1SubsetExpression(APow1SubsetExpression node) {
-		tlaModuleString.append("POW1(");
+		tlaModuleString.append(POW_1);
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseAFinSubsetExpression(AFinSubsetExpression node) {
-		tlaModuleString.append("FIN(");
+		tlaModuleString.append(FINITE_SUBSETS);
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 	}
 
 	@Override
 	public void caseAFin1SubsetExpression(AFin1SubsetExpression node) {
-		tlaModuleString.append("FIN1(");
+		tlaModuleString.append(FINITE_1_SUBSETS);
+		tlaModuleString.append("(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 	}
@@ -1962,30 +1966,28 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseANotSubsetPredicate(ANotSubsetPredicate node) {
-		inANotSubsetPredicate(node);
-		tlaModuleString.append("notSubset(");
+		tlaModuleString.append(NOT_SUBSET);
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
 		tlaModuleString.append(")");
-		outANotSubsetPredicate(node);
 	}
 
 	@Override
 	public void caseANotSubsetStrictPredicate(ANotSubsetStrictPredicate node) {
-		inANotSubsetStrictPredicate(node);
-		tlaModuleString.append("notStrictSubset(");
+		tlaModuleString.append(NOT_STRICT_SUBSET);
+		tlaModuleString.append("(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
 		tlaModuleString.append(")");
-		outANotSubsetStrictPredicate(node);
 	}
 
 	@Override
 	public void caseAGeneralUnionExpression(AGeneralUnionExpression node) {
 		inAGeneralUnionExpression(node);
-		tlaModuleString.append("Union(");
+		tlaModuleString.append("UNION(");
 		node.getExpression().apply(this);
 		tlaModuleString.append(")");
 		outAGeneralUnionExpression(node);
@@ -2006,7 +2008,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 
-		tlaModuleString.append("Union({");
+		tlaModuleString.append("UNION({");
 		node.getExpression().apply(this);
 		tlaModuleString.append(": ");
 		printIdentifierList(copy);
@@ -2065,7 +2067,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseARelationsExpression(ARelationsExpression node) {
-		tlaModuleString.append(RELATION + "(");
+		tlaModuleString.append(RELATIONS + "(");
 		node.getLeft().apply(this);
 		tlaModuleString.append(", ");
 		node.getRight().apply(this);
@@ -2527,7 +2529,19 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralConcatExpression(AGeneralConcatExpression node) {
-		printSequenceOrRelation(node.getExpression(),
+		BType result = typechecker.getType(node.getExpression());
+
+		if (result instanceof FunctionType && ((FunctionType) result).getRange() instanceof FunctionType) {
+
+		}else{
+			BType expected2 = new SetType(new PairType(IntegerType.getInstance(),
+					new SetType(new PairType(IntegerType.getInstance(),
+							new UntypedType()))));
+			typechecker.unify(expected2, result, node);
+		}
+
+		
+		printSequenceOrRelation(node,
 				SEQUENCE_GENERAL_CONCATINATION,
 				REL_SEQUENCE_GENERAL_CONCATINATION, node.getExpression(), null);
 	}

@@ -3,6 +3,7 @@ package de.b2tla;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -12,9 +13,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 
 import tlc2.TLCGlobals;
-
 import de.b2tla.B2TLAGlobals;
-
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.b2tla.exceptions.B2TLAIOException;
@@ -100,14 +99,13 @@ public class B2TLA {
 			return;
 		}
 
-		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing") + " ms");
+		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
+				+ " ms");
 		System.out.println("Translation time: " + StopWatch.getRunTime("Pure"));
 		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
 				+ " sec");
-		System.out.println("States analysed: "
-				+ tlcOutput.getDistinctStates());
-		System.out.println("Transitions fired: "
-				+ tlcOutput.getTransitions());
+		System.out.println("States analysed: " + tlcOutput.getDistinctStates());
+		System.out.println("Transitions fired: " + tlcOutput.getTransitions());
 		System.out.println("Result: " + tlcOutput.getResultString());
 		if (tlcOutput.hasTrace() && createTraceFile) {
 			StringBuilder trace = tlcOutput.getErrorTrace();
@@ -127,15 +125,13 @@ public class B2TLA {
 		System.out.println("------------- Results -------------");
 		System.out.println("Model Checking Time: "
 				+ (tlcOutput.getRunningTime() * 1000) + " ms");
-		System.out.println("States analysed: "
-				+ tlcOutput.getDistinctStates());
-		System.out.println("Transitions fired: "
-				+ tlcOutput.getTransitions());
+		System.out.println("States analysed: " + tlcOutput.getDistinctStates());
+		System.out.println("Transitions fired: " + tlcOutput.getTransitions());
 		if (tlcOutput.getResult() != TLCResult.NoError) {
 			System.err.println("@@");
 			System.err.println("12" + tlcOutput.getResultString());
 		}
-		
+
 	}
 
 	private void handleParameter(String[] args) {
@@ -160,7 +156,7 @@ public class B2TLA {
 			} else if (args[index].toLowerCase().equals("-testscript")) {
 				B2TLAGlobals.setRunTestscript(true);
 			} else if (args[index].toLowerCase().equals("-notrace")) {
-				
+
 			} else if (args[index].toLowerCase().equals("-del")) {
 				B2TLAGlobals.setDeleteOnExit(true);
 			} else if (args[index].toLowerCase().equals("-ltlformula")) {
@@ -316,14 +312,16 @@ public class B2TLA {
 		InputStream is = null;
 		FileOutputStream fos = null;
 		try {
-			is = this.getClass().getClassLoader()
-					.getResourceAsStream("standardModules/" + name + ".tla");
-			//is = null;
-			if (is == null) {
+
+			try {
 				is = new FileInputStream("src/main/resources/standardModules/"
 						+ name + ".tla");
+			} catch (FileNotFoundException e) {
+				is = this
+						.getClass()
+						.getClassLoader()
+						.getResourceAsStream("standardModules/" + name + ".tla");
 			}
-
 			fos = new FileOutputStream(file);
 
 			int read = 0;
@@ -332,7 +330,6 @@ public class B2TLA {
 			while ((read = is.read(bytes)) != -1) {
 				fos.write(bytes, 0, read);
 			}
-
 			System.out.println("Standard module '" + path + name
 					+ ".tla' created.");
 		} catch (IOException e) {

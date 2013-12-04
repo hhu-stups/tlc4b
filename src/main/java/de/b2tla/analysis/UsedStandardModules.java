@@ -352,10 +352,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
-	public void inAGeneralUnionExpression(AGeneralUnionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
-	}
-
 	public void inAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
 		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
@@ -364,7 +360,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
 		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		//usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	/**

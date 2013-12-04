@@ -676,8 +676,8 @@ public class MachineContext extends DepthFirstAdapter {
 		// first collect all operations
 		for (POperation e : copy) {
 			AOperation op = (AOperation) e;
-			// /exist(op.getOpName());
 			String name = Utils.getIdentifierAsString(op.getOpName());
+			existString(name);;
 			operations.put(name, op);
 		}
 

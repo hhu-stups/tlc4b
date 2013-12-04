@@ -1,45 +1,84 @@
 ------------------------ MODULE FunctionsAsRelations ----------------------------------
 EXTENDS FiniteSets, Functions, TLC, Sequences
 
-LOCAL RelDom(r) == { x[1] :x \in r} 
-LOCAL RelRan(r) == { x[2] :x \in r} 
+LOCAL RelDom(f) == { x[1] :x \in f} \* The domain of the function
+LOCAL RelRan(f) == { x[2] :x \in f} \* The range of the function
+LOCAL MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f} 
+ \* Converting a TLA+ function to a set of pairs
+LOCAL Rel(S, T) == SUBSET (S \times T) \* The set of relations
+LOCAL IsFunc(f) == Cardinality(RelDom(f)) = Cardinality(f)
+ \* Testing if f is a function
+LOCAL IsTotal(f, dom) == RelDom(f) = dom
+ \* Testing if f is a total function
+LOCAL IsInj(f) == Cardinality(RelRan(f)) = Cardinality(f)
+ \* Testing if f is a injective function
+LOCAL IsSurj(f, ran) == RelRan(f) = ran
+ \* Testing if f is a surjective function
 
-RelCall(r, x) ==  IF Cardinality(r) = Cardinality(RelDom(r)) /\ x \in RelDom(r)
-	THEN (CHOOSE y \in r: y[1] = x)[2]
-	ELSE PrintT("Error: Invalid function call to relation " \o ToString(r) \o " and value " \o ToString(x) \o "." )
-		/\ Assert(Cardinality(r) = Cardinality(RelDom(r)), "Applied a function call to the relation: " \o ToString(r))
-		/\ Assert(x \in RelDom(r), "Function applied outside domain. Function: " \o ToString(r) \o ", Value: " \o ToString(x))
-                 
-LOCAL MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f}    
-LOCAL Rel(S, S2) == SUBSET (S \times S2)    
-LOCAL func(f) == Cardinality(RelDom(f)) = Cardinality(f)
-LOCAL total(f, dom) == RelDom(f) = dom
-LOCAL inj(f) == Cardinality(RelRan(f)) = Cardinality(f)
-LOCAL surj(f, ran) == RelRan(f) = ran
+RelCall(f, x) ==  IF Cardinality(f) = Cardinality(RelDom(f)) /\ x \in RelDom(f)
+   THEN (CHOOSE y \in f: y[1] = x)[2]
+   ELSE PrintT("Error: Invalid function call to relation "
+            \o ToString(f) \o " and value " \o ToString(x) \o ".")
+       /\ Assert(Cardinality(f) # Cardinality(RelDom(f)), "Applied a function call to a relation.")
+       /\ Assert(x \notin RelDom(f), "Function applied outside domain.")
+ \* The function call applied to function f and argument x
+                  
+RelTotalFunc(S, T) == {MakeRel(f): f \in [S -> T]}
+ \* The set of total function
+ 
+RelTotalFuncEleOf(S, T) == {f \in Rel(S,T): IsFunc(f) /\ IsTotal(f,S)}
+ \* The set of total functions
+ \* (Optimized to test if a certain function is a element of this set.)
 
-RelTotalFunc(S, S2) == {MakeRel(f): f \in [S -> S2]}
-RelTotalFuncEleOf(S, S2) == {f \in Rel(S,S2): func(f) /\ total(f,S)}
+RelTotalInjFunc(S, T) == {MakeRel(f): f \in TotalInjFunc(S, T)}
+ \* The set of total injective functions
 
-RelTotalInjFunc(S, S2) == {MakeRel(f): f \in TotalInjFunc(S, S2)} 
-RelTotalInjFuncEleOf(S, S2) == {f \in Rel(S,S2): func(f) /\ total(f,S) /\ inj(f)}
+RelTotalInjFuncEleOf(S, T) == {f \in Rel(S,T): IsFunc(f) /\ IsTotal(f,S) /\ IsInj(f)}
+ \* The set of total injective functions
+ \* (Optimized to test if a certain function is a element of this set.)
 
-RelTotalSurFunc(S, S2) == {MakeRel(f): f \in TotalSurFunc(S, S2)} 
-RelTotalSurFuncEleOf(S, S2) == {f \in Rel(S,S2): 
-    /\ func(f) /\ total(f,S) /\ surj(f, S2)}
+RelTotalSurFunc(S, T) == {MakeRel(f): f \in TotalSurFunc(S, T)}
+ \* The set of total surjective functions
+ 
+RelTotalSurFuncEleOf(S, T) == {f \in Rel(S,T): 
+    /\ IsFunc(f) /\ IsTotal(f,S) /\ IsSurj(f, T)}
+ \* The set of total surjective functions
+ \* (Optimized to test if a certain function is a element of this set.)
 
-RelTotalBijFunc(S, S2) == {MakeRel(f): f \in TotalBijFunc(S, S2)} 
-RelTotalBijFuncEleOf(S, S2) == {f \in (SUBSET (S \times S2)):
-    /\ func(f) /\ total(f,S) /\ inj(f) /\ surj(f, S2)}
+RelTotalBijFunc(S, T) == {MakeRel(f): f \in TotalBijFunc(S, T)} 
+\* The set of total bijective functions
 
-RelParFunc(S, S2) == {MakeRel(f):  f \in ParFunc(S, S2)}
-RelParFuncEleOf(S, S2) == {f \in Rel(S, S2): func(f)} 
+RelTotalBijFuncEleOf(S, T) == {f \in (SUBSET (S \times T)):
+    /\ IsFunc(f) /\ IsTotal(f,S) /\ IsInj(f) /\ IsSurj(f, T)}
+ \* The set of total bijective functions
+ \* (Optimized to test if a certain function is a element of this set.)
 
-RelParInjFunc(S, S2) == {MakeRel(f):  f \in ParInjFunc(S, S2)}
-RelParInjFuncEleOf(S, S2) == {f \in Rel(S, S2): func(f) /\ inj(f)} 
 
-RelParSurFunc(S, S2) == {MakeRel(f):  f \in ParSurFunc(S, S2)}
-RelParSurFuncEleOf(S, S2) == {f \in Rel(S, S2): func(f) /\ surj(f, S2)}
+RelParFunc(S, T) == {MakeRel(f):  f \in ParFunc(S, T)}
+ \* The set of partial functions
+ 
+RelParFuncEleOf(S, T) == {f \in Rel(S, T): IsFunc(f)} 
+ \* The set of partial functions
+ \* (Optimized to test if a certain function is a element of this set.)
 
-RelParBijFunc(S, S2) == {MakeRel(f):  f \in ParBijFunc(S, S2)}
-RelParBijFuncEleOf(S, S2) == {f \in Rel(S, S2): func(f) /\ surj(f, S2) /\ inj(f)}                 
+RelParInjFunc(S, T) == {MakeRel(f):  f \in ParInjFunc(S, T)}
+ \* The set of partial injective functions.
+ 
+RelParInjFuncEleOf(S, T) == {f \in Rel(S, T): IsFunc(f) /\ IsInj(f)} 
+ \* The set of partial injective functions
+ \* (Optimized to test if a certain function is a element of this set.)
+ 
+RelParSurFunc(S, T) == {MakeRel(f):  f \in ParSurFunc(S, T)}
+ \* The set of partial surjective functions
+ 
+RelParSurFuncEleOf(S, T) == {f \in Rel(S, T): IsFunc(f) /\ IsSurj(f, T)}
+ \* The set of partial surjective functions.
+ \* (Optimized to test if a certain function is a element of this set.)
+ 
+RelParBijFunc(S, T) == {MakeRel(f):  f \in ParBijFunc(S, T)}
+ \* The set of partial bijective functions
+ 
+RelParBijFuncEleOf(S, T) == {f \in Rel(S, T): IsFunc(f) /\ IsSurj(f, T) /\ IsInj(f)}                 
+ \* The set of partial bijective functions
+ \* (Optimized to test if a certain function is a element of this set.)
 =========================================================================================

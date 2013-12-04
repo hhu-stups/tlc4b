@@ -1,49 +1,52 @@
 ----------------------------- MODULE BBuiltIns -----------------------------
-
 EXTENDS Integers, FiniteSets, TLC
 
+Max(S) == CHOOSE x \in S : \A p \in S : x >= p
+ \* The largest element of the set S
+ 
+Min(S) == CHOOSE x \in S : \A p \in S : x =< p
+ \* The smallest element of the set S
+ 
+succ[x \in Int] == x + 1
+ \* The successor function
+
+pred[x \in Int] == x - 1
+ \* The predecessor function
+ 
 RECURSIVE Sigma(_) 
 Sigma(S) == LET e == CHOOSE e \in S: TRUE
             IN IF  S = {} THEN 0 ELSE e[2] + Sigma(S \ {e}) 
+ \* The sum of all second components of pairs which are elements of S
 
 RECURSIVE Pi(_) 
 Pi(S) == LET e == CHOOSE e \in S: TRUE
          IN IF  S = {} THEN 0 ELSE e[2] + Pi(S \ {e}) 
+ \* The product of all second components of pairs which are elements of S
 
-Max(S) == CHOOSE x \in S : \A p \in S : x >= p
+Pow1(S) == (SUBSET S) \ {{}}
+ \* The set of non-empty subsets
 
-Min(S) == CHOOSE x \in S : \A p \in S : x =< p
+Fin(S) == {x \in SUBSET S: IsFiniteSet(x)}
+ \* The set of all finite subsets.
+ 
+Fin1(S) == {x \in SUBSET S: IsFiniteSet(x) /\ x # {}}
+ \* The set of all non-empty finite subsets
+ 
+S \subset T == S \subseteq T /\ S # T
+ \* The predicate becomes true if S is a strict subset of T
 
-succ[x \in Int] == x + 1
+NotSubset(S, T) == ~ (S \subseteq T)
+ \* The predicate becomes true if S is not a subset of T
 
-pred[x \in Int] == x - 1
-
-POW1(S) == (SUBSET S) \ {{}}
-
-FIN(S) == {x \in SUBSET S: IsFiniteSet(x)}
-
-FIN1(S) == {x \in SUBSET S: IsFiniteSet(x) /\ x # {}}
-
-a \subset b == a \subseteq b /\ a # b
-
-notSubset(a, b) == ~ (a \subseteq b)
-
-notStrictSubset(a, b) == ~ (a \subset b )
-
+NotStrictSubset(S, T) == ~ (S \subset T)
+  \* The predicate becomes true if S is not a strict subset of T
+  
 RECURSIVE Inter(_)
 Inter(S) == IF S = {}
-	    THEN Assert(FALSE, "Applied the inter operator to an empty set.")
+	    THEN Assert(FALSE, "Error: Applied the inter operator to an empty set.")
 	    ELSE LET e == (CHOOSE e \in S: TRUE)
             	  IN IF  Cardinality(S) = 1 
                	    THEN e 
                    ELSE e \cap Inter(S \ {e})
-
-RECURSIVE Union(_)
-Union(S) == IF S = {}
-	    THEN {}
-	    ELSE LET e == (CHOOSE e \in S: TRUE)
-            	 IN IF  Cardinality(S) = 1 
-               	    THEN e 
-                    ELSE e \cup Union(S \ {e})
-
+ \* The intersection of all elements of S.
 =============================================================================

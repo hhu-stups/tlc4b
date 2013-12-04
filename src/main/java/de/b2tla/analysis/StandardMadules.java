@@ -26,7 +26,7 @@ public class StandardMadules {
 	public static final String PARITAL_BIJECTIVE_FUNCTION = "ParBijFunc";
 
 	// Relations
-	public static final String RELATION = "Relation";
+	public static final String RELATIONS = "Relations";
 	public static final String REL_DOMAIN = "RelDomain";
 	public static final String REL_RANGE = "RelRange";
 	public static final String REL_ID = "RelId";
@@ -86,7 +86,7 @@ public class StandardMadules {
 	public static final String INJECTIVE_SEQUENCE_1 = "ISeq1";
 	public static final String INJECTIVE_SEQUENCE_1_ELEMENT_OF = "ISeq1EleOf";
 	public static final String SEQUENCE_PERMUTATION = "Perm";
-	public static final String SEQUENCE_REVERSE = "Rev";
+	public static final String SEQUENCE_REVERSE = "Reverse";
 	public static final String SEQUENCE_GENERAL_CONCATINATION = "Conc";
 
 	public static final String SEQUENCE_TAKE_FIRST_ELEMENTS = "TakeFirstElements";
@@ -105,7 +105,7 @@ public class StandardMadules {
 	public static final String REL_SEQUENCE_Concat = "RelSeqConcat";
 	public static final String REL_SEQUENCE_PREPAND = "RelSeqPrepand";
 	public static final String REL_SEQUENCE_APPEND = "RelSeqAppend";
-	public static final String REL_SEQUENCE_REVERSE = "RelSeqRev";
+	public static final String REL_SEQUENCE_REVERSE = "RelSeqReverse";
 	public static final String REL_SEQUENCE_FIRST_ELEMENT = "RelSeqFirst";
 	public static final String REL_SEQUENCE_LAST_ELEMENT = "RelSeqLast";
 	public static final String REL_SEQUENCE_FRONT = "RelSeqFront";
@@ -121,13 +121,19 @@ public class StandardMadules {
 
 	public static final String MIN = "Min";
 	public static final String MAX = "Max";
+	public static final String NOT_SUBSET = "NotSubset";
+	public static final String NOT_STRICT_SUBSET = "NotStrictSubset";
+	public static final String POW_1 = "Pow1";
+	public static final String FINITE_SUBSETS = "Fin";
+	public static final String FINITE_1_SUBSETS = "Fin1";
+	
 	public static final String GENERAL_SUMMATION = "Sigma";
 	public static final String GENERAL_PRODUCT = "Pi";
 
 	public static final ArrayList<String> Relations = new ArrayList<String>();
 
 	static {
-		Relations.add(RELATION);
+		Relations.add(RELATIONS);
 		Relations.add(REL_DOMAIN);
 		Relations.add(REL_RANGE);
 		Relations.add(REL_ID);

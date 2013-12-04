@@ -105,8 +105,8 @@ public class FunctionTest {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES {} = {1,2} +-> {1,2}\n" + "END";
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS Functions\n"
-				+ "ASSUME {} = ParFunc({1, 2}, {1, 2})\n"
+				+ "EXTENDS FunctionsAsRelations\n"
+				+ "ASSUME {} = RelParFunc({1, 2}, {1, 2})\n"
 				+ "====";
 		compareEquals(expected, machine);
 	}

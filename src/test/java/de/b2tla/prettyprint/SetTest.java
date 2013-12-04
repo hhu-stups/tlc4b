@@ -176,8 +176,7 @@ public class SetTest {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES union({{1},{2}}) = {1,2} \n" + "END";
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME Union({{1}, {2}}) = {1, 2}\n"
+				+ "ASSUME UNION({{1}, {2}}) = {1, 2}\n"
 				+ "====";
 		assertEquals(expected, translate(machine));
 	}
@@ -199,8 +198,7 @@ public class SetTest {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES UNION(z).(z: {1,2} & 1 = 1| {z}) = {1,2} \n" + "END";
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS BBuiltIns\n"
-				+ "ASSUME Union({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {1, 2}\n"
+				+ "ASSUME UNION({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {1, 2}\n"
 				+ "====";
 		//TODO ERROR in TLA2B
 		compareEquals(expected, machine);
