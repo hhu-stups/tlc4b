@@ -212,7 +212,8 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	@Override
 	public void caseAWeakFairLtl(AWeakFairLtl node) {
-		String operationName = node.getOperation().getText();
+		String operationName = node.getOperation().getText().trim();
+		
 		if (!machineContext.getOperations().containsKey(operationName)) {
 			throw new ScopeException("Unkown operation " + operationName + ".");
 		}
@@ -220,7 +221,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	@Override
 	public void caseAStrongFairLtl(AStrongFairLtl node) {
-		String operationName = node.getOperation().getText();
+		String operationName = node.getOperation().getText().trim();
 		if (!machineContext.getOperations().containsKey(operationName)) {
 			throw new ScopeException("Unkown operation " + operationName + ".");
 		}
