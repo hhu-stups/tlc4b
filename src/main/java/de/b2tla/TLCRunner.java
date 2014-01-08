@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,10 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import de.b2tla.util.BTLCPrintStream;
-
 import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
+import tlc2.tool.ModelChecker;
+import tlc2.tool.TLCStateInfo;
 
 public class TLCRunner {
 
@@ -85,6 +87,7 @@ public class TLCRunner {
 	}
 
 	public static ArrayList<String> runTLC(String machineName, String path) {
+
 		System.out.println("--------------------------------");
 		
 		BTLCPrintStream btlcStream = new BTLCPrintStream();
@@ -106,6 +109,7 @@ public class TLCRunner {
 
 
 		TLC tlc = new TLC();
+        
 		// handle parameters
 		if (tlc.handleParameters(args)) {
 			tlc.setResolver(new SimpleFilenameToStream());
@@ -113,7 +117,6 @@ public class TLCRunner {
 			try {
 				tlc.process();	
 			} catch (Exception e) {
-				System.out.println("hallo");
 			}
 			
 		}
@@ -129,6 +132,23 @@ public class TLCRunner {
 		//ToolIO.printAllMessages();
 		
 		ArrayList<String> messages = btlcStream.getArrayList();
+		
+		
+        Field field;
+		try {
+			field = TLC.class.getDeclaredField("instance");
+	        field.setAccessible(true);
+	        ModelChecker mc = (ModelChecker) field.get(tlc);
+	        //System.out.println(mc.trace.printTrace(arg0, arg1););
+	        //TLCStateInfo[] states = value.trace.getTrace();
+//	        for (int i = 0; i < states.length; i++) {
+//				System.out.println(states[i]);
+//			}
+	        
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		System.out.println("--------------------------------");
 		closeThreads();

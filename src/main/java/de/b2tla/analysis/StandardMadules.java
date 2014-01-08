@@ -1,6 +1,8 @@
 package de.b2tla.analysis;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StandardMadules {
 
@@ -15,7 +17,22 @@ public class StandardMadules {
 	public static final String FUNC_RANGE_SUBSTRACTION = "RanSub";
 	public static final String FUNC_OVERRIDE = "Override";
 	public static final String FUNC_ASSIGN = "FuncAssign";
+
 	
+	
+	public static ArrayList<String> functions = new ArrayList<String>();
+	static {
+		functions.add(FUNC_RANGE);
+		functions.add(FUNC_ID);
+		functions.add(FUNC_INVERSE);
+		functions.add(FUNC_DOMAIN_RESTRICTION);
+		functions.add(FUNC_DOMAIN_SUBSTRACTION);
+		functions.add(FUNC_RANGE_RESTRICTION);
+		functions.add(FUNC_RANGE_SUBSTRACTION);
+		functions.add(FUNC_OVERRIDE);
+		functions.add(FUNC_ASSIGN);
+	}
+
 	public static final String TOTAL_INJECTIVE_FUNCTION = "TotalInjFunc";
 	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
 	public static final String TOTAL_BIJECTIVE_FUNCTION = "TotalBijFunc";
@@ -88,11 +105,25 @@ public class StandardMadules {
 	public static final String SEQUENCE_PERMUTATION = "Perm";
 	public static final String SEQUENCE_REVERSE = "Reverse";
 	public static final String SEQUENCE_GENERAL_CONCATINATION = "Conc";
-
 	public static final String SEQUENCE_TAKE_FIRST_ELEMENTS = "TakeFirstElements";
 	public static final String SEQUENCE_DROP_FIRST_ELEMENTS = "DropFirstElements";
 
-
+	public final static Set<String> SequencesExtendedKeywords = new HashSet<String>();
+	static {
+		SequencesExtendedKeywords.add(SEQUENCE_LAST_ELEMENT);
+		SequencesExtendedKeywords.add(SEQUENCE_PREPEND_ELEMENT);
+		SequencesExtendedKeywords.add(SEQUENCE_FRONT);
+		SequencesExtendedKeywords.add(SEQUENCE_1);
+		SequencesExtendedKeywords.add(INJECTIVE_SEQUENCE);
+		SequencesExtendedKeywords.add(INJECTIVE_SEQUENCE_ELEMENT_OF);
+		SequencesExtendedKeywords.add(INJECTIVE_SEQUENCE_1);
+		SequencesExtendedKeywords.add(INJECTIVE_SEQUENCE_1_ELEMENT_OF);
+		SequencesExtendedKeywords.add(SEQUENCE_PERMUTATION);
+		SequencesExtendedKeywords.add(SEQUENCE_REVERSE);
+		SequencesExtendedKeywords.add(SEQUENCE_GENERAL_CONCATINATION);
+		SequencesExtendedKeywords.add(SEQUENCE_TAKE_FIRST_ELEMENTS);
+		SequencesExtendedKeywords.add(SEQUENCE_DROP_FIRST_ELEMENTS);
+	}
 	
 	// SequencesAsRelations
 	public static final String REL_SEQUENCE_SIZE = "RelSeqSize";
@@ -114,7 +145,7 @@ public class StandardMadules {
 	public static final String REL_SEQUENCE_GENERAL_CONCATINATION = "RelSeqConc";
 	public static final String REL_SEQUENCE_TAKE_FIRST_ELEMENTS = "RelSeqTakeFirstElements";
 	public static final String REL_SEQUENCE_DROP_FIRST_ELEMENTS = "RelSeqDropFirstElements";
-	
+
 	/*
 	 * BBuiltIns
 	 */
@@ -126,7 +157,7 @@ public class StandardMadules {
 	public static final String POW_1 = "Pow1";
 	public static final String FINITE_SUBSETS = "Fin";
 	public static final String FINITE_1_SUBSETS = "Fin1";
-	
+
 	public static final String GENERAL_SUMMATION = "Sigma";
 	public static final String GENERAL_PRODUCT = "Pi";
 

@@ -100,24 +100,6 @@ public class Renamer extends DepthFirstAdapter {
 		SequencesKeywords.add("SelectSeq");
 	}
 
-	private final static Set<String> SequencesExtendedKeywords = new HashSet<String>();
-	static {
-		SequencesKeywords.add("Last");
-		SequencesKeywords.add("Front");
-		SequencesKeywords.add("Prepend");
-		SequencesKeywords.add("BoundedSeq");
-		SequencesKeywords.add("Seq1");
-		SequencesKeywords.add("ISeq");
-		SequencesKeywords.add("ISeqEleOf");
-		SequencesKeywords.add("ISeq1");
-		SequencesKeywords.add("ISeq1EleOf");
-		SequencesKeywords.add("Perm");
-		SequencesKeywords.add("Rev");
-		SequencesKeywords.add("Conc");
-		SequencesKeywords.add("TakeFirstElements");
-		SequencesKeywords.add("DropFirstElements");
-	}
-
 	public Renamer(MachineContext machineContext) {
 		this.machineContext = machineContext;
 		this.namesTable = new Hashtable<Node, String>();
@@ -224,9 +206,12 @@ public class Renamer extends DepthFirstAdapter {
 		if (globalNames.contains(name))
 			return true;
 		// TODO check only if the standard module is extended
+
+		if(StandardMadules.functions.contains(name))
+			return true;
 		if (SequencesKeywords.contains(name))
 			return true;
-		if (SequencesExtendedKeywords.contains(name))
+		if (StandardMadules.SequencesExtendedKeywords.contains(name))
 			return true;
 
 		for (int i = 0; i < localContexts.size(); i++) {

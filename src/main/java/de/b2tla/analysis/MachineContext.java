@@ -677,7 +677,10 @@ public class MachineContext extends DepthFirstAdapter {
 		for (POperation e : copy) {
 			AOperation op = (AOperation) e;
 			String name = Utils.getIdentifierAsString(op.getOpName());
-			existString(name);;
+			//existString(name);
+			if (operations.keySet().contains(name)){
+				throw new ScopeException("Duplicate identifier: '" + name + "'");
+			}
 			operations.put(name, op);
 		}
 
