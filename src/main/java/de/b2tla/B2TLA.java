@@ -159,7 +159,16 @@ public class B2TLA {
 
 			} else if (args[index].toLowerCase().equals("-del")) {
 				B2TLAGlobals.setDeleteOnExit(true);
-			} else if (args[index].toLowerCase().equals("-ltlformula")) {
+			}else if (args[index].toLowerCase().equals("-workers")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new B2TLAIOException(
+							"Error: Number requiered after option '-workers'.");
+				}
+				int workers = Integer.parseInt(args[index]);
+				B2TLAGlobals.setWorkers(workers);
+			}
+			else if (args[index].toLowerCase().equals("-ltlformula")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new B2TLAIOException(

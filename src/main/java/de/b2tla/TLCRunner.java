@@ -100,6 +100,11 @@ public class TLCRunner {
 		if (!B2TLAGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
+		if(B2TLAGlobals.getWorkers() > 1){
+			list.add("-workers");
+			list.add(""+B2TLAGlobals.getWorkers());
+		}
+		
 		list.add("-config");
 		list.add(machineName + ".cfg");
 		list.add(machineName);

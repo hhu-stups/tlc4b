@@ -17,6 +17,9 @@ public class B2TLAGlobals {
 	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
 
+	private static int workers;
+	
+	
 	private static boolean runTestscript;
 
 	static {
@@ -33,6 +36,8 @@ public class B2TLAGlobals {
 		checkInvariant = true;
 		checkLTL = true;
 
+		workers = 1;
+		
 		// for debugging purposes
 		runTLC = true;
 		translate = true;
@@ -150,4 +155,12 @@ public class B2TLAGlobals {
 		B2TLAGlobals.deleteFilesOnExit = deleteOnExit;
 	}
 
+	public static void setWorkers(int w){
+		B2TLAGlobals.workers = w;
+	}
+	
+	public static int getWorkers(){
+		return B2TLAGlobals.workers;
+	}
+	
 }
