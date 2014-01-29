@@ -7,6 +7,7 @@ import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.node.AAndLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
+import de.be4.ltl.core.parser.node.AFairnessImplicationLtl;
 import de.be4.ltl.core.parser.node.AFalseLtl;
 import de.be4.ltl.core.parser.node.AFinallyLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
@@ -44,6 +45,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend("<>(");
 		node.getLtl().apply(this);
 		tlaPrinter.moduleStringAppend(")");
+		System.out.println(node.parent().getClass());
 	}
 
 	@Override
@@ -84,6 +86,13 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAImpliesLtl(AImpliesLtl node) {
+		node.getLeft().apply(this);
+		tlaPrinter.moduleStringAppend(" => ");
+		node.getRight().apply(this);
+	}
+
+	@Override
+	public void caseAFairnessImplicationLtl(AFairnessImplicationLtl node) {
 		node.getLeft().apply(this);
 		tlaPrinter.moduleStringAppend(" => ");
 		node.getRight().apply(this);

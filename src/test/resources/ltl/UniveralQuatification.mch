@@ -1,0 +1,13 @@
+MACHINE CounterLTL
+CONSTANTS k
+PROPERTIES k = 1..11
+DEFINITIONS
+ASSERT_LTL_1 == "!p.({p : k} =>  F {x = p})"
+VARIABLES x
+INVARIANT
+ x : 1..20
+INITIALISATION x:=1
+OPERATIONS
+  Inc = PRE x < 10 THEN x:= x + 1 END;
+  Reset = PRE x >= 10 THEN x := 1 END
+END

@@ -19,7 +19,28 @@ public class LTLTest {
 	@Test
 	public void testCounterLTL() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\CounterLTL.mch"};
-		B2TLA.main(a);
+		//B2TLA.main(a);
+		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testFairnessCounterLTL() throws Exception {
+		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\FairnessCounter.mch"};
+		//B2TLA.main(a);
+		assertEquals(TLCOutput.TLCResult.TemporalPropertyError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testUniversalQuantificaitonLTL() throws Exception {
+		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\UniveralQuatification.mch"};
+		//B2TLA.main(a);
+		assertEquals(TLCOutput.TLCResult.TemporalPropertyError, B2TLA.test(a,true));
+	}
+	
+	@Test
+	public void testExistentialQuantificationLTL() throws Exception {
+		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\ExistentialQuantification.mch"};
+		//B2TLA.main(a);
 		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
 	}
 	
