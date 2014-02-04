@@ -134,6 +134,21 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append("))");
 
 	}
+	
+	public void printWeakFairnessWithParameter(String s) {
+		Node operation = machineContext.getOperations().get(s.trim());
+		
+		tlaModuleString.append("([]<><<");
+		printOperationCall(operation);
+		tlaModuleString.append(">>_vars \\/  []<>~ENABLED(");
+		printOperationCall(operation);
+		tlaModuleString.append(") \\/ []<> ENABLED(");
+		printOperationCall(operation);
+		tlaModuleString.append(" /\\ ");	
+		printVarsStuttering();
+		tlaModuleString.append("))");
+
+	}
 
 	private void printVarsStuttering() {
 		ArrayList<Node> vars = this.tlaModule.getVariables();

@@ -44,4 +44,11 @@ public class LTLTest {
 		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
 	}
 	
+	@Test
+	public void testFairnessParameter() throws Exception {
+		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\Fairness_Parameter.mch"};
+		//B2TLA.main(a);
+		assertEquals(TLCOutput.TLCResult.NoError, B2TLA.test(a,true));
+	}
+	
 }

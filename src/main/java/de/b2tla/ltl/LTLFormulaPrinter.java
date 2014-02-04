@@ -107,7 +107,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAWeakFairLtl(AWeakFairLtl node) {
-		tlaPrinter.printWeakFairness(node.getOperation().getText());
+		tlaPrinter.printWeakFairnessWithParameter(node.getOperation().getText());
 	}
 
 	@Override
