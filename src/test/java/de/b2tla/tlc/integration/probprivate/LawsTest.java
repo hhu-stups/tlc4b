@@ -14,70 +14,70 @@ public class LawsTest {
 	@Test
 	public void BoolLaws() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolLaws.mch"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/BoolLaws.mch"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void BoolWithArithLaws() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolWithArithLaws.mch", "-nodead"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/BoolWithArithLaws.mch", "-nodead"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void FunLaws() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/FunLaws.mch"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/FunLaws.mch"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void FunLawsWithLambda() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/FunLawsWithLambda.mch"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/FunLawsWithLambda.mch"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void RelLaws_TLC() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/RelLaws_TLC.mch"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/RelLaws_TLC.mch"};
 		assertEquals(Goal, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void BoolLaws_SetCompr() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolLaws_SetCompr.mch"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/BoolLaws_SetCompr.mch"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void BoolLaws_SetComprCLPFD() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/BoolLaws_SetComprCLPFD.mch"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/BoolLaws_SetComprCLPFD.mch"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 
 	@Test
 	public void CardinalityLaws_TLC() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/CardinalityLaws_TLC.mch", "-nodead"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/CardinalityLaws_TLC.mch", "-nodead"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void EqualityLaws() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/EqualityLaws.mch", "-nodead"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/EqualityLaws.mch", "-nodead"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 	
 	@Test
 	public void SubsetLaws() throws Exception {
 		B2TLAGlobals.setDeleteOnExit(true);
-		String[] a = new String[] { "../probprivate/public_examples/TLC/Laws/SubsetLaws.mch", "-nodead"};
+		String[] a = new String[] { "../prob_examples/public_examples/TLC/Laws/SubsetLaws.mch", "-nodead"};
 		assertEquals(NoError, B2TLA.test(a,true));
 	}
 }
