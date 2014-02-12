@@ -37,7 +37,7 @@ public class GoalTest extends AbstractParseMachineTest {
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
 		list.add(new TestPair(TLCResult.Goal,
-				"../probprivate/public_examples/TLC/GOAL"));
+				"../prob_examples/public_examples/TLC/GOAL"));
 		return getConfiguration(list);
 	}
 }

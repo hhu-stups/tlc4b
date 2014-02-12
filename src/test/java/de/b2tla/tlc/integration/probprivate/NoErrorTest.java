@@ -38,7 +38,7 @@ public class NoErrorTest extends AbstractParseMachineTest {
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
 		list.add(new TestPair(NoError,
-				"../probprivate/public_examples/TLC/NoError"));
+				"../prob_examples/public_examples/TLC/NoError"));
 		return getConfiguration(list);
 	}
 

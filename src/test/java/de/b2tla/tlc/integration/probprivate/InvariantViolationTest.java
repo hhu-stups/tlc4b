@@ -38,7 +38,7 @@ public class InvariantViolationTest extends AbstractParseMachineTest {
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
 		list.add(new TestPair(InvariantViolation,
-				"../probprivate/public_examples/TLC/InvariantViolation"));
+				"../prob_examples/public_examples/TLC/InvariantViolation"));
 		return getConfiguration(list);
 	}
 }
