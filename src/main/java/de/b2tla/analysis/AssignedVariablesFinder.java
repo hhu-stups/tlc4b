@@ -10,12 +10,14 @@ import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesElementOfSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
+import de.be4.classicalb.core.parser.node.ABlockSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceOrSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AFunctionExpression;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
+import de.be4.classicalb.core.parser.node.AIfElsifSubstitution;
 import de.be4.classicalb.core.parser.node.AIfSubstitution;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AOperation;
@@ -70,6 +72,15 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 		if (null != assignedVariables) {
 			assignedVariablesTable.put(node.parent(), assignedVariables);
 		}
+	}
+
+	@Override
+	public void caseABlockSubstitution(ABlockSubstitution node) {
+		inABlockSubstitution(node);
+		if (node.getSubstitution() != null) {
+			node.getSubstitution().apply(this);
+		}
+		outABlockSubstitution(node);
 	}
 
 	@Override
@@ -150,7 +161,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 			list.add(identifier);
 		}
 		assignedVariablesTable.put(node, list);
-		defaultCase(node);
+		defaultOut(node);
 	}
 
 	@Override
@@ -190,6 +201,16 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 			node.getElse().apply(this);
 			list.addAll(getVariableList(node.getElse()));
 		}
+
+		assignedVariablesTable.put(node, list);
+		defaultOut(node);
+	}
+
+	@Override
+	public void caseAIfElsifSubstitution(AIfElsifSubstitution node) {
+		HashSet<Node> list = new HashSet<Node>();
+		node.getThenSubstitution().apply(this);
+		list.addAll(getVariableList(node.getThenSubstitution()));
 
 		assignedVariablesTable.put(node, list);
 		defaultOut(node);

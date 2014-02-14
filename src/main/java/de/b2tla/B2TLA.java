@@ -35,6 +35,7 @@ public class B2TLA {
 	private B2TlaTranslator translator;
 	private TLCOutputInfo tlcOutputInfo;
 	private String ltlFormula;
+	private String constantsSetup;
 
 	public static void main(String[] args) throws IOException {
 		B2TLA b2tla = new B2TLA();
@@ -70,6 +71,7 @@ public class B2TLA {
 			throws IOException {
 		B2TLAGlobals.resetGlobals();
 		B2TLAGlobals.setDeleteOnExit(deleteFiles);
+		// B2TLAGlobals.setCleanup(true);
 		B2TLA b2tla = new B2TLA();
 		try {
 			b2tla.progress(args);
@@ -159,7 +161,7 @@ public class B2TLA {
 
 			} else if (args[index].toLowerCase().equals("-del")) {
 				B2TLAGlobals.setDeleteOnExit(true);
-			}else if (args[index].toLowerCase().equals("-workers")) {
+			} else if (args[index].toLowerCase().equals("-workers")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new B2TLAIOException(
@@ -167,8 +169,14 @@ public class B2TLA {
 				}
 				int workers = Integer.parseInt(args[index]);
 				B2TLAGlobals.setWorkers(workers);
-			}
-			else if (args[index].toLowerCase().equals("-ltlformula")) {
+			} else if (args[index].toLowerCase().equals("-constantssetup")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new B2TLAIOException(
+							"Error: String requiered after option '-constantsetup'.");
+				}
+				constantsSetup = args[index];
+			} else if (args[index].toLowerCase().equals("-ltlformula")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new B2TLAIOException(
@@ -202,7 +210,7 @@ public class B2TLA {
 			StopWatch.start("Parsing");
 			translator = new B2TlaTranslator(
 					machineFileNameWithoutFileExtension, getFile(),
-					this.ltlFormula);
+					this.ltlFormula, this.constantsSetup);
 			StopWatch.stop("Parsing");
 			StopWatch.start("Pure");
 			translator.translate();

@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import de.b2tla.B2TLA;
-import de.b2tla.B2TLAGlobals;
 import de.b2tla.tlc.TLCOutput.TLCResult;
 import de.b2tla.util.AbstractParseMachineTest;
 import de.b2tla.util.PolySuite;

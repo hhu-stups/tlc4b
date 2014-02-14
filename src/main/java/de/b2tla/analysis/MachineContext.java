@@ -21,6 +21,7 @@ import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConcreteVariablesMachineClause;
+import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
 import de.be4.classicalb.core.parser.node.ADeferredSetSet;
@@ -76,6 +77,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private final Start start;
 	private final Hashtable<String, MachineContext> machineContextsTable;
 	private ArrayList<LTLFormulaVisitor> ltlVisitors;
+	private PPredicate constantSetup;
 
 	// machine identifier
 	private final LinkedHashMap<String, Node> setParameter;
@@ -131,9 +133,10 @@ public class MachineContext extends DepthFirstAdapter {
 	// start.apply(this);
 	// }
 
-	public MachineContext(String machineName, Start start, String ltlFormula) {
+	public MachineContext(String machineName, Start start, String ltlFormula, PPredicate constantSetup) {
 		this.start = start;
 		this.machineName = machineName;
+		this.constantSetup = constantSetup;
 		this.referencesTable = new Hashtable<Node, Node>();
 		this.ltlVisitors = new ArrayList<LTLFormulaVisitor>();
 
@@ -564,7 +567,12 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		this.propertiesMachineClause = node;
-
+		
+		if(constantSetup != null){
+			AConjunctPredicate and = new AConjunctPredicate(constantSetup, node.getPredicates());
+			node.setPredicates(and);
+		}
+		
 		/**
 		 * check identifier scope in properties clauses
 		 */

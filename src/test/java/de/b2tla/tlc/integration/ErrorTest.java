@@ -3,12 +3,10 @@ package de.b2tla.tlc.integration;
 import static de.b2tla.tlc.TLCOutput.TLCResult.*;
 import static org.junit.Assert.*;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import de.b2tla.B2TLA;
-import de.b2tla.B2TLAGlobals;
 
 public class ErrorTest {
 

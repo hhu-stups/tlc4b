@@ -67,6 +67,10 @@ public class TLCRunner {
 		if (!B2TLAGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
+		
+		if(B2TLAGlobals.isCheckltl()){
+			list.add("-cleanup");
+		}
 		// list.add("-coverage");
 		// list.add("1");
 

@@ -16,6 +16,8 @@ public class B2TLAGlobals {
 	private static boolean translate;
 	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
+	
+	private static boolean cleanup;
 
 	private static int workers;
 	
@@ -36,6 +38,8 @@ public class B2TLAGlobals {
 		checkInvariant = true;
 		checkLTL = true;
 
+		setCleanup(true);
+		
 		workers = 1;
 		
 		// for debugging purposes
@@ -161,6 +165,14 @@ public class B2TLAGlobals {
 	
 	public static int getWorkers(){
 		return B2TLAGlobals.workers;
+	}
+
+	public static boolean isCleanup() {
+		return cleanup;
+	}
+
+	public static void setCleanup(boolean cleanup) {
+		B2TLAGlobals.cleanup = cleanup;
 	}
 	
 }

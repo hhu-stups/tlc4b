@@ -3,7 +3,6 @@ package de.b2tla.prettyprint;
 import static de.b2tla.util.TestUtil.*;
 import static org.junit.Assert.*;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class SetTest {
@@ -46,16 +45,6 @@ public class SetTest {
 				+ "ASSUME {1} = {x \\in {1}: 1 = 1 } \n"
 				+ "======";
 		compare(expected, machine);
-	}
-	
-	@Ignore
-	@Test
-	public void testSetComprehension3() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "PROPERTIES (1,TRUE,2) : {a,b,c | (a,b,c) : {1} * {TRUE} * {2} } \n" + "END";
-		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME {1} = {x \\in {1}: 1 = 1 } \n"
-				+ "======";
 	}
 	
 	

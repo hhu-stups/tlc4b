@@ -10,11 +10,13 @@ import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AAssertionSubstitution;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
+import de.be4.classicalb.core.parser.node.ABecomesElementOfSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
 import de.be4.classicalb.core.parser.node.ABlockSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceOrSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
+import de.be4.classicalb.core.parser.node.AIfElsifSubstitution;
 import de.be4.classicalb.core.parser.node.AIfSubstitution;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.ALetSubstitution;
@@ -51,10 +53,10 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 
 	private final Hashtable<Node, HashSet<Node>> unchangedVariablesNull;
 
-	public HashSet<Node> getUnchangedVariables(Node node){
+	public HashSet<Node> getUnchangedVariables(Node node) {
 		return unchangedVariablesTable.get(node);
 	}
-	
+
 	public HashSet<Node> getUnchangedVariablesNull(Node node) {
 		return unchangedVariablesNull.get(node);
 	}
@@ -130,6 +132,12 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	}
 
 	@Override
+	public void caseABecomesElementOfSubstitution(
+			ABecomesElementOfSubstitution node) {
+		check(node);
+	}
+
+	@Override
 	public void caseAParallelSubstitution(AParallelSubstitution node) {
 		check(node);
 
@@ -201,7 +209,6 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	@Override
 	public void caseAIfSubstitution(AIfSubstitution node) {
 		check(node);
-
 		// Separating variables and output parameters
 		HashSet<Node> foundIdentifiers = assignedIdentifiersTable.get(node);
 		HashSet<Node> foundVariables = new HashSet<Node>(foundIdentifiers);
@@ -231,6 +238,15 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 					assignedIdentifiersTable.get(node.getThen()));
 		}
 
+	}
+
+	@Override
+	public void caseAIfElsifSubstitution(AIfElsifSubstitution node) {
+		expectedOutputParametersTable.put(node.getThenSubstitution(),
+				expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getThenSubstitution(),
+				expectedVariablesTable.get(node));
+		node.getThenSubstitution().apply(this);
 	}
 
 	@Override

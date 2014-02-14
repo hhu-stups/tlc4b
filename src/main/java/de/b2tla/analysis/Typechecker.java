@@ -541,6 +541,13 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	@Override
+	public void caseAIfElsifSubstitution(AIfElsifSubstitution node) {
+		setType(node.getCondition(), BoolType.getInstance());
+		node.getCondition().apply(this);
+		node.getThenSubstitution().apply(this);
+	}
+
+	@Override
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getLhsExpression());
