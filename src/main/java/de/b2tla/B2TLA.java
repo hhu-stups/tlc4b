@@ -51,14 +51,14 @@ public class B2TLA {
 
 		if (B2TLAGlobals.isRunTLC()) {
 			try {
-				ArrayList<String> output = TLCRunner.runTLC(
+				TLCRunner.runTLC(
 						b2tla.machineFileNameWithoutFileExtension, b2tla.path);
 				// b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
 				// System.out.println("------------------------------");
 
 				TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
 				results.evalResults();
-				b2tla.printResults(results, output,
+				b2tla.printResults(results,
 						B2TLAGlobals.isCreateTraceFile());
 
 			} catch (NoClassDefFoundError e) {
@@ -71,7 +71,7 @@ public class B2TLA {
 
 	}
 
-	private void printResults(TLCResults results, ArrayList<String> output,
+	private void printResults(TLCResults results,
 			boolean createTraceFile) {
 
 		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
@@ -121,6 +121,8 @@ public class B2TLA {
 			results.evalResults();
 			TLCResult result = results.getTLCResult();
 			System.out.println("Result: " + result);
+			
+			//b2tla.printResults(results, B2TLAGlobals.isCreateTraceFile());
 			System.exit(0);
 		}
 		System.exit(1);

@@ -179,6 +179,8 @@ public class TestUtil {
 			if(s.startsWith("Result:")){
 				String resultString = s.substring(s.indexOf(':') + 2);
 				System.out.println(resultString);
+				resultString = resultString.replaceAll("\\s","");
+				//System.out.println(resultString);
 				return TLCResult.valueOf(resultString);
 			}
 		}

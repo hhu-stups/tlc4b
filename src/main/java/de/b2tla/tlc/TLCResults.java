@@ -26,7 +26,7 @@ public class TLCResults {
 	private TLCOutputInfo tlcOutputInfo;
 
 	public static enum TLCResult {
-		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyError, WellDefinednessError;
+		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError;
 	}
 
 	public boolean hasTrace() {
@@ -82,7 +82,7 @@ public class TLCResults {
 
 		ArrayList<Message> messages = OutputCollector.getAllMessages();
 		for (Message m : messages) {
-
+			
 			switch (m.getMessageClass()) {
 			case ERROR:
 				evalErrorMessage(m);
@@ -108,7 +108,7 @@ public class TLCResults {
 	}
 
 	private void evalStatusMessage(Message m) {
-
+		
 		switch (m.getMessageCode()) {
 
 		case EC.TLC_STARTING:
@@ -135,6 +135,7 @@ public class TLCResults {
 	}
 
 	private void evalErrorMessage(Message m) {
+		//System.out.println(m.getMessageCode() + " "+ m.getParameters().length);
 		switch (m.getMessageCode()) {
 		case EC.TLC_INVARIANT_VIOLATED_INITIAL:
 		case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
@@ -165,7 +166,7 @@ public class TLCResults {
 			break;
 
 		case EC.TLC_TEMPORAL_PROPERTY_VIOLATED:
-			tlcResult = TLCResult.TemporalPropertyError;
+			tlcResult = TLCResult.TemporalPropertyViolation;
 			break;
 
 		case EC.TLC_ASSUMPTION_EVALUATION_ERROR:
@@ -216,7 +217,7 @@ public class TLCResults {
 	public String getResultString() {
 		if (tlcResult == TLCResult.InvariantViolation) {
 			return "Invariant Violation";
-		} else if (tlcResult == TLCResult.TemporalPropertyError) {
+		} else if (tlcResult == TLCResult.TemporalPropertyViolation) {
 			return "Temporal Property Violation";
 		}
 		if (tlcResult == null) {

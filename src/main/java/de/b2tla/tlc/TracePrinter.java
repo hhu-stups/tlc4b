@@ -44,7 +44,7 @@ public class TracePrinter {
 			TLCOutputInfo tlcOutputInfo) {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
-
+		
 		evalTrace();
 	}
 
@@ -52,7 +52,6 @@ public class TracePrinter {
 	public TracePrinter(TLCState initialState, TLCOutputInfo tlcOutputInfo) {
 		this.initialState = initialState;
 		this.tlcOutputInfo = tlcOutputInfo;
-		
 		evalTrace();
 	}
 	
@@ -75,7 +74,7 @@ public class TracePrinter {
 			traceBuilder.append(evalExpression(initialState));
 		}
 		
-		System.out.println(traceBuilder);
+		//System.out.println(traceBuilder);
 	}
 
 	private StringBuilder evalExpression(TLCState state) {

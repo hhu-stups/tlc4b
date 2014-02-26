@@ -20,17 +20,23 @@ public class LTLTest {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\CounterLTL.mch" };
 		assertEquals(NoError, test(a));
 	}
+	
+	@Test
+	public void testCounterError() throws Exception {
+		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\CounterError.mch" };
+		assertEquals(TemporalPropertyViolation, test(a));
+	}
 
 	@Test
 	public void testFairnessCounterLTL() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\FairnessCounter.mch" };
-		assertEquals(TemporalPropertyError, test(a));
+		assertEquals(TemporalPropertyViolation, test(a));
 	}
 
 	@Test
 	public void testUniversalQuantificaitonLTL() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\UniveralQuatification.mch" };
-		assertEquals(TemporalPropertyError, test(a));
+		assertEquals(TemporalPropertyViolation, test(a));
 	}
 
 	@Test

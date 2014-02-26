@@ -69,7 +69,7 @@ public class ErrorTest {
 	@Test
 	public void testTemporalPropertyError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/LTLError.mch" };
-		assertEquals(TemporalPropertyError, test(a));
+		assertEquals(TemporalPropertyViolation, test(a));
 	}
 	
 	@Test
