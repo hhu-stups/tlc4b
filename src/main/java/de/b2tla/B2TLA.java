@@ -60,6 +60,7 @@ public class B2TLA {
 				results.evalResults();
 				b2tla.printResults(results,
 						B2TLAGlobals.isCreateTraceFile());
+				System.exit(0);
 
 			} catch (NoClassDefFoundError e) {
 				System.err
@@ -123,9 +124,9 @@ public class B2TLA {
 			System.out.println("Result: " + result);
 			
 			//b2tla.printResults(results, B2TLAGlobals.isCreateTraceFile());
-			System.exit(0);
+			//System.exit(0);
 		}
-		System.exit(1);
+		//System.exit(1);
 	}
 
 
