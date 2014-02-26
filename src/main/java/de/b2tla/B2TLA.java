@@ -121,12 +121,12 @@ public class B2TLA {
 			TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
 			results.evalResults();
 			TLCResult result = results.getTLCResult();
-			System.out.println("Result: " + result);
+			//System.out.println("Result: " + result);
 			
-			//b2tla.printResults(results, B2TLAGlobals.isCreateTraceFile());
-			//System.exit(0);
+			b2tla.printResults(results, B2TLAGlobals.isCreateTraceFile());
+			System.exit(0);
 		}
-		//System.exit(1);
+		System.exit(1);
 	}
 
 

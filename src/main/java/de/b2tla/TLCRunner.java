@@ -85,14 +85,14 @@ public class TLCRunner {
 		return stdOut.getLog();
 	}
 
-	public static ArrayList<String> runTLC(String machineName, String path) {
+	public static void runTLC(String machineName, String path) {
 
 		System.out.println("--------------------------------");
 		
-		BTLCPrintStream btlcStream = new BTLCPrintStream();
-		PrintStream systemOut = System.out;
+		//BTLCPrintStream btlcStream = new BTLCPrintStream();
+		//PrintStream systemOut = System.out;
 		//System.setErr(btlcStream);
-		System.setOut(btlcStream);
+		//System.setOut(btlcStream);
 		ToolIO.setMode(ToolIO.SYSTEM);
 		
 		ArrayList<String> list = new ArrayList<String>();
@@ -110,8 +110,6 @@ public class TLCRunner {
 		ToolIO.setUserDir(path);
 		String[] args = list.toArray(new String[list.size()]);
 
-
-
 		TLC tlc = new TLC();
         
 		// handle parameters
@@ -124,16 +122,12 @@ public class TLCRunner {
 			}
 			
 		}
-		
-		
-		System.setOut(systemOut);
-
-		
-		ArrayList<String> messages = btlcStream.getArrayList();
+		//System.setOut(systemOut);
+		//ArrayList<String> messages = btlcStream.getArrayList();
 		
 		System.out.println("--------------------------------");
 		closeThreads();
-		return messages;
+		//return messages;
 	}
 
 	private static void closeThreads() {

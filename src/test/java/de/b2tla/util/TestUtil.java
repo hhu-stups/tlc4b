@@ -173,9 +173,9 @@ public class TestUtil {
 			e.printStackTrace();
 		}
 		
-		
 		for (int i = stdOut.getLog().size()-1; i > 1 ; i--) {
 			String s = stdOut.getLog().get(i);
+			//System.out.println(s);
 			if(s.startsWith("Result:")){
 				String resultString = s.substring(s.indexOf(':') + 2);
 				System.out.println(resultString);
@@ -184,6 +184,7 @@ public class TestUtil {
 				return TLCResult.valueOf(resultString);
 			}
 		}
+		System.out.println("No result found.");
 		return null;
 	}
 	
