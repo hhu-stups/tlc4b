@@ -8,16 +8,16 @@ import java.util.List;
 
 import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.MachineContext;
-import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.PrecedenceCollector;
 import de.b2tla.analysis.PrimedNodesMarker;
 import de.b2tla.analysis.Renamer;
-import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.analysis.nodes.SubsetNode;
+import de.b2tla.analysis.typerestriction.TypeRestrictor;
+import de.b2tla.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;

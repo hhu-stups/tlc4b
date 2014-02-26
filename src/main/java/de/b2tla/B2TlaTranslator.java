@@ -10,15 +10,15 @@ import de.b2tla.analysis.ConstantsEvaluator;
 import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
 import de.b2tla.analysis.NotSupportedConstructs;
-import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.PrecedenceCollector;
 import de.b2tla.analysis.PrimedNodesMarker;
 import de.b2tla.analysis.Renamer;
-import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.b2tla.analysis.transformation.DefinitionsEliminator;
+import de.b2tla.analysis.typerestriction.TypeRestrictor;
+import de.b2tla.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
 import de.b2tla.tlc.TLCOutputInfo;
@@ -48,7 +48,7 @@ public class B2TlaTranslator {
 		start = parser.parse(machineString, false);
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		System.out.println(ast2String2.toString());
+		//System.out.println(ast2String2.toString());
 	}
 
 	public B2TlaTranslator(String machineString, String ltlFormula)
@@ -59,7 +59,7 @@ public class B2TlaTranslator {
 		start = parser.parse(machineString, false);
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		System.out.println(ast2String2.toString());
+		//System.out.println(ast2String2.toString());
 	}
 
 	public B2TlaTranslator(String machineName, File machineFile, String ltlFormula, String constantSetup)
@@ -79,12 +79,12 @@ public class B2TlaTranslator {
 			
 			final Ast2String ast2String2 = new Ast2String();
 			start2.apply(ast2String2);
-			System.out.println(ast2String2.toString());
+			//System.out.println(ast2String2.toString());
 		}
 		
 	    final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		System.out.println(ast2String2.toString());
+		//System.out.println(ast2String2.toString());
 	}
 
 	public void translate() {

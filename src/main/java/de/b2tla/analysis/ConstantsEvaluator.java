@@ -12,19 +12,21 @@ import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
+import de.be4.classicalb.core.parser.node.ADisjunctPredicate;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AGreaterPredicate;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AIntegerExpression;
 import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
+import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
 
 /**
- * In the class the order of constants is determined. Constants can depend on
+ * In this class the order of constants is determined. Constants can depend on
  * other constants: as an example in the expression k = k2 + 1 the value of the
  * constant k depends on k2. Constants are translated as definitions to TLA+ and
  * these definitions must be in order.
@@ -69,6 +71,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 
 		ConstantsInTreeFinder constantInTreeFinder = new ConstantsInTreeFinder();
 
+        if(machineContext.getConstantsSetup()!= null){
+        	machineContext.getConstantsSetup().apply(constantInTreeFinder);
+        }
+		
 		APropertiesMachineClause properties = machineContext
 				.getPropertiesMachineClause();
 		if (null != properties) {
@@ -139,13 +145,22 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			HashSet<Node> set = dependsOnIdentifierTable.get(node);
 			Node parent = node.parent();
 			HashSet<Node> parentSet = dependsOnIdentifierTable.get(parent);
-			parentSet.addAll(set);
+			if(parentSet!= null){
+				parentSet.addAll(set);
+			}
+			
 		}
 
 		@Override
 		public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 			defaultIn(node);
 			node.getPredicates().apply(this);
+		}
+		
+		@Override
+		public void caseAPredicateParseUnit(APredicateParseUnit node){
+			defaultIn(node);
+			node.getPredicate();
 		}
 
 		@Override
@@ -191,11 +206,17 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 								.getPredicates(),
 						false);
 			}
+			
+			if(machineContext.getConstantsSetup() != null){
+				analysePredicate(machineContext.getConstantsSetup(), true);
+			}
+			
 			Node properties = machineContext.getPropertiesMachineClause();
 			if (properties != null) {
-				analysePredicate(
-						((APropertiesMachineClause) properties).getPredicates(),
-						true);
+				PPredicate predicate = (PPredicate) ((APropertiesMachineClause) properties)
+						.getPredicates();
+				analysePredicate(predicate, true);
+
 			}
 
 			Node invariantClause = machineContext.getInvariantMachineClause();
@@ -219,13 +240,13 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		private void analysePredicate(Node node, boolean isProperties) {
 			if (node instanceof AEqualPredicate) {
 				analyseEqualsPredicate((AEqualPredicate) node);
-			} 
-//			else if (node instanceof AGreaterPredicate) {
-//				analyseGreaterPredicate((AGreaterPredicate) node);
-//			}
-//			else if (node instanceof ALessEqualPredicate) {
-//				analyseLessEqualPredicate((ALessEqualPredicate) node);
-//			}
+			}
+			// else if (node instanceof AGreaterPredicate) {
+			// analyseGreaterPredicate((AGreaterPredicate) node);
+			// }
+			// else if (node instanceof ALessEqualPredicate) {
+			// analyseLessEqualPredicate((ALessEqualPredicate) node);
+			// }
 			else if (node instanceof AConjunctPredicate) {
 				AConjunctPredicate conjunction = (AConjunctPredicate) node;
 				analysePredicate(conjunction.getLeft(), isProperties);

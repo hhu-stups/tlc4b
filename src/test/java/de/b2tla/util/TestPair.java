@@ -1,17 +1,18 @@
 package de.b2tla.util;
 
-import de.b2tla.tlc.TLCOutput;
+import de.b2tla.tlc.TLCResults.TLCResult;
+
 
 public class TestPair {
-	private final TLCOutput.TLCResult error;
+	private final TLCResult error;
 	private final String path;
 
-	public TestPair(TLCOutput.TLCResult error, String path) {
+	public TestPair(TLCResult error, String path) {
 		this.error = error;
 		this.path = path;
 	}
 
-	public TLCOutput.TLCResult getResult() {
+	public TLCResult getResult() {
 		return error;
 	}
 

@@ -3,21 +3,30 @@ package de.b2tla.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 
-import util.ToolIO;
+
+
+
+import java.util.List;
 
 import de.b2tla.B2TLA;
+import de.b2tla.B2TLAGlobals;
 import de.b2tla.B2TlaTranslator;
+import de.b2tla.TLCRunner;
 import de.b2tla.analysis.Ast2String;
 import de.b2tla.btypes.BType;
-import de.b2tla.tlc.TLCExpressionParser;
+import de.b2tla.tlc.TLCResults.TLCResult;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
-import de.tla2b.translation.TLA2B;
 
 public class TestUtil {
 
@@ -127,30 +136,6 @@ public class TestUtil {
 		return translator.getModuleString();
 	}
 
-	public static void compare2(String expected, String machine)
-			throws Exception {
-		B2TlaTranslator b2tlaTranslator = new B2TlaTranslator(machine);
-		b2tlaTranslator.translate();
-		String name = b2tlaTranslator.getMachineName();
-		String module = b2tlaTranslator.getModuleString();
-
-		String dir = "build/testfiles/";
-		createTempfile(dir, name + ".tla", module);
-
-		B2TLA.createUsedStandardModules(dir,
-				b2tlaTranslator.getUsedStandardModule());
-		ToolIO.setMode(ToolIO.TOOL);
-		String sb1 = TLA2B.translateFile(dir + name);
-		// result
-		createTempfile(dir, name + ".tla", expected);
-		String sb2 = TLA2B.translateFile(dir + name);
-
-		if (!sb2.toString().equals(sb1)) {
-			// assertEquals(expected, actual);
-			fail("expected:\n" + expected + "\nbut was:\n" + module);
-		}
-	}
-
 	public static void createTempfile(String dir, String fileName,
 			String moduleString) {
 		File d = new File(dir);
@@ -173,22 +158,89 @@ public class TestUtil {
 			e.printStackTrace();
 		}
 	}
-
-	public static void compareExpr(String expected, String tla) {
-		String res = TLCExpressionParser.parseLine(tla);
-		System.out.println(res);
-		res = res.replaceAll("\\s", "");
-		expected = expected.replaceAll("\\s", "");
-		assertEquals(expected, res);
+	
+	
+	public static TLCResult test(String[] args) throws IOException {
+		System.out.println("Starting JVM...");
+		final Process p = startJVM("", TLC4BTester.class.getCanonicalName(), args);
+		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
+		stdOut.start();
+		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
+		errOut.start();
+		try {
+			p.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+		for (int i = stdOut.getLog().size()-1; i > 1 ; i--) {
+			String s = stdOut.getLog().get(i);
+			if(s.startsWith("Result:")){
+				String resultString = s.substring(s.indexOf(':') + 2);
+				System.out.println(resultString);
+				return TLCResult.valueOf(resultString);
+			}
+		}
+		return null;
 	}
+	
+	
+	
+	
+	
+	private static Process startJVM(final String optionsAsString,
+			final String mainClass, final String[] arguments)
+			throws IOException {
 
-	public static void compareExpr(String expected, String tla,
-			Hashtable<String, BType> types) {
-		String res = TLCExpressionParser.parseLine(tla, types);
-		System.out.println(res);
-		res = res.replaceAll("\\s", "");
-		expected = expected.replaceAll("\\s", "");
-		assertEquals(expected, res);
+		String separator = System.getProperty("file.separator");
+
+		String jvm = System.getProperty("java.home") + separator + "bin"
+				+ separator + "java";
+		String classpath = System.getProperty("java.class.path");
+
+		List<String> command = new ArrayList<String>();
+		command.add(jvm);
+		command.add("-cp");
+		command.add(classpath);
+		command.add(mainClass);
+		command.addAll(Arrays.asList(arguments));
+
+		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		Process process = processBuilder.start();
+		return process;
 	}
 
 }
+
+
+
+class StreamGobbler extends Thread {
+	private InputStream is;
+	private ArrayList<String> log;
+
+	public ArrayList<String> getLog() {
+		return log;
+	}
+
+	StreamGobbler(InputStream is) {
+		this.is = is;
+		this.log = new ArrayList<String>();
+	}
+
+	public void run() {
+		try {
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				System.out.println("> " + line);
+				log.add(line);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
+

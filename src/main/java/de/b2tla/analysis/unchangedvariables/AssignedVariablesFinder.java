@@ -1,10 +1,11 @@
-package de.b2tla.analysis;
+package de.b2tla.analysis.unchangedvariables;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
+import de.b2tla.analysis.MachineContext;
 import de.b2tla.exceptions.SubstitutionException;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;

@@ -1,10 +1,12 @@
-package de.b2tla.analysis;
+package de.b2tla.analysis.typerestriction;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
+import de.b2tla.analysis.MachineContext;
+import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
@@ -15,6 +17,7 @@ import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
+import de.be4.classicalb.core.parser.node.ADisjunctPredicate;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
@@ -35,6 +38,7 @@ import de.be4.classicalb.core.parser.node.ASelectSubstitution;
 import de.be4.classicalb.core.parser.node.ASubsetPredicate;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
@@ -59,6 +63,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 		this.identifierDependencies = new IdentifierDependencies(machineContext);
 
+		
 		start.apply(this);
 
 		checkLTLFormulas();
@@ -126,9 +131,21 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
 		HashSet<Node> list = new HashSet<Node>();
 		list.addAll(machineContext.getConstants().values());
+		
 		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 	}
 
+	
+	public void analyseDisjunktionPredicate(PPredicate node, HashSet<Node> list) {
+		if (node instanceof ADisjunctPredicate) {
+			ADisjunctPredicate dis = (ADisjunctPredicate) node;
+			analyseDisjunktionPredicate(dis.getLeft(), list);
+			analyseDisjunktionPredicate(dis.getRight(), list);
+		}else{
+			analysePredicate(node, list, new HashSet<Node>());
+		}
+	}
+	
 	private void analysePredicate(Node n, HashSet<Node> list, HashSet<Node> ignoreList) {
 		if (n instanceof AEqualPredicate) {
 			PExpression left = ((AEqualPredicate) n).getLeft();

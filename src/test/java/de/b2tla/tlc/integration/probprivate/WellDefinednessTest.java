@@ -1,6 +1,7 @@
 package de.b2tla.tlc.integration.probprivate;
 
-import static de.b2tla.tlc.TLCOutput.TLCResult.WellDefinednessError;
+import static de.b2tla.tlc.TLCResults.TLCResult.*;
+import static de.b2tla.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -9,8 +10,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.b2tla.B2TLA;
-import de.b2tla.tlc.TLCOutput.TLCResult;
+import de.b2tla.tlc.TLCResults.TLCResult;
 import de.b2tla.util.AbstractParseMachineTest;
 import de.b2tla.util.PolySuite;
 import de.b2tla.util.TestPair;
@@ -19,8 +19,6 @@ import de.b2tla.util.PolySuite.Configuration;
 
 @RunWith(PolySuite.class)
 public class WellDefinednessTest extends AbstractParseMachineTest  {
-
-	
 
 		private final File machine;
 		private final TLCResult error;
@@ -33,7 +31,7 @@ public class WellDefinednessTest extends AbstractParseMachineTest  {
 		@Test
 		public void testRunTLC() throws Exception {
 			String[] a = new String[] { machine.getPath() };
-			assertEquals(error, B2TLA.test(a,true));
+			assertEquals(error, test(a));
 		}
 
 		@Config

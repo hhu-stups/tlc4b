@@ -9,18 +9,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
 import java.util.ArrayList;
 
-import tlc2.TLCGlobals;
 import de.b2tla.B2TLAGlobals;
-import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.b2tla.exceptions.B2TLAIOException;
 import de.b2tla.exceptions.B2tlaException;
-import de.b2tla.tlc.TLCOutput;
 import de.b2tla.tlc.TLCOutputInfo;
-import de.b2tla.tlc.TLCOutput.TLCResult;
+import de.b2tla.tlc.TLCResults.TLCResult;
+import de.b2tla.tlc.TLCResults;
 import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.exceptions.BException;
 
@@ -56,21 +53,56 @@ public class B2TLA {
 			try {
 				ArrayList<String> output = TLCRunner.runTLC(
 						b2tla.machineFileNameWithoutFileExtension, b2tla.path);
-				b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
+				// b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
+				// System.out.println("------------------------------");
+
+				TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
+				results.evalResults();
+				b2tla.printResults(results, output,
+						B2TLAGlobals.isCreateTraceFile());
+
 			} catch (NoClassDefFoundError e) {
-				System.out
-						.println("Can not find TLC. The tla2tools must be included in the classpath.");
-				System.out.println(e.getMessage());
+				System.err
+						.println("Can not find TLC. The tlatools.jar must be included in the classpath.");
+				// System.out.println(e.getMessage());
 			}
 
 		}
 
 	}
 
-	public static TLCResult test(String[] args, boolean deleteFiles)
+	private void printResults(TLCResults results, ArrayList<String> output,
+			boolean createTraceFile) {
+
+		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
+				+ " ms");
+		System.out.println("Translation time: " + StopWatch.getRunTime("Pure") + " ms");
+		System.out.println("Model checking time: "
+				+ results.getModelCheckingTime() + " sec");
+		System.out.println("States analysed: "
+				+ results.getNumberOfDistinctStates());
+		System.out.println("Transitions fired: "
+				+ results.getNumberOfTransitions());
+		System.out.println("Result: " + results.getResultString());
+
+		if (results.hasTrace() && createTraceFile) {
+			String trace = results.getTrace();
+			String tracefileName = machineFileNameWithoutFileExtension
+					+ ".tla.trace";
+			File traceFile = createFile(path, tracefileName, trace, false);
+			if (traceFile != null) {
+				System.out.println("Trace file '" + traceFile.getAbsolutePath()
+						+ "' created.");
+			}
+		}
+
+	}
+
+	public static void test(String[] args, boolean deleteFiles)
 			throws IOException {
 		B2TLAGlobals.resetGlobals();
 		B2TLAGlobals.setDeleteOnExit(deleteFiles);
+		B2TLAGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		B2TLA b2tla = new B2TLA();
 		try {
@@ -78,60 +110,34 @@ public class B2TLA {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
-			return null;
-		}
-
-		if (B2TLAGlobals.isRunTLC()) {
-			ArrayList<String> output = TLCRunner.runTLCInANewJVM(
-					b2tla.machineFileNameWithoutFileExtension, b2tla.path);
-			TLCResult error = TLCOutput.findError(output);
-			System.out.println(error);
-			return error;
-		}
-		return null;
-	}
-
-	private void evalOutput(ArrayList<String> output, boolean createTraceFile) {
-		TLCOutput tlcOutput = new TLCOutput(
-				machineFileNameWithoutFileExtension,
-				output.toArray(new String[output.size()]), tlcOutputInfo);
-		tlcOutput.parseTLCOutput();
-		if (B2TLAGlobals.isRunTestscript()) {
-			printTestResultsForTestscript(tlcOutput);
 			return;
 		}
 
-		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
-				+ " ms");
-		System.out.println("Translation time: " + StopWatch.getRunTime("Pure"));
-		System.out.println("Model checking time: " + tlcOutput.getRunningTime()
-				+ " sec");
-		System.out.println("States analysed: " + tlcOutput.getDistinctStates());
-		System.out.println("Transitions fired: " + tlcOutput.getTransitions());
-		System.out.println("Result: " + tlcOutput.getResultString());
-		if (tlcOutput.hasTrace() && createTraceFile) {
-			StringBuilder trace = tlcOutput.getErrorTrace();
-			String tracefileName = machineFileNameWithoutFileExtension
-					+ ".tla.trace";
-			File traceFile = createFile(path, tracefileName, trace.toString(),
-					false);
-			if (traceFile != null) {
-				System.out.println("Trace file '" + traceFile.getAbsolutePath()
-						+ "'created.");
-			}
+		if (B2TLAGlobals.isRunTLC()) {
+			TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
+					b2tla.path);
+
+			TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
+			results.evalResults();
+			TLCResult result = results.getTLCResult();
+			System.out.println("Result: " + result);
+			System.exit(0);
 		}
+		System.exit(1);
 	}
 
-	private void printTestResultsForTestscript(TLCOutput tlcOutput) {
+
+	private void printTestResultsForTestscript() {
+		TLCResults tlcResults = null;
 		// This output is adapted to Ivo's testscript
 		System.out.println("------------- Results -------------");
 		System.out.println("Model Checking Time: "
-				+ (tlcOutput.getRunningTime() * 1000) + " ms");
-		System.out.println("States analysed: " + tlcOutput.getDistinctStates());
-		System.out.println("Transitions fired: " + tlcOutput.getTransitions());
-		if (tlcOutput.getResult() != TLCResult.NoError) {
+				+ (tlcResults.getModelCheckingTime() * 1000) + " ms");
+		System.out.println("States analysed: " + tlcResults.getNumberOfDistinctStates());
+		System.out.println("Transitions fired: " + tlcResults.getNumberOfTransitions());
+		if (tlcResults.getTLCResult() != TLCResult.NoError) {
 			System.err.println("@@");
-			System.err.println("12" + tlcOutput.getResultString());
+			System.err.println("12" + tlcResults.getResultString());
 		}
 
 	}
@@ -170,10 +176,11 @@ public class B2TLA {
 				int workers = Integer.parseInt(args[index]);
 				B2TLAGlobals.setWorkers(workers);
 			} else if (args[index].toLowerCase().equals("-constantssetup")) {
+				B2TLAGlobals.setProBconstantsSetup(true);
 				index = index + 1;
 				if (index == args.length) {
 					throw new B2TLAIOException(
-							"Error: String requiered after option '-constantsetup'.");
+							"Error: String requiered after option '-constantssetup'.");
 				}
 				constantsSetup = args[index];
 			} else if (args[index].toLowerCase().equals("-ltlformula")) {
@@ -363,54 +370,6 @@ public class B2TLA {
 				ex.printStackTrace();
 			}
 		}
-	}
-
-	public static void createUsedStandardModules(String path,
-			ArrayList<UsedStandardModules.STANDARD_MODULES> standardModules) {
-		if (standardModules.contains(STANDARD_MODULES.Relations)) {
-			File naturalsFile = new File(path + File.separator
-					+ "Relations.tla");
-			if (!naturalsFile.exists()) {
-				try {
-					naturalsFile.createNewFile();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-			try {
-				Writer fw = new FileWriter(naturalsFile);
-				fw.write(StandardModules.Relations);
-				fw.close();
-				System.out.println("Standard module '" + naturalsFile.getName()
-						+ "' created.");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-
-		if (standardModules.contains(STANDARD_MODULES.BBuiltIns)) {
-			File bBuiltInsFile = new File(path + File.separator
-					+ "BBuiltIns.tla");
-			if (!bBuiltInsFile.exists()) {
-				try {
-					bBuiltInsFile.createNewFile();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			try {
-				Writer fw = new FileWriter(bBuiltInsFile);
-				fw.write(StandardModules.BBuiltIns);
-				fw.close();
-				System.out.println("Standard modules BBuiltIns.tla created.");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-
 	}
 
 	private File getFile() {

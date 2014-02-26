@@ -11,10 +11,10 @@ import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.ConstantsEvaluator;
 import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
-import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.NodeType;
+import de.b2tla.analysis.typerestriction.TypeRestrictor;
 import de.b2tla.btypes.BType;
 import de.b2tla.tla.config.ModelValueAssignment;
 import de.b2tla.tla.config.SetOfModelValuesAssignment;
@@ -237,7 +237,7 @@ public class Generator extends DepthFirstAdapter {
 		while (cons.hasNext()) {
 			AIdentifierExpression con = (AIdentifierExpression) cons.next();
 			Node value = conValueTable.get(con);
-			tlaModule.definitions.add(new TLADefinition(con, value));
+			//tlaModule.definitions.add(new TLADefinition(con, value));
 
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
@@ -250,7 +250,7 @@ public class Generator extends DepthFirstAdapter {
 		ArrayList<Node> remainingConstants = new ArrayList<Node>();
 		remainingConstants.addAll(machineContext.getConstants().values());
 		remainingConstants.removeAll(conValueTable.keySet());
-
+		
 		Node propertiesPerdicate = machineContext.getPropertiesMachineClause()
 				.getPredicates();
 		if (remainingConstants.size() != 0) {
@@ -301,7 +301,7 @@ public class Generator extends DepthFirstAdapter {
 					}
 
 				} else {
-					tlaModule.definitions.add(new TLADefinition(con, value));
+					//tlaModule.definitions.add(new TLADefinition(con, value));
 				}
 
 			}
