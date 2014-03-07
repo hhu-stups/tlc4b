@@ -178,9 +178,8 @@ public class TestUtil {
 			//System.out.println(s);
 			if(s.startsWith("Result:")){
 				String resultString = s.substring(s.indexOf(':') + 2);
+				resultString = resultString.replaceAll("\\s+","");
 				System.out.println(resultString);
-				resultString = resultString.replaceAll("\\s","");
-				//System.out.println(resultString);
 				return TLCResult.valueOf(resultString);
 			}
 		}

@@ -41,7 +41,7 @@ dependencies {
 
 test { 
 	exclude('de/b2tla/tlc/integration/probprivate')
-	exclude('de/b2tla/tlc/integration/testing')
+	exclude('testing')
 	
 }
 

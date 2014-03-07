@@ -30,6 +30,7 @@ import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.AMemberPredicate;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
+import de.be4.classicalb.core.parser.node.ASetExtensionExpression;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
@@ -255,9 +256,28 @@ public class Generator extends DepthFirstAdapter {
 				.getPredicates();
 		if (remainingConstants.size() != 0) {
 			boolean init = false;
+			int numberOfIteratedConstants = 0;
+			
+			
 			for (int i = 0; i < remainingConstants.size(); i++) {
+				init = true;
 				Node con = remainingConstants.get(i);
 				this.tlaModule.variables.add(con);
+				
+				ArrayList<PExpression> rangeList = constantsEvaluator.getRangeOfIdentifier(con);
+				if(rangeList.size() > 0){
+					numberOfIteratedConstants++;
+					ArrayList<PExpression> clone = new ArrayList<PExpression>();
+					for (PExpression pExpression : rangeList) {
+						clone.add((PExpression) pExpression.clone());
+					}
+					ASetExtensionExpression set = new ASetExtensionExpression(clone);
+					AMemberPredicate member = new AMemberPredicate((AIdentifierExpression) con, set);
+					tlaModule.addInit(member);
+					continue;
+				}
+				
+				
 				Integer value = constantsEvaluator.getIntValue(con);
 				if (value == null) {
 					init = true;
@@ -305,15 +325,26 @@ public class Generator extends DepthFirstAdapter {
 				}
 
 			}
+			
+			if(numberOfIteratedConstants > 1){
+				tlaModule.addInit(machineContext.getConstantsSetup());
+			}
+			
+			
 			if (init) {
 				configFile.setInit();
 				tlaModule.addInit(propertiesPerdicate);
 			}
+			
+
 
 		} else {
 			tlaModule.assumes.addAll(constantsEvaluator.getPropertiesList());
 			// tlaModule.addAssume(propertiesPerdicate);
 		}
+		
+		
+		
 	}
 
 	@Override

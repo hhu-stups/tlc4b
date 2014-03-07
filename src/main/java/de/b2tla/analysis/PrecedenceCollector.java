@@ -71,11 +71,16 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		return brackets;
 	}
 
-	public PrecedenceCollector(Start start, Hashtable<Node, BType> types) {
+	public PrecedenceCollector(Start start, Hashtable<Node, BType> types, MachineContext machineContext) {
 		precedenceTable = new Hashtable<Node, Precedence>();
 		brackets = new HashSet<Node>();
 		typeTable = types;
 		start.apply(this);
+		
+		if(machineContext.getConstantsSetup() != null){
+			machineContext.getConstantsSetup().apply(this);
+		}
+		
 	}
 
 	@Override

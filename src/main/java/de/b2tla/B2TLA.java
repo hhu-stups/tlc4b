@@ -40,6 +40,7 @@ public class B2TLA {
 		try {
 			b2tla.progress(args);
 		} catch (BException e) {
+			System.err.println("***** Parsing Error *****");
 			System.err.println(e.getMessage());
 			return;
 		} catch (B2tlaException e) {

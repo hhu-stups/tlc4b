@@ -1,0 +1,10 @@
+MACHINE ConstantSetup
+CONSTANTS a, b
+PROPERTIES a : NAT & b : NAT
+VARIABLES x, y 
+INVARIANT
+ x : NAT & y : NAT
+INITIALISATION x := a || y := b
+OPERATIONS
+foo = skip
+END

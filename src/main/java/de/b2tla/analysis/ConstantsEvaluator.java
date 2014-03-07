@@ -14,11 +14,9 @@ import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
 import de.be4.classicalb.core.parser.node.ADisjunctPredicate;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
-import de.be4.classicalb.core.parser.node.AGreaterPredicate;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AIntegerExpression;
 import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
-import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
@@ -57,11 +55,15 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	public LinkedHashMap<Node, Node> getValueOfIdentifierMap() {
 		return valueOfIdentifier;
 	}
-
+	
 	public Integer getIntValue(Node node) {
 		return integerValueTable.get(node);
 	}
 
+	public ArrayList<PExpression> getRangeOfIdentifier(Node con){;
+		return valuesOfConstantsFinder.rangeOfIdentifierTable.get(con);
+	}
+	
 	public ConstantsEvaluator(MachineContext machineContext) {
 		this.dependsOnIdentifierTable = new Hashtable<Node, HashSet<Node>>();
 		this.integerValueTable = new HashMap<Node, Integer>();
@@ -71,10 +73,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 
 		ConstantsInTreeFinder constantInTreeFinder = new ConstantsInTreeFinder();
 
-        if(machineContext.getConstantsSetup()!= null){
-        	machineContext.getConstantsSetup().apply(constantInTreeFinder);
-        }
-		
+		if (machineContext.getConstantsSetup() != null) {
+			machineContext.getConstantsSetup().apply(constantInTreeFinder);
+		}
+
 		APropertiesMachineClause properties = machineContext
 				.getPropertiesMachineClause();
 		if (null != properties) {
@@ -145,10 +147,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			HashSet<Node> set = dependsOnIdentifierTable.get(node);
 			Node parent = node.parent();
 			HashSet<Node> parentSet = dependsOnIdentifierTable.get(parent);
-			if(parentSet!= null){
+			if (parentSet != null) {
 				parentSet.addAll(set);
 			}
-			
+
 		}
 
 		@Override
@@ -156,9 +158,9 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			defaultIn(node);
 			node.getPredicates().apply(this);
 		}
-		
+
 		@Override
-		public void caseAPredicateParseUnit(APredicateParseUnit node){
+		public void caseAPredicateParseUnit(APredicateParseUnit node) {
 			defaultIn(node);
 			node.getPredicate();
 		}
@@ -184,19 +186,23 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 
 	class ValuesOfIdentifierFinder extends DepthFirstAdapter {
 		private Hashtable<Node, HashSet<Node>> valuesOfIdentifierTable;
+		private Hashtable<Node, ArrayList<PExpression>> rangeOfIdentifierTable;
 		private HashSet<Node> identifiers;
 
 		public ValuesOfIdentifierFinder() {
-			valuesOfIdentifierTable = new Hashtable<Node, HashSet<Node>>();
+			this.valuesOfIdentifierTable = new Hashtable<Node, HashSet<Node>>();
+			this.rangeOfIdentifierTable = new Hashtable<Node, ArrayList<PExpression>>();
 
 			this.identifiers = new HashSet<Node>();
-			identifiers.addAll(machineContext.getConstants().values());
-			identifiers.addAll(machineContext.getScalarParameter().values());
+			this.identifiers.addAll(machineContext.getConstants().values());
+			this.identifiers.addAll(machineContext.getScalarParameter()
+					.values());
 
 			Iterator<Node> itr = identifiers.iterator();
 			while (itr.hasNext()) {
 				Node id = itr.next();
 				valuesOfIdentifierTable.put(id, new HashSet<Node>());
+				rangeOfIdentifierTable.put(id, new ArrayList<PExpression>());
 			}
 
 			Node constraints = machineContext.getConstraintMachineClause();
@@ -206,11 +212,26 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 								.getPredicates(),
 						false);
 			}
-			
-			if(machineContext.getConstantsSetup() != null){
-				analysePredicate(machineContext.getConstantsSetup(), true);
+
+			if (machineContext.getConstantsSetup() != null) {
+				if (machineContext.getConstantsSetup() instanceof ADisjunctPredicate) {
+					analyseConstantSetupPredicate(machineContext
+							.getConstantsSetup());
+					
+					for (Node con : this.identifiers) {
+						ArrayList<PExpression> list = rangeOfIdentifierTable.get(con);
+						if(list.size() == 1){
+							// there only one value for the constant con, hence con remains a constant 
+							valuesOfIdentifierTable.get(con).add(list.get(0));
+						}
+					}
+				}else{
+					analysePredicate(machineContext.getConstantsSetup(), true);
+				}
+				
+
 			}
-			
+
 			Node properties = machineContext.getPropertiesMachineClause();
 			if (properties != null) {
 				PPredicate predicate = (PPredicate) ((APropertiesMachineClause) properties)
@@ -224,6 +245,35 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				analyseInvariantPredicate(((AInvariantMachineClause) invariantClause)
 						.getPredicates());
 			}
+		}
+
+		private void analyseConstantSetupPredicate(PPredicate constantsSetup) {
+			if (constantsSetup instanceof ADisjunctPredicate) {
+				ADisjunctPredicate dis = (ADisjunctPredicate) constantsSetup;
+				analyseConstantSetupPredicate(dis.getLeft());
+				analyseConstantSetupPredicate(dis.getRight());
+			} else if (constantsSetup instanceof AConjunctPredicate) {
+				AConjunctPredicate con = (AConjunctPredicate) constantsSetup;
+				analyseConstantSetupPredicate(con.getLeft());
+				analyseConstantSetupPredicate(con.getRight());
+			} else if (constantsSetup instanceof AEqualPredicate) {
+				AEqualPredicate equals = (AEqualPredicate) constantsSetup;
+				PExpression left = equals.getLeft();
+				Node left_ref = machineContext.getReferences().get(left);
+				ArrayList<PExpression> currentRange = rangeOfIdentifierTable.get(left_ref);
+				
+				boolean found = false;
+				for (PExpression pExpression : currentRange) {
+					if(pExpression.toString().equals(equals.getRight().toString())){
+						found = true;
+					}
+				}
+				if(found == false){
+					currentRange.add((PExpression) equals.getRight());
+				}
+				
+			}
+
 		}
 
 		private void analyseInvariantPredicate(Node node) {
@@ -240,14 +290,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		private void analysePredicate(Node node, boolean isProperties) {
 			if (node instanceof AEqualPredicate) {
 				analyseEqualsPredicate((AEqualPredicate) node);
-			}
-			// else if (node instanceof AGreaterPredicate) {
-			// analyseGreaterPredicate((AGreaterPredicate) node);
-			// }
-			// else if (node instanceof ALessEqualPredicate) {
-			// analyseLessEqualPredicate((ALessEqualPredicate) node);
-			// }
-			else if (node instanceof AConjunctPredicate) {
+			} else if (node instanceof AConjunctPredicate) {
 				AConjunctPredicate conjunction = (AConjunctPredicate) node;
 				analysePredicate(conjunction.getLeft(), isProperties);
 				analysePredicate(conjunction.getRight(), isProperties);
@@ -256,42 +299,6 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 
 			if (isProperties) {
 				propertiesList.add((PPredicate) node);
-			}
-		}
-
-		private void analyseLessEqualPredicate(ALessEqualPredicate node) {
-			PExpression left = node.getLeft();
-			Node left_ref = machineContext.getReferences().get(left);
-			PExpression right = node.getRight();
-			Node right_ref = machineContext.getReferences().get(right);
-			if (identifiers.contains(left_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) right;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(left_ref, value);
-			}
-
-			if (identifiers.contains(right_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) left;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(right_ref, value);
-			}
-		}
-
-		private void analyseGreaterPredicate(AGreaterPredicate node) {
-			PExpression left = node.getLeft();
-			Node left_ref = machineContext.getReferences().get(left);
-			PExpression right = node.getRight();
-			Node right_ref = machineContext.getReferences().get(right);
-			if (identifiers.contains(left_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) right;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(left_ref, value + 1);
-			}
-
-			if (identifiers.contains(right_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) left;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(right_ref, value - 1);
 			}
 		}
 

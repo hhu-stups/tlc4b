@@ -28,7 +28,6 @@ import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
-import de.be4.ltl.core.parser.node.TYesterday;
 
 public class B2TlaTranslator {
 
@@ -72,8 +71,15 @@ public class B2TlaTranslator {
 
 		
 		if(constantSetup!= null){
-			BParser con = new BParser("Constants");
-			Start start2 = con.parse("#FORMULA " + constantSetup, false);
+			BParser con = new BParser();
+			Start start2 = null;
+			try {
+				start2 = con.parse("#FORMULA " + constantSetup, false);
+			} catch (BException e) {
+				System.err.println("An error occured while parsing the constants setup predicate.");
+				throw e;
+			}
+			
 			APredicateParseUnit parseUnit = (APredicateParseUnit) start2.getPParseUnit();
 			this.constantsSetup = parseUnit.getPredicate();
 			
@@ -101,7 +107,7 @@ public class B2TlaTranslator {
 				machineContext);
 
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
-				start, typechecker.getTypes());
+				start, typechecker.getTypes(), machineContext);
 
 		ConstantsEliminator constantsEliminator = new ConstantsEliminator(
 				machineContext);
