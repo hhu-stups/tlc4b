@@ -2,6 +2,7 @@ package de.b2tla.prettyprint;
 
 import static de.b2tla.util.TestUtil.compare;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SubstitutionsTest {
@@ -94,4 +95,25 @@ public class SubstitutionsTest {
 				+ "====";
 		compare(expected, machine);
 	}
+	
+	@Test
+	public void testIFElseIFSubstitution() throws Exception {
+		String machine = "MACHINE test\n" 
+				+ "VARIABLES x\n"
+				+ "INVARIANT x = 1\n" 
+				+ "INITIALISATION IF 1=1 THEN x:= 1 ELSIF 1=2 THEN x:= 2 ELSE x:= 4 END \n"
+				+ "END";
+		
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals \n"
+				+ "VARIABLES x \n"
+				+ "Invariant == x = 1\n"
+				+ "Init == (CASE 1 = 1 -> x = 1 [] 1 = 2 -> x = 2 [] OTHER -> x = 4)\n"
+				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
+				+ "====";
+		compare(expected, machine);
+	}
+	
+	
+	
 }

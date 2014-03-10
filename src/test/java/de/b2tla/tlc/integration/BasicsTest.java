@@ -1,6 +1,6 @@
 package de.b2tla.tlc.integration;
 
-import static de.b2tla.tlc.TLCOutput.TLCResult.NoError;
+import static de.b2tla.tlc.TLCResults.TLCResult.NoError;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -9,14 +9,13 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.b2tla.B2TLA;
-import de.b2tla.B2TLAGlobals;
-import de.b2tla.tlc.TLCOutput.TLCResult;
+import de.b2tla.tlc.TLCResults.TLCResult;
 import de.b2tla.util.AbstractParseMachineTest;
 import de.b2tla.util.PolySuite;
 import de.b2tla.util.TestPair;
 import de.b2tla.util.PolySuite.Config;
 import de.b2tla.util.PolySuite.Configuration;
+import static de.b2tla.util.TestUtil.test;
 
 @RunWith(PolySuite.class)
 public class BasicsTest extends AbstractParseMachineTest {
@@ -32,7 +31,7 @@ public class BasicsTest extends AbstractParseMachineTest {
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(error, B2TLA.test(a, true));
+		assertEquals(error, test(a));
 	}
 
 	@Config

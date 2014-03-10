@@ -9,6 +9,7 @@ public class B2TLAGlobals {
 	private static boolean checkDeadlock;
 	private static boolean checkInvariant;
 	private static boolean checkLTL;
+	private static boolean proBconstantsSetup;
 
 	private static boolean deleteFilesOnExit;
 
@@ -16,6 +17,10 @@ public class B2TLAGlobals {
 	private static boolean translate;
 	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
+	
+	private static boolean testingMode;
+	
+	private static boolean cleanup;
 
 	private static int workers;
 	
@@ -35,7 +40,10 @@ public class B2TLAGlobals {
 		checkDeadlock = true;
 		checkInvariant = true;
 		checkLTL = true;
+		setProBconstantsSetup(false);
 
+		setCleanup(true);
+		
 		workers = 1;
 		
 		// for debugging purposes
@@ -48,6 +56,7 @@ public class B2TLAGlobals {
 									// the created B2TLA standard modules (e.g.
 									// Relation, but not Naturals etc.).
 		runTestscript = false;
+		testingMode = false;
 		createTraceFile = true;
 	}
 
@@ -161,6 +170,30 @@ public class B2TLAGlobals {
 	
 	public static int getWorkers(){
 		return B2TLAGlobals.workers;
+	}
+
+	public static boolean isCleanup() {
+		return cleanup;
+	}
+
+	public static void setCleanup(boolean cleanup) {
+		B2TLAGlobals.cleanup = cleanup;
+	}
+
+	public static boolean isProBconstantsSetup() {
+		return proBconstantsSetup;
+	}
+
+	public static void setProBconstantsSetup(boolean proBconstantsSetup) {
+		B2TLAGlobals.proBconstantsSetup = proBconstantsSetup;
+	}
+	
+	public static void setTestingMode(boolean b){
+		B2TLAGlobals.testingMode = b;
+	}
+	
+	public static boolean getTestingMode(){
+		return B2TLAGlobals.testingMode;
 	}
 	
 }

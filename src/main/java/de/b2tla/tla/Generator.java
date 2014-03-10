@@ -11,10 +11,10 @@ import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.ConstantsEvaluator;
 import de.b2tla.analysis.DefinitionsAnalyser;
 import de.b2tla.analysis.MachineContext;
-import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.nodes.ElementOfNode;
 import de.b2tla.analysis.nodes.NodeType;
+import de.b2tla.analysis.typerestriction.TypeRestrictor;
 import de.b2tla.btypes.BType;
 import de.b2tla.tla.config.ModelValueAssignment;
 import de.b2tla.tla.config.SetOfModelValuesAssignment;
@@ -30,6 +30,7 @@ import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.AMemberPredicate;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
+import de.be4.classicalb.core.parser.node.ASetExtensionExpression;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
@@ -237,7 +238,7 @@ public class Generator extends DepthFirstAdapter {
 		while (cons.hasNext()) {
 			AIdentifierExpression con = (AIdentifierExpression) cons.next();
 			Node value = conValueTable.get(con);
-			tlaModule.definitions.add(new TLADefinition(con, value));
+			//tlaModule.definitions.add(new TLADefinition(con, value));
 
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
@@ -250,14 +251,33 @@ public class Generator extends DepthFirstAdapter {
 		ArrayList<Node> remainingConstants = new ArrayList<Node>();
 		remainingConstants.addAll(machineContext.getConstants().values());
 		remainingConstants.removeAll(conValueTable.keySet());
-
+		
 		Node propertiesPerdicate = machineContext.getPropertiesMachineClause()
 				.getPredicates();
 		if (remainingConstants.size() != 0) {
 			boolean init = false;
+			int numberOfIteratedConstants = 0;
+			
+			
 			for (int i = 0; i < remainingConstants.size(); i++) {
+				init = true;
 				Node con = remainingConstants.get(i);
 				this.tlaModule.variables.add(con);
+				
+				ArrayList<PExpression> rangeList = constantsEvaluator.getRangeOfIdentifier(con);
+				if(rangeList.size() > 0){
+					numberOfIteratedConstants++;
+					ArrayList<PExpression> clone = new ArrayList<PExpression>();
+					for (PExpression pExpression : rangeList) {
+						clone.add((PExpression) pExpression.clone());
+					}
+					ASetExtensionExpression set = new ASetExtensionExpression(clone);
+					AMemberPredicate member = new AMemberPredicate((AIdentifierExpression) con, set);
+					tlaModule.addInit(member);
+					continue;
+				}
+				
+				
 				Integer value = constantsEvaluator.getIntValue(con);
 				if (value == null) {
 					init = true;
@@ -301,19 +321,30 @@ public class Generator extends DepthFirstAdapter {
 					}
 
 				} else {
-					tlaModule.definitions.add(new TLADefinition(con, value));
+					//tlaModule.definitions.add(new TLADefinition(con, value));
 				}
 
 			}
+			
+			if(numberOfIteratedConstants > 1){
+				tlaModule.addInit(machineContext.getConstantsSetup());
+			}
+			
+			
 			if (init) {
 				configFile.setInit();
 				tlaModule.addInit(propertiesPerdicate);
 			}
+			
+
 
 		} else {
 			tlaModule.assumes.addAll(constantsEvaluator.getPropertiesList());
 			// tlaModule.addAssume(propertiesPerdicate);
 		}
+		
+		
+		
 	}
 
 	@Override

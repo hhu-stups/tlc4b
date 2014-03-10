@@ -1,10 +1,11 @@
-package de.b2tla.analysis;
+package de.b2tla.analysis.typerestriction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import de.b2tla.analysis.MachineContext;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;

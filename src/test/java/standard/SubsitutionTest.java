@@ -10,10 +10,11 @@ import org.junit.Test;
 
 
 
+
 import de.b2tla.analysis.Ast2String;
 import de.b2tla.analysis.MachineContext;
 import de.b2tla.analysis.Typechecker;
-import de.b2tla.analysis.UnchangedVariablesFinder;
+import de.b2tla.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.b2tla.exceptions.SubstitutionException;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;

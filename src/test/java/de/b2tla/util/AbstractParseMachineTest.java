@@ -5,7 +5,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import de.b2tla.tlc.TLCOutput;
+import de.b2tla.tlc.TLCResults.TLCResult;
 import de.b2tla.util.PolySuite.Configuration;
 
 public abstract class AbstractParseMachineTest {
@@ -31,7 +31,7 @@ public abstract class AbstractParseMachineTest {
 	protected static Configuration getConfiguration(ArrayList<TestPair> list) {
 		final ArrayList<File> allMachines = new ArrayList<File>();
 		
-		final ArrayList<TLCOutput.TLCResult> expectedValues = new ArrayList<TLCOutput.TLCResult>();
+		final ArrayList<TLCResult> expectedValues = new ArrayList<TLCResult>();
 		for (TestPair testPair : list) {
 			File[] machines = getMachines(testPair.getPath());
 			allMachines.addAll(Arrays.asList(machines));
@@ -53,7 +53,7 @@ public abstract class AbstractParseMachineTest {
 				return allMachines.get(index).getName();
 			}
 
-			public TLCOutput.TLCResult getExpectedValue(int index) {
+			public TLCResult getExpectedValue(int index) {
 				return expectedValues.get(index);
 			}
 		};

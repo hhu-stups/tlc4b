@@ -8,16 +8,16 @@ import java.util.List;
 
 import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.MachineContext;
-import de.b2tla.analysis.UnchangedVariablesFinder;
 import de.b2tla.analysis.PrecedenceCollector;
 import de.b2tla.analysis.PrimedNodesMarker;
 import de.b2tla.analysis.Renamer;
-import de.b2tla.analysis.TypeRestrictor;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.analysis.UsedStandardModules;
 import de.b2tla.analysis.nodes.EqualsNode;
 import de.b2tla.analysis.nodes.NodeType;
 import de.b2tla.analysis.nodes.SubsetNode;
+import de.b2tla.analysis.typerestriction.TypeRestrictor;
+import de.b2tla.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
@@ -134,17 +134,17 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append("))");
 
 	}
-	
+
 	public void printWeakFairnessWithParameter(String s) {
 		Node operation = machineContext.getOperations().get(s.trim());
-		
+
 		tlaModuleString.append("([]<><<");
 		printOperationCall(operation);
 		tlaModuleString.append(">>_vars \\/  []<>~ENABLED(");
 		printOperationCall(operation);
 		tlaModuleString.append(") \\/ []<> ENABLED(");
 		printOperationCall(operation);
-		tlaModuleString.append(" /\\ ");	
+		tlaModuleString.append(" /\\ ");
 		printVarsStuttering();
 		tlaModuleString.append("))");
 
@@ -356,7 +356,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 			return;
 		tlaModuleString.append("Init == ");
 		for (int i = 0; i < inits.size(); i++) {
-			inits.get(i).apply(this);
+			Node init = inits.get(i);
+			if(init instanceof ADisjunctPredicate){
+				tlaModuleString.append("(");
+			}
+			init.apply(this);
+			if(init instanceof ADisjunctPredicate){
+				tlaModuleString.append(")");
+			}
 			if (i < inits.size() - 1)
 				tlaModuleString.append(" /\\ ");
 		}
@@ -661,6 +668,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIfSubstitution(AIfSubstitution node) {
+		if(node.getElsifSubstitutions().size() > 0){
+			printElseIFSubsitution(node);
+			return;
+		}
 		tlaModuleString.append("(IF ");
 		node.getCondition().apply(this);
 		tlaModuleString.append(" THEN ");
@@ -679,6 +690,37 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		tlaModuleString.append(")");
 		printUnchangedVariables(node, true);
+	}
+	
+	private void printElseIFSubsitution(AIfSubstitution node){
+		tlaModuleString.append("(CASE ");
+		node.getCondition().apply(this);
+		tlaModuleString.append(" -> ");
+		node.getThen().apply(this);
+		List<PSubstitution> copy = new ArrayList<PSubstitution>(
+				node.getElsifSubstitutions());
+		for (PSubstitution e : copy) {
+			tlaModuleString.append(" [] ");
+			e.apply(this);
+		}
+		tlaModuleString.append(" [] OTHER -> ");
+		if (node.getElse() != null) {
+			node.getElse().apply(this);
+		} else {
+			printUnchangedVariablesNull(node, false);
+		}
+		tlaModuleString.append(")");
+		printUnchangedVariables(node, true);
+		
+	}
+
+	@Override
+	public void caseAIfElsifSubstitution(AIfElsifSubstitution node) {
+		node.getCondition().apply(this);
+		tlaModuleString.append(" -> ");
+		node.getThenSubstitution().apply(this);
+		printUnchangedVariables(node, true);
+		
 	}
 
 	public void printUnchangedVariablesNull(Node node, boolean printAnd) {
@@ -2546,18 +2588,17 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAGeneralConcatExpression(AGeneralConcatExpression node) {
 		BType result = typechecker.getType(node.getExpression());
 
-		if (result instanceof FunctionType && ((FunctionType) result).getRange() instanceof FunctionType) {
+		if (result instanceof FunctionType
+				&& ((FunctionType) result).getRange() instanceof FunctionType) {
 
-		}else{
-			BType expected2 = new SetType(new PairType(IntegerType.getInstance(),
-					new SetType(new PairType(IntegerType.getInstance(),
-							new UntypedType()))));
+		} else {
+			BType expected2 = new SetType(new PairType(
+					IntegerType.getInstance(), new SetType(new PairType(
+							IntegerType.getInstance(), new UntypedType()))));
 			typechecker.unify(expected2, result, node);
 		}
 
-		
-		printSequenceOrRelation(node,
-				SEQUENCE_GENERAL_CONCATINATION,
+		printSequenceOrRelation(node, SEQUENCE_GENERAL_CONCATINATION,
 				REL_SEQUENCE_GENERAL_CONCATINATION, node.getExpression(), null);
 	}
 
@@ -2613,7 +2654,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseACartesianProductExpression(ACartesianProductExpression node) {
-		inACartesianProductExpression(node); //TODO cartesianproduct vs AMultOrCartExpression
+		inACartesianProductExpression(node); // TODO cartesianproduct vs
+												// AMultOrCartExpression
 		node.getLeft().apply(this);
 		tlaModuleString.append(" \\times ");
 		node.getRight().apply(this);

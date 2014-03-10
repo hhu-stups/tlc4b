@@ -1,14 +1,12 @@
 package de.b2tla;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,8 +17,6 @@ import de.b2tla.util.BTLCPrintStream;
 import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
-import tlc2.tool.ModelChecker;
-import tlc2.tool.TLCStateInfo;
 
 public class TLCRunner {
 
@@ -67,13 +63,16 @@ public class TLCRunner {
 		if (!B2TLAGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
+		
+		if(B2TLAGlobals.isCheckltl()){
+			list.add("-cleanup");
+		}
 		// list.add("-coverage");
 		// list.add("1");
 
 		String[] args = list.toArray(new String[list.size()]);
 		System.out.println("Starting JVM...");
 		final Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
-		
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
 		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
@@ -86,14 +85,14 @@ public class TLCRunner {
 		return stdOut.getLog();
 	}
 
-	public static ArrayList<String> runTLC(String machineName, String path) {
+	public static void runTLC(String machineName, String path) {
 
 		System.out.println("--------------------------------");
 		
-		BTLCPrintStream btlcStream = new BTLCPrintStream();
-		PrintStream systemOut = System.out;
+		//BTLCPrintStream btlcStream = new BTLCPrintStream();
+		//PrintStream systemOut = System.out;
 		//System.setErr(btlcStream);
-		System.setOut(btlcStream);
+		//System.setOut(btlcStream);
 		ToolIO.setMode(ToolIO.SYSTEM);
 		
 		ArrayList<String> list = new ArrayList<String>();
@@ -111,8 +110,6 @@ public class TLCRunner {
 		ToolIO.setUserDir(path);
 		String[] args = list.toArray(new String[list.size()]);
 
-
-
 		TLC tlc = new TLC();
         
 		// handle parameters
@@ -125,39 +122,12 @@ public class TLCRunner {
 			}
 			
 		}
-		
-		
-		System.setOut(systemOut);
-
-		
-		String [] a = ToolIO.getAllMessages();
-		for (int i = 0; i < a.length; i++) {
-			//System.out.println(a[i]);
-		}
-		//ToolIO.printAllMessages();
-		
-		ArrayList<String> messages = btlcStream.getArrayList();
-		
-		
-        Field field;
-		try {
-			field = TLC.class.getDeclaredField("instance");
-	        field.setAccessible(true);
-	        ModelChecker mc = (ModelChecker) field.get(tlc);
-	        //System.out.println(mc.trace.printTrace(arg0, arg1););
-	        //TLCStateInfo[] states = value.trace.getTrace();
-//	        for (int i = 0; i < states.length; i++) {
-//				System.out.println(states[i]);
-//			}
-	        
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		//System.setOut(systemOut);
+		//ArrayList<String> messages = btlcStream.getArrayList();
 		
 		System.out.println("--------------------------------");
 		closeThreads();
-		return messages;
+		//return messages;
 	}
 
 	private static void closeThreads() {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Collections;
 
+import de.b2tla.analysis.typerestriction.TypeRestrictor;
 import de.b2tla.btypes.BType;
 import de.b2tla.btypes.FunctionType;
 import de.b2tla.btypes.IntegerType;
