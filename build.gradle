@@ -15,7 +15,7 @@ repositories {
 configurations { // configuration that holds jars to copy into lib
 	releaseJars }
 
-def parser_version = '2.4.20-SNAPSHOT'
+def parser_version = '2.4.22-SNAPSHOT'
 
 dependencies {
 	compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
