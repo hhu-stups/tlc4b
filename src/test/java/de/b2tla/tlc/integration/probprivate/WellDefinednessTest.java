@@ -30,7 +30,7 @@ public class WellDefinednessTest extends AbstractParseMachineTest  {
 		
 		@Test
 		public void testRunTLC() throws Exception {
-			String[] a = new String[] { machine.getPath() };
+			String[] a = new String[] { machine.getPath(), "-wdcheck" };
 			assertEquals(error, test(a));
 		}
 
