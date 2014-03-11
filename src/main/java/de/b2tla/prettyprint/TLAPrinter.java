@@ -1616,7 +1616,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 			tlaModuleString.append("]");
 		} else {
-			tlaModuleString.append(REL_CALL + "(");
+			
+			if(B2TLAGlobals.checkWelldefinedness()){
+				tlaModuleString.append(REL_CALL + "(");
+			}else{
+				tlaModuleString.append(REL_CALL_WITHOUT_WD_CHECK + "(");
+			}
+			
 			node.getIdentifier().apply(this);
 			tlaModuleString.append(", ");
 			List<PExpression> copy = new ArrayList<PExpression>(

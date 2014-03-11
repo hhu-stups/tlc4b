@@ -2,10 +2,29 @@ package de.b2tla.prettyprint;
 
 import static de.b2tla.util.TestUtil.compare;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
+import de.b2tla.exceptions.SubstitutionException;
+
 public class SubstitutionsTest {
+	
+	
+	@Test (expected = SubstitutionException.class)
+	public void testVariableAssignedTwice() throws Exception {
+		String machine = "MACHINE test\n" + "VARIABLES x\n"
+				+ "INVARIANT x = 1 \n" + "INITIALISATION x := 1 || x := 1 \n"
+				+ "END";
+		compare(null, machine);
+	}
+	
+	@Test  (expected = SubstitutionException.class)
+	public void testMissingVariableAssignment() throws Exception {
+		String machine = "MACHINE test\n" + "VARIABLES x,y \n"
+				+ "INVARIANT x = 1 & y = 1 \n" + "INITIALISATION x := 1 \n"
+				+ "END";
+		compare(null, machine);
+	}
+	
 	@Test
 	public void testLet() throws Exception {
 		String machine = "MACHINE test\n"
@@ -113,7 +132,5 @@ public class SubstitutionsTest {
 				+ "====";
 		compare(expected, machine);
 	}
-	
-	
 	
 }

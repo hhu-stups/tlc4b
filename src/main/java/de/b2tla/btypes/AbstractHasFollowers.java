@@ -22,7 +22,7 @@ public abstract class AbstractHasFollowers implements BType{
 			if(!(o instanceof Node)){
 				res+= o.hashCode();
 				res+= o.getClass();
-				IntegerOrSetOfPairType i = (IntegerOrSetOfPairType) o;
+				//IntegerOrSetOfPairType i = (IntegerOrSetOfPairType) o;
 				res += " ";
 			}
 			

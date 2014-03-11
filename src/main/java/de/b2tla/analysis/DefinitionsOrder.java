@@ -45,21 +45,6 @@ public class DefinitionsOrder extends DepthFirstAdapter {
 
 	}
 
-	private void printDefintions(ArrayList<PDefinition> list) {
-		for (PDefinition pDefinition : list) {
-			if (pDefinition instanceof APredicateDefinitionDefinition) {
-				APredicateDefinitionDefinition def = (APredicateDefinitionDefinition) pDefinition;
-				System.out.print(def.getName());
-				System.out.println(dependenciesTable.get(def));
-			} else {
-				AExpressionDefinitionDefinition def = (AExpressionDefinitionDefinition) pDefinition;
-				System.out.print(def.getName());
-				System.out.println(dependenciesTable.get(def));
-			}
-
-		}
-	}
-
 	private ArrayList<PDefinition> sort(ArrayList<PDefinition> list) {
 		ArrayList<PDefinition> result = new ArrayList<PDefinition>();
 		boolean newRun = true;

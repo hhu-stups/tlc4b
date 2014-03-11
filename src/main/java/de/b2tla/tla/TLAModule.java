@@ -7,7 +7,6 @@ import de.b2tla.analysis.MachineContext;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.POperation;
-import de.be4.classicalb.core.parser.node.PPredicate;
 
 public class TLAModule {
 

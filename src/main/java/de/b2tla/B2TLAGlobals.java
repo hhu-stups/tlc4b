@@ -9,6 +9,7 @@ public class B2TLAGlobals {
 	private static boolean checkDeadlock;
 	private static boolean checkInvariant;
 	private static boolean checkLTL;
+	private static boolean checkWD;
 	private static boolean proBconstantsSetup;
 
 	private static boolean deleteFilesOnExit;
@@ -40,6 +41,8 @@ public class B2TLAGlobals {
 		checkDeadlock = true;
 		checkInvariant = true;
 		checkLTL = true;
+		checkWD= false;
+		
 		setProBconstantsSetup(false);
 
 		setCleanup(true);
@@ -194,6 +197,14 @@ public class B2TLAGlobals {
 	
 	public static boolean getTestingMode(){
 		return B2TLAGlobals.testingMode;
+	}
+	
+	public static void setWelldefinednessCheck(boolean b){
+		B2TLAGlobals.checkWD = b;
+	}
+	
+	public static boolean checkWelldefinedness(){
+		return B2TLAGlobals.checkWD;
 	}
 	
 }

@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.UsedStandardModules.STANDARD_MODULES;
@@ -25,11 +24,10 @@ public class B2TLA {
 
 	private String mainFileName;
 	private String machineFileNameWithoutFileExtension;
-	private String pathAndName;
 	private String path;
 	private String tlaModule;
 	private String config;
-	private B2TlaTranslator translator;
+	private Translator translator;
 	private TLCOutputInfo tlcOutputInfo;
 	private String ltlFormula;
 	private String constantsSetup;
@@ -52,15 +50,14 @@ public class B2TLA {
 
 		if (B2TLAGlobals.isRunTLC()) {
 			try {
-				TLCRunner.runTLC(
-						b2tla.machineFileNameWithoutFileExtension, b2tla.path);
+				TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
+						b2tla.path);
 				// b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
 				// System.out.println("------------------------------");
 
 				TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
 				results.evalResults();
-				b2tla.printResults(results,
-						B2TLAGlobals.isCreateTraceFile());
+				b2tla.printResults(results, B2TLAGlobals.isCreateTraceFile());
 				System.exit(0);
 
 			} catch (NoClassDefFoundError e) {
@@ -73,12 +70,12 @@ public class B2TLA {
 
 	}
 
-	private void printResults(TLCResults results,
-			boolean createTraceFile) {
+	private void printResults(TLCResults results, boolean createTraceFile) {
 
 		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
 				+ " ms");
-		System.out.println("Translation time: " + StopWatch.getRunTime("Pure") + " ms");
+		System.out.println("Translation time: " + StopWatch.getRunTime("Pure")
+				+ " ms");
 		System.out.println("Model checking time: "
 				+ results.getModelCheckingTime() + " sec");
 		System.out.println("States analysed: "
@@ -121,24 +118,28 @@ public class B2TLA {
 
 			TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
 			results.evalResults();
+			@SuppressWarnings("unused")
 			TLCResult result = results.getTLCResult();
-			//System.out.println("Result: " + result);
-			
-			b2tla.printResults(results, B2TLAGlobals.isCreateTraceFile());
+			// System.out.println("Result: " + result);
+
+			b2tla.printResults(results, false);
+			System.out.println(results.getTrace());
 			System.exit(0);
 		}
 		System.exit(1);
 	}
 
-
+	@SuppressWarnings({ "unused", "null" })
 	private void printTestResultsForTestscript() {
 		TLCResults tlcResults = null;
 		// This output is adapted to Ivo's testscript
 		System.out.println("------------- Results -------------");
 		System.out.println("Model Checking Time: "
 				+ (tlcResults.getModelCheckingTime() * 1000) + " ms");
-		System.out.println("States analysed: " + tlcResults.getNumberOfDistinctStates());
-		System.out.println("Transitions fired: " + tlcResults.getNumberOfTransitions());
+		System.out.println("States analysed: "
+				+ tlcResults.getNumberOfDistinctStates());
+		System.out.println("Transitions fired: "
+				+ tlcResults.getNumberOfTransitions());
 		if (tlcResults.getTLCResult() != TLCResult.NoError) {
 			System.err.println("@@");
 			System.err.println("12" + tlcResults.getResultString());
@@ -159,6 +160,8 @@ public class B2TLA {
 				B2TLAGlobals.setGOAL(false);
 			} else if (args[index].toLowerCase().equals("-noinv")) {
 				B2TLAGlobals.setInvariant(false);
+			} else if (args[index].toLowerCase().equals("-wdcheck")) {
+				B2TLAGlobals.setWelldefinednessCheck(true);
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				B2TLAGlobals.setTool(false);
 			} else if (args[index].toLowerCase().equals("-tmp")) {
@@ -219,9 +222,8 @@ public class B2TLA {
 		handleMainFileName();
 		if (B2TLAGlobals.isTranslate()) {
 			StopWatch.start("Parsing");
-			translator = new B2TlaTranslator(
-					machineFileNameWithoutFileExtension, getFile(),
-					this.ltlFormula, this.constantsSetup);
+			translator = new Translator(machineFileNameWithoutFileExtension,
+					getFile(), this.ltlFormula, this.constantsSetup);
 			StopWatch.stop("Parsing");
 			StopWatch.start("Pure");
 			translator.translate();
@@ -244,7 +246,6 @@ public class B2TLA {
 		if (name.toLowerCase().endsWith(".mch")) {
 			name = name.substring(0, name.length() - 4);
 		}
-		pathAndName = name;
 		if (path == null) {
 			if (name.contains(File.separator)) {
 				path = name.substring(0, name.lastIndexOf(File.separator) + 1);

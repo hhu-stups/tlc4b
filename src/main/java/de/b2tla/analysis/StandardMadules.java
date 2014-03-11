@@ -68,6 +68,7 @@ public class StandardMadules {
 
 	// FunctionsAsRelations
 	public static final String REL_CALL = "RelCall";
+	public static final String REL_CALL_WITHOUT_WD_CHECK = "RelCallWithoutWDCheck";
 
 	public static final String REL_TOTAL_FUNCTION = "RelTotalFunc";
 	public static final String REL_TOTAL_FUNCTION_ELEMENT_OF = "RelTotalFuncEleOf";

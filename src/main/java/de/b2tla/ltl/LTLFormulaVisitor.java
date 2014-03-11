@@ -38,7 +38,6 @@ import de.be4.ltl.core.parser.node.AYesterdayLtl;
 import de.be4.ltl.core.parser.node.PLtl;
 import de.be4.ltl.core.parser.node.Start;
 import de.be4.ltl.core.parser.parser.Parser;
-import de.be4.ltl.core.parser.parser.ParserException;
 
 public class LTLFormulaVisitor extends DepthFirstAdapter {
 
@@ -99,8 +98,8 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	}
 
 	public void printLTLFormula(TLAPrinter tlaPrinter) {
-		LTLFormulaPrinter ltlFormulaPrinter = new LTLFormulaPrinter(tlaPrinter,
-				this);
+		// LTLFormulaPrinter ltlFormulaPrinter =
+		new LTLFormulaPrinter(tlaPrinter, this);
 	}
 
 	public static Start parse(String ltlFormula) {

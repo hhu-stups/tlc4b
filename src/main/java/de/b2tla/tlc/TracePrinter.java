@@ -174,9 +174,8 @@ public class TracePrinter {
 
 		case MODELVALUE:
 			ModelValue modelValue = (ModelValue) val;
-			// TODO B name of model value
-			String name = tlcOutputInfo.getBName(modelValue.toString());
-			res.append(modelValue.toString());
+			String BName = tlcOutputInfo.getBName(modelValue.toString());
+			res.append(BName);
 			return res;
 
 		case SETOFTUPLESVALUE: {

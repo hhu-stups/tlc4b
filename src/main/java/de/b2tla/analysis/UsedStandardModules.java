@@ -37,7 +37,6 @@ import de.be4.classicalb.core.parser.node.AGeneralConcatExpression;
 import de.be4.classicalb.core.parser.node.AGeneralIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
 import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
-import de.be4.classicalb.core.parser.node.AGeneralUnionExpression;
 import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;
 import de.be4.classicalb.core.parser.node.AGreaterPredicate;
 import de.be4.classicalb.core.parser.node.AIdentityExpression;

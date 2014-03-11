@@ -55,6 +55,7 @@ public class TLCOutputInfo {
 		LinkedHashMap<String, Node> identifiers = new LinkedHashMap<String, Node>();
 		identifiers.putAll(machineContext.getConstants());
 		identifiers.putAll(machineContext.getVariables());
+		identifiers.putAll(machineContext.getEnumValues());
 		
 		for (Iterator<String> iter = identifiers.keySet().iterator(); iter.hasNext();) {
 			String name = iter.next();

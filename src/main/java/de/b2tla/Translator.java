@@ -22,14 +22,13 @@ import de.b2tla.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.b2tla.prettyprint.TLAPrinter;
 import de.b2tla.tla.Generator;
 import de.b2tla.tlc.TLCOutputInfo;
-import de.b2tla.util.StopWatch;
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
 
-public class B2TlaTranslator {
+public class Translator {
 
 	private String machineString;
 	private Start start;
@@ -41,7 +40,7 @@ public class B2TlaTranslator {
 	private ArrayList<STANDARD_MODULES> usedStandardModules;
 	private TLCOutputInfo tlcOutputInfo;
 
-	public B2TlaTranslator(String machineString) throws BException {
+	public Translator(String machineString) throws BException {
 		this.machineString = machineString;
 		BParser parser = new BParser("Testing");
 		start = parser.parse(machineString, false);
@@ -50,7 +49,7 @@ public class B2TlaTranslator {
 		//System.out.println(ast2String2.toString());
 	}
 
-	public B2TlaTranslator(String machineString, String ltlFormula)
+	public Translator(String machineString, String ltlFormula)
 			throws BException {
 		this.machineString = machineString;
 		this.ltlFormula = ltlFormula;
@@ -61,7 +60,7 @@ public class B2TlaTranslator {
 		//System.out.println(ast2String2.toString());
 	}
 
-	public B2TlaTranslator(String machineName, File machineFile, String ltlFormula, String constantSetup)
+	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
 			throws IOException, BException {
 		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
@@ -94,6 +93,7 @@ public class B2TlaTranslator {
 	}
 
 	public void translate() {
+		@SuppressWarnings("unused")
 		DefinitionsEliminator defEliminator = new DefinitionsEliminator(start);
 
 		new NotSupportedConstructs(start);

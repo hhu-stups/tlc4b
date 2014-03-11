@@ -3,7 +3,6 @@ package de.b2tla.btypes;
 import de.b2tla.B2TLAGlobals;
 import de.b2tla.analysis.Typechecker;
 import de.b2tla.exceptions.UnificationException;
-import de.be4.classicalb.core.parser.node.AIntegerExpression;
 import de.be4.classicalb.core.parser.node.AIntegerSetExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
 

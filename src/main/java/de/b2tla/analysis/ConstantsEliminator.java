@@ -282,42 +282,6 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 
 		}
 
-		private void analyseLessEqualPredicate(ALessEqualPredicate node) {
-			PExpression left = node.getLeft();
-			Node left_ref = machineContext.getReferences().get(left);
-			PExpression right = node.getRight();
-			Node right_ref = machineContext.getReferences().get(right);
-			if (identifiers.contains(left_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) right;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(left_ref, value);
-			}
-
-			if (identifiers.contains(right_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) left;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(right_ref, value);
-			}
-		}
-
-		private void analyseGreaterPredicate(AGreaterPredicate node) {
-			PExpression left = node.getLeft();
-			Node left_ref = machineContext.getReferences().get(left);
-			PExpression right = node.getRight();
-			Node right_ref = machineContext.getReferences().get(right);
-			if (identifiers.contains(left_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) right;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(left_ref, value + 1);
-			}
-
-			if (identifiers.contains(right_ref)) {
-				AIntegerExpression intExpr = (AIntegerExpression) left;
-				int value = Integer.parseInt(intExpr.getLiteral().getText());
-				integerValueTable.put(right_ref, value - 1);
-			}
-		}
-
 		private void analyseEqualsPredicate(AEqualPredicate node) {
 			PExpression left = node.getLeft();
 			Node left_ref = machineContext.getReferences().get(left);

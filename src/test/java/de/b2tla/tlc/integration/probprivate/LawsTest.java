@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.b2tla.B2TLA;
 import de.b2tla.B2TLAGlobals;
 
 public class LawsTest {

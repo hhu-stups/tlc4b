@@ -7,13 +7,8 @@ import de.b2tla.btypes.BType;
 import de.b2tla.btypes.IntegerType;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
-import de.be4.classicalb.core.parser.node.AGreaterEqualPredicate;
-import de.be4.classicalb.core.parser.node.AGreaterPredicate;
-import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
-import de.be4.classicalb.core.parser.node.ALessPredicate;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
-import de.be4.classicalb.core.parser.node.APowerOfExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 

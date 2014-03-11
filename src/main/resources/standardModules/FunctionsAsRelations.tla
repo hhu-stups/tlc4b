@@ -15,6 +15,8 @@ LOCAL IsInj(f) == Cardinality(RelRan(f)) = Cardinality(f)
 LOCAL IsSurj(f, ran) == RelRan(f) = ran
  \* Testing if f is a surjective function
 
+RelCallWithoutWDCheck(f, x) == (CHOOSE y \in f: y[1] = x)[2]
+
 RelCall(f, x) ==  IF Cardinality(f) = Cardinality(RelDom(f)) /\ x \in RelDom(f)
    THEN (CHOOSE y \in f: y[1] = x)[2]
    ELSE PrintT("Error: Invalid function call to relation "
