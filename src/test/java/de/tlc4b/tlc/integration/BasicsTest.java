@@ -1,6 +1,5 @@
-package testing;
+package de.tlc4b.tlc.integration;
 
-import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -9,39 +8,37 @@ import java.util.ArrayList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.tlc4b.TLC4B;
 import de.tlc4b.tlc.TLCResults.TLCResult;
 import de.tlc4b.util.AbstractParseMachineTest;
 import de.tlc4b.util.PolySuite;
 import de.tlc4b.util.TestPair;
 import de.tlc4b.util.PolySuite.Config;
 import de.tlc4b.util.PolySuite.Configuration;
-
-
+import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
+import static de.tlc4b.util.TestUtil.test;
 
 @RunWith(PolySuite.class)
-public class Testing extends AbstractParseMachineTest{
+public class BasicsTest extends AbstractParseMachineTest {
 
-	
 	private final File machine;
 	private final TLCResult error;
 
-	public Testing(File machine, TLCResult result) {
+	public BasicsTest(File machine, TLCResult result) {
 		this.machine = machine;
 		this.error = result;
 	}
 
 	@Test
 	public void testRunTLC() throws Exception {
-		String[] a = new String[] { machine.getPath()};
-		//B2TLA.main(a);
-		//assertEquals(error, B2TLA.test(a,false));
+		String[] a = new String[] { machine.getPath() };
+		assertEquals(error, test(a));
 	}
 
 	@Config
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
-		list.add(new TestPair(NoError, "./src/test/resources/Testing"));
+		list.add(new TestPair(NoError, "./src/test/resources/basics"));
+		list.add(new TestPair(NoError, "./src/test/resources/laws"));
 		return getConfiguration(list);
 	}
 }

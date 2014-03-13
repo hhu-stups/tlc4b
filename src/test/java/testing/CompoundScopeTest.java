@@ -13,13 +13,14 @@ import org.junit.Test;
 
 
 
-import de.b2tla.analysis.Ast2String;
-import de.b2tla.analysis.MachineContext;
+
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.analysis.pragma.Pragma;
 import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
+import de.tlc4b.analysis.Ast2String;
+import de.tlc4b.analysis.MachineContext;
 
 public class CompoundScopeTest {
 

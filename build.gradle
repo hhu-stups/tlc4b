@@ -40,7 +40,7 @@ dependencies {
 
 
 test { 
-	exclude('de/b2tla/tlc/integration/probprivate')
+	exclude('de/tlc4b/tlc/integration/probprivate')
 	exclude('testing')
 	
 }
@@ -49,14 +49,14 @@ test {
 task integrationtests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
-	include('de/b2tla/tlc/integration/probprivate/**')
+	include('de/tlc4b/tlc/integration/probprivate/**')
 }
 
 jar { from sourceSets.main.allJava }
 jar	{
 	from configurations.releaseJars.collect { it.isDirectory() ? it : zipTree(it) }
 }
-manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
+manifest.mainAttributes("Main-Class" : 'de.tlc4b.TLC4B')
 manifest.mainAttributes("Class-Path": './tla/ tlatools.jar')
 
 task tlc4b(dependsOn: build) << {

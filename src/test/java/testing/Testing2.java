@@ -1,22 +1,23 @@
 package testing;
 
 
-import static de.b2tla.tlc.TLCResults.TLCResult.NoError;
 import static org.junit.Assert.*;
-import static de.b2tla.util.TestUtil.test;
+import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
+import static de.tlc4b.util.TestUtil.test;
+
 import java.io.File;
 import java.util.ArrayList;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.b2tla.B2TLA;
-import de.b2tla.tlc.TLCResults.TLCResult;
-import de.b2tla.util.AbstractParseMachineTest;
-import de.b2tla.util.PolySuite;
-import de.b2tla.util.TestPair;
-import de.b2tla.util.PolySuite.Config;
-import de.b2tla.util.PolySuite.Configuration;
+import de.tlc4b.TLC4B;
+import de.tlc4b.tlc.TLCResults.TLCResult;
+import de.tlc4b.util.AbstractParseMachineTest;
+import de.tlc4b.util.PolySuite;
+import de.tlc4b.util.TestPair;
+import de.tlc4b.util.PolySuite.Config;
+import de.tlc4b.util.PolySuite.Configuration;
 
 @RunWith(PolySuite.class)
 public class Testing2 extends AbstractParseMachineTest{
@@ -33,7 +34,7 @@ public class Testing2 extends AbstractParseMachineTest{
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] {machine.getPath()};
 		
-		B2TLA.main(a);
+		TLC4B.main(a);
 		//B2TLA.test(a,true);
 		//test(a);
 		//assertEquals(error, B2TLA.test(a,true));
