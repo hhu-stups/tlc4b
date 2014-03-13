@@ -29,7 +29,7 @@ dependencies {
 	//compile(group: 'de.prob', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
 
 	testCompile (group: 'junit', name: 'junit', version: '4.+')
-	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.3-SNAPSHOT')
+	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.4-SNAPSHOT')
 
 	releaseJars (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT')
 	releaseJars (group: 'de.prob', name: 'prologlib', version: parser_version)

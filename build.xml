@@ -1,0 +1,5 @@
+<project default="copy">
+    <target name="copy">
+       <copy file="build/b2tla/B2TLA.jar" tofile="../../Desktop/ProB/lib/B2TLA.jar"/>
+    </target>
+</project>
