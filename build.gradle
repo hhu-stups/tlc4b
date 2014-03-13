@@ -59,17 +59,17 @@ jar	{
 manifest.mainAttributes("Main-Class" : 'de.b2tla.B2TLA')
 manifest.mainAttributes("Class-Path": './tla/ tlatools.jar')
 
-task b2tla(dependsOn: build) << {
+task tlc4b(dependsOn: build) << {
 	copy {
 		from('build/libs/')
-		into('build/b2tla')
-		include('b2tla-'+project.version+'.jar')
-		rename('b2tla-(.+)', 'B2TLA.jar')
+		into('build/tlc4b')
+		include('tlc4b-'+project.version+'.jar')
+		rename('tlc4b-(.+)', 'TLC4B.jar')
 	}
 }
 
-task all(dependsOn: b2tla) <<{
-	ant.get(src: 'http://tla.msr-inria.inria.fr/tlatoolbox/dist/tla2tools.jar', verbose:true, dest: 'build/b2tla/')
+task all(dependsOn: tlc4b) <<{
+	ant.get(src: 'http://tla.msr-inria.inria.fr/tlatoolbox/dist/tla2tools.jar', verbose:true, dest: 'build/tlc4b/')
 }
 
 
