@@ -2018,10 +2018,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		inASubsetPredicate(node);
 		node.getLeft().apply(this);
-		tlaModuleString.append(" \\in SUBSET(");
-		// tlaModuleString.append(" \\subseteq ");
+		//tlaModuleString.append(" \\in SUBSET(");
+		tlaModuleString.append(" \\subseteq ");
 		node.getRight().apply(this);
-		tlaModuleString.append(")");
+		//tlaModuleString.append(")");
 		outASubsetPredicate(node);
 	}
 

@@ -115,7 +115,7 @@ public class ConstantsTest {
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "N == {1,2,3,4}\n"
-				+ "ASSUME N \\in SUBSET(Nat) \n"
+				+ "ASSUME N \\subseteq Nat \n"
 				+ "======";
 		compare(expected, machine);
 	}

@@ -48,6 +48,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AGreaterEqualPredicate", 5, 5, false);
 		put("ANotEqualPredicate", 5, 5, false);
 		put("APowerOfExpression", 14, 14, false);
+		put("ASubsetPredicate", 5, 5, false);
 		// put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
 
 		put("AUnionExpression", 8, 8, true);

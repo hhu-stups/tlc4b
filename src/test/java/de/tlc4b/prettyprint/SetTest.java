@@ -154,7 +154,7 @@ public class SetTest {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES {1} <: {1} \n" + "END";
 		String expected = "---- MODULE test----\n"
-				+ "ASSUME {1} \\in SUBSET({1})  \n"
+				+ "ASSUME {1} \\subseteq {1}  \n"
 				+ "======";
 		compare(expected, machine);
 	}
