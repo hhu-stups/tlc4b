@@ -256,7 +256,7 @@ public class NumbersTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers\n"
-				+ "ASSUME {x \\in (-1..4): 1 = 1 => x = 1} = {}\n"
+				+ "ASSUME {x \\in (Int): 1 = 1 => x = 1} = {}\n"
 				+ "======";
 		compare(expected, machine);
 	}

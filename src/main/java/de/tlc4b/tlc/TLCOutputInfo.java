@@ -9,6 +9,7 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Renamer;
 import de.tlc4b.btypes.BType;
+import de.tlc4b.tla.TLAModule;
 
 public class TLCOutputInfo {
 	
@@ -16,6 +17,11 @@ public class TLCOutputInfo {
 	Hashtable<String, BType> typesTable;
 	Set<String> constants;
 	boolean constantSetup= false;
+	private boolean init= false;
+	
+	public boolean hasInitialisation(){
+		return init;
+	}
 	
 	public String getBName(String tlaName){
 		return namesMapping.get(tlaName);
@@ -42,11 +48,12 @@ public class TLCOutputInfo {
 	}
 	
 	public TLCOutputInfo(MachineContext machineContext, Renamer renamer,
-			Hashtable<Node, BType> types) {
+			Hashtable<Node, BType> types, TLAModule tlaModule) {
 		
 		namesMapping = new Hashtable<String, String>();
 		typesTable = new Hashtable<String, BType>();
 		constants = machineContext.getConstants().keySet();
+		init = tlaModule.getInitPredicates().size()>0;
 		
 		if(machineContext.getConstantsMachineClause() != null){
 			this.constantSetup = true;

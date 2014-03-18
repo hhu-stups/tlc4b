@@ -1,7 +1,6 @@
 package de.tlc4b.tla;
 
 import java.util.ArrayList;
-
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.POperation;
@@ -36,6 +35,7 @@ public class TLAModule {
 		this.invariants = new ArrayList<Node>();
 		
 		this.allDefinitions = new ArrayList<PDefinition>();
+
 	}
 
 	public void sortAllDefinitions(MachineContext machineContext){

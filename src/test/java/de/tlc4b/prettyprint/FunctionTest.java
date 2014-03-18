@@ -50,7 +50,7 @@ public class FunctionTest {
 				+ "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Integers\n"
-				+ "ASSUME 4 = [<<a, b>> \\in { <<a, b>> \\in ((-1..4) \\times (-1..4)) : a = b} |-> a + b][2, 2]\n"
+				+ "ASSUME 4 = [<<a, b>> \\in { <<a, b>> \\in ((Int) \\times (Int)) : a = b} |-> a + b][2, 2]\n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -63,7 +63,7 @@ public class FunctionTest {
 				+ "END";
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Integers\n"
-				+ "ASSUME {<<<<1, 2>>,3>>} = {<<<<a, b>>, a + b>> : <<a, b>> \\in { <<a, b>> \\in ((-1..4) \\times (-1..4)) : a = b}}\n"
+				+ "ASSUME {<<<<1, 2>>,3>>} = {<<<<a, b>>, a + b>> : <<a, b>> \\in { <<a, b>> \\in ((Int) \\times (Int)) : a = b}}\n"
 				+ "====";
 		compare(expected, machine);
 	}

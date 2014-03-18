@@ -14,7 +14,6 @@ public class MachineParameterTest {
 		
 		String expected = "---- MODULE test----\n" 
 				+ "a == 1\n"
-				+ "ASSUME a = 1\n"
 				+ "======";
 		compare(expected, machine);
 	}

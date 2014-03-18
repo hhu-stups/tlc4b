@@ -1,8 +1,11 @@
 package de.tlc4b.ltl;
 
-import de.be4.classicalb.core.parser.node.AIdentifierExpression;
+import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.Start;
 import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
+import de.be4.ltl.core.parser.node.AAndFair1Ltl;
+import de.be4.ltl.core.parser.node.AAndFair2Ltl;
 import de.be4.ltl.core.parser.node.AAndLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
@@ -18,19 +21,24 @@ import de.be4.ltl.core.parser.node.AStrongFairLtl;
 import de.be4.ltl.core.parser.node.ATrueLtl;
 import de.be4.ltl.core.parser.node.AUnparsedLtl;
 import de.be4.ltl.core.parser.node.AWeakFairLtl;
+import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.prettyprint.TLAPrinter;
 
 public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	private final LTLFormulaVisitor ltlFormulaVisitor;
 	private final TLAPrinter tlaPrinter;
+	private final TypeRestrictor typeRestrictor;
 
 	public LTLFormulaPrinter(TLAPrinter tlaPrinter,
-			LTLFormulaVisitor ltlFormulaVisitor) {
+			LTLFormulaVisitor ltlFormulaVisitor, TypeRestrictor typeRestrictor) {
 		this.ltlFormulaVisitor = ltlFormulaVisitor;
 		this.tlaPrinter = tlaPrinter;
+		this.typeRestrictor = typeRestrictor;
+		
 
 		ltlFormulaVisitor.getLTLFormulaStart().apply(this);
+		
 	}
 
 	@Override
@@ -45,7 +53,6 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend("<>(");
 		node.getLtl().apply(this);
 		tlaPrinter.moduleStringAppend(")");
-		System.out.println(node.parent().getClass());
 	}
 
 	@Override
@@ -69,7 +76,23 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend(" /\\ ");
 		node.getRight().apply(this);
 	}
+	
+    @Override
+    public void caseAAndFair1Ltl(AAndFair1Ltl node)
+    {
+    	node.getLeft().apply(this);
+		tlaPrinter.moduleStringAppend(" /\\ ");
+		node.getRight().apply(this);
+    }
 
+    @Override
+    public void caseAAndFair2Ltl(AAndFair2Ltl node)
+    {
+    	node.getLeft().apply(this);
+		tlaPrinter.moduleStringAppend(" /\\ ");
+		node.getRight().apply(this);
+    }
+    
 	@Override
 	public void caseAOrLtl(AOrLtl node) {
 		node.getLeft().apply(this);
@@ -122,10 +145,14 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend(" \\in ");
 		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node
 				.getExistsIdentifier().getText());
-		tlaPrinter.printTypeOfIdentifier((AIdentifierExpression) id, false);
+		typeRestrictor.getRestrictedNode(id).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(": ");
-		ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
-		tlaPrinter.moduleStringAppend(" /\\ ");
+		Start start = (Start) ltlFormulaVisitor.getBAst(node);
+		APredicateParseUnit p = (APredicateParseUnit) start.getPParseUnit(); 
+		if(!typeRestrictor.isARemovedNode(p.getPredicate())){
+			ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
+			tlaPrinter.moduleStringAppend(" /\\ ");
+		}
 		node.getLtl().apply(this);
 	}
 
@@ -136,10 +163,14 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend(" \\in ");
 		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node
 				.getForallIdentifier().getText());
-		tlaPrinter.printTypeOfIdentifier((AIdentifierExpression) id, false);
+		typeRestrictor.getRestrictedNode(id).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(": ");
-		ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
-		tlaPrinter.moduleStringAppend(" /\\ ");
+		Start start = (Start) ltlFormulaVisitor.getBAst(node);
+		APredicateParseUnit p = (APredicateParseUnit) start.getPParseUnit(); 
+		if(!typeRestrictor.isARemovedNode(p.getPredicate())){
+			ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
+			tlaPrinter.moduleStringAppend(" => ");
+		}
 		node.getLtl().apply(this);
 	}
 

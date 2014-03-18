@@ -13,19 +13,17 @@ import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AClosureExpression;
 import de.be4.classicalb.core.parser.node.ACompositionExpression;
-import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConcatExpression;
 import de.be4.classicalb.core.parser.node.ADirectProductExpression;
 import de.be4.classicalb.core.parser.node.ADivExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
 import de.be4.classicalb.core.parser.node.ADomainRestrictionExpression;
 import de.be4.classicalb.core.parser.node.ADomainSubtractionExpression;
-import de.be4.classicalb.core.parser.node.AExistsPredicate;
+import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AFin1SubsetExpression;
 import de.be4.classicalb.core.parser.node.AFinSubsetExpression;
 import de.be4.classicalb.core.parser.node.AFirstExpression;
 import de.be4.classicalb.core.parser.node.AFirstProjectionExpression;
-import de.be4.classicalb.core.parser.node.AForallPredicate;
 import de.be4.classicalb.core.parser.node.AFrontExpression;
 import de.be4.classicalb.core.parser.node.AFunctionExpression;
 import de.be4.classicalb.core.parser.node.AGeneralConcatExpression;
@@ -43,7 +41,6 @@ import de.be4.classicalb.core.parser.node.AIntervalExpression;
 import de.be4.classicalb.core.parser.node.AIseq1Expression;
 import de.be4.classicalb.core.parser.node.AIseqExpression;
 import de.be4.classicalb.core.parser.node.AIterationExpression;
-import de.be4.classicalb.core.parser.node.ALambdaExpression;
 import de.be4.classicalb.core.parser.node.ALastExpression;
 import de.be4.classicalb.core.parser.node.ALessEqualPredicate;
 import de.be4.classicalb.core.parser.node.ALessPredicate;
@@ -96,12 +93,16 @@ import de.be4.classicalb.core.parser.node.ATransFunctionExpression;
 import de.be4.classicalb.core.parser.node.ATransRelationExpression;
 import de.be4.classicalb.core.parser.node.AUnaryMinusExpression;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.node.Start;
+import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.FunctionType;
 import de.tlc4b.btypes.IntegerType;
 import de.tlc4b.btypes.SetType;
+import de.tlc4b.tla.TLAModule;
 
 public class UsedStandardModules extends DepthFirstAdapter {
 
@@ -124,15 +125,25 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		modules.add(STANDARD_MODULES.SequencesAsRelations);
 	}
 
-	private Set<STANDARD_MODULES> usedStandardModules;
-	private Typechecker typechecker;
-	private TypeRestrictor typeRestrictor;
+	private final Set<STANDARD_MODULES> usedStandardModules;
+	private final Typechecker typechecker;
 
-	public UsedStandardModules(Typechecker typechecker,
-			TypeRestrictor typeRestrictor) {
+	public UsedStandardModules(Start start, Typechecker typechecker,
+			TypeRestrictor typeRestrictor, TLAModule tlaModule) {
 		this.usedStandardModules = new HashSet<STANDARD_MODULES>();
 		this.typechecker = typechecker;
-		this.typeRestrictor = typeRestrictor;
+
+		List<PDefinition> definitions = tlaModule.getAllDefinitions();
+		if (definitions != null) {
+			for (PDefinition pDefinition : definitions) {
+				pDefinition.apply(this);
+			}
+		}
+		for (Node node : typeRestrictor.getAllRestrictedNodes()) {
+			node.apply(this);
+		}
+		
+		start.apply(this);
 	}
 
 	class StandardModuleComparator implements Comparator<STANDARD_MODULES> {
@@ -159,33 +170,12 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 * 
 	 */
 
-	private void searchForIntegerTypeinTypesOFBoundedVariables(
-			List<PExpression> list) {
-		for (PExpression e : list) {
-			if (typeRestrictor.hasARestrictedType(e)) {
-				continue;
-			}
-			BType t = typechecker.getType(e);
-			if (t.containsIntegerType()) {
-				usedStandardModules.add(STANDARD_MODULES.Integers);
-			}
+	@Override
+	public void inAExpressionDefinitionDefinition(
+			AExpressionDefinitionDefinition node) {
+		if (TLC4BGlobals.isForceTLCToEvalConstants()){
+			usedStandardModules.add(STANDARD_MODULES.TLC);
 		}
-	}
-
-	public void inAForallPredicate(AForallPredicate node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-	}
-
-	public void inAExistsPredicate(AExistsPredicate node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-	}
-
-	public void inALambdaExpression(ALambdaExpression node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-	}
-
-	public void inAComprehensionSetExpression(AComprehensionSetExpression node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 	}
 
 	/**
@@ -310,12 +300,10 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
@@ -354,13 +342,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public void inAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
 		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
-		searchForIntegerTypeinTypesOFBoundedVariables(node.getIdentifiers());
-		//usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		// usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	/**

@@ -146,7 +146,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo(p) == p = 1 /\\ x' = p\n"
+				+ "foo(p) == x' = p\n"
 				+ "Next == \\E p \\in {1} : foo(p)\n"
 				+ "====";
 		compare(expected, machine);
@@ -166,7 +166,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo == \\E p \\in {1} : p = 1 /\\ x' = p\n"
+				+ "foo == \\E p \\in {1} : x' = p\n"
 				+ "Next == foo\n"
 				+ "====";
 		compare(expected, machine);
@@ -270,7 +270,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo(a) == a = 1 /\\ x' = a\n"
+				+ "foo(a) == x' = a\n"
 				+ "Next == \\E a \\in {1}: foo(a) \n"
 				+ "====";
 		compare(expected, machine);
@@ -373,8 +373,8 @@ public class OperationsTest {
 				+ "VARIABLES x, y \n"
 				+ "Invariant == x = 1 /\\ y = 1\n"
 				+ "Init == x = 1 /\\ y = 1\n"
-				+ "foo == x = 1 /\\ (( ((x = 1) /\\ (x' = 1))\n"
-				+ "\\/ (x = 2 /\\  UNCHANGED <<x>>))) /\\ y' = 1\n"
+				+ "foo == x = 1 \n"
+				+ "/\\ (((x = 1 /\\ x' = 1) \\/ (x = 2 /\\  UNCHANGED <<x>>)) /\\ y' = 1)\n"
 				+ "Next == foo \n"
 				+ "====";
 		compare(expected, machine);

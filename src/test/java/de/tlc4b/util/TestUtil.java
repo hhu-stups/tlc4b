@@ -19,6 +19,7 @@ import java.util.List;
 
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
+import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.Translator;
 import de.tlc4b.analysis.Ast2String;
 import de.tlc4b.tlc.TLCResults.TLCResult;
@@ -27,6 +28,8 @@ public class TestUtil {
 
 	public static void compare(String expectedModule, String machine)
 			throws Exception {
+		TLC4BGlobals.setForceTLCToEvalConstants(false);
+		
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
 		System.out.println(b2tlaTranslator.getModuleString());

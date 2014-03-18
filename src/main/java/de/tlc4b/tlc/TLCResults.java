@@ -26,7 +26,7 @@ public class TLCResults {
 	private TLCOutputInfo tlcOutputInfo;
 
 	public static enum TLCResult {
-		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError;
+		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError, InitialStateError;
 	}
 
 	public boolean hasTrace() {
@@ -64,6 +64,11 @@ public class TLCResults {
 			evalTrace();
 		}
 
+		if(tlcResult == NoError & tlcOutputInfo.hasInitialisation() & numberOfDistinctStates == 0){
+			// Can not setup constants
+			tlcResult = InitialStateError;
+		}
+		
 	}
 
 	private void evalTrace() {

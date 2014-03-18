@@ -23,6 +23,8 @@ public class TLC4BGlobals {
 	
 	private static boolean cleanup;
 
+	private static boolean forceTLCToEvalConstants;
+	
 	private static int workers;
 	
 	
@@ -42,6 +44,8 @@ public class TLC4BGlobals {
 		checkInvariant = true;
 		checkLTL = true;
 		checkWD= false;
+		
+		setForceTLCToEvalConstants(true);
 		
 		setProBconstantsSetup(false);
 
@@ -205,6 +209,14 @@ public class TLC4BGlobals {
 	
 	public static boolean checkWelldefinedness(){
 		return TLC4BGlobals.checkWD;
+	}
+
+	public static boolean isForceTLCToEvalConstants() {
+		return forceTLCToEvalConstants;
+	}
+
+	public static void setForceTLCToEvalConstants(boolean forceTLCToEvalConstants) {
+		TLC4BGlobals.forceTLCToEvalConstants = forceTLCToEvalConstants;
 	}
 	
 }

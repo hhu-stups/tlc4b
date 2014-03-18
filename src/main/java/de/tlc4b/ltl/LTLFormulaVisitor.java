@@ -34,7 +34,9 @@ import de.be4.ltl.core.parser.node.AYesterdayLtl;
 import de.be4.ltl.core.parser.node.PLtl;
 import de.be4.ltl.core.parser.node.Start;
 import de.be4.ltl.core.parser.parser.Parser;
+import de.tlc4b.analysis.Ast2String;
 import de.tlc4b.analysis.MachineContext;
+import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.exceptions.LTLParseException;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.prettyprint.TLAPrinter;
@@ -44,13 +46,29 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	private final String name;
 	private final Start ltlFormulaStart;
 	private final MachineContext machineContext;
-
+	
 	private final LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node> ltlNodeToBNodeTable;
 	private final ArrayList<LTLBPredicate> bPredicates;
 	private final Hashtable<String, AIdentifierExpression> ltlIdentifierTable;
 
 	private ArrayList<Hashtable<String, AIdentifierExpression>> contextTable;
 
+	
+	public LTLFormulaVisitor(String name, String ltlFormula,
+			MachineContext machineContext) {
+		this.name = name;
+		this.ltlFormulaStart = parse(ltlFormula);
+		this.machineContext = machineContext;
+		
+		this.bPredicates = new ArrayList<LTLBPredicate>();
+		this.ltlNodeToBNodeTable = new LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node>();
+		this.ltlIdentifierTable = new Hashtable<String, AIdentifierExpression>();
+
+		this.contextTable = new ArrayList<Hashtable<String, AIdentifierExpression>>();
+		
+	}
+	
+	
 	public ArrayList<LTLBPredicate> getBPredicates() {
 		return bPredicates;
 	}
@@ -76,19 +94,6 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		return this.name;
 	}
 
-	public LTLFormulaVisitor(String name, String ltlFormula,
-			MachineContext machineContext) {
-		this.name = name;
-		this.ltlFormulaStart = parse(ltlFormula);
-		this.machineContext = machineContext;
-
-		this.bPredicates = new ArrayList<LTLBPredicate>();
-		this.ltlNodeToBNodeTable = new LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node>();
-		this.ltlIdentifierTable = new Hashtable<String, AIdentifierExpression>();
-
-		this.contextTable = new ArrayList<Hashtable<String, AIdentifierExpression>>();
-	}
-
 	public void start() {
 		ltlFormulaStart.apply(this);
 	}
@@ -97,9 +102,9 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		return ltlFormulaStart;
 	}
 
-	public void printLTLFormula(TLAPrinter tlaPrinter) {
+	public void printLTLFormula(TLAPrinter tlaPrinter, TypeRestrictor typeRestrictor) {
 		// LTLFormulaPrinter ltlFormulaPrinter =
-		new LTLFormulaPrinter(tlaPrinter, this);
+		new LTLFormulaPrinter(tlaPrinter, this, typeRestrictor);
 	}
 
 	public static Start parse(String ltlFormula) {

@@ -1182,16 +1182,33 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 	private boolean compareElementsOfList(ArrayList<Node> list) {
 		try {
-			HashSet<Integer> set = new HashSet<Integer>();
-			for (int i = 0; i < list.size(); i++) {
-				AIntegerExpression aInt = (AIntegerExpression) list.get(i);
-				int integer = Integer.parseInt(aInt.getLiteral().getText());
-				set.add(integer);
-			}
-			if (list.size() == set.size()) {
-				return true;
-			}
+			if (list.get(0) instanceof AIntegerExpression) {
+				HashSet<Integer> set = new HashSet<Integer>();
+				for (int i = 0; i < list.size(); i++) {
+					AIntegerExpression aInt = (AIntegerExpression) list.get(i);
+					int integer = Integer.parseInt(aInt.getLiteral().getText());
+					set.add(integer);
+				}
+				if (list.size() == set.size()) {
+					return true;
+				}
+			} else if (list.get(0) instanceof AIdentifierExpression) {
+				HashSet<Node> set = new HashSet<Node>();
+				for (int i = 0; i < list.size(); i++) {
+					AIdentifierExpression id = (AIdentifierExpression) list
+							.get(i);
+					Node enumValue = machineContext.getReferences().get(id);
+					if (!machineContext.getEnumValues()
+							.containsValue(enumValue)) {
+						return false;
+					}
+					set.add(enumValue);
+				}
+				if (list.size() == set.size()) {
+					return true;
+				}
 
+			}
 		} catch (ClassCastException e) {
 		}
 		return false;

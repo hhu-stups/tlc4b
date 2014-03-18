@@ -13,8 +13,6 @@ import de.tlc4b.exceptions.TypeErrorException;
 
 public class LtlFormulaTest {
 
-	
-	
 	@Test (expected = ScopeException.class)
 	public void testScopeException() throws Exception {
 		String machine = "MACHINE test\n"
@@ -283,15 +281,24 @@ public class LtlFormulaTest {
 		compareLTL(expected, machine, "SF(foo)");
 	}
 	
-	
 	@Test 
 	public void testExistentialQuantification() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\E p \\in {1}: p = 1 /\\ p = 1\n"
+				+ "ltl == \\E p \\in {1}: p = 1\n"
 				+ "====";
 		compareLTL(expected, machine, "#p.({p=1} & {p = 1})");
+	}
+	
+	@Test 
+	public void testExistentialQuantification2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "END";
+		String expected = "---- MODULE test ----\n"
+				+ "ltl == \\E p \\in {1}: 1 = 1 /\\ p = 1\n"
+				+ "====";
+		compareLTL(expected, machine, "#p.({p=1 & 1 = 1} & {p = 1})");
 	}
 	
 	@Test 
@@ -299,9 +306,19 @@ public class LtlFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\A p \\in {1}: p = 1 /\\ p = 1\n"
+				+ "ltl == \\A p \\in {1}: p = 1\n"
 				+ "====";
 		compareLTL(expected, machine, "!p.({p=1} => {p = 1})");
+	}
+	
+	@Test 
+	public void testForallQuantification2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "END";
+		String expected = "---- MODULE test ----\n"
+				+ "ltl == \\A p \\in {1}: 1 = 1 => p = 1\n"
+				+ "====";
+		compareLTL(expected, machine, "!p.({p=1 & 1=1 } => {p = 1})");
 	}
 	
 	@Ignore

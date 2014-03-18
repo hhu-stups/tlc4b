@@ -106,7 +106,6 @@ public class ConstantsTest {
 		compare(expected, machine);
 	}
 	
-	
 	@Test
 	public void testConstants2() throws Exception {
 		String machine = "MACHINE test\n"

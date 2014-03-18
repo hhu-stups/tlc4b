@@ -33,10 +33,10 @@ public class TLC4B {
 	private String constantsSetup;
 
 	public static void main(String[] args) throws IOException {
-		TLC4B b2tla = new TLC4B();
+		TLC4B tlc4b = new TLC4B();
 
 		try {
-			b2tla.progress(args);
+			tlc4b.progress(args);
 		} catch (BException e) {
 			System.err.println("***** Parsing Error *****");
 			System.err.println(e.getMessage());
@@ -50,14 +50,14 @@ public class TLC4B {
 
 		if (TLC4BGlobals.isRunTLC()) {
 			try {
-				TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
-						b2tla.path);
+				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
+						tlc4b.path);
 				// b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
 				// System.out.println("------------------------------");
 
-				TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
+				TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
-				b2tla.printResults(results, TLC4BGlobals.isCreateTraceFile());
+				tlc4b.printResults(results, TLC4BGlobals.isCreateTraceFile());
 				System.exit(0);
 
 			} catch (NoClassDefFoundError e) {
@@ -168,6 +168,8 @@ public class TLC4B {
 				path = System.getProperty("java.io.tmpdir");
 			} else if (args[index].toLowerCase().equals("-noltl")) {
 				TLC4BGlobals.setCheckltl(false);
+			} else if (args[index].toLowerCase().equals("-lazyconstants")) {
+				TLC4BGlobals.setForceTLCToEvalConstants(false);
 			} else if (args[index].toLowerCase().equals("-testscript")) {
 				TLC4BGlobals.setRunTestscript(true);
 			} else if (args[index].toLowerCase().equals("-notrace")) {

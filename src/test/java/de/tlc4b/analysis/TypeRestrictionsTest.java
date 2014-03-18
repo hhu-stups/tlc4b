@@ -17,7 +17,6 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
-	
 	@Test
 	public void testExistentielQuantification() throws Exception {
 		String machine = "MACHINE test\n"
@@ -80,7 +79,7 @@ public class TypeRestrictionsTest {
 				+ "PROPERTIES #x,y.(x = 1 & x = y) \n" + "END";
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME \\E x \\in {1}, y \\in -1..4: x = y \n"
+				+ "ASSUME \\E x \\in {1}, y \\in Int: x = y \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -97,7 +96,7 @@ public class TypeRestrictionsTest {
 	}
 	
 	@Test
-	public void testSetComprehension2VariablesConstant() throws Exception {
+	public void testExist2VariablesConstant() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "CONSTANTS k \n"
 				+ "PROPERTIES k = 1 & #x,y.(x = 1 & y = k + 1)\n" + "END";
@@ -141,7 +140,7 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME \\A x \\in {k} : x = k => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {k} : 1 = 1 \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -154,7 +153,7 @@ public class TypeRestrictionsTest {
 		
 		String expected = "---- MODULE test ----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME \\A x \\in {k} : x = k => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {k} : 1 = 1 \n"
 				+ "====";
 		compare(expected, machine);
 	}
@@ -177,7 +176,7 @@ public class TypeRestrictionsTest {
 				+ "k == 1 .. 4\n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo(a) == a \\in k /\\ x' = a\n"
+				+ "foo(a) == x' = a\n"
 				+ "Next == \\E a \\in k: foo(a) \n"
 				+ "====";
 		compare(expected, machine);
@@ -196,7 +195,6 @@ public class TypeRestrictionsTest {
 	}
 	
 	
-	
 	@Test
 	public void testExistDependingVariables() throws Exception {
 		String machine = "MACHINE test\n"
@@ -205,7 +203,7 @@ public class TypeRestrictionsTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Integers \n"
-				+ "ASSUME \\E x \\in {1}, y \\in -1..4 : y = x \n"
+				+ "ASSUME \\E x \\in {1}, y \\in Int : y = x \n"
 				+ "====";
 		compare(expected, machine);
 	}

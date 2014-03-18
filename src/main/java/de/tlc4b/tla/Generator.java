@@ -31,10 +31,7 @@ import de.tlc4b.analysis.ConstantsEvaluator;
 import de.tlc4b.analysis.DefinitionsAnalyser;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Typechecker;
-import de.tlc4b.analysis.nodes.ElementOfNode;
-import de.tlc4b.analysis.nodes.NodeType;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
-import de.tlc4b.btypes.BType;
 import de.tlc4b.tla.config.ModelValueAssignment;
 import de.tlc4b.tla.config.SetOfModelValuesAssignment;
 
@@ -44,7 +41,6 @@ public class Generator extends DepthFirstAdapter {
 	private TypeRestrictor typeRestrictor;
 	private ConstantsEvaluator constantsEvaluator;
 	private DefinitionsAnalyser deferredSetSizeCalculator;
-	private Typechecker typechecker;
 
 	private TLAModule tlaModule;
 	private ConfigFile configFile;
@@ -58,7 +54,6 @@ public class Generator extends DepthFirstAdapter {
 		this.typeRestrictor = typeRestrictor;
 		this.constantsEvaluator = constantsEvaluator;
 		this.deferredSetSizeCalculator = deferredSetSizeCalculator;
-		this.typechecker = typechecker;
 
 		this.tlaModule = new TLAModule();
 		this.configFile = new ConfigFile();
@@ -153,6 +148,11 @@ public class Generator extends DepthFirstAdapter {
 				continue;
 			}
 
+			Node restrictedNode = typeRestrictor.getRestrictedNode(param);
+			AMemberPredicate memberPredicate = new AMemberPredicate(
+					(PExpression) param, (PExpression) restrictedNode);
+			tlaModule.addInit(memberPredicate);
+			
 			init = true;
 			this.tlaModule.variables.add(param);
 		}
@@ -161,9 +161,13 @@ public class Generator extends DepthFirstAdapter {
 				.getConstraintMachineClause();
 		if (init) {
 			configFile.setInit();
-			tlaModule.addInit(clause.getPredicates());
+			if (!typeRestrictor.isARemovedNode(clause.getPredicates())) {
+				tlaModule.addInit(clause.getPredicates());
+			}
+			
 		} else {
-			tlaModule.addAssume(clause.getPredicates());
+			if (!typeRestrictor.isARemovedNode(clause.getPredicates()))
+				tlaModule.addAssume(clause.getPredicates());
 		}
 	}
 
@@ -238,7 +242,7 @@ public class Generator extends DepthFirstAdapter {
 		while (cons.hasNext()) {
 			AIdentifierExpression con = (AIdentifierExpression) cons.next();
 			Node value = conValueTable.get(con);
-			//tlaModule.definitions.add(new TLADefinition(con, value));
+			// tlaModule.definitions.add(new TLADefinition(con, value));
 
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
@@ -251,104 +255,60 @@ public class Generator extends DepthFirstAdapter {
 		ArrayList<Node> remainingConstants = new ArrayList<Node>();
 		remainingConstants.addAll(machineContext.getConstants().values());
 		remainingConstants.removeAll(conValueTable.keySet());
-		
+
 		Node propertiesPerdicate = machineContext.getPropertiesMachineClause()
 				.getPredicates();
 		if (remainingConstants.size() != 0) {
 			boolean init = false;
 			int numberOfIteratedConstants = 0;
-			
-			
+
 			for (int i = 0; i < remainingConstants.size(); i++) {
 				init = true;
 				Node con = remainingConstants.get(i);
 				this.tlaModule.variables.add(con);
-				
-				ArrayList<PExpression> rangeList = constantsEvaluator.getRangeOfIdentifier(con);
-				if(rangeList.size() > 0){
+
+				ArrayList<PExpression> rangeList = constantsEvaluator
+						.getRangeOfIdentifier(con);
+				if (rangeList.size() > 0) {
 					numberOfIteratedConstants++;
 					ArrayList<PExpression> clone = new ArrayList<PExpression>();
 					for (PExpression pExpression : rangeList) {
 						clone.add((PExpression) pExpression.clone());
 					}
-					ASetExtensionExpression set = new ASetExtensionExpression(clone);
-					AMemberPredicate member = new AMemberPredicate((AIdentifierExpression) con, set);
+					ASetExtensionExpression set = new ASetExtensionExpression(
+							clone);
+					AMemberPredicate member = new AMemberPredicate(
+							(AIdentifierExpression) con, set);
 					tlaModule.addInit(member);
 					continue;
 				}
-				
-				
-				Integer value = constantsEvaluator.getIntValue(con);
-				if (value == null) {
-					init = true;
-					
-					ArrayList<NodeType> a = typeRestrictor.getRestrictedTypesSet(con);
-					if(a != null && a.size() > 0 ){
-						for (int j = 0; j < a.size(); j++) {
-							NodeType type = a.get(j);
-							if(type instanceof ElementOfNode){
-								Node parent = type.getExpression().parent();
-								typeRestrictor.addRemoveNode(parent);
-								tlaModule.addInit(parent);
-							}
-							continue;
-						}
-						
-					}
-					
-					BType conType = typechecker.getType(con);
 
-					if (!conType.containsIntegerType()) {
-						PExpression n = conType
-								.createSyntaxTreeNode(typechecker);
-						AMemberPredicate member = new AMemberPredicate(
-								(PExpression) con.clone(), n);
-
-						ArrayList<NodeType> list = this.typeRestrictor
-								.getRestrictedTypesSet(con);
-						if (list == null || list.size() == 0) {
-							tlaModule.addInit(member);
-						} else {
-							for (int j = 0; j < list.size(); j++) {
-								NodeType val = list.get(j);
-								if(val instanceof ElementOfNode){
-									Node eleOfNode = val.getExpression().parent();
-									tlaModule.addInit(eleOfNode);
-									this.typeRestrictor.addRemoveNode(eleOfNode);
-								}
-							}
-						}
-					}
-
-				} else {
-					//tlaModule.definitions.add(new TLADefinition(con, value));
-				}
+				Node restrictedNode = typeRestrictor.getRestrictedNode(con);
+				AMemberPredicate memberPredicate = new AMemberPredicate(
+						(PExpression) con, (PExpression) restrictedNode);
+				tlaModule.addInit(memberPredicate);
 
 			}
-			
-			if(numberOfIteratedConstants > 1){
+
+			if (numberOfIteratedConstants > 1) {
 				tlaModule.addInit(machineContext.getConstantsSetup());
 			}
-			
-			
+
 			if (init) {
 				configFile.setInit();
-				tlaModule.addInit(propertiesPerdicate);
+				if (!typeRestrictor.isARemovedNode(propertiesPerdicate))
+					tlaModule.addInit(propertiesPerdicate);
 			}
-			
-
 
 		} else {
 			tlaModule.assumes.addAll(constantsEvaluator.getPropertiesList());
 			// tlaModule.addAssume(propertiesPerdicate);
 		}
-		
-		
-		
+
 	}
 
 	@Override
-	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
+	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
 		if (!tlaModule.isInitPredicate(node.getPredicates())) {
 			// this.tlaModule.addAssume(node.getPredicates());
 		}
@@ -364,7 +324,7 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
+	public void inAAssertionsMachineClause(AAssertionsMachineClause node) {
 		List<PPredicate> copy = new ArrayList<PPredicate>(node.getPredicates());
 		for (PPredicate e : copy) {
 			this.tlaModule.addAssertion(e);
@@ -373,8 +333,7 @@ public class Generator extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAInitialisationMachineClause(
-			AInitialisationMachineClause node) {
+	public void inAInitialisationMachineClause(AInitialisationMachineClause node) {
 		this.configFile.setInit();
 		this.tlaModule.addInit(node.getSubstitutions());
 	}

@@ -106,8 +106,7 @@ public class Translator {
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
 				machineContext);
 
-		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
-				start, typechecker.getTypes(), machineContext);
+
 
 		ConstantsEliminator constantsEliminator = new ConstantsEliminator(
 				machineContext);
@@ -118,11 +117,10 @@ public class Translator {
 
 		TypeRestrictor typeRestrictor = new TypeRestrictor(start,
 				machineContext, typechecker);
-		UsedStandardModules usedModules = new UsedStandardModules(typechecker,
-				typeRestrictor);
-		start.apply(usedModules);
-		usedStandardModules = usedModules.getUsedModules();
 
+		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
+				start, typechecker.getTypes(), machineContext, typeRestrictor);
+		
 		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
 				machineContext);
 
@@ -132,6 +130,11 @@ public class Translator {
 
 		generator.getTlaModule().sortAllDefinitions(machineContext);
 
+		UsedStandardModules usedModules = new UsedStandardModules(start, typechecker,
+				typeRestrictor, generator.getTlaModule());
+		
+		usedStandardModules = usedModules.getUsedModules();
+		
 		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator
 				.getTlaModule().getOperations(), machineContext);
 		primedNodesMarker.start();
@@ -146,7 +149,7 @@ public class Translator {
 		configString = printer.getConfigString().toString();
 
 		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer,
-				typechecker.getTypes());
+				typechecker.getTypes(), generator.getTlaModule());
 	}
 
 	public String getMachineString() {

@@ -14,7 +14,7 @@ public class ExpressionConstantTest {
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
-				+ "ASSUME \\A x \\in {k} : x = k => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {k} : 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -38,7 +38,7 @@ public class ExpressionConstantTest {
 				+ "PROPERTIES !x.(x = 1 => !y.(y= x => 1 = 1))\n" + "END";
 		
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
-				+ "ASSUME \\A x \\in {1} : x = 1 => \\A y \\in {x} : y = x => 1 = 1 \n"
+				+ "ASSUME \\A x \\in {1} : \\A y \\in {x} : 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -50,7 +50,7 @@ public class ExpressionConstantTest {
 		
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers \n"
-				+ "ASSUME \\A x \\in (-1..4), y \\in {1} : x = y => 1 = 1 \n"
+				+ "ASSUME \\A x \\in Int, y \\in {1} : x = y => 1 = 1 \n"
 				+ "======";
 		compare(expected, machine);
 	}

@@ -68,7 +68,7 @@ public class ScopeTest {
 	}
 
 	@Test
-	public void testInvariantConstatnParameter() throws Exception {
+	public void testInvariantConstantParameter() throws Exception {
 		String machine = "MACHINE test\n" + "CONSTANTS k \n"
 				+ "PROPERTIES k = 1" + "INVARIANT k = 1 \n" + "END";
 		checkMachine(machine);

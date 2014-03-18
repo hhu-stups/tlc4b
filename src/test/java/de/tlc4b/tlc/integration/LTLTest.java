@@ -31,7 +31,7 @@ public class LTLTest {
 	@Test
 	public void testFairnessCounterLTL() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\FairnessCounter.mch" };
-		assertEquals(TemporalPropertyViolation, test(a));
+		assertEquals(NoError, test(a));
 	}
 
 	@Test
