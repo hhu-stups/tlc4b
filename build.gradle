@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply plugin: 'jacoco'
+apply plugin: 'findbugs'
 
 project.version = '1.0.0-SNAPSHOT'
 project.group = 'de.prob'
@@ -13,7 +15,35 @@ repositories {
 }
 
 configurations { // configuration that holds jars to copy into lib
-	releaseJars }
+	releaseJars 
+}
+
+jacoco {
+    toolVersion = "0.6.2.201302030002"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+ }
+
+findbugs { 
+	ignoreFailures = true 
+} 
+ 
+
+ 
 
 def parser_version = '2.4.22-SNAPSHOT'
 
@@ -28,8 +58,11 @@ dependencies {
 	
 	//compile(group: 'de.prob', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
 
-	testCompile (group: 'junit', name: 'junit', version: '4.+')
+
+
+	testCompile (group: 'junit', name: 'junit', version: '4.7')
 	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.4-SNAPSHOT')
+    
 
 	releaseJars (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT')
 	releaseJars (group: 'de.prob', name: 'prologlib', version: parser_version)
@@ -42,14 +75,15 @@ dependencies {
 test { 
 	exclude('de/tlc4b/tlc/integration/probprivate')
 	exclude('testing')
-	
+	//exclude('de/tlc4b/tlc/integration')
 }
 
 
 task integrationtests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
-	include('de/tlc4b/tlc/integration/probprivate/**')
+	//include('de/tlc4b/tlc/integration/probprivate/**')
+	include('de/tlc4b/**')
 }
 
 jar { from sourceSets.main.allJava }

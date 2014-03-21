@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
@@ -238,16 +239,16 @@ public class Generator extends DepthFirstAdapter {
 			return;
 		LinkedHashMap<Node, Node> conValueTable = constantsEvaluator
 				.getValueOfIdentifierMap();
-		Iterator<Node> cons = conValueTable.keySet().iterator();
-		while (cons.hasNext()) {
-			AIdentifierExpression con = (AIdentifierExpression) cons.next();
-			Node value = conValueTable.get(con);
-			// tlaModule.definitions.add(new TLADefinition(con, value));
-
+		Iterator<Entry<Node, Node>> iterator = conValueTable.entrySet().iterator();
+		while (iterator.hasNext()){
+			Entry<Node, Node> entry = iterator.next();
+			AIdentifierExpression con = (AIdentifierExpression) entry.getKey();
+			Node value = entry.getValue();
+			
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
 					(PExpression) value.clone());
-			machineContext.getReferences().put(exprDef, con);
+			machineContext.addReference(exprDef, con);
 
 			this.tlaModule.addToAllDefinitions(exprDef);
 		}

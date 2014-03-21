@@ -5,9 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -80,10 +80,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseAPredicateParseUnit(APredicateParseUnit node) {
 		setType(node.getPredicate(), BoolType.getInstance());
 		node.getPredicate().apply(this);
-	}
-
-	public Hashtable<Node, BType> getTypes() {
-		return types;
 	}
 
 	public MachineContext getContext() {
@@ -304,13 +300,12 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		LinkedHashMap<String, Node> parameter = machineContext
-				.getScalarParameter();
-		for (String c : parameter.keySet()) {
-			Node n = parameter.get(c);
+		for (Entry<String, Node> entry : machineContext.getScalarParameter().entrySet()) {
+			String name = entry.getKey();
+			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {
 				throw new TypeErrorException(
-						"Can not infer type of parameter '" + c + "'");
+						"Can not infer type of parameter '" + name + "'");
 			}
 		}
 	}
@@ -321,9 +316,10 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		LinkedHashMap<String, Node> constants = machineContext.getConstants();
-		for (String c : constants.keySet()) {
-			Node n = constants.get(c);
+		for (Entry<String, Node> entry : machineContext.getConstants()
+				.entrySet()) {
+			String c = entry.getKey();
+			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {
 				throw new TypeErrorException("Can not infer type of constant '"
 						+ c + "': " + getType(n));
@@ -335,9 +331,10 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
 		setType(node.getPredicates(), BoolType.getInstance());
 		node.getPredicates().apply(this);
-		LinkedHashMap<String, Node> variables = machineContext.getVariables();
-		for (String c : variables.keySet()) {
-			Node n = variables.get(c);
+		for (Entry<String, Node> entry : machineContext.getVariables()
+				.entrySet()) {
+			String c = entry.getKey();
+			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {
 				throw new TypeErrorException("Can not infer type of variable '"
 						+ c + "'");
@@ -1324,7 +1321,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		BType expected = getType(node);
 
 		try {
-			found = found.unify(expected, this);
+			found.unify(expected, this);
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "'");
@@ -1657,11 +1654,19 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getLeft(), new SetType(dom));
 		setType(node.getRight(), new SetType(ran));
 		BType expected = getType(node);
-		BType found = new SetType(new SetType(new PairType(dom, ran)));
+		BType found = evalFunctionTypeVsRelationType(node, dom, ran);
 		unify(expected, found, node);
 		node.getLeft().apply(this);
 		node.getRight().apply(this);
 		// evalFunction(node, node.getLeft(), node.getRight());
+	}
+
+	private BType evalFunctionTypeVsRelationType(Node node, BType dom, BType ran) {
+		String clazz = node.parent().getClass().getName();
+		if (clazz.contains("Total") || clazz.contains("Partial"))
+			return new SetType(new SetType(new PairType(dom, ran)));
+		else
+			return new SetType(new FunctionType(dom, ran));
 	}
 
 	@Override
@@ -1676,7 +1681,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getLeft(), new SetType(dom));
 		setType(node.getRight(), new SetType(ran));
 		BType expected = getType(node);
-		BType found = new SetType(new SetType(new PairType(dom, ran)));
+		BType found = evalFunctionTypeVsRelationType(node, dom, ran);
 		unify(expected, found, node);
 		node.getLeft().apply(this);
 		node.getRight().apply(this);
@@ -1697,7 +1702,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getLeft(), new SetType(dom));
 		setType(node.getRight(), new SetType(ran));
 		BType expected = getType(node);
-		BType found = new SetType(new SetType(new PairType(dom, ran)));
+		BType found = evalFunctionTypeVsRelationType(node, dom, ran);
 		unify(expected, found, node);
 		node.getLeft().apply(this);
 		node.getRight().apply(this);
@@ -1716,7 +1721,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getLeft(), new SetType(dom));
 		setType(node.getRight(), new SetType(ran));
 		BType expected = getType(node);
-		BType found = new SetType(new SetType(new PairType(dom, ran)));
+		BType found = evalFunctionTypeVsRelationType(node, dom, ran);
 		unify(expected, found, node);
 		node.getLeft().apply(this);
 		node.getRight().apply(this);

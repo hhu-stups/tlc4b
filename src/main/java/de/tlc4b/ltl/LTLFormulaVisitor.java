@@ -34,7 +34,6 @@ import de.be4.ltl.core.parser.node.AYesterdayLtl;
 import de.be4.ltl.core.parser.node.PLtl;
 import de.be4.ltl.core.parser.node.Start;
 import de.be4.ltl.core.parser.parser.Parser;
-import de.tlc4b.analysis.Ast2String;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.exceptions.LTLParseException;

@@ -43,7 +43,7 @@ import de.tlc4b.exceptions.SubstitutionException;
  */
 
 public class AssignedVariablesFinder extends DepthFirstAdapter {
-	private final Hashtable<Node, HashSet<Node>> assignedVariablesTable;
+	protected final Hashtable<Node, HashSet<Node>> assignedVariablesTable;
 	private final MachineContext machineContext;
 
 	public AssignedVariablesFinder(MachineContext machineContext) {
@@ -53,7 +53,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	}
 
-	public Hashtable<Node, HashSet<Node>> getAssignedVariablesTable() {
+	protected Hashtable<Node, HashSet<Node>> getAssignedVariablesTable() {
 		return assignedVariablesTable;
 	}
 
@@ -124,7 +124,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 				node.getIdentifiers());
 		HashSet<Node> list = new HashSet<Node>();
 		for (PExpression e : copy) {
-			Node identifier = machineContext.getReferences().get(e);
+			Node identifier = machineContext.getReferenceNode(e);
 			list.add(identifier);
 		}
 		assignedVariablesTable.put(node, list);
@@ -137,11 +137,11 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 		HashSet<Node> list = new HashSet<Node>();
 		for (PExpression e : copy) {
 			if (e instanceof AIdentifierExpression) {
-				Node identifier = machineContext.getReferences().get(e);
+				Node identifier = machineContext.getReferenceNode(e);
 				list.add(identifier);
 			} else {
 				AFunctionExpression func = (AFunctionExpression) e;
-				Node identifier = machineContext.getReferences().get(
+				Node identifier = machineContext.getReferenceNode(
 						func.getIdentifier());
 				list.add(identifier);
 			}
@@ -158,7 +158,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 				node.getIdentifiers());
 		HashSet<Node> list = new HashSet<Node>();
 		for (PExpression e : copy) {
-			Node identifier = machineContext.getReferences().get(e);
+			Node identifier = machineContext.getReferenceNode(e);
 			list.add(identifier);
 		}
 		assignedVariablesTable.put(node, list);
@@ -278,7 +278,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseADefinitionSubstitution(ADefinitionSubstitution node) {
-		Node refNode = machineContext.getReferences().get(node);
+		Node refNode = machineContext.getReferenceNode(node);
 		HashSet<Node> assignedVariables = assignedVariablesTable.get(refNode);
 		assignedVariablesTable.put(node, assignedVariables);
 		assignedVariablesTable.put(node.parent(), assignedVariables);

@@ -5,11 +5,8 @@ import java.util.Hashtable;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
-import de.be4.classicalb.core.parser.node.AGeneralIntersectionExpression;
-import de.be4.classicalb.core.parser.node.AIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
-import de.be4.classicalb.core.parser.node.ASetSubtractionExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
@@ -30,17 +27,17 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AExistsPredicate", 1, 1, false);
 		put("AForallPredicate", 1, 1, false);
 		put("AEquivalencePredicate", 2, 2, false);
-		put("ADisjunctPredicate", 3, 3, true); //or
-		
+		put("ADisjunctPredicate", 3, 3, true); // or
+
 		/** and **/
 		put("AConjunctPredicate", 3, 3, true);
 		put("APreconditionSubstitution", 3, 3, true);
 		put("AAssertionSubstitution", 3, 3, true);
 		put("ASelectWhenSubstitution", 3, 3, true);
-		put("AParallelSubstitution", 3, 3, true); 
-		
-		put("ASelectSubstitution", 3, 3, true); //and or or
-		
+		put("AParallelSubstitution", 3, 3, true);
+
+		put("ASelectSubstitution", 3, 3, true); // and or or
+
 		put("AEqualPredicate", 5, 5, false);
 		put("ALessPredicate", 5, 5, false);
 		put("AGreaterPredicate", 5, 5, false);
@@ -72,26 +69,27 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 
 	private final Hashtable<Node, Precedence> precedenceTable;
 	private final HashSet<Node> brackets;
-	private final Hashtable<Node, BType> typeTable;
+	private final Typechecker typechecker;
 
 	public HashSet<Node> getBrackets() {
 		return brackets;
 	}
 
-	public PrecedenceCollector(Start start, Hashtable<Node, BType> types, MachineContext machineContext, TypeRestrictor typeRestrictor) {
+	public PrecedenceCollector(Start start, Typechecker typeChecker,
+			MachineContext machineContext, TypeRestrictor typeRestrictor) {
 		precedenceTable = new Hashtable<Node, Precedence>();
 		brackets = new HashSet<Node>();
-		typeTable = types;
+		this.typechecker = typeChecker;
 		start.apply(this);
-		
-		if(machineContext.getConstantsSetup() != null){
+
+		if (machineContext.getConstantsSetup() != null) {
 			machineContext.getConstantsSetup().apply(this);
 		}
-		
+
 		for (Node node : typeRestrictor.getAllRestrictedNodes()) {
 			node.apply(this);
 		}
-		
+
 	}
 
 	@Override
@@ -107,15 +105,15 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		Precedence p = getPrecedence(node);
 		if (p != null) {
 			precedenceTable.put(node, p);
-			
-			if(node.parent()!= null){
+
+			if (node.parent() != null) {
 				Precedence parent = precedenceTable.get(node.parent());
 				if (Precedence.makeBrackets(p, parent)) {
 					brackets.add(node);
 				}
 			}
 		}
-		 //System.out.println(node.getClass().getSimpleName() + " " + p );
+		// System.out.println(node.getClass().getSimpleName() + " " + p );
 	}
 
 	public void inAConvertBoolExpression(AConvertBoolExpression node) {
@@ -128,7 +126,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 
 	@Override
 	public void inAMultOrCartExpression(AMultOrCartExpression node) {
-		BType type = typeTable.get(node);
+		BType type = typechecker.getType(node);
 
 		Precedence p;
 		if (type instanceof IntegerType) {
@@ -149,7 +147,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 	@Override
 	public void inAMinusOrSetSubtractExpression(
 			AMinusOrSetSubtractExpression node) {
-		BType type = typeTable.get(node);
+		BType type = typechecker.getType(node);
 		Precedence p;
 		if (type instanceof IntegerType) {
 			// minus

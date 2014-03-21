@@ -1,5 +1,6 @@
 package de.tlc4b.analysis;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -108,9 +109,10 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private ArrayList<LinkedHashMap<String, Node>> contextTable;
 
-	private final Hashtable<Node, Node> referencesTable;
+	protected final Hashtable<Node, Node> referencesTable;
 
-	public MachineContext(String machineName, Start start, String ltlFormula, PPredicate constantsSetup) {
+	public MachineContext(String machineName, Start start, String ltlFormula,
+			PPredicate constantsSetup) {
 		this.start = start;
 		this.machineName = machineName;
 		this.constantsSetup = constantsSetup;
@@ -137,17 +139,17 @@ public class MachineContext extends DepthFirstAdapter {
 
 		this.machineContextsTable = new Hashtable<String, MachineContext>();
 		start.apply(this);
-		
+
 		checkLTLFormulas();
-		
+
 		checkConstantsSetup();
 	}
 
 	private void checkConstantsSetup() {
-		if(constantsSetup == null){
+		if (constantsSetup == null) {
 			return;
 		}
-		
+
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 
 		ArrayList<MachineContext> list = lookupExtendedMachines();
@@ -160,7 +162,7 @@ public class MachineContext extends DepthFirstAdapter {
 			contextTable.add(s.getDefinitions());
 		}
 		constantsSetup.apply(this);
-		
+
 	}
 
 	private void checkLTLFormulas() {
@@ -174,7 +176,8 @@ public class MachineContext extends DepthFirstAdapter {
 			try {
 				visitor.start();
 			} catch (ScopeException e) {
-				System.out.println("Warning: LTL formula '" + visitor.getName() + "' cannot be checked by TLC.");
+				System.out.println("Warning: LTL formula '" + visitor.getName()
+						+ "' cannot be checked by TLC.");
 				notSupportedLTLFormulas.add(visitor);
 			}
 		}
@@ -242,7 +245,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAMachineHeader(AMachineHeader node) {
 		this.header = node;
-		if(machineName == null){
+		if (machineName == null) {
 			List<TIdentifierLiteral> nameList = new ArrayList<TIdentifierLiteral>(
 					node.getName());
 			this.machineName = Utils.getIdentifierAsString(nameList);
@@ -300,7 +303,7 @@ public class MachineContext extends DepthFirstAdapter {
 								"Error: LTL formula is not in a string representation.");
 					}
 					definitionsToRemove.add(def);
-				}else if (name.startsWith("ANIMATION_")){
+				} else if (name.startsWith("ANIMATION_")) {
 					definitionsToRemove.add(def);
 				}
 				evalDefinitionName(((AExpressionDefinitionDefinition) e)
@@ -565,7 +568,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		this.propertiesMachineClause = node;
-		
+
 		/**
 		 * check identifier scope in properties clauses
 		 */
@@ -678,8 +681,8 @@ public class MachineContext extends DepthFirstAdapter {
 		for (POperation e : copy) {
 			AOperation op = (AOperation) e;
 			String name = Utils.getIdentifierAsString(op.getOpName());
-			//existString(name);
-			if (operations.keySet().contains(name)){
+			// existString(name);
+			if (operations.keySet().contains(name)) {
 				throw new ScopeException("Duplicate identifier: '" + name + "'");
 			}
 			operations.put(name, op);
@@ -1004,8 +1007,16 @@ public class MachineContext extends DepthFirstAdapter {
 		return seenMachines;
 	}
 
-	public Hashtable<Node, Node> getReferences() {
+	protected Hashtable<Node, Node> getReferences() {
 		return referencesTable;
+	}
+
+	public Node getReferenceNode(Node node) {
+		return referencesTable.get(node);
+	}
+
+	public void addReference(Node node, Node ref) {
+		referencesTable.put(node, ref);
 	}
 
 	public ArrayList<LTLFormulaVisitor> getLTLFormulas() {
@@ -1073,15 +1084,17 @@ public class MachineContext extends DepthFirstAdapter {
 			ADefinitionsMachineClause definitionMachineClause) {
 		this.definitionMachineClause = definitionMachineClause;
 	}
-	
+
 	public PPredicate getConstantsSetup() {
 		return constantsSetup;
 	}
 
 }
 
-class PMachineClauseComparator implements Comparator<PMachineClause> {
+class PMachineClauseComparator implements Comparator<PMachineClause>,
+		Serializable {
 
+	private static final long serialVersionUID = 2606332412649258695L;
 	private static Hashtable<Object, Integer> priority = new Hashtable<Object, Integer>();
 	static {
 		// declarations clauses

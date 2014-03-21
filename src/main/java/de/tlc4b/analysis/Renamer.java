@@ -3,10 +3,10 @@ package de.tlc4b.analysis;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -122,11 +122,11 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private void evalEnumValues() {
-		LinkedHashMap<String, Node> map = machineContext.getEnumValues();
-		Iterator<String> iter = map.keySet().iterator();
-		while (iter.hasNext()) {
-			String name = iter.next();
-			Node node = map.get(name);
+
+		for (Entry<String, Node> entry : machineContext.getEnumValues()
+				.entrySet()) {
+			String name = entry.getKey();
+			Node node = entry.getValue();
 
 			if (name.indexOf('_') == 1) {
 				name = name.replaceFirst("_", "1_");
@@ -139,9 +139,8 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	public void evalGlobalNames(LinkedHashMap<String, Node> map) {
-		Iterator<String> iter = map.keySet().iterator();
-		while (iter.hasNext()) {
-			String name = iter.next();
+		for (Entry<String, Node> entry : map.entrySet()) {
+			String name = entry.getKey();
 			String newName = incName(name);
 			namesTable.put(map.get(name), newName);
 			globalNames.add(newName);
@@ -207,7 +206,7 @@ public class Renamer extends DepthFirstAdapter {
 			return true;
 		// TODO check only if the standard module is extended
 
-		if(StandardMadules.functions.contains(name))
+		if (StandardMadules.functions.contains(name))
 			return true;
 		if (SequencesKeywords.contains(name))
 			return true;

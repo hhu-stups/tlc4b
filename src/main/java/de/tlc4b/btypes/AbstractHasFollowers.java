@@ -17,19 +17,17 @@ public abstract class AbstractHasFollowers implements BType{
 	}
 	
 	public String printFollower(){
-		String res = "[";
+		StringBuffer res = new StringBuffer();
+		res.append("[");
 		for (Object o : followers) {
 			if(!(o instanceof Node)){
-				res+= o.hashCode();
-				res+= o.getClass();
-				//IntegerOrSetOfPairType i = (IntegerOrSetOfPairType) o;
-				res += " ";
+				res.append(o.hashCode());
+				res.append(o.getClass());
+				res.append(" ");
 			}
-			
-			
 		}
-		res+= "]";
-		return res;
+		res.append("]");
+		return res.toString();
 	}
 	
 	public void deleteFollower(Object obj){

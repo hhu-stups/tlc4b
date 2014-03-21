@@ -1,8 +1,6 @@
 package de.tlc4b;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -61,8 +59,8 @@ public class TLCRunner {
 		if (!TLC4BGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
-		
-		if(TLC4BGlobals.isCheckltl()){
+
+		if (TLC4BGlobals.isCheckltl()) {
 			list.add("-cleanup");
 		}
 		// list.add("-coverage");
@@ -86,22 +84,18 @@ public class TLCRunner {
 	public static void runTLC(String machineName, String path) {
 
 		System.out.println("--------------------------------");
-		
-		//BTLCPrintStream btlcStream = new BTLCPrintStream();
-		//PrintStream systemOut = System.out;
-		//System.setErr(btlcStream);
-		//System.setOut(btlcStream);
+
 		ToolIO.setMode(ToolIO.SYSTEM);
-		
+
 		ArrayList<String> list = new ArrayList<String>();
 		if (!TLC4BGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
-		if(TLC4BGlobals.getWorkers() > 1){
+		if (TLC4BGlobals.getWorkers() > 1) {
 			list.add("-workers");
-			list.add(""+TLC4BGlobals.getWorkers());
+			list.add("" + TLC4BGlobals.getWorkers());
 		}
-		
+
 		list.add("-config");
 		list.add(machineName + ".cfg");
 		list.add(machineName);
@@ -109,23 +103,23 @@ public class TLCRunner {
 		String[] args = list.toArray(new String[list.size()]);
 
 		TLC tlc = new TLC();
-        
+
 		// handle parameters
 		if (tlc.handleParameters(args)) {
 			tlc.setResolver(new SimpleFilenameToStream());
 			// call the actual processing method
 			try {
-				tlc.process();	
+				tlc.process();
 			} catch (Exception e) {
 			}
-			
+
 		}
-		//System.setOut(systemOut);
-		//ArrayList<String> messages = btlcStream.getArrayList();
-		
+		// System.setOut(systemOut);
+		// ArrayList<String> messages = btlcStream.getArrayList();
+
 		System.out.println("--------------------------------");
 		closeThreads();
-		//return messages;
+		// return messages;
 	}
 
 	private static void closeThreads() {
@@ -141,28 +135,6 @@ public class TLCRunner {
 		}
 		// System.exit(0);
 	}
-
-	public static void createfile(String dir, String fileName, String text) {
-		File d = new File(dir);
-		d.mkdirs();
-		File tempFile = new File(dir + File.separator + fileName);
-		try {
-			tempFile.createNewFile();
-			System.out
-					.println("Tempfile:'" + tempFile.getName() + "' created.");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		FileWriter fw;
-		try {
-			fw = new FileWriter(tempFile);
-			fw.write(text);
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 }
 
 class StreamGobbler extends Thread {
@@ -180,7 +152,7 @@ class StreamGobbler extends Thread {
 
 	public void run() {
 		try {
-			InputStreamReader isr = new InputStreamReader(is);
+			InputStreamReader isr = new InputStreamReader(is, "UTF-8");
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
 			while ((line = br.readLine()) != null) {

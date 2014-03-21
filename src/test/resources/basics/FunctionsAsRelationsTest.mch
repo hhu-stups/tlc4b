@@ -4,8 +4,8 @@ PROPERTIES
 /* The following functions are translated as relations */
 
 /* total function */
-{{(1,3),(2,3)}} = {1,2} --> {3}
-& {(1,1)} : {1} --> NATURAL
+{{(1,3),(1+1,3)}} = {1,2} --> {3}
+& {(1+1,1)} : {2} --> NATURAL
 
 /* total injectiv function */
 & {{(1,3), (2,4)}, {(1,4),(2,3)}} = {1,2} >-> {3,4}

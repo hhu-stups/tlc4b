@@ -1,0 +1,4 @@
+MACHINE StringTest
+PROPERTIES
+"abc" : STRING 
+END

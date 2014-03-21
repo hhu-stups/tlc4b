@@ -1,6 +1,6 @@
 package de.tlc4b.btypes;
 
-import de.be4.classicalb.core.parser.node.ATotalFunctionExpression;
+import de.be4.classicalb.core.parser.node.APartialFunctionExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
@@ -129,7 +129,7 @@ public class FunctionType extends AbstractHasFollowers {
 	}
 
 	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
-		ATotalFunctionExpression node = new ATotalFunctionExpression(
+		APartialFunctionExpression node = new APartialFunctionExpression(
 				domain.createSyntaxTreeNode(typechecker),
 				range.createSyntaxTreeNode(typechecker));
 		typechecker.setType(node, new SetType(this));

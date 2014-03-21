@@ -55,7 +55,7 @@ public class SubstitutionsTest {
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
-				+ "Init == \\E a \\in {1}, b \\in {2} : TRUE /\\ x = a + b \n"
+				+ "Init == \\E a \\in {1}, b \\in {2} : x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);
@@ -70,10 +70,9 @@ public class SubstitutionsTest {
 				+ "END";
 
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
-				+ "Init == 1 = 1 /\\ x = 1\n"
+				+ "Invariant1 == x = 1\n"
+				+ "Init == \n/\\ 1 = 1 \n/\\ x = 1\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);
@@ -90,8 +89,8 @@ public class SubstitutionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
-				+ "Init == 1 = 1 /\\ x = 1\n"
+				+ "Invariant1 == x = 1\n"
+				+ "Init == \n/\\1 = 1 \n/\\ x = 1\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
 		compare(expected, machine);

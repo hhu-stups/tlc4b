@@ -7,12 +7,12 @@ public class StopWatch {
 	private static final Hashtable<String, Long> runTime = new Hashtable<String, Long>();
 	
 	public static void start(String id) {
-		startTime.put(id, new Long(System.currentTimeMillis()));
+		startTime.put(id, System.currentTimeMillis());
 	}
 
 	public static long stop(String id) {
 		long stopTime = System.currentTimeMillis()
-				- ((Long) startTime.remove(id)).longValue();
+				-  startTime.remove(id);
 		runTime.put(id, stopTime);
 		return stopTime;
 	}

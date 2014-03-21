@@ -47,7 +47,6 @@ import de.be4.classicalb.core.parser.node.ALessPredicate;
 import de.be4.classicalb.core.parser.node.AMaxExpression;
 import de.be4.classicalb.core.parser.node.AMinExpression;
 import de.be4.classicalb.core.parser.node.AMinIntExpression;
-import de.be4.classicalb.core.parser.node.AMinusExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AModuloExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
@@ -142,17 +141,8 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		for (Node node : typeRestrictor.getAllRestrictedNodes()) {
 			node.apply(this);
 		}
-		
+
 		start.apply(this);
-	}
-
-	class StandardModuleComparator implements Comparator<STANDARD_MODULES> {
-		public int compare(STANDARD_MODULES s1, STANDARD_MODULES s2) {
-			Integer i1 = new Integer(modules.indexOf(s1));
-			Integer i2 = new Integer(modules.indexOf(s2));
-			return i1.compareTo(i2);
-		}
-
 	}
 
 	public ArrayList<STANDARD_MODULES> getUsedModules() {
@@ -161,7 +151,15 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		if (list.contains(STANDARD_MODULES.Integers)) {
 			list.remove(STANDARD_MODULES.Naturals);
 		}
-		Collections.sort(list, new StandardModuleComparator());
+		Collections.sort(list, new Comparator<STANDARD_MODULES>() {
+			public int compare(STANDARD_MODULES s1, STANDARD_MODULES s2) {
+				Integer i1 = Integer.valueOf(modules.indexOf(s1));
+				Integer i2 = Integer.valueOf(modules.indexOf(s2));
+				return i1.compareTo(i2);
+			}
+		}
+
+		);
 		return list;
 	}
 
@@ -173,7 +171,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	@Override
 	public void inAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
-		if (TLC4BGlobals.isForceTLCToEvalConstants()){
+		if (TLC4BGlobals.isForceTLCToEvalConstants()) {
 			usedStandardModules.add(STANDARD_MODULES.TLC);
 		}
 	}
@@ -219,11 +217,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAAddExpression(AAddExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
-	}
-
-	public void inAMinusExpression(AMinusExpression node) {
-		// TODO what is a AMinusExpression
 		usedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 

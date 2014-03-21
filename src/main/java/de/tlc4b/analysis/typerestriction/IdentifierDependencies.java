@@ -39,7 +39,7 @@ public class IdentifierDependencies extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
-		Node refNode = machineContext.getReferences().get(node);
+		Node refNode = machineContext.getReferenceNode(node);
 		if(refNode == null)
 			refNode = node;
 		HashSet<Node> set = new HashSet<Node>();

@@ -1,6 +1,6 @@
 MACHINE FairnessCounter
 DEFINITIONS
-ASSERT_LTL_1 == "WF(Reset) & WF(Inc) =>  F {x = 0}"
+ASSERT_LTL_1 == "WF(Reset) & SF(Inc) =>  F {x = 0}"
 VARIABLES x
 INVARIANT
  x : 0..20

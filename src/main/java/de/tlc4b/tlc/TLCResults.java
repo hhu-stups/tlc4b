@@ -64,11 +64,12 @@ public class TLCResults {
 			evalTrace();
 		}
 
-		if(tlcResult == NoError & tlcOutputInfo.hasInitialisation() & numberOfDistinctStates == 0){
+		if (tlcResult == NoError && tlcOutputInfo.hasInitialisation()
+				&& numberOfDistinctStates == 0) {
 			// Can not setup constants
 			tlcResult = InitialStateError;
 		}
-		
+
 	}
 
 	private void evalTrace() {
@@ -80,14 +81,16 @@ public class TLCResults {
 			printer = new TracePrinter(OutputCollector.getInitialState(),
 					tlcOutputInfo);
 		}
-		traceString = printer.getTrace().toString();
+		if (printer != null) {
+			traceString = printer.getTrace().toString();
+		}
 	}
 
 	private void evalAllMessages() {
 
 		ArrayList<Message> messages = OutputCollector.getAllMessages();
 		for (Message m : messages) {
-			
+
 			switch (m.getMessageClass()) {
 			case ERROR:
 				evalErrorMessage(m);
@@ -102,7 +105,8 @@ public class TLCResults {
 			case NONE:
 				evalStatusMessage(m);
 				break;
-
+			default:
+				break;
 			}
 		}
 
@@ -113,7 +117,7 @@ public class TLCResults {
 	}
 
 	private void evalStatusMessage(Message m) {
-		
+
 		switch (m.getMessageCode()) {
 
 		case EC.TLC_STARTING:
@@ -135,12 +139,19 @@ public class TLCResults {
 		case EC.TLC_SUCCESS:
 			tlcResult = TLCResult.NoError;
 			break;
+
+		default:
+			break;
 		}
 
 	}
 
 	private void evalErrorMessage(Message m) {
-		//System.out.println(m.getMessageCode() + " "+ m.getParameters().length);
+		// System.out.print(m.getMessageCode() + " "+ m.getParameters().length);
+		// for (int i = 0; i < m.getParameters().length; i++) {
+		// System.out.print(" "+m.getParameters()[i]);
+		// }
+		// System.out.println();
 		switch (m.getMessageCode()) {
 		case EC.TLC_INVARIANT_VIOLATED_INITIAL:
 		case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
@@ -192,6 +203,8 @@ public class TLCResults {
 			tlcResult = evaluatingParameter(m.getParameters());
 			break;
 
+		default:
+			break;
 		}
 	}
 
@@ -207,6 +220,10 @@ public class TLCResults {
 			} else if (s.contains("In applying the function")) {
 				return WellDefinednessError;
 			} else if (s.contains("tlc2.module.TLC.Assert")) {
+				return tlcResult = WellDefinednessError;
+			} else if (s
+					.contains("CHOOSE x \\in S: P, but no element of S satisfied P")
+					&& s.contains("module FunctionsAsRelations")) {
 				return tlcResult = WellDefinednessError;
 			}
 

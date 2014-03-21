@@ -1,14 +1,14 @@
 package de.tlc4b;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.tlc4b.TLC4BGlobals;
@@ -17,7 +17,6 @@ import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.exceptions.TLC4BException;
 import de.tlc4b.tlc.TLCOutputInfo;
 import de.tlc4b.tlc.TLCResults;
-import de.tlc4b.tlc.TLCResults.TLCResult;
 import de.tlc4b.util.StopWatch;
 
 public class TLC4B {
@@ -33,8 +32,9 @@ public class TLC4B {
 	private String constantsSetup;
 
 	public static void main(String[] args) throws IOException {
+		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
+															// windows
 		TLC4B tlc4b = new TLC4B();
-
 		try {
 			tlc4b.progress(args);
 		} catch (BException e) {
@@ -52,8 +52,6 @@ public class TLC4B {
 			try {
 				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
 						tlc4b.path);
-				// b2tla.evalOutput(output, B2TLAGlobals.isCreateTraceFile());
-				// System.out.println("------------------------------");
 
 				TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
@@ -63,7 +61,6 @@ public class TLC4B {
 			} catch (NoClassDefFoundError e) {
 				System.err
 						.println("Can not find TLC. The tlatools.jar must be included in the classpath.");
-				// System.out.println(e.getMessage());
 			}
 
 		}
@@ -98,54 +95,51 @@ public class TLC4B {
 	}
 
 	public static void test(String[] args, boolean deleteFiles)
-			throws IOException {
+			throws Exception {
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
+		TLC4BGlobals.setCreateTraceFile(false);
 		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
-		TLC4B b2tla = new TLC4B();
+		TLC4B tlc4b = new TLC4B();
 		try {
-			b2tla.progress(args);
+			tlc4b.progress(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
-			return;
+			throw e;
 		}
-
+		//System.out.println(tlc4b.tlaModule);
 		if (TLC4BGlobals.isRunTLC()) {
-			TLCRunner.runTLC(b2tla.machineFileNameWithoutFileExtension,
-					b2tla.path);
+			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
+					tlc4b.path);
 
-			TLCResults results = new TLCResults(b2tla.tlcOutputInfo);
+			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
-			@SuppressWarnings("unused")
-			TLCResult result = results.getTLCResult();
-			// System.out.println("Result: " + result);
+			// System.out.println("Result: " + results.getTLCResult());
 
-			b2tla.printResults(results, false);
-			System.out.println(results.getTrace());
+			tlc4b.printResults(results, false);
+			//System.out.println(results.getTrace());
+
 			System.exit(0);
 		}
-		System.exit(1);
 	}
 
-	@SuppressWarnings({ "unused", "null" })
-	private void printTestResultsForTestscript() {
-		TLCResults tlcResults = null;
-		// This output is adapted to Ivo's testscript
-		System.out.println("------------- Results -------------");
-		System.out.println("Model Checking Time: "
-				+ (tlcResults.getModelCheckingTime() * 1000) + " ms");
-		System.out.println("States analysed: "
-				+ tlcResults.getNumberOfDistinctStates());
-		System.out.println("Transitions fired: "
-				+ tlcResults.getNumberOfTransitions());
-		if (tlcResults.getTLCResult() != TLCResult.NoError) {
-			System.err.println("@@");
-			System.err.println("12" + tlcResults.getResultString());
-		}
-
-	}
+	/*
+	 * private void printTestResultsForTestscript() { TLCResults tlcResults =
+	 * null; // This output is adapted to Ivo's testscript
+	 * System.out.println("------------- Results -------------");
+	 * System.out.println("Model Checking Time: " +
+	 * (tlcResults.getModelCheckingTime() * 1000) + " ms");
+	 * System.out.println("States analysed: " +
+	 * tlcResults.getNumberOfDistinctStates());
+	 * System.out.println("Transitions fired: " +
+	 * tlcResults.getNumberOfTransitions()); if (tlcResults.getTLCResult() !=
+	 * TLCResult.NoError) { System.err.println("@@"); System.err.println("12" +
+	 * tlcResults.getResultString()); }
+	 * 
+	 * }
+	 */
 
 	private void handleParameter(String[] args) {
 		int index = 0;
@@ -364,17 +358,21 @@ public class TLC4B {
 			System.out.println("Standard module '" + path + name
 					+ ".tla' created.");
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new TLC4BIOException(e.getMessage());
 		} finally {
-			if (TLC4BGlobals.isDeleteOnExit()) {
+			if (TLC4BGlobals.isDeleteOnExit() && file.exists()) {
 				file.deleteOnExit();
 			}
 			try {
-				is.close();
-				fos.flush();
-				fos.close();
+				if (is != null) {
+					is.close();
+				}
+				if (fos != null) {
+					fos.flush();
+					fos.close();
+				}
 			} catch (IOException ex) {
-				ex.printStackTrace();
+				throw new TLC4BIOException(ex.getMessage());
 			}
 		}
 	}
@@ -388,37 +386,50 @@ public class TLC4B {
 		return mainFile;
 	}
 
-	public static String fileToString(String fileName) throws IOException {
-		StringBuilder res = new StringBuilder();
-		BufferedReader in = new BufferedReader(new FileReader(fileName));
-		String str;
-		while ((str = in.readLine()) != null) {
-			res.append(str + "\n");
-		}
-		in.close();
-		return res.toString();
-	}
-
 	public static File createFile(String dir, String fileName, String text,
 			boolean deleteOnExit) {
-		File d = new File(dir);
-		d.mkdirs();
 		File file = new File(dir + File.separator + fileName);
+
+		BufferedWriter out;
 		try {
-			file.createNewFile();
-			FileWriter fw;
-			fw = new FileWriter(file);
-			fw.write(text);
-			fw.close();
+			out = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(file), "UTF-8"));
+			out.write(text);
+			out.close();
 			return file;
+		} catch (UnsupportedEncodingException e1) {
+			throw new TLC4BIOException(e1.getMessage());
+		} catch (FileNotFoundException e1) {
+			throw new TLC4BIOException(e1.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
 			throw new TLC4BIOException(e.getMessage());
-		} finally {
-			if (deleteOnExit) {
+		} finally{
+			if (deleteOnExit && file.exists()) {
 				file.deleteOnExit();
 			}
 		}
+		
+//		try {
+//			out = new BufferedWriter(new OutputStreamWriter(
+//					new FileOutputStream(file), "UTF-8"));
+//			out.write(text);
+//			out.close();
+//			// FileWriter fw;
+//			// fw = new FileWriter(file);
+//			// fw.write(text);
+//			// fw.close();
+//			return file;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			throw new TLC4BIOException(e.getMessage());
+//		} finally {
+//			try {
+//				out.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//				throw new TLC4BIOException(e.getMessage());
+//			}
+//		}
 	}
 
 }

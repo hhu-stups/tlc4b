@@ -85,7 +85,7 @@ public class OperationsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES x, y \n"
 				+ "Invariant == x = 1 /\\ y = 1\n"
-				+ "Init == x = 1 /\\ y = 1 \n"
+				+ "Init == x \\in {1} /\\ y \\in {1} \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x, y>>\n"
 				+ "====";
 		compare(expected, machine);
@@ -104,8 +104,8 @@ public class OperationsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES x, y \n"
 				+ "Invariant == x = 1 /\\ y = 1\n"
-				+ "Init == x = 1 /\\ y = 1 \n"
-				+ "foo == x' = 1 /\\ y' = 1\n"
+				+ "Init == x \\in {1} /\\ y \\in {1}\n"
+				+ "foo == x' \\in {1} /\\ y' \\in {1}\n"
 				+ "Next == foo\n"
 				+ "====";
 		compare(expected, machine);
@@ -125,8 +125,8 @@ public class OperationsTest {
 				+ "EXTENDS Naturals\n"
 				+ "VARIABLES x, y \n"
 				+ "Invariant == x = 1 /\\ y = 1\n"
-				+ "Init == x = 1 /\\ y = 1 \n"
-				+ "foo == x' = x + 1 /\\ UNCHANGED <<y>>\n"
+				+ "Init == x \\in {1} /\\ y \\in {1} \n"
+				+ "foo == x' \\in {x + 1} /\\ UNCHANGED <<y>>\n"
 				+ "Next == foo\n"
 				+ "====";
 		compare(expected, machine);
@@ -187,7 +187,7 @@ public class OperationsTest {
 				+ "VARIABLES x \n"
 				+ "Invariant == x = 1\n"
 				+ "Init == x = 1 \n"
-				+ "foo(p) == \\E p2 \\in {1} : TRUE /\\ x' = p + p2\n"
+				+ "foo(p) == \\E p2 \\in {1} : x' = p + p2\n"
 				+ "Next == \\E p \\in {1} : foo(p)\n"
 				+ "====";
 		compare(expected, machine);

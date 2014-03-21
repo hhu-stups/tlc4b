@@ -47,6 +47,9 @@ TotalBijFunc(S, T) == {f \in [S -> T]: T = Range(f) /\
     
 ParFunc(S, T) ==  UNION{[x -> T] :x \in SUBSET S}
  \* The set of all partial functions
+
+ParFuncEleOf(f, S, T) == {x \in {f} :  DOMAIN f \subseteq S /\ Range(f) \subseteq T}
+ \* The set containing f if f is a partial function
  
 isEleOfParFunc(f, S, T) == DOMAIN f \subseteq S /\ Range(f) \subseteq T 
  \* Test if the function f is a partial function
@@ -55,10 +58,30 @@ ParInjFunc(S, T)== {f \in ParFunc(S, T):
     Cardinality(DOMAIN f) = Cardinality(Range(f))}
 \* The set of all partial injective functions
 
+ParInjFuncEleOf(f, S, T)== {x \in {f}:  
+	/\ DOMAIN f \subseteq S 
+	/\ Range(f) \subseteq T
+    /\ Cardinality(DOMAIN f) = Cardinality(Range(f))}
+\* The set containing f if f is a partial injective function
+
 ParSurFunc(S, T)== {f \in ParFunc(S, T): T = Range(f)}
 \* The set of all partial surjective function
 
-ParBijFunc(S, T) == {f \in ParFunc(S, T): T = Range(f) /\
-    Cardinality(DOMAIN f) = Cardinality(Range(f))}
+ParSurFuncEleOf(f, S, T)== {x \in {f}:  
+	/\ DOMAIN f \subseteq S 
+	/\ Range(f) \subseteq T
+    /\ T = Range(f)}
+\* The set containing f if f is a partial surjective function
+
+ParBijFunc(S, T) == {f \in ParFunc(S, T): 
+	/\ Range(f) = T
+	/\ Cardinality(DOMAIN f) = Cardinality(Range(f))}
  \* The set of all partial bijective functions
+ 
+ParBijFuncEleOf(f, S, T) == {x \in {f}:  
+	/\ DOMAIN f \subseteq S 
+	/\ Range(f) \subseteq T
+    /\ Cardinality(DOMAIN f) = Cardinality(Range(f))
+	/\ T = Range(f)}
+\* The set containing f if f is a partial bijective function 
 =============================================================================

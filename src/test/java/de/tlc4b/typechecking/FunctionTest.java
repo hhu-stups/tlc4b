@@ -189,7 +189,7 @@ public class FunctionTest {
 				+ "PROPERTIES k = INT +-> INT \n"
 				+ "END";
 		TestTypechecker t = new TestTypechecker(machine);
-		assertEquals("POW(POW(INTEGER*INTEGER))", t.constants.get("k").toString());
+		assertEquals("POW(FUNC(INTEGER,INTEGER))", t.constants.get("k").toString());
 	}
 	
 	

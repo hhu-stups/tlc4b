@@ -73,6 +73,7 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
 			nodesToPrime.add(ref);
+			primedNodes.add(e);
 		}
 		node.getPredicate().apply(this);
 		nodesToPrime = null;

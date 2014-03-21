@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StandardMadules {
+public final class StandardMadules {
 
+	private StandardMadules(){
+	}
+	
 	// Functions
 	public static final String FUNC_RANGE = "Range";
 	public static final String FUNC_IMAGE = "Image";
@@ -19,8 +22,7 @@ public class StandardMadules {
 	public static final String FUNC_ASSIGN = "FuncAssign";
 
 	
-	
-	public static ArrayList<String> functions = new ArrayList<String>();
+	public static final ArrayList<String> functions = new ArrayList<String>();
 	static {
 		functions.add(FUNC_RANGE);
 		functions.add(FUNC_ID);
@@ -37,11 +39,22 @@ public class StandardMadules {
 	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
 	public static final String TOTAL_BIJECTIVE_FUNCTION = "TotalBijFunc";
 
+	
+	/** Sets of Partial functions **/
 	public static final String PARTIAL_FUNCTION = "ParFunc";
+	public static final String PARTIAL_FUNCTION_ELEMENT_OF = "ParFuncEleOf";
+	public static final String ELEMENT_OF_PARTIAL_FUNCTION = "isEleOfParFunc";
+	
+	// injective
 	public static final String PARTIAL_INJECTIVE_FUNCTION = "ParInjFunc";
+	public static final String PARTIAL_INJECTIVE_FUNCTION_ELEMENT_OF = "ParInjFuncEleOf";
+	// surjective 
 	public static final String PARTIAL_SURJECTIVE_FUNCTION = "ParSurFunc";
+	public static final String PARTIAL_SURJECTIVE_FUNCTION_ELEMENT_OF = "ParSurFuncEleOf";
+	// bijective
 	public static final String PARITAL_BIJECTIVE_FUNCTION = "ParBijFunc";
-
+	public static final String PARITAL_BIJECTIVE_FUNCTION_ELEMENT_OF = "ParBijFuncEleOf";
+	
 	// Relations
 	public static final String RELATIONS = "Relations";
 	public static final String REL_DOMAIN = "RelDomain";

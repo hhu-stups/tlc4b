@@ -41,18 +41,20 @@ public class StructType extends AbstractHasFollowers {
 
 	@Override
 	public String toString() {
-		String res = "struct(";
+		StringBuffer res = new StringBuffer();
+		res.append("struct(");
+		
 		Iterator<String> keys = types.keySet().iterator();
 		if (!keys.hasNext())
-			res += "...";
+			res.append("...");
 		while (keys.hasNext()) {
 			String fieldName = (String) keys.next();
-			res += fieldName + ":" + types.get(fieldName);
+			res.append(fieldName + ":" + types.get(fieldName));
 			if (keys.hasNext())
-				res += ",";
+				res.append(",");
 		}
-		res += ")";
-		return res;
+		res.append(")");
+		return res.toString();
 	}
 
 	public void update(BType oldType, BType newType) {
@@ -170,18 +172,19 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public String getTlaType() {
-		String res = "[";
+		StringBuffer res = new StringBuffer();
+		res.append("[");
 		Iterator<String> keys = types.keySet().iterator();
 		if (!keys.hasNext())
-			res += "...";
+			res.append("...");
 		while (keys.hasNext()) {
 			String fieldName = (String) keys.next();
-			res += fieldName + ":" + types.get(fieldName);
+			res.append(fieldName + ":" + types.get(fieldName));
 			if (keys.hasNext())
-				res += ",";
+				res.append(",");
 		}
-		res += "]";
-		return res;
+		res.append("]");
+		return res.toString();
 	}
 
 	public boolean containsIntegerType() {

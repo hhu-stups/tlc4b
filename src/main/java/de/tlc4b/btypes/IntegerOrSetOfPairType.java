@@ -212,15 +212,11 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		if (this.first.equals(other) || this.second.equals(other)) {
 			return true;
 		}
-		if (first instanceof AbstractHasFollowers) {
-			if (((AbstractHasFollowers) first).contains(other))
-				return true;
-		}
-		if (second instanceof AbstractHasFollowers) {
-			if (((AbstractHasFollowers) second).contains(other))
-				return true;
-		}
-		return false;
+		
+		if(first.contains(other) || second.contains(other)){
+			return true;
+		}else
+			return false;
 	}
 
 	public String getTlaType() {

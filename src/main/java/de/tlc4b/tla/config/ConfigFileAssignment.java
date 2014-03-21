@@ -12,13 +12,14 @@ public abstract class ConfigFileAssignment {
 	public abstract String getString(Renamer renamer);
 	
 	public String getIdentifier(AIdentifierExpression node) {
-		String res = "";
+		StringBuffer res = new StringBuffer();
+		
 		List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(
 				node.getIdentifier());
 		for (TIdentifierLiteral e : copy) {
-			res += e.getText();
+			res.append(e.getText());
 		}
-		return res;
+		return res.toString();
 	}
 	
 }

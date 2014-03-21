@@ -93,8 +93,7 @@ public class Translator {
 	}
 
 	public void translate() {
-		@SuppressWarnings("unused")
-		DefinitionsEliminator defEliminator = new DefinitionsEliminator(start);
+		new DefinitionsEliminator(start);
 
 		new NotSupportedConstructs(start);
 
@@ -119,7 +118,7 @@ public class Translator {
 				machineContext, typechecker);
 
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
-				start, typechecker.getTypes(), machineContext, typeRestrictor);
+				start, typechecker, machineContext, typeRestrictor);
 		
 		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
 				machineContext);
@@ -149,7 +148,7 @@ public class Translator {
 		configString = printer.getConfigString().toString();
 
 		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer,
-				typechecker.getTypes(), generator.getTlaModule());
+				typechecker, generator.getTlaModule());
 	}
 
 	public String getMachineString() {
