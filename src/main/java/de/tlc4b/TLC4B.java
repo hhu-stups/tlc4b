@@ -409,27 +409,6 @@ public class TLC4B {
 			}
 		}
 		
-//		try {
-//			out = new BufferedWriter(new OutputStreamWriter(
-//					new FileOutputStream(file), "UTF-8"));
-//			out.write(text);
-//			out.close();
-//			// FileWriter fw;
-//			// fw = new FileWriter(file);
-//			// fw.write(text);
-//			// fw.close();
-//			return file;
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			throw new TLC4BIOException(e.getMessage());
-//		} finally {
-//			try {
-//				out.close();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//				throw new TLC4BIOException(e.getMessage());
-//			}
-//		}
 	}
 
 }

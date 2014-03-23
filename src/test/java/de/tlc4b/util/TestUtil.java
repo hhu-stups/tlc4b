@@ -134,30 +134,6 @@ public class TestUtil {
 		return translator.getModuleString();
 	}
 
-	public static void createTempfile(String dir, String fileName,
-			String moduleString) {
-		File d = new File(dir);
-		d.mkdirs();
-
-		File tempFile = new File(dir + fileName);
-		try {
-			tempFile.createNewFile();
-			System.out
-					.println("Testfile:'" + tempFile.getName() + "' created.");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		FileWriter fw;
-		try {
-			fw = new FileWriter(tempFile);
-			fw.write(moduleString);
-			fw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
 	public static TLCResult test(String[] args) throws IOException {
 		System.out.println("Starting JVM...");
 		final Process p = startJVM("", TLC4BTester.class.getCanonicalName(), args);
@@ -230,14 +206,13 @@ class StreamGobbler extends Thread {
 
 	public void run() {
 		try {
-			InputStreamReader isr = new InputStreamReader(is);
+			InputStreamReader isr =	new InputStreamReader(is, "UTF-8");
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
 			while ((line = br.readLine()) != null) {
 				System.out.println("> " + line);
 				log.add(line);
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

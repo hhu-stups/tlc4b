@@ -11,40 +11,15 @@ sourceCompatibility = 1.5
 
 repositories {
 	mavenCentral()
-	mavenRepo name: 'cobra_ext', url: "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
+	maven {
+	    	url "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
+	}
 }
 
 configurations { // configuration that holds jars to copy into lib
 	releaseJars 
 }
-
-jacoco {
-    toolVersion = "0.6.2.201302030002"
-    reportsDir = file("$buildDir/customJacocoReportDir")
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination "${buildDir}/jacocoHtml"
-    }
-}
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
- }
-
-findbugs { 
-	ignoreFailures = true 
-} 
  
-
- 
-
 def parser_version = '2.4.22-SNAPSHOT'
 
 dependencies {
@@ -70,6 +45,31 @@ dependencies {
 	releaseJars (group: 'de.prob', name: 'bparser', version: parser_version)
 	releaseJars (group: 'de.prob', name: 'ltlparser', version: parser_version)
 }
+
+jacoco {
+    toolVersion = "0.6.2.201302030002"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+findbugs { 
+	ignoreFailures = true 
+} 
+ 
 
 
 test { 

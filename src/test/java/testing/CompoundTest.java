@@ -35,7 +35,7 @@ public class CompoundTest {
 		pragmas.addAll(parser.getPragmas());
 		r.loadAllMachines(machineFile, tree, parser.getSourcePositions(), parser.getDefinitions(), pragmas);
 		
-		r.printAsProlog(new PrintWriter(System.out), false);
+		//r.printAsProlog(new PrintWriter(System.out), false);
 	}
 
 }

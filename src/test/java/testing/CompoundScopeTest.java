@@ -50,7 +50,7 @@ public class CompoundScopeTest {
 		ArrayList<String> list = new ArrayList<String>(map.keySet());
 		
 		
-		Hashtable<String, MachineContext> machineContextsTable = new Hashtable<String, MachineContext>();
+		//Hashtable<String, MachineContext> machineContextsTable = new Hashtable<String, MachineContext>();
 		//Hashtable<String, Typechecker> typecheckerTable = new Hashtable<String, Typechecker>();
 		for (int i = 0; i < list.size(); i++) {
 			String name = list.get(i);
