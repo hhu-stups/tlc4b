@@ -351,7 +351,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 		ArrayList<Node> inits = this.tlaModule.getInitPredicates();
 		if (inits.size() == 0)
 			return;
-		tlaModuleString.append("Init ==\n\t/\\ ");
+		tlaModuleString.append("Init == ");
+		if(inits.size() > 1)
+			tlaModuleString.append("\n\t/\\ ");
 		for (int i = 0; i < inits.size(); i++) {
 			Node init = inits.get(i);
 			if (init instanceof ADisjunctPredicate) {

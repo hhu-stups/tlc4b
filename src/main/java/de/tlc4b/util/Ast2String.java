@@ -1,4 +1,4 @@
-package de.tlc4b.analysis;
+package de.tlc4b.util;
 
 import de.be4.classicalb.core.parser.analysis.ExtendedDFAdapter;
 import de.be4.classicalb.core.parser.node.Node;

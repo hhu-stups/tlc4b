@@ -21,7 +21,6 @@ import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.Translator;
-import de.tlc4b.analysis.Ast2String;
 import de.tlc4b.tlc.TLCResults.TLCResult;
 
 public class TestUtil {

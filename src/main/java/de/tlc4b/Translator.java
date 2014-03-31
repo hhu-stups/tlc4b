@@ -9,7 +9,6 @@ import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
-import de.tlc4b.analysis.Ast2String;
 import de.tlc4b.analysis.ConstantsEliminator;
 import de.tlc4b.analysis.ConstantsEvaluator;
 import de.tlc4b.analysis.DefinitionsAnalyser;
@@ -27,6 +26,7 @@ import de.tlc4b.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.tlc4b.prettyprint.TLAPrinter;
 import de.tlc4b.tla.Generator;
 import de.tlc4b.tlc.TLCOutputInfo;
+import de.tlc4b.util.Ast2String;
 
 public class Translator {
 

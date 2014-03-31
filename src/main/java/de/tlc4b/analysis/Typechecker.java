@@ -82,9 +82,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		node.getPredicate().apply(this);
 	}
 
-	public MachineContext getContext() {
-		return machineContext;
-	}
 
 	public void setType(Node node, BType t) {
 		this.types.put(node, t);
