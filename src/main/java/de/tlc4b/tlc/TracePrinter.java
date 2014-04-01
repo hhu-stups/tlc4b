@@ -49,24 +49,28 @@ public class TracePrinter {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
 
+		setup();
+	}
+
+	private void setup() {
 		constants = new ArrayList<OpDeclNode>();
 		variables = new ArrayList<OpDeclNode>();
 		for (int i = 0; i < TLCState.vars.length; i++) {
-			String id = TLCState.vars[i].getName().toString();
-			if (tlcOutputInfo.constants.contains(id)) {
+			String tlaName = TLCState.vars[i].getName().toString();
+			String bName = tlcOutputInfo.getBName(tlaName);
+			if (tlcOutputInfo.constants.contains(bName)) {
 				constants.add(TLCState.vars[i]);
 			} else {
 				variables.add(TLCState.vars[i]);
 			}
 		}
-
 		evalTrace();
 	}
 
 	public TracePrinter(TLCState initialState, TLCOutputInfo tlcOutputInfo) {
 		this.initialState = initialState;
 		this.tlcOutputInfo = tlcOutputInfo;
-		evalTrace();
+		setup();
 	}
 
 	public StringBuilder getTrace() {
@@ -75,7 +79,7 @@ public class TracePrinter {
 
 	private void evalTrace() {
 		traceBuilder = new StringBuilder();
-		
+
 		if (trace != null) {
 			traceBuilder.append(setupConstants(trace.get(0).state));
 			for (int i = 0; i < trace.size(); i++) {
@@ -95,18 +99,19 @@ public class TracePrinter {
 	private StringBuilder setupConstants(TLCState state) {
 		StringBuilder expression = new StringBuilder();
 		if (tlcOutputInfo.constantSetup) {
-			if(constants.size() == 0){
+			if (constants.size() == 0) {
 				expression.append("1 = 1");
-			}else{
+			} else {
 				for (int i = 0; i < constants.size(); i++) {
 					if (i > 0) {
 						expression.append(" & ");
 					}
 					UniqueString var = constants.get(i).getName();
+					String bName = tlcOutputInfo.getBName(var.toString());
 					BType type = tlcOutputInfo.getBType(var.toString());
 					String value = parseValue(state.lookup(var), type)
 							.toString();
-					expression.append(var).append(" = ").append(value);
+					expression.append(bName).append(" = ").append(value);
 				}
 			}
 			expression.append("\n");
@@ -122,9 +127,10 @@ public class TracePrinter {
 				expression.append(" & ");
 			}
 			UniqueString var = variables.get(i).getName();
+			String bName = tlcOutputInfo.getBName(var.toString());
 			BType type = tlcOutputInfo.getBType(var.toString());
 			String value = parseValue(state.lookup(var), type).toString();
-			expression.append(var).append(" = ").append(value);
+			expression.append(bName).append(" = ").append(value);
 		}
 		return expression;
 	}
@@ -165,12 +171,19 @@ public class TracePrinter {
 				res.append(")");
 				return res;
 			} else if (type instanceof FunctionType) {
-				BType subtype = ((FunctionType) type).getRange();
-				res.append("[");
-				res.append(parseEnumerationValue(((TupleValue) val).elems,
-						subtype));
-				res.append("]");
-				return res;
+				if(((TupleValue) val).elems.length == 0){
+					res.append("{}");
+					return res;
+				}else{
+					BType subtype = ((FunctionType) type).getRange();
+					res.append("[");
+					System.out.println();
+					res.append(parseEnumerationValue(((TupleValue) val).elems,
+							subtype));
+					res.append("]");
+					return res;
+				}
+
 			}
 			return null;
 

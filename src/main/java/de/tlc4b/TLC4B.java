@@ -121,6 +121,7 @@ public class TLC4B {
 			tlc4b.printResults(results, false);
 			//System.out.println(results.getTrace());
 
+			
 			System.exit(0);
 		}
 	}
