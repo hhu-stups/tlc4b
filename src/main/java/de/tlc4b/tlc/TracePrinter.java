@@ -7,6 +7,7 @@ import de.tlc4b.btypes.FunctionType;
 import de.tlc4b.btypes.PairType;
 import de.tlc4b.btypes.SetType;
 import de.tlc4b.btypes.StructType;
+import tla2sany.semantic.OpDeclNode;
 import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
 import tlc2.value.FcnLambdaValue;
@@ -37,54 +38,90 @@ public class TracePrinter {
 	ArrayList<TLCStateInfo> trace;
 	TLCState initialState;
 	TLCOutputInfo tlcOutputInfo;
-	
+
+	ArrayList<OpDeclNode> constants;
+	ArrayList<OpDeclNode> variables;
+
 	StringBuilder traceBuilder;
 
 	public TracePrinter(ArrayList<TLCStateInfo> trace,
 			TLCOutputInfo tlcOutputInfo) {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
-		
+
+		constants = new ArrayList<OpDeclNode>();
+		variables = new ArrayList<OpDeclNode>();
+		for (int i = 0; i < TLCState.vars.length; i++) {
+			String id = TLCState.vars[i].getName().toString();
+			if (tlcOutputInfo.constants.contains(id)) {
+				constants.add(TLCState.vars[i]);
+			} else {
+				variables.add(TLCState.vars[i]);
+			}
+		}
+
 		evalTrace();
 	}
-
 
 	public TracePrinter(TLCState initialState, TLCOutputInfo tlcOutputInfo) {
 		this.initialState = initialState;
 		this.tlcOutputInfo = tlcOutputInfo;
 		evalTrace();
 	}
-	
-	public StringBuilder getTrace(){
+
+	public StringBuilder getTrace() {
 		return traceBuilder;
 	}
-	
 
 	private void evalTrace() {
 		traceBuilder = new StringBuilder();
 		
-		if(trace != null){
+		if (trace != null) {
+			traceBuilder.append(setupConstants(trace.get(0).state));
 			for (int i = 0; i < trace.size(); i++) {
 				if (i > 0) {
 					traceBuilder.append("\n");
 				}
 				traceBuilder.append(evalExpression(trace.get(i).state));
 			}
-		}else {
+		} else {
+			traceBuilder.append(setupConstants(initialState));
 			traceBuilder.append(evalExpression(initialState));
 		}
-		
-		//System.out.println(traceBuilder);
+
+		// System.out.println(traceBuilder);
+	}
+
+	private StringBuilder setupConstants(TLCState state) {
+		StringBuilder expression = new StringBuilder();
+		if (tlcOutputInfo.constantSetup) {
+			if(constants.size() == 0){
+				expression.append("1 = 1");
+			}else{
+				for (int i = 0; i < constants.size(); i++) {
+					if (i > 0) {
+						expression.append(" & ");
+					}
+					UniqueString var = constants.get(i).getName();
+					BType type = tlcOutputInfo.getBType(var.toString());
+					String value = parseValue(state.lookup(var), type)
+							.toString();
+					expression.append(var).append(" = ").append(value);
+				}
+			}
+			expression.append("\n");
+		}
+		return expression;
 	}
 
 	private StringBuilder evalExpression(TLCState state) {
 		StringBuilder expression = new StringBuilder();
 
-		for (int i = 0; i < TLCState.vars.length; i++) {
+		for (int i = 0; i < variables.size(); i++) {
 			if (i > 0) {
 				expression.append(" & ");
 			}
-			UniqueString var = TLCState.vars[i].getName();
+			UniqueString var = variables.get(i).getName();
 			BType type = tlcOutputInfo.getBType(var.toString());
 			String value = parseValue(state.lookup(var), type).toString();
 			expression.append(var).append(" = ").append(value);
@@ -93,7 +130,7 @@ public class TracePrinter {
 	}
 
 	private StringBuilder parseValue(Value val, BType type) {
-		//System.out.println(val.getClass());
+		// System.out.println(val.getClass());
 		StringBuilder res = new StringBuilder();
 		int valueType = val.getKind();
 		switch (valueType) {
@@ -137,7 +174,7 @@ public class TracePrinter {
 			}
 			return null;
 
-		case RECORDVALUE:{
+		case RECORDVALUE: {
 			RecordValue rec = (RecordValue) val;
 			StructType struct = (StructType) type;
 			res.append("rec(");
@@ -153,7 +190,6 @@ public class TracePrinter {
 			res.append(")");
 			return res;
 		}
-
 
 		case FCNRCDVALUE:
 			FcnRcdValue function = (FcnRcdValue) val;
@@ -202,7 +238,7 @@ public class TracePrinter {
 			res.append(parseValue(s.set2, type));
 			return res;
 		}
-		
+
 		case SETDIFFVALUE: {
 			SetDiffValue s = (SetDiffValue) val;
 			res.append(parseValue(s.set1, type));
@@ -210,14 +246,15 @@ public class TracePrinter {
 			res.append(parseValue(s.set2, type));
 			return res;
 		}
-		
-		case SUBSETVALUE:{
+
+		case SUBSETVALUE: {
 			SubsetValue s = (SubsetValue) val;
 			SetType t = (SetType) type;
-			res.append("POW(").append(parseValue(s.set, t.getSubtype())).append(")");
+			res.append("POW(").append(parseValue(s.set, t.getSubtype()))
+					.append(")");
 			return res;
 		}
-		case UNIONVALUE:{
+		case UNIONVALUE: {
 			UnionValue s = (UnionValue) val;
 			SetType t = (SetType) type;
 			res.append("union(");
@@ -225,14 +262,14 @@ public class TracePrinter {
 			res.append(")");
 			return res;
 		}
-		
-		case SETOFRCDSVALUE:{
+
+		case SETOFRCDSVALUE: {
 			SetOfRcdsValue s = (SetOfRcdsValue) val;
 			SetType t = (SetType) type;
 			StructType struct = (StructType) t.getSubtype();
 			res.append("struct(");
 			for (int i = 0; i < s.names.length; i++) {
-				if(i>0){
+				if (i > 0) {
 					res.append(", ");
 				}
 				res.append(s.names[i]);
@@ -243,8 +280,8 @@ public class TracePrinter {
 			res.append(")");
 			return res;
 		}
-		
-		case SETOFFCNSVALUE:{
+
+		case SETOFFCNSVALUE: {
 			SetOfFcnsValue s = (SetOfFcnsValue) val;
 			SetType t = (SetType) type;
 			FunctionType func = (FunctionType) t.getSubtype();
@@ -255,30 +292,29 @@ public class TracePrinter {
 			res.append(")");
 			return res;
 		}
-		
-		case STRINGVALUE:{
+
+		case STRINGVALUE: {
 			StringValue s = (StringValue) val;
 			res.append("\"").append(s.getVal()).append("\"");
 			return res;
 		}
-		
-		case FCNLAMBDAVALUE:{
+
+		case FCNLAMBDAVALUE: {
 			FcnLambdaValue s = (FcnLambdaValue) val;
 			res.append(parseValue(s.fcnRcd, type));
 			return res;
 		}
-		case SETPREDVALUE:{
+		case SETPREDVALUE: {
 			SetPredValue s = (SetPredValue) val;
 			res.append(parseValue(s.inVal, type));
 			return res;
 		}
-		
-		case LAZYVALUE:{
+
+		case LAZYVALUE: {
 			LazyValue s = (LazyValue) val;
 			res.append(parseValue(s.val, type));
 			return res;
 		}
-		
 
 		}
 		System.err.println("Type: " + val.getKind());
