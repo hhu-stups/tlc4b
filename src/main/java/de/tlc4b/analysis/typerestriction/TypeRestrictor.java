@@ -198,6 +198,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 			if (list.contains(r_left)
 					&& isAConstantExpression(right, list, ignoreList)) {
+				right.apply(this);
 				ArrayList<PExpression> element = new ArrayList<PExpression>();
 				element.add(right);
 				if (machineContext.getVariables().values().contains(r_left)) {
@@ -207,9 +208,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				removedNodes.add(n);
 			}
 			if (list.contains(r_right)
-					&& isAConstantExpression(right, list, ignoreList)) {
+					&& isAConstantExpression(left, list, ignoreList)) {
+				left.apply(this);
 				ArrayList<PExpression> element = new ArrayList<PExpression>();
-				element.add(right);
+				element.add(left);
 				if (machineContext.getVariables().values().contains(r_right)) {
 					r_right = variablesHashTable.get(r_right);
 				}
@@ -256,6 +258,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 			if (list.contains(r_left)
 					&& isAConstantExpression(right, list, ignoreList)) {
+				right.apply(this);
 				if (machineContext.getVariables().values().contains(r_left)) {
 					r_left = variablesHashTable.get(r_left);
 				}
@@ -268,11 +271,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		if (n instanceof AConjunctPredicate) {
 			Node left = ((AConjunctPredicate) n).getLeft();
 			Node right = ((AConjunctPredicate) n).getRight();
-			analysePredicate(left, list,
-					ignoreList);
-			analysePredicate(right, list,
-					ignoreList);
-			if(removedNodes.contains(left) && removedNodes.contains(right)){
+			analysePredicate(left, list, ignoreList);
+			analysePredicate(right, list, ignoreList);
+			if (removedNodes.contains(left) && removedNodes.contains(right)) {
 				removedNodes.add(n);
 			}
 			return;
@@ -474,6 +475,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				node.getIdentifiers()));
 	}
 
+
 	@Override
 	public void inALetSubstitution(ALetSubstitution node) {
 		HashSet<Node> list = new HashSet<Node>();
@@ -491,7 +493,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	private Hashtable<Node, Node> variablesHashTable;
 
 	public void inABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
-		if(!(node.getPredicate() instanceof AExistsPredicate)){
+		if (!(node.getPredicate() instanceof AExistsPredicate)) {
 			variablesHashTable = new Hashtable<Node, Node>();
 
 			HashSet<Node> list = new HashSet<Node>();

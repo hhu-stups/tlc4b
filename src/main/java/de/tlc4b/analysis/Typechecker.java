@@ -57,6 +57,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		c.getTree().apply(this);
 
 		checkLTLFormulas();
+		checkConstantsSetup();
 	}
 
 	private void checkLTLFormulas() {
@@ -74,6 +75,23 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			}
 		}
 
+	}
+	
+	private void checkConstantsSetup() {
+		PPredicate p = machineContext.getConstantsSetup();
+		if (p != null) {
+			setType(p, BoolType.getInstance());
+			p.apply(this);
+			for (Entry<String, Node> entry : machineContext.getConstants()
+					.entrySet()) {
+				String c = entry.getKey();
+				Node n = entry.getValue();
+				if (getType(n).isUntyped()) {
+					throw new TypeErrorException("Can not infer type of constant '"
+							+ c + "': " + getType(n));
+				}
+			}
+		}
 	}
 
 	@Override
@@ -197,7 +215,19 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(v, u);
 		}
 	}
-
+	
+	@Override
+	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			UntypedType u = new UntypedType();
+			setType(v, u);
+		}
+	}
+	
+	
 	/**
 	 * Definitions
 	 */

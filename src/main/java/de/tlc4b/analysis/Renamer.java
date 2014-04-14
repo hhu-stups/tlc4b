@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
@@ -19,11 +20,13 @@ import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
 import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
 import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
 import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
+import de.be4.classicalb.core.parser.node.AVarSubstitution;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
@@ -339,6 +342,52 @@ public class Renamer extends DepthFirstAdapter {
 			context.add(newName);
 		}
 		localContexts.add(context);
+	}
+
+	@Override
+	public void caseAAnySubstitution(AAnySubstitution node) {
+		List<PExpression> list = new ArrayList<PExpression>();
+		list.addAll(node.getIdentifiers());
+		evalBoundedVariables(node, list);
+
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
+		node.getWhere().apply(this);
+		node.getThen().apply(this);
+		removeLastContext();
+	}
+
+	@Override
+	public void caseALetSubstitution(ALetSubstitution node) {
+		List<PExpression> list = new ArrayList<PExpression>();
+		list.addAll(node.getIdentifiers());
+		evalBoundedVariables(node, list);
+
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
+		node.getPredicate().apply(this);
+		node.getSubstitution().apply(this);
+		removeLastContext();
+	}
+
+	@Override
+	public void caseAVarSubstitution(AVarSubstitution node) {
+		List<PExpression> list = new ArrayList<PExpression>();
+		list.addAll(node.getIdentifiers());
+		evalBoundedVariables(node, list);
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
+		node.getSubstitution().apply(this);
+		removeLastContext();
 	}
 
 	public void removeLastContext() {

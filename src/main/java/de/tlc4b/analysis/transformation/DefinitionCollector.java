@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
+import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
@@ -26,16 +27,25 @@ import de.be4.classicalb.core.parser.node.Start;
 public class DefinitionCollector extends DepthFirstAdapter {
 
 	private Hashtable<String, PDefinition> definitionsTable;
+	private ADefinitionsMachineClause definitionsMachineClause;
 
 	public Hashtable<String, PDefinition> getDefinitions(){
 		return new Hashtable<String, PDefinition>(definitionsTable);
+	}
+	public ADefinitionsMachineClause getDefinitionsMachineClause(){
+		return this.definitionsMachineClause;
 	}
 	
 	public DefinitionCollector(Start tree) {
 		definitionsTable = new Hashtable<String, PDefinition>();
 		tree.apply(this);
 	}
-
+	
+	@Override
+	public void inADefinitionsMachineClause(ADefinitionsMachineClause node) {
+		this.definitionsMachineClause = node;
+	}
+	
 
 	@Override
 	public void caseAPredicateDefinitionDefinition(

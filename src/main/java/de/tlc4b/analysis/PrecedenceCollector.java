@@ -5,12 +5,14 @@ import java.util.Hashtable;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
+import de.be4.classicalb.core.parser.node.ADomainExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.btypes.BType;
+import de.tlc4b.btypes.FunctionType;
 import de.tlc4b.btypes.IntegerType;
 
 public class PrecedenceCollector extends DepthFirstAdapter {
@@ -58,8 +60,10 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AAddExpression", 10, 10, true);
 
 		put("AModuloExpression", 10, 11, true);
+		put("AUnaryMinusExpression", 12, 12, false);
 		put("AConcatExpression", 13, 13, true);
-
+		put("ADivExpression", 13, 13, false);
+		
 	}
 
 	private Precedence getPrecedence(Node node) {
@@ -142,6 +146,25 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		if (Precedence.makeBrackets(p, parent)) {
 			brackets.add(node);
 		}
+	}
+	
+	@Override
+	public void inADomainExpression(ADomainExpression node)  {
+		BType type = typechecker.getType(node.getExpression());
+
+		Precedence p;
+		if (type instanceof FunctionType) {
+			// Function
+			p = new Precedence("ADomainExpression", 9, 9, false);
+		
+			precedenceTable.put(node, p);
+
+			Precedence parent = precedenceTable.get(node.parent());
+			if (Precedence.makeBrackets(p, parent)) {
+				brackets.add(node);
+			}
+		}
+
 	}
 
 	@Override

@@ -101,7 +101,6 @@ public class MachineContext extends DepthFirstAdapter {
 	private AConstantsMachineClause constantsMachineClause;
 	private ADefinitionsMachineClause definitionMachineClause;
 	private APropertiesMachineClause propertiesMachineClause;
-	private AVariablesMachineClause variablesMachineClause;
 	private AInvariantMachineClause invariantMachineClause;
 	private AInitialisationMachineClause initialisationMachineClause;
 	private AOperationsMachineClause operationMachineClause;
@@ -437,8 +436,6 @@ public class MachineContext extends DepthFirstAdapter {
 		}
 	}
 
-	// TODO import, include, ..
-
 	@Override
 	public void caseASetsContextClause(ASetsContextClause node) {
 		this.setsMachineClause = node;
@@ -490,7 +487,19 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
-		this.variablesMachineClause = node;
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			String name = Utils.getIdentifierAsString(v.getIdentifier());
+			exist(v.getIdentifier());
+			variables.put(name, v);
+		}
+	}
+
+	@Override
+	public void caseAConcreteVariablesMachineClause(
+			AConcreteVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
@@ -724,8 +733,6 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
-		// TODO maybe give better feedback to the user, e.g. cannot assign a
-		// value to constant 'c'
 		ArrayList<LinkedHashMap<String, Node>> temp = contextTable;
 		{
 			List<PExpression> copy = new ArrayList<PExpression>(
@@ -788,10 +795,7 @@ public class MachineContext extends DepthFirstAdapter {
 		if (node.getName() != null) {
 			AIdentifierExpression op = (AIdentifierExpression) node.getName();
 			String name = Utils.getIdentifierAsString(op.getIdentifier());
-			Node o = operations.get(name); // TODO operation
-											// of an
-											// external
-			// machine
+			Node o = operations.get(name);
 			if (o != null) {
 				this.referencesTable.put(op, o);
 			} else {
@@ -1058,10 +1062,6 @@ public class MachineContext extends DepthFirstAdapter {
 	public void setPropertiesMachineClaus(
 			APropertiesMachineClause propertiesMachineClause) {
 		this.propertiesMachineClause = propertiesMachineClause;
-	}
-
-	public AVariablesMachineClause getVariablesMachineClause() {
-		return variablesMachineClause;
 	}
 
 	public AInvariantMachineClause getInvariantMachineClause() {

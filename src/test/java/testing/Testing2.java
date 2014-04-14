@@ -1,7 +1,7 @@
 package testing;
 
-
 import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
+import static de.tlc4b.util.TestUtil.test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,8 +18,8 @@ import de.tlc4b.util.PolySuite.Config;
 import de.tlc4b.util.PolySuite.Configuration;
 
 @RunWith(PolySuite.class)
-public class Testing2 extends AbstractParseMachineTest{
-		
+public class Testing2 extends AbstractParseMachineTest {
+
 	private final File machine;
 
 	public Testing2(File machine, TLCResult result) {
@@ -28,9 +28,11 @@ public class Testing2 extends AbstractParseMachineTest{
 
 	@Test
 	public void testRunTLC() throws Exception {
-		String[] a = new String[] {machine.getPath()};
+		String[] a = new String[] {
+				machine.getPath()};
 		TLC4B.main(a);
 		//TLC4B.test(a,false);
+		//test(a);
 	}
 
 	@Config
@@ -39,5 +41,5 @@ public class Testing2 extends AbstractParseMachineTest{
 		list.add(new TestPair(NoError, "./src/test/resources/testing"));
 		return getConfiguration(list);
 	}
-	
+
 }

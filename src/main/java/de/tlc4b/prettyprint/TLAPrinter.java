@@ -304,7 +304,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		ArrayList<Node> list = this.tlaModule.getAssume();
 		if (list.size() == 0)
 			return;
-
+		
 		for (int i = 0; i < list.size(); i++) {
 			tlaModuleString.append("ASSUME ");
 			list.get(i).apply(this);
@@ -352,7 +352,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (inits.size() == 0)
 			return;
 		tlaModuleString.append("Init == ");
-		if(inits.size() > 1)
+		if (inits.size() > 1)
 			tlaModuleString.append("\n\t/\\ ");
 		for (int i = 0; i < inits.size(); i++) {
 			Node init = inits.get(i);
@@ -1040,14 +1040,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAConjunctPredicate(AConjunctPredicate node) {
 		boolean left = typeRestrictor.isARemovedNode(node.getLeft());
 		boolean right = typeRestrictor.isARemovedNode(node.getRight());
-		
-		if(left && right){
+
+		if (left && right) {
 			tlaModuleString.append("TRUE");
-		} else if (left){
+		} else if (left) {
 			node.getRight().apply(this);
-		} else if (right){
+		} else if (right) {
 			node.getLeft().apply(this);
-		}else{
+		} else {
 			inAConjunctPredicate(node);
 			node.getLeft().apply(this);
 			tlaModuleString.append(" /\\ ");
@@ -1715,7 +1715,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 			tlaModuleString.append("]");
 		} else {
 			if (node.parent() instanceof AMemberPredicate
-					&& !typeRestrictor.isARemovedNode(node.parent())) {
+					&& !typeRestrictor.isARemovedNode(node.parent())
+					&& !this.tlaModule.getInitPredicates().contains(node.parent())) {
 				tlaModuleString.append(REL_TOTAL_FUNCTION_ELEMENT_OF);
 			} else {
 				tlaModuleString.append(REL_TOTAL_FUNCTION);
@@ -1732,8 +1733,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		Node parent = node.parent();
 		if (parent instanceof AMemberPredicate
 				&& !typeRestrictor.isARemovedNode(parent)
-		// && !this.tlaModule.getInitPredicates().contains(parent)
-		) {
+				&& !this.tlaModule.getInitPredicates().contains(parent)) {
 			return true;
 		} else {
 			String clazz = parent.getClass().getName();
@@ -1806,7 +1806,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				right.apply(this);
 				tlaModuleString.append(")");
 				return;
-			}else {
+			} else {
 				tlaModuleString.append(funcName);
 			}
 		} else {
@@ -1883,9 +1883,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 			tlaModuleString.append(")");
 			return;
-
 		}
-
 		tlaModuleString.append("{");
 		{
 			List<PExpression> copy = new ArrayList<PExpression>(
@@ -2461,31 +2459,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseASeqExpression(ASeqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			if (node.parent() instanceof AMemberPredicate) {
-				AMemberPredicate member = (AMemberPredicate) node.parent();
-				tlaModuleString.append(REL_SEQUENCE_SET);
-				tlaModuleString.append("(");
-				member.getLeft().apply(this);
-				tlaModuleString.append(", ");
-				node.getExpression().apply(this);
-				tlaModuleString.append(")");
-			} else if (node.parent() instanceof ANotMemberPredicate) {
-				ANotMemberPredicate member = (ANotMemberPredicate) node
-						.parent();
-				tlaModuleString.append(REL_SEQUENCE_SET);
-				tlaModuleString.append("(");
-				member.getLeft().apply(this);
-				tlaModuleString.append(", ");
-				node.getExpression().apply(this);
-				tlaModuleString.append(")");
-			}
-
+			tlaModuleString.append(REL_SET_OF_SEQUENCES);
 		} else {
 			tlaModuleString.append("Seq");
-			tlaModuleString.append("(");
-			node.getExpression().apply(this);
-			tlaModuleString.append(")");
 		}
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
 	}
 
 	@Override
@@ -2593,31 +2573,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseASeq1Expression(ASeq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			if (node.parent() instanceof AMemberPredicate) {
-				AMemberPredicate member = (AMemberPredicate) node.parent();
-				tlaModuleString.append(REL_SEQUENCE_1_SET);
-				tlaModuleString.append("(");
-				member.getLeft().apply(this);
-				tlaModuleString.append(", ");
-				node.getExpression().apply(this);
-				tlaModuleString.append(")");
-			} else if (node.parent() instanceof ANotMemberPredicate) {
-				ANotMemberPredicate member = (ANotMemberPredicate) node
-						.parent();
-				tlaModuleString.append(REL_SEQUENCE_1_SET);
-				tlaModuleString.append("(");
-				member.getLeft().apply(this);
-				tlaModuleString.append(", ");
-				node.getExpression().apply(this);
-				tlaModuleString.append(")");
-			}
+			tlaModuleString.append(REL_SET_OF_NON_EMPTY_SEQUENCES);
 		} else {
-
 			tlaModuleString.append(SEQUENCE_1);
-			tlaModuleString.append("(");
-			node.getExpression().apply(this);
-			tlaModuleString.append(")");
 		}
+		tlaModuleString.append("(");
+		node.getExpression().apply(this);
+		tlaModuleString.append(")");
 	}
 
 	@Override

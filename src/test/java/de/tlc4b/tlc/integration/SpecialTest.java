@@ -42,5 +42,12 @@ public class SpecialTest {
 	}
 	
 	
+	@Test
+	public void testDefinitionsLoad() throws Exception {
+		String[] a = new String[] {
+				"./src/test/resources/special/LoadDefinitions.mch"};
+		assertEquals(NoError, test(a));
+	}
+	
 	
 }

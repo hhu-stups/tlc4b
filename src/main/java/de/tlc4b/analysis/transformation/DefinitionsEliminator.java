@@ -63,16 +63,26 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 		List<PDefinition> copy = new ArrayList<PDefinition>(
 				node.getDefinitions());
 		for (PDefinition e : copy) {
+			if (e instanceof AExpressionDefinitionDefinition) {
+				String name = ((AExpressionDefinitionDefinition) e).getName()
+						.getText().toString();
+				if (name.startsWith("ASSERT_LTL") || name.startsWith("scope_")
+						|| name.startsWith("SET_PREF_")
+						|| name.startsWith("ANIMATION_FUNCTION"))
+					continue;
+			}
 			e.apply(this);
 		}
 		for (PDefinition e : copy) {
 			if (e instanceof AExpressionDefinitionDefinition) {
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
-				if (name.startsWith("ASSERT_LTL") || name.startsWith("scope_")|| name.startsWith("SET_PREF_"))
+				if (name.startsWith("ASSERT_LTL") || name.startsWith("scope_")
+						|| name.startsWith("SET_PREF_"))
 					continue;
 			} else if (e instanceof APredicateDefinitionDefinition) {
-				String name = ((APredicateDefinitionDefinition) e).getName().getText().toString();
+				String name = ((APredicateDefinitionDefinition) e).getName()
+						.getText().toString();
 				if (name.equals("GOAL"))
 					continue;
 			}
@@ -94,7 +104,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
 			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
-			
+
 			Node arg = arguments.get(i);
 			arg.apply(this);
 			context.put(paramName, node.getParameters().get(i));
@@ -124,7 +134,6 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			context.put(paramName, node.getParameters().get(i));
 		}
 		contextStack.add(context);
-		
 		clone.getRhs().apply(this);
 		node.replaceBy(clone.getRhs());
 		contextStack.remove(context);
@@ -144,16 +153,15 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
 			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
-			
+
 			Node arg = arguments.get(i);
 			arg.apply(this);
 			context.put(paramName, node.getParameters().get(i));
-			//context.put(paramName, arguments.get(i));
+			// context.put(paramName, arguments.get(i));
 		}
 		contextStack.add(context);
 		clone.getRhs().apply(this);
 		node.replaceBy(clone.getRhs());
-		
 
 		contextStack.remove(context);
 	}

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import de.be4.classicalb.core.parser.BParser;
+import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
@@ -68,6 +69,10 @@ public class Translator {
 		BParser parser = new BParser(machineName);
 		start = parser.parseFile(machineFile, false);
 
+		// Definitions of definitions files are injected in the ast of the main machine
+		final RecursiveMachineLoader rml = new RecursiveMachineLoader(
+				machineFile.getParent(), parser.getContentProvider());
+		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions(), parser.getPragmas());
 		
 		if(constantSetup!= null){
 			BParser con = new BParser();
@@ -93,9 +98,9 @@ public class Translator {
 	}
 
 	public void translate() {
-		new DefinitionsEliminator(start);
-
 		new NotSupportedConstructs(start);
+		
+		new DefinitionsEliminator(start);
 
 		MachineContext machineContext = new MachineContext(machineName, start,
 				ltlFormula, constantsSetup);

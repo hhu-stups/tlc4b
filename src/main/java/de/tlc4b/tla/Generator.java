@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
+import de.be4.classicalb.core.parser.node.AConcreteVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
@@ -153,7 +154,7 @@ public class Generator extends DepthFirstAdapter {
 			AMemberPredicate memberPredicate = new AMemberPredicate(
 					(PExpression) param, (PExpression) restrictedNode);
 			tlaModule.addInit(memberPredicate);
-			
+
 			init = true;
 			this.tlaModule.variables.add(param);
 		}
@@ -165,7 +166,7 @@ public class Generator extends DepthFirstAdapter {
 			if (!typeRestrictor.isARemovedNode(clause.getPredicates())) {
 				tlaModule.addInit(clause.getPredicates());
 			}
-			
+
 		} else {
 			if (!typeRestrictor.isARemovedNode(clause.getPredicates()))
 				tlaModule.addAssume(clause.getPredicates());
@@ -239,12 +240,13 @@ public class Generator extends DepthFirstAdapter {
 			return;
 		LinkedHashMap<Node, Node> conValueTable = constantsEvaluator
 				.getValueOfIdentifierMap();
-		Iterator<Entry<Node, Node>> iterator = conValueTable.entrySet().iterator();
-		while (iterator.hasNext()){
+		Iterator<Entry<Node, Node>> iterator = conValueTable.entrySet()
+				.iterator();
+		while (iterator.hasNext()) {
 			Entry<Node, Node> entry = iterator.next();
 			AIdentifierExpression con = (AIdentifierExpression) entry.getKey();
 			Node value = entry.getValue();
-			
+
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
 					(PExpression) value.clone());
@@ -259,7 +261,7 @@ public class Generator extends DepthFirstAdapter {
 
 		Node propertiesPerdicate = machineContext.getPropertiesMachineClause()
 				.getPredicates();
-		if (remainingConstants.size() != 0) {
+		if (remainingConstants.size() > 0) {
 			boolean init = false;
 			int numberOfIteratedConstants = 0;
 
@@ -302,8 +304,11 @@ public class Generator extends DepthFirstAdapter {
 			}
 
 		} else {
-			tlaModule.assumes.addAll(constantsEvaluator.getPropertiesList());
-			// tlaModule.addAssume(propertiesPerdicate);
+			if (machineContext.getConstantsSetup() == null){
+				tlaModule.assumes
+				.addAll(constantsEvaluator.getPropertiesList());
+			}
+			tlaModule.addAssume(propertiesPerdicate);
 		}
 
 	}
@@ -317,6 +322,15 @@ public class Generator extends DepthFirstAdapter {
 
 	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			this.tlaModule.variables.add(e);
+		}
+	}
+	
+	@Override
+	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {

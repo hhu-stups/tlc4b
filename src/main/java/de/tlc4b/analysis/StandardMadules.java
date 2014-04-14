@@ -143,6 +143,8 @@ public final class StandardMadules {
 	public static final String REL_SEQUENCE_SIZE = "RelSeqSize";
 	public static final String IS_REL_SEQUENCE = "isRelSeq";
 	public static final String REL_SEQUENCE_SET = "RelSeqSet";
+	public static final String REL_SET_OF_SEQUENCES = "RelSeq";
+	public static final String REL_SET_OF_NON_EMPTY_SEQUENCES = "RelSeq1";
 	public static final String IS_REL_SEQUENCE_1 = "isRelSeq1";
 	public static final String REL_SEQUENCE_1_SET = "RelSeqSet1";
 	public static final String REL_INJECTIVE_SEQUENCE = "RelISeq";

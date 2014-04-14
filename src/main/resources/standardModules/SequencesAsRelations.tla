@@ -6,10 +6,22 @@ IsRelSeq(x, S) == \A n \in 1..Cardinality(x): RelCall(x,n) \in S
 
 RelSeqSet(x, S) == IF IsRelSeq(x,S) THEN {x} ELSE {}
 
+RelSeq(S) == {p \in SUBSET(Nat \times S): 
+    LET d == {q[1] : q \in p} 
+    IN /\ Cardinality(p) = Cardinality(d)
+       /\ d = 1..Cardinality(d)}
+
 IsRelSeq1(x, S) == x # {} /\ IsRelSeq(x, S)
  \* Testing if x is a non-empty sequence with elements of the set S
  
 RelSeqSet1(x, S) == IF IsRelSeq1(x,S) THEN {x} ELSE {}
+
+RelSeq1(S) == {p \in SUBSET(Nat \times S): 
+    LET d == {q[1] : q \in p} 
+    IN /\ Cardinality(p) > 0
+       /\ Cardinality(p) = Cardinality(d)
+       /\ d = 1..Cardinality(d)}
+
 
 LOCAL ISeq(S) == UNION { {x \in [(1..n) -> S]: Cardinality(Range(x)) = Cardinality(DOMAIN x)} 
                         : n \in 0..Cardinality(S)}
