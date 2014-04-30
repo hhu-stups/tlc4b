@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.AAbstractConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
@@ -54,7 +55,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 		this.integerValueTable = new HashMap<Node, Integer>();
 		this.machineContext = machineContext;
 	}
-	
+
 	public void start() {
 		ConstantsInTreeFinder constantInTreeFinder = new ConstantsInTreeFinder();
 
@@ -76,16 +77,13 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 
 		// creating a new list of the constants, because constants will be
 		// removed from the original list
-		AConstantsMachineClause constantsMachineClause = machineContext
-				.getConstantsMachineClause();
-		if (null != constantsMachineClause) {
-			LinkedList<Node> oldConstants = new LinkedList<Node>(machineContext
-					.getConstantsMachineClause().getIdentifiers());
+		LinkedList<Node> oldConstants = new LinkedList<Node>(machineContext.getConstantArrayList());
+		if (oldConstants.size() > 0) {
 			evalIdentifier(oldConstants);
 		}
-		
-		//TODO adapting the elimination of constants to scalar parameters  
-		//evalIdentifier(machineContext.getScalarParameter().values());
+
+		// TODO adapting the elimination of constants to scalar parameters
+		// evalIdentifier(machineContext.getScalarParameter().values());
 	}
 
 	private void evalIdentifier(Collection<Node> ids) {
@@ -140,13 +138,9 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 	}
 
 	private void removeConstant(AIdentifierExpression id) {
-		AConstantsMachineClause constantsMachineClause = machineContext
-				.getConstantsMachineClause();
-		constantsMachineClause.getIdentifiers().remove(id);
-
 		HashMap<String, Node> constants = machineContext.getConstants();
 		for (Entry<String, Node> entry : constants.entrySet()) {
-			if(entry.getValue() == id){
+			if (entry.getValue() == id) {
 				constants.remove(entry.getKey());
 				break;
 			}
@@ -167,10 +161,10 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			Node parentParent = conjunction.parent();
 			if (parentParent instanceof APropertiesMachineClause) {
 				((APropertiesMachineClause) parentParent).setPredicates(other);
-			}else if (parentParent instanceof AConjunctPredicate){
-				if (((AConjunctPredicate) parentParent).getLeft() == parent){
+			} else if (parentParent instanceof AConjunctPredicate) {
+				if (((AConjunctPredicate) parentParent).getLeft() == parent) {
 					((AConjunctPredicate) parentParent).setLeft(other);
-				}else{
+				} else {
 					((AConjunctPredicate) parentParent).setRight(other);
 				}
 			}
@@ -270,9 +264,9 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 				analyseEqualsPredicate((AEqualPredicate) n);
 				return;
 			} else if (n instanceof AGreaterPredicate) {
-				//analyseGreaterPredicate((AGreaterPredicate) n);
+				// analyseGreaterPredicate((AGreaterPredicate) n);
 			} else if (n instanceof ALessEqualPredicate) {
-				//analyseLessEqualPredicate((ALessEqualPredicate) n);
+				// analyseLessEqualPredicate((ALessEqualPredicate) n);
 			} else if (n instanceof AConjunctPredicate) {
 				analysePredicate(((AConjunctPredicate) n).getLeft());
 				analysePredicate(((AConjunctPredicate) n).getRight());

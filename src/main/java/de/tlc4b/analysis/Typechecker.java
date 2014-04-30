@@ -76,7 +76,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		}
 
 	}
-	
+
 	private void checkConstantsSetup() {
 		PPredicate p = machineContext.getConstantsSetup();
 		if (p != null) {
@@ -87,8 +87,9 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 				String c = entry.getKey();
 				Node n = entry.getValue();
 				if (getType(n).isUntyped()) {
-					throw new TypeErrorException("Can not infer type of constant '"
-							+ c + "': " + getType(n));
+					throw new TypeErrorException(
+							"Can not infer type of constant '" + c + "': "
+									+ getType(n));
 				}
 			}
 		}
@@ -99,7 +100,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getPredicate(), BoolType.getInstance());
 		node.getPredicate().apply(this);
 	}
-
 
 	public void setType(Node node, BType t) {
 		this.types.put(node, t);
@@ -206,6 +206,18 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	@Override
+	public void caseAAbstractConstantsMachineClause(
+			AAbstractConstantsMachineClause node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression id = (AIdentifierExpression) e;
+			UntypedType u = new UntypedType();
+			setType(id, u);
+		}
+	}
+
+	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
@@ -215,9 +227,10 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(v, u);
 		}
 	}
-	
+
 	@Override
-	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
+	public void caseAConcreteVariablesMachineClause(
+			AConcreteVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
@@ -226,8 +239,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(v, u);
 		}
 	}
-	
-	
+
 	/**
 	 * Definitions
 	 */
@@ -327,7 +339,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		for (Entry<String, Node> entry : machineContext.getScalarParameter().entrySet()) {
+		for (Entry<String, Node> entry : machineContext.getScalarParameter()
+				.entrySet()) {
 			String name = entry.getKey();
 			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {

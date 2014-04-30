@@ -29,7 +29,7 @@ public abstract class AbstractParseMachineTest {
 		return dir.listFiles(new MachineFilenameFilter());
 	}
 
-	protected static File[] getMachinesRecursive(String path, ArrayList<String> ignoreList) {
+	protected static File[] getMachinesRecursively(String path, ArrayList<String> ignoreList) {
 		File[] files = walk(path, ignoreList).toArray(new File[0]);
 		return files;
 	}
@@ -74,7 +74,7 @@ public abstract class AbstractParseMachineTest {
 
 		final ArrayList<TLCResult> expectedValues = new ArrayList<TLCResult>();
 		for (String path : list) {
-			File[] machines = getMachinesRecursive(path, ignoreList);
+			File[] machines = getMachinesRecursively(path, ignoreList);
 			allMachines.addAll(Arrays.asList(machines));
 			for (int i = 0; i < machines.length; i++) {
 				expectedValues.add(TLCResult.NoError);

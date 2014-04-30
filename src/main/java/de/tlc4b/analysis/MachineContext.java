@@ -10,9 +10,11 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.AAbstractConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
@@ -79,6 +81,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private final ArrayList<LTLFormulaVisitor> ltlVisitors;
 	private final PPredicate constantsSetup;
 
+	private boolean originallyHadConstants = false;
 	// machine identifier
 	private final LinkedHashMap<String, Node> setParameter;
 	private final LinkedHashMap<String, Node> scalarParameter;
@@ -98,7 +101,6 @@ public class MachineContext extends DepthFirstAdapter {
 	private AConstraintsMachineClause constraintMachineClause;
 	private ASeesMachineClause seesMachineClause;
 	private ASetsContextClause setsMachineClause;
-	private AConstantsMachineClause constantsMachineClause;
 	private ADefinitionsMachineClause definitionMachineClause;
 	private APropertiesMachineClause propertiesMachineClause;
 	private AInvariantMachineClause invariantMachineClause;
@@ -474,7 +476,21 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
-		this.constantsMachineClause = node;
+		originallyHadConstants = true;
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression c = (AIdentifierExpression) e;
+			String name = Utils.getIdentifierAsString(c.getIdentifier());
+			exist(c.getIdentifier());
+			constants.put(name, c);
+		}
+	}
+
+	@Override
+	public void caseAAbstractConstantsMachineClause(
+			AAbstractConstantsMachineClause node) {
+		originallyHadConstants = true;
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
@@ -979,6 +995,14 @@ public class MachineContext extends DepthFirstAdapter {
 		return scalarParameter;
 	}
 
+	public ArrayList<Node> getConstantArrayList() {
+		ArrayList<Node> list = new ArrayList<Node>();
+		for (Entry<String, Node> entry : constants.entrySet()) {
+			list.add(entry.getValue());
+		}
+		return list;
+	}
+
 	public LinkedHashMap<String, Node> getConstants() {
 		return constants;
 	}
@@ -1047,10 +1071,6 @@ public class MachineContext extends DepthFirstAdapter {
 		return setsMachineClause;
 	}
 
-	public AConstantsMachineClause getConstantsMachineClause() {
-		return constantsMachineClause;
-	}
-
 	public APropertiesMachineClause getPropertiesMachineClause() {
 		return propertiesMachineClause;
 	}
@@ -1089,6 +1109,9 @@ public class MachineContext extends DepthFirstAdapter {
 		return constantsSetup;
 	}
 
+	public boolean originallyHadConstants() {
+		return originallyHadConstants;
+	}
 }
 
 class PMachineClauseComparator implements Comparator<PMachineClause>,
@@ -1099,8 +1122,9 @@ class PMachineClauseComparator implements Comparator<PMachineClause>,
 	static {
 		// declarations clauses
 
-		priority.put(ASeesMachineClause.class, 11);
-		priority.put(ASetsMachineClause.class, 10);
+		priority.put(ASeesMachineClause.class, 12);
+		priority.put(ASetsMachineClause.class, 11);
+		priority.put(AAbstractConstantsMachineClause.class, 10);
 		priority.put(AConstantsMachineClause.class, 9);
 		priority.put(AVariablesMachineClause.class, 8);
 		priority.put(AConcreteVariablesMachineClause.class, 7);

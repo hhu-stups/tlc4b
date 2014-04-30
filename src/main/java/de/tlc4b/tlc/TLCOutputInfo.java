@@ -52,7 +52,7 @@ public class TLCOutputInfo {
 		this.constants = machineContext.getConstants().keySet();
 		this.hasInit = tlaModule.getInitPredicates().size() > 0;
 
-		if (machineContext.getConstantsMachineClause() != null) {
+		if (machineContext.originallyHadConstants()) {
 			this.constantSetup = true;
 		}
 
@@ -69,7 +69,6 @@ public class TLCOutputInfo {
 			namesMapping.put(newName, name);
 			typesTable.put(newName, typechecker.getType(node));
 		}
-
 	}
 
 }

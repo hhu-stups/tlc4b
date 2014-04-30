@@ -29,4 +29,28 @@ public class ClausesTest {
 		compare(expected, machine);
 	}
 	
+	@Test
+	public void testAbstractConstants() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "ABSTRACT_CONSTANTS k\n"
+				+ "PROPERTIES k = 1\n"
+				+ "END";
+		String expected = "---- MODULE test ----\n"
+				+ "k == 1 "
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testConcreteConstants() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "CONCRETE_CONSTANTS k\n"
+				+ "PROPERTIES k = 1\n"
+				+ "END";
+		String expected = "---- MODULE test ----\n"
+				+ "k == 1 "
+				+ "======";
+		compare(expected, machine);
+	}
+	
 }

@@ -57,7 +57,6 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AIntervalExpression", 9, 9, true);
 
 		put("AAddExpression", 10, 10, true);
-		put("AAddExpression", 10, 10, true);
 
 		put("AModuloExpression", 10, 11, true);
 		put("AUnaryMinusExpression", 12, 12, false);
