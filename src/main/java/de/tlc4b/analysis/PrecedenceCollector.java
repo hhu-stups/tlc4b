@@ -8,6 +8,7 @@ import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
+import de.be4.classicalb.core.parser.node.APowSubsetExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
@@ -50,14 +51,17 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ASubsetPredicate", 5, 5, false);
 		// put("ANatural1SetExpression", 8, 8, false); // NAT \ {0}
 
+		put("APowSubsetExpression", 8, 8, false);
 		put("AUnionExpression", 8, 8, true);
 		put("AIntersectionExpression", 8, 8, true);
 		put("AUnionExpression", 8, 8, true);
 		put("ASetSubtractionExpression", 8, 8, false);
 		put("AIntervalExpression", 9, 9, true);
+		
 
 		put("AAddExpression", 10, 10, true);
-
+		
+		
 		put("AModuloExpression", 10, 11, true);
 		put("AUnaryMinusExpression", 12, 12, false);
 		put("AConcatExpression", 13, 13, true);
@@ -137,7 +141,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			p = new Precedence("AMultOrCartExpression", 13, 13, true);
 		} else {
 			// \times
-			p = new Precedence("AMultOrCartExpression", 10, 13, false);
+			p = new Precedence("AMultOrCartExpression", 8, 13, false);
 		}
 		precedenceTable.put(node, p);
 
