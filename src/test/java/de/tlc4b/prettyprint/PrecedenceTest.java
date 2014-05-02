@@ -8,6 +8,7 @@ public class PrecedenceTest {
 
 	@Test
 	public void testSubsetVsTimes() throws Exception {
+		
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES POW({1}) * {1} = POW({1}) * {1} \n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"

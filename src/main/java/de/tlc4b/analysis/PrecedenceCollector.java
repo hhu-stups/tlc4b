@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.ACartesianProductExpression;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
@@ -58,7 +59,8 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ASetSubtractionExpression", 8, 8, false);
 		put("AIntervalExpression", 9, 9, true);
 		
-
+		put("ACartesianProductExpression", 8, 13, false);
+		
 		put("AAddExpression", 10, 10, true);
 		
 		
