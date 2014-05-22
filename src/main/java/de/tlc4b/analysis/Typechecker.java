@@ -50,14 +50,15 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		this.referenceTable = machineContext.getReferences();
 	}
 
-	public Typechecker(MachineContext c) {
+	public Typechecker(MachineContext context) {
 		this.types = new Hashtable<Node, BType>();
-		this.referenceTable = c.getReferences();
-		this.machineContext = c;
-		c.getTree().apply(this);
+		this.referenceTable = context.getReferences();
+		this.machineContext = context;
+		context.getTree().apply(this);
 
 		checkLTLFormulas();
 		checkConstantsSetup();
+		
 	}
 
 	private void checkLTLFormulas() {

@@ -1,0 +1,10 @@
+MACHINE ConstantSetup2
+CONSTANTS a
+PROPERTIES a : 1..1 --> {TRUE}
+VARIABLES x, y 
+INVARIANT
+ x : BOOL & y : NAT
+INITIALISATION x := a(1) || y := 1
+OPERATIONS
+foo = skip
+END

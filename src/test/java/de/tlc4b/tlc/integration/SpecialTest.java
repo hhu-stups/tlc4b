@@ -35,6 +35,14 @@ public class SpecialTest {
 	
 	
 	@Test
+	public void testConstantSetupFile2() throws Exception {
+		String[] a = new String[] {
+				"./src/test/resources/special/ConstantsSetup2.mch",
+				"-constantsSetup", "a = {(1,TRUE)}" };
+		assertEquals(NoError, test(a));
+	}
+	
+	@Test
 	public void testTraceFile() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/TraceCheck.mch"};

@@ -249,7 +249,7 @@ public class Generator extends DepthFirstAdapter {
 
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
-					(PExpression) value.clone());
+					(PExpression) value);//.clone());
 			machineContext.addReference(exprDef, con);
 
 			this.tlaModule.addToAllDefinitions(exprDef);
