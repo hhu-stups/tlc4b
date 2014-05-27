@@ -153,7 +153,7 @@ public class Translator {
 		configString = printer.getConfigString().toString();
 
 		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer,
-				typechecker, generator.getTlaModule());
+				typechecker, generator.getTlaModule(), generator.getConfigFile());
 	}
 
 	public String getMachineString() {

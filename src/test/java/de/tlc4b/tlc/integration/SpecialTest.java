@@ -33,7 +33,6 @@ public class SpecialTest {
 		assertEquals(NoError, test(a));
 	}
 	
-	
 	@Test
 	public void testConstantSetupFile2() throws Exception {
 		String[] a = new String[] {
@@ -48,7 +47,6 @@ public class SpecialTest {
 				"./src/test/resources/special/TraceCheck.mch"};
 		assertEquals(Deadlock, test(a));
 	}
-	
 	
 	@Test
 	public void testDefinitionsLoad() throws Exception {

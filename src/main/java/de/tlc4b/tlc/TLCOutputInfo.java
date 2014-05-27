@@ -10,7 +10,10 @@ import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Renamer;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.btypes.BType;
+import de.tlc4b.tla.ConfigFile;
 import de.tlc4b.tla.TLAModule;
+import de.tlc4b.tla.config.ConfigFileAssignment;
+import de.tlc4b.tla.config.ModelValueAssignment;
 
 public class TLCOutputInfo {
 
@@ -45,7 +48,7 @@ public class TLCOutputInfo {
 	}
 
 	public TLCOutputInfo(MachineContext machineContext, Renamer renamer,
-			Typechecker typechecker, TLAModule tlaModule) {
+			Typechecker typechecker, TLAModule tlaModule, ConfigFile configFile) {
 
 		this.namesMapping = new Hashtable<String, String>();
 		this.typesTable = new Hashtable<String, BType>();
@@ -60,7 +63,8 @@ public class TLCOutputInfo {
 		identifiers.putAll(machineContext.getConstants());
 		identifiers.putAll(machineContext.getVariables());
 		identifiers.putAll(machineContext.getEnumValues());
-
+		//TODO add sets of modelvalues
+		
 		
 		for (Entry<String, Node> entry : identifiers.entrySet()) {
 			String name = entry.getKey();

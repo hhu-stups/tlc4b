@@ -7,6 +7,7 @@ import de.tlc4b.btypes.FunctionType;
 import de.tlc4b.btypes.PairType;
 import de.tlc4b.btypes.SetType;
 import de.tlc4b.btypes.StructType;
+import de.tlc4b.exceptions.NotSupportedException;
 import tla2sany.semantic.OpDeclNode;
 import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
@@ -185,7 +186,7 @@ public class TracePrinter {
 				}
 
 			}
-			return null;
+			throw new NotSupportedException("Unkown type of tuple.");
 
 		case RECORDVALUE: {
 			RecordValue rec = (RecordValue) val;
@@ -223,8 +224,11 @@ public class TracePrinter {
 
 		case MODELVALUE:
 			ModelValue modelValue = (ModelValue) val;
-			String BName = tlcOutputInfo.getBName(modelValue.toString());
-			res.append(BName);
+			String bName = tlcOutputInfo.getBName(modelValue.toString());
+			if(bName == null){
+				bName = modelValue.toString();
+			}
+			res.append(bName);
 			return res;
 
 		case SETOFTUPLESVALUE: {
