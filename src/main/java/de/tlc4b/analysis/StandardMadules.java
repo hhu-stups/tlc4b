@@ -148,7 +148,9 @@ public final class StandardMadules {
 	public static final String IS_REL_SEQUENCE_1 = "isRelSeq1";
 	public static final String REL_SEQUENCE_1_SET = "RelSeqSet1";
 	public static final String REL_INJECTIVE_SEQUENCE = "RelISeq";
+	public static final String REL_INJECTIVE_SEQUENCE_ELEMENT_OF = "RelISeqEleOf";
 	public static final String REL_INJECTIVE_SEQUENCE_1 = "RelISeq1";
+	public static final String REL_INJECTIVE_SEQUENCE_1_ELEMENT_OF = "RelISeq1EleOf";
 	public static final String REL_SEQUENCE_Concat = "RelSeqConcat";
 	public static final String REL_SEQUENCE_PREPAND = "RelSeqPrepand";
 	public static final String REL_SEQUENCE_APPEND = "RelSeqAppend";

@@ -81,7 +81,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private final ArrayList<LTLFormulaVisitor> ltlVisitors;
 	private final PPredicate constantsSetup;
 
-	private boolean originallyHadConstants = false;
+	private boolean constantSetupInTraceFile = false;
 	// machine identifier
 	private final LinkedHashMap<String, Node> setParameter;
 	private final LinkedHashMap<String, Node> scalarParameter;
@@ -476,7 +476,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
-		originallyHadConstants = true;
+		constantSetupInTraceFile = true;
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
@@ -490,7 +490,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAAbstractConstantsMachineClause(
 			AAbstractConstantsMachineClause node) {
-		originallyHadConstants = true;
+		constantSetupInTraceFile = true;
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {
@@ -593,7 +593,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		this.propertiesMachineClause = node;
-
+		constantSetupInTraceFile = true;
 		/**
 		 * check identifier scope in properties clauses
 		 */
@@ -1109,8 +1109,8 @@ public class MachineContext extends DepthFirstAdapter {
 		return constantsSetup;
 	}
 
-	public boolean originallyHadConstants() {
-		return originallyHadConstants;
+	public boolean constantSetupInTraceFile() {
+		return constantSetupInTraceFile;
 	}
 }
 

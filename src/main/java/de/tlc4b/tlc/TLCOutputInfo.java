@@ -55,7 +55,7 @@ public class TLCOutputInfo {
 		this.constants = machineContext.getConstants().keySet();
 		this.hasInit = tlaModule.getInitPredicates().size() > 0;
 
-		if (machineContext.originallyHadConstants()) {
+		if (machineContext.constantSetupInTraceFile()) {
 			this.constantSetup = true;
 		}
 

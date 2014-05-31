@@ -28,9 +28,22 @@ LOCAL ISeq(S) == UNION { {x \in [(1..n) -> S]: Cardinality(Range(x)) = Cardinali
                         
 RelISeq(S) == {{<<n, x[n]>>:n \in 1..Len(x)} :x \in ISeq(S)}
  \* The set of all injective sequences with elements of S
+
+RelISeqEleOf(S) == {p \in SUBSET(Nat \times S): 
+    LET d == {q[1] : q \in p} 
+    IN /\ Cardinality(p) = Cardinality(d)
+       /\ d = 1..Cardinality(d)
+       /\ Cardinality(p) = Cardinality(RelRange(p))}
  
 RelISeq1(S) == RelISeq(S) \ {{}}
  \* The set of all non-empty injective sequences with elements of S
+
+RelISeq1EleOf(S) == {p \in SUBSET(Nat \times S): 
+    LET d == {q[1] : q \in p} 
+    IN /\ Cardinality(p) > 0
+       /\ Cardinality(p) = Cardinality(d)
+       /\ d = 1..Cardinality(d)
+       /\ Cardinality(p) = Cardinality(RelRange(p))}
 
 LOCAL SeqTest(s) == RelDomain(s) = 1..Cardinality(s)
  \* Testing if s is a sequence

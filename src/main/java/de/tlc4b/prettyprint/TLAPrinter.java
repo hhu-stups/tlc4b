@@ -173,11 +173,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private void printLTLFormulas() {
 		ArrayList<LTLFormulaVisitor> visitors = machineContext.getLTLFormulas();
-		for (int i = 0; i < visitors.size(); i++) {
-			LTLFormulaVisitor visitor = visitors.get(i);
-			tlaModuleString.append(visitor.getName() + " == ");
-			visitor.printLTLFormula(this, typeRestrictor);
-			tlaModuleString.append("\n");
+		if (TLC4BGlobals.isCheckltl()) {
+			for (int i = 0; i < visitors.size(); i++) {
+				LTLFormulaVisitor visitor = visitors.get(i);
+				tlaModuleString.append(visitor.getName() + " == ");
+				visitor.printLTLFormula(this, typeRestrictor);
+				tlaModuleString.append("\n");
+			}
 		}
 	}
 
@@ -304,7 +306,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		ArrayList<Node> list = this.tlaModule.getAssume();
 		if (list.size() == 0)
 			return;
-		
+
 		for (int i = 0; i < list.size(); i++) {
 			tlaModuleString.append("ASSUME ");
 			list.get(i).apply(this);
@@ -1716,7 +1718,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 		} else {
 			if (node.parent() instanceof AMemberPredicate
 					&& !typeRestrictor.isARemovedNode(node.parent())
-					&& !this.tlaModule.getInitPredicates().contains(node.parent())) {
+					&& !this.tlaModule.getInitPredicates().contains(
+							node.parent())) {
 				tlaModuleString.append(REL_TOTAL_FUNCTION_ELEMENT_OF);
 			} else {
 				tlaModuleString.append(REL_TOTAL_FUNCTION);
@@ -2537,7 +2540,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAIseqExpression(AIseqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			tlaModuleString.append(REL_INJECTIVE_SEQUENCE);
+			if (node.parent() instanceof AMemberPredicate
+					&& !typeRestrictor.isARemovedNode(node.parent())) {
+				tlaModuleString.append(REL_INJECTIVE_SEQUENCE_ELEMENT_OF);
+			} else {
+				tlaModuleString.append(REL_INJECTIVE_SEQUENCE);
+			}
 		} else {
 			if (node.parent() instanceof AMemberPredicate
 					&& !typeRestrictor.isARemovedNode(node.parent())) {
@@ -2555,7 +2563,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAIseq1Expression(AIseq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			tlaModuleString.append(REL_INJECTIVE_SEQUENCE_1);
+			if (node.parent() instanceof AMemberPredicate
+					&& !typeRestrictor.isARemovedNode(node.parent())) {
+				tlaModuleString.append(REL_INJECTIVE_SEQUENCE_1_ELEMENT_OF);
+			} else {
+				tlaModuleString.append(REL_INJECTIVE_SEQUENCE_1);
+			}
 		} else {
 			if (node.parent() instanceof AMemberPredicate
 					&& !typeRestrictor.isARemovedNode(node.parent())) {

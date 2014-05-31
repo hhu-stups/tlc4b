@@ -532,11 +532,16 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 */
 
 	public void inASeqExpression(ASeqExpression node) {
-		evalSequenceOrRelation(node);
+		SetType type = (SetType) typechecker.getType(node);
+		if (type.getSubtype() instanceof FunctionType) {
+			usedStandardModules.add(STANDARD_MODULES.Sequences);
+		} else {
+			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+		}
 	}
 
 	public void inASizeExpression(ASizeExpression node) {
-		evalSequenceOrRelation(node);
+		evalSequenceOrRelation(node.getExpression());
 	}
 
 	public void inAConcatExpression(AConcatExpression node) {
@@ -553,11 +558,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAFirstExpression(AFirstExpression node) {
-		evalSequenceOrRelation(node);
+		evalSequenceOrRelation(node.getExpression());
 	}
 
 	public void inATailExpression(ATailExpression node) {
-		evalSequenceOrRelation(node);
+		evalSequenceOrRelation(node.getExpression());
 	}
 
 	/**
