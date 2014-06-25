@@ -1367,8 +1367,13 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "'");
 		}
-		setType(node.getExpression(), new SetType(new UntypedType()));
+		
+		setType(node.getExpression(), new UntypedType());
 		node.getExpression().apply(this);
+		BType type = getType(node.getExpression());
+		if (! (type instanceof FunctionType)){
+			new SetType(new UntypedType()).unify(type, this);
+		}
 	}
 
 	@Override
