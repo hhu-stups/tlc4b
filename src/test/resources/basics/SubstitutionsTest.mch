@@ -1,4 +1,4 @@
-MACHINE FunctionsTest
+MACHINE SubstitutionsTest
 VARIABLES x
 INVARIANT x : 1..5
 INITIALISATION x := 1
