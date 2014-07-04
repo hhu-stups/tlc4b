@@ -74,6 +74,7 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testExistQuantification2VariablesNotConstant() throws Exception {
 		String machine = "MACHINE test\n"
@@ -195,7 +196,7 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
-	
+	@Ignore
 	@Test
 	public void testExistDependingVariables() throws Exception {
 		String machine = "MACHINE test\n"

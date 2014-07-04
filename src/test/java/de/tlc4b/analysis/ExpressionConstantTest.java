@@ -4,6 +4,8 @@ import static de.tlc4b.util.TestUtil.compare;
 
 import org.junit.Test;
 
+import de.tlc4b.exceptions.NotSupportedException;
+
 public class ExpressionConstantTest {
 
 	@Test
@@ -43,7 +45,7 @@ public class ExpressionConstantTest {
 		compare(expected, machine);
 	}
 	
-	@Test
+	@Test (expected = NotSupportedException.class)
 	public void testNotConstantBoundedVariable() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "PROPERTIES !x,y.(x = y & y = 1 => 1 = 1)\n" + "END";

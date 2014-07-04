@@ -556,7 +556,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 					conType = typechecker.getType(machineContext
 							.getReferenceNode(e));
 				}
-				if (conType.containsIntegerType()) {
+				if (conType.containsIntegerType()
+						&& !(e.parent() instanceof ALambdaExpression)
+						&& !(e.parent() instanceof AComprehensionSetExpression)) {
 					AIdentifierExpression id = (AIdentifierExpression) e;
 					String localVariableName = Utils.getIdentifierAsString(id
 							.getIdentifier());

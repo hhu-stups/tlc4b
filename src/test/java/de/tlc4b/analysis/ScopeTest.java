@@ -147,7 +147,7 @@ public class ScopeTest {
 	@Test
 	public void testNestedLocalExists() throws Exception {
 		String machine = "MACHINE test\n"
-				+ "PROPERTIES #x.(x : INT & #x.(x + 1 = 1))\n" + "END";
+				+ "PROPERTIES #x.(x : {1} & #x.(x : {1} & x + 1 = 1))\n" + "END";
 		checkMachine(machine);
 	}
 
