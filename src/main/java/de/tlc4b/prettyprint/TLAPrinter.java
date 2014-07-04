@@ -1639,7 +1639,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
-	// Functioncall
+	// Function call
 	public void caseAFunctionExpression(AFunctionExpression node) {
 		inAFunctionExpression(node);
 

@@ -1,5 +1,6 @@
 <project default="copy">
     <target name="copy">
        <copy file="build/tlc4b/TLC4B.jar" tofile="../../Desktop/ProB/lib/TLC4B.jar"/>
+       <copy file="build/tlc4b/TLC4B.jar" tofile="/Users/hansen/git/prob_prolog/lib/TLC4B.jar"/>
     </target>
 </project>

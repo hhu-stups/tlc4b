@@ -7,18 +7,21 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
+import de.be4.classicalb.core.parser.node.ACoupleExpression;
 import de.be4.classicalb.core.parser.node.ADisjunctPredicate;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
 import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
 import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
+import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AImplicationPredicate;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AIntersectionExpression;
@@ -46,6 +49,7 @@ import de.be4.ltl.core.parser.node.AForallLtl;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.btypes.BType;
+import de.tlc4b.exceptions.NotSupportedException;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 
 public class TypeRestrictor extends DepthFirstAdapter {
@@ -59,6 +63,8 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	private final Hashtable<Node, ArrayList<Node>> restrictedNodeTable;
 	private final Hashtable<Node, ArrayList<Node>> subtractedNodeTable;
+
+	private final Hashtable<Node, ArrayList<Node>> restrictedCoupleTable;
 
 	public Node getRestrictedNode(Node node) {
 		return restrictedTypeNodeTable.get(node);
@@ -78,6 +84,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 		this.restrictedNodeTable = new Hashtable<Node, ArrayList<Node>>();
 		this.subtractedNodeTable = new Hashtable<Node, ArrayList<Node>>();
+		this.restrictedCoupleTable = new Hashtable<Node, ArrayList<Node>>();
 
 		this.identifierDependencies = new IdentifierDependencies(machineContext);
 
@@ -218,6 +225,24 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				putRestrictedType(r_right, new ASetExtensionExpression(element));
 				removedNodes.add(n);
 			}
+			if (left instanceof ACoupleExpression) {
+				ACoupleExpression couple = (ACoupleExpression) left;
+				PExpression first = couple.getList().get(0);
+				Node r_first = machineContext.getReferenceNode(first);
+				PExpression second = couple.getList().get(0);
+				Node r_second = machineContext.getReferenceNode(second);
+
+				if (list.contains(r_first) && list.contains(r_second)
+						&& isAConstantExpression(right, list, ignoreList)) {
+					ArrayList<PExpression> element = new ArrayList<PExpression>();
+					element.add(right);
+					putRestrictedTypeOfTuple(r_right,
+							new ASetExtensionExpression(element));
+					removedNodes.add(n);
+				}
+
+			}
+
 			return;
 		}
 
@@ -296,6 +321,18 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			analysePredicate(((APredicateParseUnit) n).getPredicate(), list,
 					ignoreList);
 			return;
+		}
+	}
+
+	private void putRestrictedTypeOfTuple(Node identifier,
+			PExpression restrictedType) {
+		ArrayList<Node> list = restrictedCoupleTable.get(identifier);
+		if (list == null) {
+			list = new ArrayList<Node>();
+			list.add(restrictedType);
+			restrictedCoupleTable.put(identifier, list);
+		} else {
+			list.add(restrictedType);
 		}
 	}
 
@@ -475,7 +512,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				node.getIdentifiers()));
 	}
 
-
 	@Override
 	public void inALetSubstitution(ALetSubstitution node) {
 		HashSet<Node> list = new HashSet<Node>();
@@ -520,6 +556,17 @@ public class TypeRestrictor extends DepthFirstAdapter {
 					conType = typechecker.getType(machineContext
 							.getReferenceNode(e));
 				}
+				if (conType.containsIntegerType()) {
+					AIdentifierExpression id = (AIdentifierExpression) e;
+					String localVariableName = Utils.getIdentifierAsString(id
+							.getIdentifier());
+					throw new NotSupportedException(
+							"Can not restrict the type of the variable '"
+									+ localVariableName
+									+ "' to a finite set. TLC is not able to handle infinite sets.\n"
+									+ e.getStartPos());
+				}
+
 				tree = conType.createSyntaxTreeNode(typechecker);
 			} else {
 				tree = (PExpression) restrictedList.get(0);
