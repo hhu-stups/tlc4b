@@ -90,8 +90,10 @@ jar { from sourceSets.main.allJava }
 jar	{
 	from configurations.releaseJars.collect { it.isDirectory() ? it : zipTree(it) }
 }
-manifest.mainAttributes("Main-Class" : 'de.tlc4b.TLC4B')
-manifest.mainAttributes("Class-Path": './tla/ tlatools.jar')
+manifest {
+    attributes "Main-Class" : 'de.tlc4b.TLC4B'
+    attributes "Class-Path": './tla/ tlatools.jar'
+}
 
 task tlc4b(dependsOn: build) << {
 	copy {
