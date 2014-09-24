@@ -7,7 +7,7 @@ public class TLC4BTester {
 
 	public static void main(String[] args) throws Exception {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
-		TLC4B.test(args,false);
+		TLC4B.test(args,true);
 	}
 
 }

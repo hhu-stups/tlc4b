@@ -2,6 +2,7 @@ package de.tlc4b.analysis;
 
 import static de.tlc4b.util.TestUtil.compare;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TypeRestrictionsTest {
@@ -73,6 +74,7 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore
 	@Test
 	public void testExistQuantification2VariablesNotConstant() throws Exception {
 		String machine = "MACHINE test\n"
@@ -194,7 +196,7 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
-	
+	@Ignore
 	@Test
 	public void testExistDependingVariables() throws Exception {
 		String machine = "MACHINE test\n"
@@ -237,6 +239,18 @@ public class TypeRestrictionsTest {
 				+ "foo(a) == (a = a)	/\\ x' = 3\n"
 				+ "Next == \\E a \\in {1} : foo(a) \n"
 				+ "====";
+		compare(expected, machine);
+	}
+	
+	@Ignore
+	@Test
+	public void testCoupleOfParameters() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES #a,b.( (a,b) : {(1,1)})\n" + "END";
+		
+		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
+				+ "ASSUME \\E <<a,b>> \\in {<<1,1>>} : TRUE \n"
+				+ "======";
 		compare(expected, machine);
 	}
 	

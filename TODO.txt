@@ -1,0 +1,5 @@
+Validation of generated trace files: Parsing the trace files
+
+Missing constructs:
+ - SEES, INCLUDES, REFINES, IMPORTS
+ - sequential composition, while loop

@@ -90,7 +90,6 @@ public class TLCResults {
 
 		ArrayList<Message> messages = OutputCollector.getAllMessages();
 		for (Message m : messages) {
-
 			switch (m.getMessageClass()) {
 			case ERROR:
 				evalErrorMessage(m);
@@ -147,11 +146,12 @@ public class TLCResults {
 	}
 
 	private void evalErrorMessage(Message m) {
-		// System.out.print(m.getMessageCode() + " "+ m.getParameters().length);
-		// for (int i = 0; i < m.getParameters().length; i++) {
-		// System.out.print(" "+m.getParameters()[i]);
-		// }
-		// System.out.println();
+//		System.out.println(------------------);
+//		System.out.print(m.getMessageCode() + " " + m.getParameters().length);
+//		for (int i = 0; i < m.getParameters().length; i++) {
+//			System.out.print(" " + m.getParameters()[i]);
+//		}
+//		System.out.println();
 		switch (m.getMessageCode()) {
 		case EC.TLC_INVARIANT_VIOLATED_INITIAL:
 		case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
@@ -218,6 +218,8 @@ public class TLCResults {
 			} else if (s.contains("The invariant of Invariant")) {
 				return InvariantViolation;
 			} else if (s.contains("In applying the function")) {
+				return WellDefinednessError;
+			} else if (s.contains("which is not in the domain of the function")) {
 				return WellDefinednessError;
 			} else if (s.contains("tlc2.module.TLC.Assert")) {
 				return tlcResult = WellDefinednessError;

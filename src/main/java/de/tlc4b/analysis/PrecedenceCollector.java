@@ -69,6 +69,10 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AConcatExpression", 13, 13, true);
 		put("ADivExpression", 13, 13, false);
 		
+		
+		put("AFunctionExpression", 20, 20, false);
+		
+		
 	}
 
 	private Precedence getPrecedence(Node node) {

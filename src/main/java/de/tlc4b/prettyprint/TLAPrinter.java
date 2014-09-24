@@ -920,7 +920,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 			tlaModuleString.append(" : ");
 		}
 
-		node.getPredicate().apply(this);
+		if (typeRestrictor.isARemovedNode(node.getPredicate())) {
+			tlaModuleString.append("TRUE");
+		} else {
+			node.getPredicate().apply(this);
+		}
+		
 		tlaModuleString.append(" /\\ ");
 		node.getSubstitution().apply(this);
 		printUnchangedVariables(node, true);
@@ -1634,7 +1639,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
-	// Functioncall
+	// Function call
 	public void caseAFunctionExpression(AFunctionExpression node) {
 		inAFunctionExpression(node);
 
@@ -2050,11 +2055,16 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseACardExpression(ACardExpression node) {
-		inACardExpression(node);
-		tlaModuleString.append("Cardinality(");
-		node.getExpression().apply(this);
-		tlaModuleString.append(")");
-		outACardExpression(node);
+		BType type = typechecker.getType(node.getExpression());
+		if(type instanceof FunctionType){
+			tlaModuleString.append("Cardinality(DOMAIN(");
+			node.getExpression().apply(this);
+			tlaModuleString.append("))");
+		}else{
+			tlaModuleString.append("Cardinality(");
+			node.getExpression().apply(this);
+			tlaModuleString.append(")");	
+		}
 	}
 
 	@Override
