@@ -254,5 +254,17 @@ public class TypeRestrictionsTest {
 		compare(expected, machine);
 	}
 	
+	@Ignore // TODO improve type restriction algorithm
+	@Test
+	public void test2Variables() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES #a,b.( a : {1}  & b : {a})\n" + "END";
+		
+		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
+				+ "ASSUME \\E <<a,b>> \\in {<<1,1>>} : TRUE \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
 	
 }

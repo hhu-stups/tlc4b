@@ -90,7 +90,9 @@ public class MachineContext extends DepthFirstAdapter {
 	private final LinkedHashMap<String, Node> enumeratedSets;
 	private final LinkedHashMap<String, Node> enumValues;
 
-	private final LinkedHashMap<String, Node> constants;
+	private LinkedHashMap<String, Node> constants;
+	private final LinkedHashMap<String, Node> bMachineConstants;
+	
 	private final LinkedHashMap<String, Node> variables;
 	private final LinkedHashMap<String, Node> definitions;
 	private final LinkedHashMap<String, Node> operations;
@@ -112,6 +114,8 @@ public class MachineContext extends DepthFirstAdapter {
 
 	protected final Hashtable<Node, Node> referencesTable;
 
+	
+	
 	public MachineContext(String machineName, Start start, String ltlFormula,
 			PPredicate constantsSetup) {
 		this.start = start;
@@ -133,6 +137,7 @@ public class MachineContext extends DepthFirstAdapter {
 		this.enumeratedSets = new LinkedHashMap<String, Node>();
 		this.enumValues = new LinkedHashMap<String, Node>();
 		this.constants = new LinkedHashMap<String, Node>();
+		this.bMachineConstants = new LinkedHashMap<String, Node>();
 		this.variables = new LinkedHashMap<String, Node>();
 		this.definitions = new LinkedHashMap<String, Node>();
 		this.operations = new LinkedHashMap<String, Node>();
@@ -484,6 +489,7 @@ public class MachineContext extends DepthFirstAdapter {
 			String name = Utils.getIdentifierAsString(c.getIdentifier());
 			exist(c.getIdentifier());
 			constants.put(name, c);
+			bMachineConstants.put(name, c);
 		}
 	}
 
@@ -1112,6 +1118,11 @@ public class MachineContext extends DepthFirstAdapter {
 	public boolean constantSetupInTraceFile() {
 		return constantSetupInTraceFile;
 	}
+
+	public LinkedHashMap<String, Node> getBMachineConstants() {
+		return bMachineConstants;
+	}
+
 }
 
 class PMachineClauseComparator implements Comparator<PMachineClause>,

@@ -35,7 +35,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 	private MachineContext machineContext;
 	private ValuesOfIdentifierFinder valuesOfConstantsFinder;
 	private final HashMap<Node, Integer> integerValueTable;
-
+	
 	private LinkedHashMap<Node, Node> valueOfIdentifier;
 
 	public Node getValueOfConstant(Node con) {

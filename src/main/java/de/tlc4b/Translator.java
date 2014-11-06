@@ -110,8 +110,7 @@ public class Translator {
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
 				machineContext);
 
-
-
+		
 		ConstantsEliminator constantsEliminator = new ConstantsEliminator(
 				machineContext);
 		constantsEliminator.start();

@@ -194,7 +194,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			this.rangeOfIdentifierTable = new Hashtable<Node, ArrayList<PExpression>>();
 
 			this.identifiers = new HashSet<Node>();
-			this.identifiers.addAll(machineContext.getConstants().values());
+			this.identifiers.addAll(machineContext.getBMachineConstants().values());
 			this.identifiers.addAll(machineContext.getScalarParameter()
 					.values());
 
@@ -260,8 +260,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				AEqualPredicate equals = (AEqualPredicate) constantsSetup;
 				PExpression left = equals.getLeft();
 				Node left_ref = machineContext.getReferences().get(left);
+				if(rangeOfIdentifierTable.containsKey(left_ref)){
+					System.out.println("hallo");
+				}
 				ArrayList<PExpression> currentRange = rangeOfIdentifierTable.get(left_ref);
-				
 				boolean found = false;
 				for (PExpression pExpression : currentRange) {
 					if(pExpression.toString().equals(equals.getRight().toString())){

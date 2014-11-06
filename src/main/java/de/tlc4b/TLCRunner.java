@@ -1,6 +1,7 @@
 package de.tlc4b;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -81,7 +82,7 @@ public class TLCRunner {
 		return stdOut.getLog();
 	}
 
-	public static void runTLC(String machineName, String path) {
+	public static void runTLC(String machineName, File path) {
 
 		System.out.println("--------------------------------");
 
@@ -99,7 +100,7 @@ public class TLCRunner {
 		list.add("-config");
 		list.add(machineName + ".cfg");
 		list.add(machineName);
-		ToolIO.setUserDir(path);
+		ToolIO.setUserDir(path.getPath());
 		String[] args = list.toArray(new String[list.size()]);
 
 		TLC tlc = new TLC();
