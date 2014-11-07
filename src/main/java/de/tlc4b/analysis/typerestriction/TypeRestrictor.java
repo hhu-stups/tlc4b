@@ -196,6 +196,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	private void analysePredicate(Node n, HashSet<Node> list,
 			HashSet<Node> ignoreList) {
+		
 		if (removedNodes.contains(n))
 			return;
 
@@ -227,23 +228,23 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				putRestrictedType(r_right, new ASetExtensionExpression(element));
 				removedNodes.add(n);
 			}
-			if (left instanceof ACoupleExpression) {
-				ACoupleExpression couple = (ACoupleExpression) left;
-				PExpression first = couple.getList().get(0);
-				Node r_first = machineContext.getReferenceNode(first);
-				PExpression second = couple.getList().get(0);
-				Node r_second = machineContext.getReferenceNode(second);
-
-				if (list.contains(r_first) && list.contains(r_second)
-						&& isAConstantExpression(right, list, ignoreList)) {
-					ArrayList<PExpression> element = new ArrayList<PExpression>();
-					element.add(right);
-					putRestrictedTypeOfTuple(r_right,
-							new ASetExtensionExpression(element));
-					removedNodes.add(n);
-				}
-
-			}
+			// detecting couples, e.g. (a,b) = (1,3)
+//			if (left instanceof ACoupleExpression) {
+//				ACoupleExpression couple = (ACoupleExpression) left;
+//				PExpression first = couple.getList().get(0);
+//				Node r_first = machineContext.getReferenceNode(first);
+//				PExpression second = couple.getList().get(0);
+//				Node r_second = machineContext.getReferenceNode(second);
+//
+//				if (list.contains(r_first) && list.contains(r_second)
+//						&& isAConstantExpression(right, list, ignoreList)) {
+//					ArrayList<PExpression> element = new ArrayList<PExpression>();
+//					element.add(right);
+//					putRestrictedTypeOfTuple(r_right,
+//							new ASetExtensionExpression(element));
+//					removedNodes.add(n);
+//				}
+//			}
 
 			return;
 		}
