@@ -68,7 +68,6 @@ public class TLCRunner {
 		// list.add("1");
 
 		String[] args = list.toArray(new String[list.size()]);
-		System.out.println("Starting JVM...");
 		final Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
@@ -97,12 +96,12 @@ public class TLCRunner {
 			list.add("" + TLC4BGlobals.getWorkers());
 		}
 
-		list.add("-config");
-		list.add(machineName + ".cfg");
+		//list.add("-config");
+		//list.add(machineName + ".cfg");
 		list.add(machineName);
+		System.out.println(path.getPath());
 		ToolIO.setUserDir(path.getPath());
 		String[] args = list.toArray(new String[list.size()]);
-
 		TLC tlc = new TLC();
 
 		// handle parameters

@@ -23,9 +23,9 @@ public class TLC4B {
 
 	private String filename;
 	private File mainfile;
-	private String machineFileNameWithoutFileExtension; 
+	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
-	
+
 	private File buildDir;
 
 	private String tlaModule;
@@ -55,8 +55,7 @@ public class TLC4B {
 		if (TLC4BGlobals.isRunTLC()) {
 			try {
 				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
-						tlc4b.mainfile.getParentFile());
-
+						tlc4b.buildDir);
 				TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
 				tlc4b.printResults(results, TLC4BGlobals.isCreateTraceFile());
@@ -89,7 +88,8 @@ public class TLC4B {
 			String trace = results.getTrace();
 			String tracefileName = machineFileNameWithoutFileExtension
 					+ ".tla.trace";
-			File traceFile = createFile(mainfile.getParentFile(), tracefileName, trace, false);
+			File traceFile = createFile(mainfile.getParentFile(),
+					tracefileName, trace, false);
 			if (traceFile != null) {
 				System.out.println("Trace file '" + traceFile.getAbsolutePath()
 						+ "' created.");
@@ -113,17 +113,14 @@ public class TLC4B {
 			System.err.println(e.getMessage());
 			throw e;
 		}
-		// System.out.println(tlc4b.tlaModule);
 		if (TLC4BGlobals.isRunTLC()) {
 			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
 					tlc4b.buildDir);
 
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
-			// System.out.println("Result: " + results.getTLCResult());
 
 			tlc4b.printResults(results, false);
-			// System.out.println(results.getTrace());
 
 			System.exit(0);
 		}
@@ -239,27 +236,22 @@ public class TLC4B {
 			throw new TLC4BIOException("The file '" + mainfile.getPath()
 					+ "' can not be accessed.");
 		}
-		
-		
 
 		machineFileNameWithoutFileExtension = mainfile.getName().substring(0,
 				mainfile.getName().length() - 4); // deleting .mch
 
-		
-		
 		if (buildDir == null) {
 			buildDir = new File(mainfile.getParentFile(),
 					machineFileNameWithoutFileExtension);
 		}
-
 	}
 
 	private void createFiles() {
-		buildDir.mkdir();
-		if(TLC4BGlobals.isDeleteOnExit()){
+		boolean dirCreated = buildDir.mkdir();
+		if (dirCreated && TLC4BGlobals.isDeleteOnExit()) {
 			buildDir.deleteOnExit();
 		}
-		
+
 		File moduleFile = createFile(buildDir,
 				machineFileNameWithoutFileExtension + ".tla", tlaModule,
 				TLC4BGlobals.isDeleteOnExit());
@@ -391,9 +383,9 @@ public class TLC4B {
 			boolean deleteOnExit) {
 
 		File file = new File(dir, fileName);
-		
+		boolean exists = false;
 		try {
-			file.createNewFile();
+			exists = file.createNewFile();
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(file), "UTF-8"));
 			out.write(text);
@@ -406,7 +398,7 @@ public class TLC4B {
 		} catch (IOException e) {
 			throw new TLC4BIOException(e.getMessage());
 		} finally {
-			if (deleteOnExit && file.exists()) {
+			if (deleteOnExit && exists) {
 				file.deleteOnExit();
 			}
 		}

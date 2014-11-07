@@ -51,6 +51,9 @@ public class TLCResults {
 	}
 
 	public int getModelCheckingTime() {
+		if(endTime == null || startTime == null){
+			return -1;
+		}
 		return (int) (endTime.getTime() - startTime.getTime()) / 1000;
 	}
 
