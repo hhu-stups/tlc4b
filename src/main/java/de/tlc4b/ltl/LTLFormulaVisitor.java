@@ -85,7 +85,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	public void parseLTLString(String ltlString) {
 		try {
-			this.ltlFormulaStart = parse(ltlFormula);
+			this.ltlFormulaStart = parse(ltlString);
 		} catch (Exception e) {
 			throw new LTLParseException(e.getMessage());
 		}
