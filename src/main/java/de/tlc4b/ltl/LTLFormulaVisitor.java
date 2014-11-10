@@ -1,5 +1,6 @@
 package de.tlc4b.ltl;
 
+import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -10,12 +11,15 @@ import java.util.List;
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.exceptions.BException;
+import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
+import de.be4.classicalb.core.parser.node.AStringExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.internal.LtlLexer;
 import de.be4.ltl.core.parser.lexer.Lexer;
+import de.be4.ltl.core.parser.lexer.LexerException;
 import de.be4.ltl.core.parser.node.AActionLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
@@ -34,6 +38,7 @@ import de.be4.ltl.core.parser.node.AYesterdayLtl;
 import de.be4.ltl.core.parser.node.PLtl;
 import de.be4.ltl.core.parser.node.Start;
 import de.be4.ltl.core.parser.parser.Parser;
+import de.be4.ltl.core.parser.parser.ParserException;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.exceptions.LTLParseException;
@@ -43,31 +48,49 @@ import de.tlc4b.prettyprint.TLAPrinter;
 public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	private final String name;
-	private final Start ltlFormulaStart;
 	private final MachineContext machineContext;
-	
+	private String ltlFormula;
+	private Start ltlFormulaStart;
+
 	private final LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node> ltlNodeToBNodeTable;
 	private final ArrayList<LTLBPredicate> bPredicates;
 	private final Hashtable<String, AIdentifierExpression> ltlIdentifierTable;
 
 	private ArrayList<Hashtable<String, AIdentifierExpression>> contextTable;
 
-	
-	public LTLFormulaVisitor(String name, String ltlFormula,
-			MachineContext machineContext) {
+	public LTLFormulaVisitor(String name, MachineContext machineContext) {
 		this.name = name;
-		this.ltlFormulaStart = parse(ltlFormula);
 		this.machineContext = machineContext;
-		
 		this.bPredicates = new ArrayList<LTLBPredicate>();
 		this.ltlNodeToBNodeTable = new LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node>();
 		this.ltlIdentifierTable = new Hashtable<String, AIdentifierExpression>();
-
 		this.contextTable = new ArrayList<Hashtable<String, AIdentifierExpression>>();
-		
 	}
-	
-	
+
+	public void parseDefinition(AExpressionDefinitionDefinition def) {
+		if (!(def.getRhs() instanceof AStringExpression)) {
+			throw new LTLParseException(
+					"Error: LTL formula is not in a string representation.");
+		}
+		AStringExpression stringNode = (AStringExpression) def.getRhs();
+		this.ltlFormula = stringNode.getContent().getText();
+		try {
+			this.ltlFormulaStart = parse(ltlFormula);
+		} catch (Exception e) {
+			String line = "Parsing definition " + name + " (line "
+					+ def.getStartPos().getLine() + "):\n";
+			throw new LTLParseException(line + e.getMessage());
+		}
+	}
+
+	public void parseLTLString(String ltlString) {
+		try {
+			this.ltlFormulaStart = parse(ltlFormula);
+		} catch (Exception e) {
+			throw new LTLParseException(e.getMessage());
+		}
+	}
+
 	public ArrayList<LTLBPredicate> getBPredicates() {
 		return bPredicates;
 	}
@@ -101,24 +124,20 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		return ltlFormulaStart;
 	}
 
-	public void printLTLFormula(TLAPrinter tlaPrinter, TypeRestrictor typeRestrictor) {
+	public void printLTLFormula(TLAPrinter tlaPrinter,
+			TypeRestrictor typeRestrictor) {
 		// LTLFormulaPrinter ltlFormulaPrinter =
 		new LTLFormulaPrinter(tlaPrinter, this, typeRestrictor);
 	}
 
-	public static Start parse(String ltlFormula) {
+	public static Start parse(String ltlFormula) throws ParserException,
+			LexerException, IOException {
 		StringReader reader = new StringReader(ltlFormula);
 		PushbackReader r = new PushbackReader(reader);
 		Lexer l = new LtlLexer(r);
 		Parser p = new Parser(l);
 		Start ast = null;
-		try {
-			ast = p.parse();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new LTLParseException(e.getMessage());
-		}
+		ast = p.parse();
 		return ast;
 	}
 

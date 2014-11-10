@@ -28,7 +28,7 @@ public class Testing2 extends AbstractParseMachineTest {
 
 	@Test
 	public void testRunTLC() throws Exception {
-		String[] a = new String[] { machine.getPath() };
+		String[] a = new String[] { machine.getPath(), "-nodead", "-noinv" };
 		TLC4B.main(a);
 		//TLC4B.test(a, false);
 		// test(a);

@@ -92,7 +92,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private LinkedHashMap<String, Node> constants;
 	private final LinkedHashMap<String, Node> bMachineConstants;
-	
+
 	private final LinkedHashMap<String, Node> variables;
 	private final LinkedHashMap<String, Node> definitions;
 	private final LinkedHashMap<String, Node> operations;
@@ -114,8 +114,6 @@ public class MachineContext extends DepthFirstAdapter {
 
 	protected final Hashtable<Node, Node> referencesTable;
 
-	
-	
 	public MachineContext(String machineName, Start start, String ltlFormula,
 			PPredicate constantsSetup) {
 		this.start = start;
@@ -126,7 +124,8 @@ public class MachineContext extends DepthFirstAdapter {
 
 		LTLFormulaVisitor ltlVisitor = null;
 		if (null != ltlFormula) {
-			ltlVisitor = new LTLFormulaVisitor("ltl", ltlFormula, this);
+			ltlVisitor = new LTLFormulaVisitor("ltl", this);
+			ltlVisitor.parseLTLString(ltlFormula);
 			this.ltlVisitors.add(ltlVisitor);
 		}
 
@@ -298,16 +297,10 @@ public class MachineContext extends DepthFirstAdapter {
 				AExpressionDefinitionDefinition def = (AExpressionDefinitionDefinition) e;
 				String name = def.getName().getText();
 				if (name.startsWith("ASSERT_LTL")) {
-					try {
-						AStringExpression stringNode = (AStringExpression) def
-								.getRhs();
-						LTLFormulaVisitor visitor = new LTLFormulaVisitor(name,
-								stringNode.getContent().getText(), this);
-						this.ltlVisitors.add(visitor);
-					} catch (ClassCastException castException) {
-						throw new ScopeException(
-								"Error: LTL formula is not in a string representation.");
-					}
+					LTLFormulaVisitor visitor = new LTLFormulaVisitor(name, this);
+					visitor.parseDefinition(def);
+					this.ltlVisitors.add(visitor);
+
 					definitionsToRemove.add(def);
 				} else if (name.startsWith("ANIMATION_")) {
 					definitionsToRemove.add(def);
