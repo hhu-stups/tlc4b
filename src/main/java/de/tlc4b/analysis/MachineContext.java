@@ -68,6 +68,7 @@ import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.PSet;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
+import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
@@ -297,10 +298,12 @@ public class MachineContext extends DepthFirstAdapter {
 				AExpressionDefinitionDefinition def = (AExpressionDefinitionDefinition) e;
 				String name = def.getName().getText();
 				if (name.startsWith("ASSERT_LTL")) {
-					LTLFormulaVisitor visitor = new LTLFormulaVisitor(name, this);
-					visitor.parseDefinition(def);
-					this.ltlVisitors.add(visitor);
-
+					if (TLC4BGlobals.isCheckltl()) {
+						LTLFormulaVisitor visitor = new LTLFormulaVisitor(name,
+								this);
+						visitor.parseDefinition(def);
+						this.ltlVisitors.add(visitor);
+					}
 					definitionsToRemove.add(def);
 				} else if (name.startsWith("ANIMATION_")) {
 					definitionsToRemove.add(def);
