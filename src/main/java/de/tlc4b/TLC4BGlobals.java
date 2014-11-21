@@ -36,7 +36,7 @@ public class TLC4BGlobals {
 
 	public static void resetGlobals() {
 		DEFERRED_SET_SIZE = 3;
-		MAX_INT = 4;
+		MAX_INT = 3;
 		MIN_INT = -1;
 
 		checkGOAL = true;

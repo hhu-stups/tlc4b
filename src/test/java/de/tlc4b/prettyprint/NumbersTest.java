@@ -4,6 +4,8 @@ import static de.tlc4b.util.TestUtil.compare;
 
 import org.junit.Test;
 
+import de.tlc4b.TLC4BGlobals;
+
 public class NumbersTest {
 
 	
@@ -50,7 +52,7 @@ public class NumbersTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Integers\n"
-				+ "ASSUME Int = Int\n"
+				+ "ASSUME (-1..3) = (-1..3)\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -62,7 +64,7 @@ public class NumbersTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Naturals\n"
-				+ "ASSUME Nat = Nat\n"
+				+ "ASSUME (0..3) = (0..3)\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -74,7 +76,7 @@ public class NumbersTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "EXTENDS Naturals\n"
-				+ "ASSUME Nat \\ {0} = Nat \\ {0}\n"
+				+ "ASSUME (1..3) = (1..3)\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -244,7 +246,7 @@ public class NumbersTest {
 				+ "PROPERTIES MAXINT = MAXINT  \n"
 				+ "END";
 		String expected = "---- MODULE test----\n"
-				+ "ASSUME 4 = 4\n"
+				+ "ASSUME 3 = 3\n"
 				+ "======";
 		compare(expected, machine);
 	}
