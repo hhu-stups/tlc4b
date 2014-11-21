@@ -76,7 +76,7 @@ public class TLC4B {
 		for (int i = 0; i < 10; i++) {
 			s += i;
 		}
-		
+
 		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
 				+ " ms");
 		System.out.println("Translation time: " + StopWatch.getRunTime("Pure")
@@ -157,9 +157,26 @@ public class TLC4B {
 			} else if (args[index].toLowerCase().equals("-testscript")) {
 				TLC4BGlobals.setRunTestscript(true);
 			} else if (args[index].toLowerCase().equals("-notrace")) {
-
+				TLC4BGlobals.setCreateTraceFile(false);
 			} else if (args[index].toLowerCase().equals("-del")) {
 				TLC4BGlobals.setDeleteOnExit(true);
+			} else if (args[index].toLowerCase().equals("-maxint")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new TLC4BIOException(
+							"Error: Number requiered after option '-maxnint'.");
+				}
+				int maxint = Integer.parseInt(args[index]);
+				TLC4BGlobals.setMAX_INT(maxint);
+			} else if (args[index].toLowerCase().equals("-minint")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new TLC4BIOException(
+							"Error: Number requiered after option '-minint'.");
+				}
+				int minint = Integer.parseInt(args[index]);
+				TLC4BGlobals.setMIN_INT(minint);
+				;
 			} else if (args[index].toLowerCase().equals("-workers")) {
 				index = index + 1;
 				if (index == args.length) {

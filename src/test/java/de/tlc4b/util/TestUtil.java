@@ -108,9 +108,6 @@ public class TestUtil {
 		//parse check
 		translateTLA2B(name, b2tlaTranslator.getModuleString(),
 				b2tlaTranslator.getConfigString());
-		// de.tla2b.translation.Tla2BTranslator.translateString(name,
-		// b2tlaTranslator.getModuleString(),
-		// b2tlaTranslator.getConfigString());
 
 		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
 		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());

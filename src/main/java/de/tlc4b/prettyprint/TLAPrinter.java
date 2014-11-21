@@ -926,7 +926,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		} else {
 			node.getPredicate().apply(this);
 		}
-		
+
 		tlaModuleString.append(" /\\ ");
 		node.getSubstitution().apply(this);
 		printUnchangedVariables(node, true);
@@ -1323,21 +1323,22 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAIntSetExpression(AIntSetExpression node) {
 		inAIntSetExpression(node);
-		tlaModuleString.append("Int");
+		tlaModuleString.append("(" + TLC4BGlobals.getMIN_INT() + ".."
+				+ TLC4BGlobals.getMAX_INT() + ")");
 		outAIntSetExpression(node);
 	}
 
 	@Override
 	public void caseANatSetExpression(ANatSetExpression node) {
 		inANatSetExpression(node);
-		tlaModuleString.append("Nat");
+		tlaModuleString.append("(0.." + TLC4BGlobals.getMAX_INT() + ")");
 		outANatSetExpression(node);
 	}
 
 	@Override
 	public void caseANat1SetExpression(ANat1SetExpression node) {
 		inANat1SetExpression(node);
-		tlaModuleString.append("(Nat \\ {0})");
+		tlaModuleString.append("(1.." + TLC4BGlobals.getMAX_INT() + ")");
 		outANat1SetExpression(node);
 	}
 
@@ -2057,14 +2058,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseACardExpression(ACardExpression node) {
 		BType type = typechecker.getType(node.getExpression());
-		if(type instanceof FunctionType){
+		if (type instanceof FunctionType) {
 			tlaModuleString.append("Cardinality(DOMAIN(");
 			node.getExpression().apply(this);
 			tlaModuleString.append("))");
-		}else{
+		} else {
 			tlaModuleString.append("Cardinality(");
 			node.getExpression().apply(this);
-			tlaModuleString.append(")");	
+			tlaModuleString.append(")");
 		}
 	}
 
