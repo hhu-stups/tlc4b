@@ -71,7 +71,7 @@ PROPERTIES
 & max({1,2}) = 2
 
 /* MaxInt */
-& MAXINT = 4
+& MAXINT = 3
 
 /* MinInt */
 & MININT = -1
