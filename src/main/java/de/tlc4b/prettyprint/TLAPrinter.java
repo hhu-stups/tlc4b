@@ -813,7 +813,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseASelectSubstitution(ASelectSubstitution node) {
 		inASelectSubstitution(node);
 		// TODO remove brackets
-
+		tlaModuleString.append("(");
 		List<PSubstitution> copy = new ArrayList<PSubstitution>(
 				node.getWhenSubstitutions());
 
@@ -857,6 +857,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				&& (copy.size() > 0 || node.getElse() != null)) {
 			tlaModuleString.append(")");
 		}
+		tlaModuleString.append(")");
 		printUnchangedVariables(node, true);
 
 		outASelectSubstitution(node);

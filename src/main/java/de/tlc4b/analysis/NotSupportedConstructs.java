@@ -7,6 +7,7 @@ import de.be4.classicalb.core.parser.node.AImportsMachineClause;
 import de.be4.classicalb.core.parser.node.AIncludesMachineClause;
 import de.be4.classicalb.core.parser.node.APromotesMachineClause;
 import de.be4.classicalb.core.parser.node.ARefinesModelClause;
+import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.ASeesModelClause;
 import de.be4.classicalb.core.parser.node.ASequenceSubstitution;
 import de.be4.classicalb.core.parser.node.AUsesMachineClause;
@@ -18,12 +19,19 @@ public class NotSupportedConstructs extends DepthFirstAdapter {
 
 	public NotSupportedConstructs(Start start) {
 		start.apply(this);
+		System.out.println(start.getPParseUnit().getClass());
 	}
 
 	public void inARefinesModelClause(ARefinesModelClause node) {
 		throw new NotSupportedException(
 				"Refines clause is currently not supported.");
 	}
+	
+    public void inASeesMachineClause(ASeesMachineClause node)
+    {
+    	throw new NotSupportedException(
+				"SEES clause is currently not supported.");
+    }
 
 	public void inAUsesMachineClause(AUsesMachineClause node) {
 		throw new NotSupportedException(
