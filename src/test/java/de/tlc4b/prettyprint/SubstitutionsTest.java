@@ -36,7 +36,7 @@ public class SubstitutionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
-				+ "Inv == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == \\E a \\in {1}, b \\in {2} : TRUE /\\ x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";

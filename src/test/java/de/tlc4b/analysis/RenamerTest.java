@@ -28,8 +28,8 @@ public class RenamerTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES WITH_1 \n"
-				+ "Inv == WITH_1 = 1\n"
-				+ "Init == WITH_1 = 1 \n"
+				+ "Invariant1 == WITH_1 = 1\n"
+				+ "Init == WITH_1 = 1 \n\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<WITH_1>>\n"
 				+ "====";
 		compare(expected, machine);
@@ -47,7 +47,7 @@ public class RenamerTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES x \n"
-				+ "Inv == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x = 1 \n"
 				+ "WITH_1 == x' = 2\n"
 				+ "Next == WITH_1 \n"

@@ -36,7 +36,6 @@ dependencies {
 
 
 	testCompile (group: 'junit', name: 'junit', version: '4.7')
-	testCompile (group: 'de.prob', name: 'tla2b', version: '1.0.4-SNAPSHOT')
     testCompile (group: 'de.prob', name: 'tla2bAST', version: '1.0.5-SNAPSHOT')
 
 	releaseJars (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT')

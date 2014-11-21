@@ -18,7 +18,7 @@ public class OperationsTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES x \n"
-				+ "Inv == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x = 1 \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
@@ -37,7 +37,7 @@ public class OperationsTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES x \n"
-				+ "Inv == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x = 1 \n"
 				+ "foo == x' = 2\n"
 				+ "Next == foo \n"

@@ -16,12 +16,6 @@ public class ScopeTest {
 	}
 
 	@Test(expected = ScopeException.class)
-	public void testDuplicateSeenMachine() throws Exception {
-		String machine = "MACHINE test \n" + "SEES M1, M1 \n" + "END";
-		checkMachine(machine);
-	}
-
-	@Test(expected = ScopeException.class)
 	public void testConstraintsMissingMachineParameter() throws Exception {
 		String machine = "MACHINE test \n" + "CONSTRAINTS k = 1 \n" + "END";
 		checkMachine(machine);
