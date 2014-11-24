@@ -164,7 +164,7 @@ public class TLC4B {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: Number requiered after option '-maxnint'.");
+							"Error: Number requiered after option '-maxint'.");
 				}
 				int maxint = Integer.parseInt(args[index]);
 				TLC4BGlobals.setMAX_INT(maxint);
@@ -424,7 +424,28 @@ public class TLC4B {
 				file.deleteOnExit();
 			}
 		}
+	}
 
+	public static void testParse(String[] args, boolean deleteFiles)
+			throws Exception {
+		TLC4BGlobals.resetGlobals();
+		TLC4BGlobals.setDeleteOnExit(deleteFiles);
+		TLC4BGlobals.setCreateTraceFile(false);
+		TLC4BGlobals.setTestingMode(true);
+		// B2TLAGlobals.setCleanup(true);
+		TLC4B tlc4b = new TLC4B();
+		try {
+			tlc4b.progress(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+			throw e;
+		}
+		File module = new File(tlc4b.buildDir,
+				tlc4b.machineFileNameWithoutFileExtension + ".tla");
+
+		// parse result
+		new de.tla2bAst.Translator(module.getCanonicalPath());
 	}
 
 }

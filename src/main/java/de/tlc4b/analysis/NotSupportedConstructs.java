@@ -19,7 +19,6 @@ public class NotSupportedConstructs extends DepthFirstAdapter {
 
 	public NotSupportedConstructs(Start start) {
 		start.apply(this);
-		System.out.println(start.getPParseUnit().getClass());
 	}
 
 	public void inARefinesModelClause(ARefinesModelClause node) {

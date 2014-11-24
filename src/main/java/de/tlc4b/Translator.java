@@ -110,7 +110,6 @@ public class Translator {
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
 				machineContext);
 
-		
 		ConstantsEliminator constantsEliminator = new ConstantsEliminator(
 				machineContext);
 		constantsEliminator.start();
@@ -126,7 +125,7 @@ public class Translator {
 		
 		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
 				machineContext);
-
+		
 		Generator generator = new Generator(machineContext, typeRestrictor,
 				constantsEvaluator, deferredSetSizeCalculator, typechecker);
 		generator.generate();

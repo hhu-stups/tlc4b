@@ -388,11 +388,18 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	// Function call
 	public void inAFunctionExpression(AFunctionExpression node) {
-		if (!(node.parent() instanceof AAssignSubstitution)) {
-			BType type = typechecker.getType(node.getIdentifier());
-			if (type instanceof SetType) {
-				usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+		// System.out.println(node.parent().getClass());
+		if (node.parent() instanceof AAssignSubstitution) {
+			AAssignSubstitution parent = (AAssignSubstitution) node.parent();
+			if (parent.getLhsExpression().contains(node)) {
+				// function assignment (function call on the left side), e.g.
+				// f(x) := 1
+				return;
 			}
+		}
+		BType type = typechecker.getType(node.getIdentifier());
+		if (type instanceof SetType) {
+			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
 		}
 
 	}

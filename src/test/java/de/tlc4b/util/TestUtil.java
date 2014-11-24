@@ -19,8 +19,11 @@ import de.tla2b.exceptions.FrontEndException;
 import de.tla2b.exceptions.TLA2BException;
 import de.tla2b.output.ASTPrettyPrinter;
 import de.tla2b.output.Renamer;
+import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.TLCRunner;
 import de.tlc4b.Translator;
+import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.tlc.TLCResults.TLCResult;
 
 public class TestUtil {
@@ -177,7 +180,8 @@ public class TestUtil {
 		System.out.println("No result found.");
 		return null;
 	}
-
+	
+	
 	private static Process startJVM(final String optionsAsString,
 			final String mainClass, final String[] arguments)
 			throws IOException {
