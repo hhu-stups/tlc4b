@@ -92,7 +92,7 @@ jar	{
 jar {
     manifest {
         attributes "Main-Class" : 'de.tlc4b.TLC4B'
-        attributes "Class-Path": './tla/ tlatools.jar'
+        attributes "Class-Path": 'tlatools.jar'
     }
 }
 

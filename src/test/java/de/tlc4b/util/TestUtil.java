@@ -107,8 +107,8 @@ public class TestUtil {
 		System.out.println(b2tlaTranslator.getConfigString());
 
 		String name = b2tlaTranslator.getMachineName();
-		
-		//parse check
+
+		// parse check
 		translateTLA2B(name, b2tlaTranslator.getModuleString(),
 				b2tlaTranslator.getConfigString());
 
@@ -180,8 +180,7 @@ public class TestUtil {
 		System.out.println("No result found.");
 		return null;
 	}
-	
-	
+
 	private static Process startJVM(final String optionsAsString,
 			final String mainClass, final String[] arguments)
 			throws IOException {
@@ -202,6 +201,28 @@ public class TestUtil {
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		Process process = processBuilder.start();
 		return process;
+	}
+
+	public static void testParse(String[] args, boolean deleteFiles)
+			throws Exception {
+		TLC4BGlobals.resetGlobals();
+		TLC4BGlobals.setDeleteOnExit(deleteFiles);
+		TLC4BGlobals.setCreateTraceFile(false);
+		TLC4BGlobals.setTestingMode(true);
+		// B2TLAGlobals.setCleanup(true);
+		TLC4B tlc4b = new TLC4B();
+		try {
+			tlc4b.progress(args);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(e.getMessage());
+			throw e;
+		}
+		File module = new File(tlc4b.getBuildDir(),
+				tlc4b.getMachineFileNameWithoutFileExtension() + ".tla");
+
+		// parse result
+		new de.tla2bAst.Translator(module.getCanonicalPath());
 	}
 
 }

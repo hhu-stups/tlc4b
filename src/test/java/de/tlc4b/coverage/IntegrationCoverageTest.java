@@ -1,6 +1,5 @@
 package de.tlc4b.coverage;
 
-
 import java.io.File;
 import java.util.ArrayList;
 
@@ -15,9 +14,8 @@ import de.tlc4b.util.PolySuite.Config;
 import de.tlc4b.util.PolySuite.Configuration;
 
 @RunWith(PolySuite.class)
-public class IntegrationCoverageTest extends AbstractParseMachineTest{
+public class IntegrationCoverageTest extends AbstractParseMachineTest {
 
-	
 	private final File machine;
 
 	public IntegrationCoverageTest(File machine, TLCResult result) {
@@ -26,8 +24,8 @@ public class IntegrationCoverageTest extends AbstractParseMachineTest{
 
 	@Test
 	public void testRunTLC() throws Exception {
-		String[] a = new String[] {machine.getPath(), "-notlc"};
-		TLC4B.test(a,true);
+		String[] a = new String[] { machine.getPath(), "-notlc" };
+		TLC4B.test(a, true);
 	}
 
 	@Config
@@ -35,13 +33,14 @@ public class IntegrationCoverageTest extends AbstractParseMachineTest{
 		final ArrayList<String> list = new ArrayList<String>();
 		final ArrayList<String> ignoreList = new ArrayList<String>();
 		list.add("../prob_examples/public_examples/TLC/");
-		
-		list.add("./src/test/resources/"); 
+
+		list.add("./src/test/resources/");
 		ignoreList.add("./src/test/resources/compound/");
 		ignoreList.add("./src/test/resources/other/");
 		ignoreList.add("./src/test/resources/test/");
 		ignoreList.add("./src/test/resources/testing/");
+		ignoreList.add("./src/test/resources/todo/");
 		return getConfiguration2(list, ignoreList);
 	}
-	
+
 }

@@ -219,7 +219,7 @@ public class TLC4B {
 		}
 	}
 
-	private void progress(String[] args) throws IOException, BException {
+	public void progress(String[] args) throws IOException, BException {
 		handleParameter(args);
 
 		handleMainFileName();
@@ -426,26 +426,12 @@ public class TLC4B {
 		}
 	}
 
-	public static void testParse(String[] args, boolean deleteFiles)
-			throws Exception {
-		TLC4BGlobals.resetGlobals();
-		TLC4BGlobals.setDeleteOnExit(deleteFiles);
-		TLC4BGlobals.setCreateTraceFile(false);
-		TLC4BGlobals.setTestingMode(true);
-		// B2TLAGlobals.setCleanup(true);
-		TLC4B tlc4b = new TLC4B();
-		try {
-			tlc4b.progress(args);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-			throw e;
-		}
-		File module = new File(tlc4b.buildDir,
-				tlc4b.machineFileNameWithoutFileExtension + ".tla");
+	public File getBuildDir() {
+		return buildDir;
+	}
 
-		// parse result
-		new de.tla2bAst.Translator(module.getCanonicalPath());
+	public String getMachineFileNameWithoutFileExtension() {
+		return machineFileNameWithoutFileExtension;
 	}
 
 }
