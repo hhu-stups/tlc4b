@@ -30,6 +30,7 @@ import tlc2.value.SubsetValue;
 import tlc2.value.TupleValue;
 import tlc2.value.UnionValue;
 import tlc2.value.Value;
+import tlc2.value.ValueEnumeration;
 import tlc2.value.ValueVec;
 import util.UniqueString;
 import static tlc2.value.ValueConstants.*;
@@ -172,13 +173,12 @@ public class TracePrinter {
 				res.append(")");
 				return res;
 			} else if (type instanceof FunctionType) {
-				if(((TupleValue) val).elems.length == 0){
+				if (((TupleValue) val).elems.length == 0) {
 					res.append("{}");
 					return res;
-				}else{
+				} else {
 					BType subtype = ((FunctionType) type).getRange();
 					res.append("[");
-					System.out.println();
 					res.append(parseEnumerationValue(((TupleValue) val).elems,
 							subtype));
 					res.append("]");
@@ -225,7 +225,7 @@ public class TracePrinter {
 		case MODELVALUE:
 			ModelValue modelValue = (ModelValue) val;
 			String bName = tlcOutputInfo.getBName(modelValue.toString());
-			if(bName == null){
+			if (bName == null) {
 				bName = modelValue.toString();
 			}
 			res.append(bName);
@@ -233,35 +233,25 @@ public class TracePrinter {
 
 		case SETOFTUPLESVALUE: {
 			SetOfTuplesValue s = (SetOfTuplesValue) val;
-			SetType t = (SetType) type;
-			PairType pair = (PairType) t.getSubtype();
-			res.append(parseValue(s.sets[0], new SetType(pair.getFirst())));
-			res.append("*");
-			res.append(parseValue(s.sets[1], new SetType(pair.getSecond())));
-			return res;
+			ValueEnumeration e = s.elements();
+			return parseSetValue(res, s.size(), type, e);
 		}
 
 		case SETCUPVALUE: {
 			SetCupValue s = (SetCupValue) val;
-			res.append(parseValue(s.set1, type));
-			res.append("\\/");
-			res.append(parseValue(s.set2, type));
-			return res;
+			ValueEnumeration e = s.elements();
+			return parseSetValue(res, s.size(), type, e);
 		}
 		case SETCAPVALUE: {
 			SetCapValue s = (SetCapValue) val;
-			res.append(parseValue(s.set1, type));
-			res.append("/\\");
-			res.append(parseValue(s.set2, type));
-			return res;
+			ValueEnumeration e = s.elements();
+			return parseSetValue(res, s.size(), type, e);
 		}
 
 		case SETDIFFVALUE: {
 			SetDiffValue s = (SetDiffValue) val;
-			res.append(parseValue(s.set1, type));
-			res.append("-");
-			res.append(parseValue(s.set2, type));
-			return res;
+			ValueEnumeration e = s.elements();
+			return parseSetValue(res, s.size(), type, e);
 		}
 
 		case SUBSETVALUE: {
@@ -336,6 +326,23 @@ public class TracePrinter {
 		}
 		System.err.println("Type: " + val.getKind());
 		throw new RuntimeException("not supported construct: " + val);
+	}
+
+	private StringBuilder parseSetValue(StringBuilder res, int size,
+			BType type, ValueEnumeration e) {
+		SetType t = (SetType) type;
+		res.append("{");
+		for (int i = 0; i < size; i++) {
+			Value v = e.nextElement();
+			if (i != 0) {
+				res.append(", ");
+			}
+			if (v != null) {
+				res.append(parseValue(v, t.getSubtype()));
+			}
+		}
+		res.append("}");
+		return res;
 	}
 
 	private StringBuilder parseValueVec(ValueVec elems, BType bType) {

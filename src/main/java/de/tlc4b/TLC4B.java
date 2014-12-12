@@ -72,11 +72,6 @@ public class TLC4B {
 
 	private void printResults(TLCResults results, boolean createTraceFile) {
 
-		String s = "";
-		for (int i = 0; i < 10; i++) {
-			s += i;
-		}
-
 		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
 				+ " ms");
 		System.out.println("Translation time: " + StopWatch.getRunTime("Pure")
@@ -89,6 +84,7 @@ public class TLC4B {
 				+ results.getNumberOfTransitions());
 		System.out.println("Result: " + results.getResultString());
 
+		
 		if (results.hasTrace() && createTraceFile) {
 			String trace = results.getTrace();
 			String tracefileName = machineFileNameWithoutFileExtension

@@ -99,11 +99,9 @@ public class TLCRunner {
 		//list.add("-config");
 		//list.add(machineName + ".cfg");
 		list.add(machineName);
-		System.out.println(path.getPath());
 		ToolIO.setUserDir(path.getPath());
 		String[] args = list.toArray(new String[list.size()]);
 		TLC tlc = new TLC();
-
 		// handle parameters
 		if (tlc.handleParameters(args)) {
 			tlc.setResolver(new SimpleFilenameToStream());
@@ -112,7 +110,6 @@ public class TLCRunner {
 				tlc.process();
 			} catch (Exception e) {
 			}
-
 		}
 		// System.setOut(systemOut);
 		// ArrayList<String> messages = btlcStream.getArrayList();
