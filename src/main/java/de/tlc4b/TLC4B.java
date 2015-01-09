@@ -84,7 +84,6 @@ public class TLC4B {
 				+ results.getNumberOfTransitions());
 		System.out.println("Result: " + results.getResultString());
 
-		
 		if (results.hasTrace() && createTraceFile) {
 			String trace = results.getTrace();
 			String tracefileName = machineFileNameWithoutFileExtension
@@ -156,6 +155,8 @@ public class TLC4B {
 				TLC4BGlobals.setCreateTraceFile(false);
 			} else if (args[index].toLowerCase().equals("-del")) {
 				TLC4BGlobals.setDeleteOnExit(true);
+			} else if (args[index].toLowerCase().equals("-parinveval")) {
+				TLC4BGlobals.setPartialInvariantEvaluation(true);
 			} else if (args[index].toLowerCase().equals("-maxint")) {
 				index = index + 1;
 				if (index == args.length) {

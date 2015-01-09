@@ -6,9 +6,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import tlc2.TLCGlobals;
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
+import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.PrecedenceCollector;
@@ -17,6 +19,7 @@ import de.tlc4b.analysis.Renamer;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
+import de.tlc4b.analysis.unchangedvariables.InvariantPreservationAnalysis;
 import de.tlc4b.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.FunctionType;
@@ -55,6 +58,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	private ConfigFile configFile;
 	private PrimedNodesMarker primedNodesMarker;
 	private Renamer renamer;
+	private final InvariantPreservationAnalysis invariantPreservationAnalysis;
 
 	public TLAPrinter(MachineContext machineContext, Typechecker typechecker,
 			UnchangedVariablesFinder unchangedVariablesFinder,
@@ -62,7 +66,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 			UsedStandardModules usedStandardModules,
 			TypeRestrictor typeRestrictor, TLAModule tlaModule,
 			ConfigFile configFile, PrimedNodesMarker primedNodesMarker,
-			Renamer renamer) {
+			Renamer renamer,
+			InvariantPreservationAnalysis invariantPreservationAnalysis) {
 		this.typechecker = typechecker;
 		this.machineContext = machineContext;
 		this.missingVariableFinder = unchangedVariablesFinder;
@@ -73,6 +78,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		this.configFile = configFile;
 		this.primedNodesMarker = primedNodesMarker;
 		this.renamer = renamer;
+		this.invariantPreservationAnalysis = invariantPreservationAnalysis;
 
 		this.tlaModuleString = new StringBuilder();
 		this.configFileString = new StringBuilder();
@@ -230,6 +236,31 @@ public class TLAPrinter extends DepthFirstAdapter {
 				configFileString.append(assignments.get(i).getString(renamer));
 			}
 		}
+		if(TLC4BGlobals.isPartialInvariantEvaluation()){
+			configFileString.append("CONSTANTS\n");
+			configFileString.append("Init1 = Init1\n");
+			
+			ArrayList<POperation> operations = tlaModule.getOperations();
+			StringBuilder sb = new StringBuilder();
+			sb.append("{");
+			for (int i = 0; i < operations.size(); i++) {
+				AOperation node = (AOperation) operations.get(i);
+				String name = renamer.getNameOfRef(node);
+				configFileString.append(name + "1 = ");
+				configFileString.append(name + "1");
+				configFileString.append("\n");
+				sb.append(name + "1");
+				if(i < operations.size()-1){
+					sb.append(", ");
+				}
+			}
+			sb.append("}");
+			configFileString.append("OpSet = ");
+			configFileString.append(sb);
+			configFileString.append("\n");
+			configFileString.append("VIEW myView");
+		}
+		
 	}
 
 	public void moduleStringAppend(String str) {
@@ -288,6 +319,20 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	private void printConstants() {
+		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
+			ArrayList<POperation> operations = tlaModule.getOperations();
+			tlaModuleString.append("CONSTANTS OpSet, Init1, ");
+			for (int i = 0; i < operations.size(); i++) {
+				AOperation node = (AOperation) operations.get(i);
+				String name = renamer.getNameOfRef(node);
+				tlaModuleString.append(name + "1");
+
+				if (i < operations.size() - 1)
+					tlaModuleString.append(", ");
+			}
+			tlaModuleString.append("\n");
+		}
+		/******************/
 		ArrayList<Node> list = this.tlaModule.getConstants();
 		if (list.size() == 0)
 			return;
@@ -322,17 +367,50 @@ public class TLAPrinter extends DepthFirstAdapter {
 		tlaModuleString.append("VARIABLES ");
 		for (int i = 0; i < vars.size(); i++) {
 			vars.get(i).apply(this);
-			if (i < vars.size() - 1)
+			if (i < vars.size() - 1) {
 				tlaModuleString.append(", ");
+			}
+
+		}
+		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
+			tlaModuleString.append(", lastOp");
 		}
 		tlaModuleString.append("\n");
+
+		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
+			tlaModuleString.append("myView == <<");
+			for (int i = 0; i < vars.size(); i++) {
+				vars.get(i).apply(this);
+				if (i < vars.size() - 1)
+					tlaModuleString.append(", ");
+			}
+			tlaModuleString.append(">>\n");
+		}
 	}
 
 	private void printInvariant() {
 		ArrayList<Node> invariants = this.tlaModule.getInvariantList();
 		for (int i = 0; i < invariants.size(); i++) {
+			Node inv = invariants.get(i);
 			tlaModuleString.append("Invariant" + (i + 1) + " == ");
-			invariants.get(i).apply(this);
+			if (TLC4BGlobals.isPartialInvariantEvaluation()) {
+				ArrayList<Node> operations = invariantPreservationAnalysis
+						.getPreservingOperations(inv);
+				if (operations.size() > 0) {
+					tlaModuleString.append("lastOp \\in {");
+					for (int j = 0; j < operations.size(); j++) {
+						Node op = operations.get(j);
+						String name = renamer.getNameOfRef(op);
+						tlaModuleString.append(name);
+						tlaModuleString.append("1");
+						if (j < operations.size() - 1) {
+							tlaModuleString.append(", ");
+						}
+					}
+					tlaModuleString.append("} \\/ ");
+				}
+			}
+			inv.apply(this);
 			tlaModuleString.append("\n");
 		}
 	}
@@ -364,6 +442,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 			init.apply(this);
 			if (init instanceof ADisjunctPredicate) {
 				tlaModuleString.append(")");
+			}
+			if (TLC4BGlobals.isPartialInvariantEvaluation()) {
+				tlaModuleString.append(" /\\ lastOp = Init1 ");
 			}
 			if (i < inits.size() - 1)
 				tlaModuleString.append("\n\t/\\ ");
@@ -964,6 +1045,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 
 		printUnchangedConstants();
+
+		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
+			tlaModuleString.append(" /\\ lastOp' = ");
+			tlaModuleString.append(name);
+			tlaModuleString.append("1");
+		}
 
 		tlaModuleString.append("\n\n");
 	}

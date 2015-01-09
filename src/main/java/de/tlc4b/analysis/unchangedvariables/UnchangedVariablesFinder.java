@@ -58,6 +58,10 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		return unchangedVariablesTable.get(node);
 	}
 	
+	public HashSet<Node> getAssignedVariables(Node node){
+		return assignedIdentifiersTable.get(node);
+	}
+	
 	public boolean hasUnchangedVariables(Node node){
 		HashSet<Node> set = unchangedVariablesTable.get(node);
 		if(set== null){

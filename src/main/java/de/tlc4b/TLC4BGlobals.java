@@ -11,6 +11,7 @@ public class TLC4BGlobals {
 	private static boolean checkLTL;
 	private static boolean checkWD;
 	private static boolean proBconstantsSetup;
+	private static boolean partialInvariantEvaluation;
 
 	private static boolean deleteFilesOnExit;
 
@@ -65,6 +66,8 @@ public class TLC4BGlobals {
 		runTestscript = false;
 		testingMode = false;
 		createTraceFile = true;
+		
+		partialInvariantEvaluation = false;
 	}
 
 	public static boolean isCreateTraceFile() {
@@ -125,6 +128,14 @@ public class TLC4BGlobals {
 
 	public static boolean isDeleteOnExit() {
 		return deleteFilesOnExit;
+	}
+	
+	public static boolean isPartialInvariantEvaluation(){
+		return partialInvariantEvaluation;
+	}
+	
+	public static void setPartialInvariantEvaluation(boolean b){
+		partialInvariantEvaluation = b;
 	}
 
 	public static void setDEFERRED_SET_SIZE(int dEFERRED_SET_SIZE) {

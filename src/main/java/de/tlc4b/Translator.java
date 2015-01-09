@@ -23,6 +23,7 @@ import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.analysis.transformation.DefinitionsEliminator;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
+import de.tlc4b.analysis.unchangedvariables.InvariantPreservationAnalysis;
 import de.tlc4b.analysis.unchangedvariables.UnchangedVariablesFinder;
 import de.tlc4b.prettyprint.TLAPrinter;
 import de.tlc4b.tla.Generator;
@@ -47,7 +48,7 @@ public class Translator {
 		start = parser.parse(machineString, false);
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		//System.out.println(ast2String2.toString());
+		// System.out.println(ast2String2.toString());
 	}
 
 	public Translator(String machineString, String ltlFormula)
@@ -58,48 +59,52 @@ public class Translator {
 		start = parser.parse(machineString, false);
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		//System.out.println(ast2String2.toString());
+		// System.out.println(ast2String2.toString());
 	}
 
-	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
-			throws IOException, BException {
+	public Translator(String machineName, File machineFile, String ltlFormula,
+			String constantSetup) throws IOException, BException {
 		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
-		
+
 		BParser parser = new BParser(machineName);
 		start = parser.parseFile(machineFile, false);
 
-		// Definitions of definitions files are injected in the ast of the main machine
+		// Definitions of definitions files are injected in the ast of the main
+		// machine
 		final RecursiveMachineLoader rml = new RecursiveMachineLoader(
 				machineFile.getParent(), parser.getContentProvider());
-		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions(), parser.getPragmas());
-		
-		if(constantSetup!= null){
+		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions(),
+				parser.getPragmas());
+
+		if (constantSetup != null) {
 			BParser con = new BParser();
 			Start start2 = null;
 			try {
 				start2 = con.parse("#FORMULA " + constantSetup, false);
 			} catch (BException e) {
-				System.err.println("An error occured while parsing the constants setup predicate.");
+				System.err
+						.println("An error occured while parsing the constants setup predicate.");
 				throw e;
 			}
-			
-			APredicateParseUnit parseUnit = (APredicateParseUnit) start2.getPParseUnit();
+
+			APredicateParseUnit parseUnit = (APredicateParseUnit) start2
+					.getPParseUnit();
 			this.constantsSetup = parseUnit.getPredicate();
-			
+
 			final Ast2String ast2String2 = new Ast2String();
 			start2.apply(ast2String2);
-			//System.out.println(ast2String2.toString());
+			// System.out.println(ast2String2.toString());
 		}
-		
-	    final Ast2String ast2String2 = new Ast2String();
+
+		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		//System.out.println(ast2String2.toString());
+		// System.out.println(ast2String2.toString());
 	}
 
 	public void translate() {
 		new NotSupportedConstructs(start);
-		
+
 		new DefinitionsEliminator(start);
 
 		MachineContext machineContext = new MachineContext(machineName, start,
@@ -117,26 +122,30 @@ public class Translator {
 		ConstantsEvaluator constantsEvaluator = new ConstantsEvaluator(
 				machineContext);
 
+		InvariantPreservationAnalysis invariantPreservationAnalysis = new InvariantPreservationAnalysis(
+				machineContext, constantsEvaluator.getInvariantList(),
+				unchangedVariablesFinder);
+
 		TypeRestrictor typeRestrictor = new TypeRestrictor(start,
 				machineContext, typechecker);
 
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
 				start, typechecker, machineContext, typeRestrictor);
-		
+
 		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
 				machineContext);
-		
+
 		Generator generator = new Generator(machineContext, typeRestrictor,
 				constantsEvaluator, deferredSetSizeCalculator, typechecker);
 		generator.generate();
 
 		generator.getTlaModule().sortAllDefinitions(machineContext);
 
-		UsedStandardModules usedModules = new UsedStandardModules(start, typechecker,
-				typeRestrictor, generator.getTlaModule());
-		
+		UsedStandardModules usedModules = new UsedStandardModules(start,
+				typechecker, typeRestrictor, generator.getTlaModule());
+
 		usedStandardModules = usedModules.getUsedModules();
-		
+
 		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator
 				.getTlaModule().getOperations(), machineContext);
 		primedNodesMarker.start();
@@ -145,13 +154,13 @@ public class Translator {
 		TLAPrinter printer = new TLAPrinter(machineContext, typechecker,
 				unchangedVariablesFinder, precedenceCollector, usedModules,
 				typeRestrictor, generator.getTlaModule(),
-				generator.getConfigFile(), primedNodesMarker, renamer);
+				generator.getConfigFile(), primedNodesMarker, renamer, invariantPreservationAnalysis);
 		printer.start();
 		moduleString = printer.getStringbuilder().toString();
 		configString = printer.getConfigString().toString();
 
-		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer,
-				typechecker, generator.getTlaModule(), generator.getConfigFile());
+		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer, typechecker,
+				generator.getTlaModule(), generator.getConfigFile());
 	}
 
 	public String getMachineString() {
