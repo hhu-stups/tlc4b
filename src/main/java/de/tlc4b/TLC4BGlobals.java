@@ -8,6 +8,7 @@ public class TLC4BGlobals {
 	private static boolean checkGOAL;
 	private static boolean checkDeadlock;
 	private static boolean checkInvariant;
+	private static boolean checkAssertion;
 	private static boolean checkLTL;
 	private static boolean checkWD;
 	private static boolean proBconstantsSetup;
@@ -43,6 +44,7 @@ public class TLC4BGlobals {
 		checkGOAL = true;
 		checkDeadlock = true;
 		checkInvariant = true;
+		checkAssertion = true;
 		checkLTL = true;
 		checkWD= false;
 		
@@ -117,6 +119,10 @@ public class TLC4BGlobals {
 	public static boolean isInvariant() {
 		return checkInvariant;
 	}
+	
+	public static boolean isAssertion() {
+		return checkAssertion;
+	}
 
 	public static boolean isCheckltl() {
 		return checkLTL;
@@ -168,6 +174,10 @@ public class TLC4BGlobals {
 
 	public static void setInvariant(boolean invariant) {
 		TLC4BGlobals.checkInvariant = invariant;
+	}
+	
+	public static void setAssertionCheck(boolean b) {
+		TLC4BGlobals.checkAssertion = b;
 	}
 
 	public static void setCheckltl(boolean checkltl) {

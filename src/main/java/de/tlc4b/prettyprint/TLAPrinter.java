@@ -211,12 +211,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 			this.configFileString.append("INVARIANT NotGoal\n");
 		}
 
-		if (configFile.getAssertionSize() > 0) {
+		if (TLC4BGlobals.isAssertion()) {
 			for (int i = 0; i < configFile.getAssertionSize(); i++) {
 				this.configFileString.append("INVARIANT Assertion" + (i + 1)
 						+ "\n");
 			}
-
 		}
 
 		if (TLC4BGlobals.isCheckltl()) {
@@ -236,10 +235,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 				configFileString.append(assignments.get(i).getString(renamer));
 			}
 		}
-		if(TLC4BGlobals.isPartialInvariantEvaluation()){
+		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
 			configFileString.append("CONSTANTS\n");
 			configFileString.append("Init1 = Init1\n");
-			
+
 			ArrayList<POperation> operations = tlaModule.getOperations();
 			StringBuilder sb = new StringBuilder();
 			sb.append("{");
@@ -250,7 +249,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				configFileString.append(name + "1");
 				configFileString.append("\n");
 				sb.append(name + "1");
-				if(i < operations.size()-1){
+				if (i < operations.size() - 1) {
 					sb.append(", ");
 				}
 			}
@@ -260,7 +259,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			configFileString.append("\n");
 			configFileString.append("VIEW myView");
 		}
-		
+
 	}
 
 	public void moduleStringAppend(String str) {
@@ -416,15 +415,16 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	private void printAssertions() {
-		ArrayList<Node> assertions = tlaModule.getAssertions();
-		if (assertions.size() == 0)
-			return;
-		for (int i = 0; i < assertions.size(); i++) {
-			tlaModuleString.append("Assertion" + (i + 1) + " == ");
-			assertions.get(i).apply(this);
-			tlaModuleString.append("\n");
+		if (TLC4BGlobals.isAssertion()) {
+			ArrayList<Node> assertions = tlaModule.getAssertions();
+			if (assertions.size() == 0)
+				return;
+			for (int i = 0; i < assertions.size(); i++) {
+				tlaModuleString.append("Assertion" + (i + 1) + " == ");
+				assertions.get(i).apply(this);
+				tlaModuleString.append("\n");
+			}
 		}
-
 	}
 
 	private void printInit() {

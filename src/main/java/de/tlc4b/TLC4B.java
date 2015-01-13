@@ -139,6 +139,8 @@ public class TLC4B {
 				TLC4BGlobals.setGOAL(false);
 			} else if (args[index].toLowerCase().equals("-noinv")) {
 				TLC4BGlobals.setInvariant(false);
+			}else if (args[index].toLowerCase().equals("-noass")) {
+				TLC4BGlobals.setAssertionCheck(false);
 			} else if (args[index].toLowerCase().equals("-wdcheck")) {
 				TLC4BGlobals.setWelldefinednessCheck(true);
 			} else if (args[index].toLowerCase().equals("-tool")) {
