@@ -179,7 +179,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private void printLTLFormulas() {
 		ArrayList<LTLFormulaVisitor> visitors = machineContext.getLTLFormulas();
-		if (TLC4BGlobals.isCheckltl()) {
+		if (TLC4BGlobals.isCheckLTL()) {
 			for (int i = 0; i < visitors.size(); i++) {
 				LTLFormulaVisitor visitor = visitors.get(i);
 				tlaModuleString.append(visitor.getName() + " == ");
@@ -218,7 +218,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 		}
 
-		if (TLC4BGlobals.isCheckltl()) {
+		if (TLC4BGlobals.isCheckLTL()) {
 			for (int i = 0; i < machineContext.getLTLFormulas().size(); i++) {
 				LTLFormulaVisitor ltlVisitor = machineContext.getLTLFormulas()
 						.get(i);

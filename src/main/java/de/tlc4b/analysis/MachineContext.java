@@ -298,7 +298,7 @@ public class MachineContext extends DepthFirstAdapter {
 				AExpressionDefinitionDefinition def = (AExpressionDefinitionDefinition) e;
 				String name = def.getName().getText();
 				if (name.startsWith("ASSERT_LTL")) {
-					if (TLC4BGlobals.isCheckltl()) {
+					if (TLC4BGlobals.isCheckLTL()) {
 						LTLFormulaVisitor visitor = new LTLFormulaVisitor(name,
 								this);
 						visitor.parseDefinition(def);

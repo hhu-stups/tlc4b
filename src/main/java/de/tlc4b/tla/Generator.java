@@ -89,7 +89,7 @@ public class Generator extends DepthFirstAdapter {
 
 	private void evalSpec() {
 		if (this.configFile.isInit() && this.configFile.isNext()
-				&& TLC4BGlobals.isCheckltl()
+				&& TLC4BGlobals.isCheckLTL()
 				&& machineContext.getLTLFormulas().size() > 0) {
 			this.configFile.setSpec();
 		}

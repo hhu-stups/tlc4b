@@ -13,6 +13,7 @@ public class TLC4BGlobals {
 	private static boolean checkWD;
 	private static boolean proBconstantsSetup;
 	private static boolean partialInvariantEvaluation;
+	private static boolean useSymmetry;
 
 	private static boolean deleteFilesOnExit;
 
@@ -20,16 +21,15 @@ public class TLC4BGlobals {
 	private static boolean translate;
 	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
-	
+
 	private static boolean testingMode;
-	
+
 	private static boolean cleanup;
 
 	private static boolean forceTLCToEvalConstants;
-	
+
 	private static int workers;
-	
-	
+
 	private static boolean runTestscript;
 
 	static {
@@ -46,17 +46,17 @@ public class TLC4BGlobals {
 		checkInvariant = true;
 		checkAssertion = true;
 		checkLTL = true;
-		checkWD= false;
+		checkWD = false;
 		partialInvariantEvaluation = false;
-		
+		useSymmetry = false;
 		setForceTLCToEvalConstants(true);
-		
+
 		setProBconstantsSetup(false);
 
 		setCleanup(true);
-		
+
 		workers = 1;
-		
+
 		// for debugging purposes
 		runTLC = true;
 		translate = true;
@@ -69,8 +69,7 @@ public class TLC4BGlobals {
 		runTestscript = false;
 		testingMode = false;
 		createTraceFile = true;
-		
-		
+
 	}
 
 	public static boolean isCreateTraceFile() {
@@ -120,12 +119,12 @@ public class TLC4BGlobals {
 	public static boolean isInvariant() {
 		return checkInvariant;
 	}
-	
+
 	public static boolean isAssertion() {
 		return checkAssertion;
 	}
 
-	public static boolean isCheckltl() {
+	public static boolean isCheckLTL() {
 		return checkLTL;
 	}
 
@@ -136,12 +135,12 @@ public class TLC4BGlobals {
 	public static boolean isDeleteOnExit() {
 		return deleteFilesOnExit;
 	}
-	
-	public static boolean isPartialInvariantEvaluation(){
+
+	public static boolean isPartialInvariantEvaluation() {
 		return partialInvariantEvaluation;
 	}
-	
-	public static void setPartialInvariantEvaluation(boolean b){
+
+	public static void setPartialInvariantEvaluation(boolean b) {
 		partialInvariantEvaluation = b;
 	}
 
@@ -176,7 +175,7 @@ public class TLC4BGlobals {
 	public static void setInvariant(boolean invariant) {
 		TLC4BGlobals.checkInvariant = invariant;
 	}
-	
+
 	public static void setAssertionCheck(boolean b) {
 		TLC4BGlobals.checkAssertion = b;
 	}
@@ -193,11 +192,11 @@ public class TLC4BGlobals {
 		TLC4BGlobals.deleteFilesOnExit = deleteOnExit;
 	}
 
-	public static void setWorkers(int w){
+	public static void setWorkers(int w) {
 		TLC4BGlobals.workers = w;
 	}
-	
-	public static int getWorkers(){
+
+	public static int getWorkers() {
 		return TLC4BGlobals.workers;
 	}
 
@@ -216,20 +215,20 @@ public class TLC4BGlobals {
 	public static void setProBconstantsSetup(boolean proBconstantsSetup) {
 		TLC4BGlobals.proBconstantsSetup = proBconstantsSetup;
 	}
-	
-	public static void setTestingMode(boolean b){
+
+	public static void setTestingMode(boolean b) {
 		TLC4BGlobals.testingMode = b;
 	}
-	
-	public static boolean getTestingMode(){
+
+	public static boolean getTestingMode() {
 		return TLC4BGlobals.testingMode;
 	}
-	
-	public static void setWelldefinednessCheck(boolean b){
+
+	public static void setWelldefinednessCheck(boolean b) {
 		TLC4BGlobals.checkWD = b;
 	}
-	
-	public static boolean checkWelldefinedness(){
+
+	public static boolean checkWelldefinedness() {
 		return TLC4BGlobals.checkWD;
 	}
 
@@ -237,8 +236,17 @@ public class TLC4BGlobals {
 		return forceTLCToEvalConstants;
 	}
 
-	public static void setForceTLCToEvalConstants(boolean forceTLCToEvalConstants) {
+	public static void setForceTLCToEvalConstants(
+			boolean forceTLCToEvalConstants) {
 		TLC4BGlobals.forceTLCToEvalConstants = forceTLCToEvalConstants;
 	}
-	
+
+	public static boolean useSymmetry() {
+		return useSymmetry;
+	}
+
+	public static void setSymmetryUse(boolean b) {
+		useSymmetry = b;
+	}
+
 }

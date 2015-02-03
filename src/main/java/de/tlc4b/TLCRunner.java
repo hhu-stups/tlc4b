@@ -61,7 +61,7 @@ public class TLCRunner {
 			list.add("-deadlock");
 		}
 
-		if (TLC4BGlobals.isCheckltl()) {
+		if (TLC4BGlobals.isCheckLTL()) {
 			list.add("-cleanup");
 		}
 		// list.add("-coverage");
