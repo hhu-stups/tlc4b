@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 
+import tlc2.TLCGlobals;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
@@ -78,6 +79,8 @@ public class TLC4B {
 				+ " ms");
 		System.out.println("Model checking time: "
 				+ results.getModelCheckingTime() + " sec");
+		System.out.println("Number of workers: "
+				+ TLCGlobals.getNumWorkers());
 		System.out.println("States analysed: "
 				+ results.getNumberOfDistinctStates());
 		System.out.println("Transitions fired: "
@@ -221,6 +224,14 @@ public class TLC4B {
 	public void progress(String[] args) throws IOException, BException {
 		handleParameter(args);
 
+		System.out.print("Arguments: ");
+		for (int i = 0; i < args.length; i++) {
+			String string = args[i];
+			System.out.print(string);
+			System.out.print(" ");
+		}
+		System.out.println();
+		
 		handleMainFileName();
 		if (TLC4BGlobals.isTranslate()) {
 			StopWatch.start("Parsing");

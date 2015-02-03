@@ -47,6 +47,7 @@ public class TLC4BGlobals {
 		checkAssertion = true;
 		checkLTL = true;
 		checkWD= false;
+		partialInvariantEvaluation = false;
 		
 		setForceTLCToEvalConstants(true);
 		
@@ -69,7 +70,7 @@ public class TLC4BGlobals {
 		testingMode = false;
 		createTraceFile = true;
 		
-		partialInvariantEvaluation = false;
+		
 	}
 
 	public static boolean isCreateTraceFile() {

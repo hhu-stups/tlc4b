@@ -237,7 +237,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
 			configFileString.append("CONSTANTS\n");
-			configFileString.append("Init1 = Init1\n");
+			configFileString.append("Init_action = Init_action\n");
 
 			ArrayList<POperation> operations = tlaModule.getOperations();
 			StringBuilder sb = new StringBuilder();
@@ -245,17 +245,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 			for (int i = 0; i < operations.size(); i++) {
 				AOperation node = (AOperation) operations.get(i);
 				String name = renamer.getNameOfRef(node);
-				configFileString.append(name + "1 = ");
-				configFileString.append(name + "1");
+				configFileString.append(name + "_action = ");
+				configFileString.append(name + "_action");
 				configFileString.append("\n");
-				sb.append(name + "1");
+				sb.append(name + "_action");
 				if (i < operations.size() - 1) {
 					sb.append(", ");
 				}
 			}
 			sb.append("}");
-			configFileString.append("OpSet = ");
-			configFileString.append(sb);
 			configFileString.append("\n");
 			configFileString.append("VIEW myView");
 		}
@@ -320,11 +318,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 	private void printConstants() {
 		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
 			ArrayList<POperation> operations = tlaModule.getOperations();
-			tlaModuleString.append("CONSTANTS OpSet, Init1, ");
+			tlaModuleString.append("CONSTANTS Init_action, ");
 			for (int i = 0; i < operations.size(); i++) {
 				AOperation node = (AOperation) operations.get(i);
 				String name = renamer.getNameOfRef(node);
-				tlaModuleString.append(name + "1");
+				tlaModuleString.append(name + "_action");
 
 				if (i < operations.size() - 1)
 					tlaModuleString.append(", ");
@@ -372,7 +370,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		}
 		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
-			tlaModuleString.append(", lastOp");
+			tlaModuleString.append(", last_action");
 		}
 		tlaModuleString.append("\n");
 
@@ -396,12 +394,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 				ArrayList<Node> operations = invariantPreservationAnalysis
 						.getPreservingOperations(inv);
 				if (operations.size() > 0) {
-					tlaModuleString.append("lastOp \\in {");
+					tlaModuleString.append("last_action \\in {");
 					for (int j = 0; j < operations.size(); j++) {
 						Node op = operations.get(j);
 						String name = renamer.getNameOfRef(op);
 						tlaModuleString.append(name);
-						tlaModuleString.append("1");
+						tlaModuleString.append("_action");
 						if (j < operations.size() - 1) {
 							tlaModuleString.append(", ");
 						}
@@ -444,7 +442,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				tlaModuleString.append(")");
 			}
 			if (TLC4BGlobals.isPartialInvariantEvaluation()) {
-				tlaModuleString.append(" /\\ lastOp = Init1 ");
+				tlaModuleString.append(" /\\ last_action = Init_action");
 			}
 			if (i < inits.size() - 1)
 				tlaModuleString.append("\n\t/\\ ");
@@ -1047,9 +1045,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printUnchangedConstants();
 
 		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
-			tlaModuleString.append(" /\\ lastOp' = ");
+			tlaModuleString.append(" /\\ last_action' = ");
 			tlaModuleString.append(name);
-			tlaModuleString.append("1");
+			tlaModuleString.append("_action");
 		}
 
 		tlaModuleString.append("\n\n");
