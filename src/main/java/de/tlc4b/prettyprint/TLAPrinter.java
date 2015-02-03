@@ -1,6 +1,7 @@
 package de.tlc4b.prettyprint;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -98,9 +99,33 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printSpecFormula();
 		printLTLFormulas();
 
+		printSymmetry();
+		
+		
 		tlaModuleString.append("====");
 
 		printConfig();
+	}
+
+	private void printSymmetry() {
+
+		if(TLC4BGlobals.useSymmetry() && machineContext.getDeferredSets().size()>0){
+			
+			tlaModuleString.append("Symmetry == ");
+			Collection<Node> values = machineContext.getDeferredSets().values();
+			ArrayList<Node> array = new ArrayList<Node>(values);
+			for (int i = 0; i < array.size(); i++) {
+				Node node = array.get(i);
+				tlaModuleString.append("Permutations(");
+				node.apply(this);
+				tlaModuleString.append(")");
+				if(i<array.size()-1){
+					tlaModuleString.append(" \\cup ");
+				}
+			}
+			tlaModuleString.append("\n");
+			//Symmetry == Permutations(Clients) \cup Permutations(Resources)
+		}
 	}
 
 	private void printSpecFormula() {
@@ -235,6 +260,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 				configFileString.append(assignments.get(i).getString(renamer));
 			}
 		}
+		if(TLC4BGlobals.useSymmetry()&& machineContext.getDeferredSets().size()>0){
+			configFileString.append("SYMMETRY Symmetry\n");
+		}
+		
+		
 		if (TLC4BGlobals.isPartialInvariantEvaluation()) {
 			configFileString.append("CONSTANTS\n");
 			configFileString.append("Init_action = Init_action\n");

@@ -132,6 +132,12 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		this.usedStandardModules = new HashSet<STANDARD_MODULES>();
 		this.typechecker = typechecker;
 
+		
+		
+		if (TLC4BGlobals.useSymmetry()) {
+			usedStandardModules.add(STANDARD_MODULES.TLC);
+		}
+		
 		List<PDefinition> definitions = tlaModule.getAllDefinitions();
 		if (definitions != null) {
 			for (PDefinition pDefinition : definitions) {

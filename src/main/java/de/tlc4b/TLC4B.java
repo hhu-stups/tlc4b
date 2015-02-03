@@ -71,24 +71,31 @@ public class TLC4B {
 
 	}
 
-
 	private void printResults(TLCResults results, boolean createTraceFile) {
-		//options
+		// options
 		System.out.println("Used Options");
 		System.out.println("| Number of workers: " + TLC4BGlobals.getWorkers());
 		System.out.println("| Invariants check: " + TLC4BGlobals.isInvariant());
-		System.out.println("| Deadlock check: " + TLC4BGlobals.isDeadlockCheck());
+		System.out.println("| Deadlock check: "
+				+ TLC4BGlobals.isDeadlockCheck());
 		System.out.println("| Assertion check: " + TLC4BGlobals.isAssertion());
 		System.out.println("| Find Goal check: " + TLC4BGlobals.isGOAL());
-		System.out.println("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
-		System.out.println("| Partial invariant evaluation: " + TLC4BGlobals.isPartialInvariantEvaluation());
-		System.out.println("| Lazy constants setup: " + !TLC4BGlobals.isForceTLCToEvalConstants());
-		System.out.println("| Agressive well-definedness check: " + TLC4BGlobals.checkWelldefinedness());
-		System.out.println("| Prob constant setup: " + TLC4BGlobals.isProBconstantsSetup());
-		System.out.println("| Symmetry used: " + TLC4BGlobals.useSymmetry());
+		System.out
+				.println("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
+		System.out.println("| Partial invariant evaluation: "
+				+ TLC4BGlobals.isPartialInvariantEvaluation());
+		System.out.println("| Lazy constants setup: "
+				+ !TLC4BGlobals.isForceTLCToEvalConstants());
+		System.out.println("| Agressive well-definedness check: "
+				+ TLC4BGlobals.checkWelldefinedness());
+		System.out.println("| Prob constant setup: "
+				+ TLC4BGlobals.isProBconstantsSetup());
+		System.out.println("| Symmetry reduction: "
+				+ TLC4BGlobals.useSymmetry());
 		System.out.print("| MIN Int: " + TLC4BGlobals.getMIN_INT());
 		System.out.print(" | MAX Int: " + TLC4BGlobals.getMAX_INT());
-		System.out.println(" | Deferret set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
+		System.out.println(" | Standard deferret set size: "
+				+ TLC4BGlobals.getDEFERRED_SET_SIZE());
 		System.out.println("--------------------------------");
 		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
 				+ " ms");
@@ -96,7 +103,8 @@ public class TLC4B {
 				+ " ms");
 		System.out.println("Model checking time: "
 				+ results.getModelCheckingTime() + " sec");
-		//System.out.println("Number of workers: " + TLCGlobals.getNumWorkers());
+		// System.out.println("Number of workers: " +
+		// TLCGlobals.getNumWorkers());
 		System.out.println("States analysed: "
 				+ results.getNumberOfDistinctStates());
 		System.out.println("Transitions fired: "
@@ -162,6 +170,8 @@ public class TLC4B {
 				TLC4BGlobals.setAssertionCheck(false);
 			} else if (args[index].toLowerCase().equals("-wdcheck")) {
 				TLC4BGlobals.setWelldefinednessCheck(true);
+			} else if (args[index].toLowerCase().equals("-symmetry")) {
+				TLC4BGlobals.setSymmetryUse(true);
 			} else if (args[index].toLowerCase().equals("-tool")) {
 				TLC4BGlobals.setTool(false);
 			} else if (args[index].toLowerCase().equals("-tmp")) {

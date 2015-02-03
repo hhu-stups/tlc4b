@@ -67,6 +67,7 @@ public class Renamer extends DepthFirstAdapter {
 		KEYWORDS.add("WF_");
 		KEYWORDS.add("WITH");
 		KEYWORDS.add("STATE");
+		KEYWORDS.add("DEF");
 
 		KEYWORDS.add("Init");
 		KEYWORDS.add("Next");
