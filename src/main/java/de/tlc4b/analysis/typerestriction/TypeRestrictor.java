@@ -7,8 +7,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-import tla2sany.semantic.OpApplNode;
-import tla2sany.semantic.OpDefNode;
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
@@ -16,7 +14,6 @@ import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
-import de.be4.classicalb.core.parser.node.ACoupleExpression;
 import de.be4.classicalb.core.parser.node.ADisjunctPredicate;
 import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
@@ -566,7 +563,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 					String localVariableName = Utils.getIdentifierAsString(id
 							.getIdentifier());
 					throw new NotSupportedException(
-							"Can not restrict the type of the variable '"
+							"Unable to restrict the type of the variable '"
 									+ localVariableName
 									+ "' to a finite set. TLC is not able to handle infinite sets.\n"
 									+ e.getStartPos());
