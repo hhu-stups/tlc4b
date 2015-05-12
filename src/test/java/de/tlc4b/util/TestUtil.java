@@ -5,7 +5,6 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,15 +14,10 @@ import java.util.List;
 
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
-import de.tla2b.exceptions.FrontEndException;
 import de.tla2b.exceptions.TLA2BException;
-import de.tla2b.output.ASTPrettyPrinter;
-import de.tla2b.output.Renamer;
 import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
-import de.tlc4b.TLCRunner;
 import de.tlc4b.Translator;
-import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.tlc.TLCResults.TLCResult;
 
 public class TestUtil {
@@ -75,7 +69,7 @@ public class TestUtil {
 		Translator b2tlaTranslator = new Translator(machine, ltlFormula);
 		b2tlaTranslator.translate();
 		System.out.println(b2tlaTranslator.getModuleString());
-		String name = b2tlaTranslator.getMachineName();
+		// String name = b2tlaTranslator.getMachineName();
 		// de.tla2b.translation.Tla2BTranslator.translateString(name,
 		// b2tlaTranslator.getModuleString(), null);
 		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
@@ -87,7 +81,7 @@ public class TestUtil {
 		System.out.println(b2tlaTranslator.getModuleString());
 
 		String name = b2tlaTranslator.getMachineName();
-		String str1 = translateTLA2B(name, b2tlaTranslator.getModuleString());
+		translateTLA2B(name, b2tlaTranslator.getModuleString());
 		// de.tla2b.translation.Tla2BTranslator.translateString(name,
 		// b2tlaTranslator.getModuleString(), null);
 	}
@@ -124,7 +118,7 @@ public class TestUtil {
 		System.out.println(b2tlaTranslator.getModuleString());
 		System.out.println(b2tlaTranslator.getConfigString());
 
-		String name = b2tlaTranslator.getMachineName();
+		// String name = b2tlaTranslator.getMachineName();
 		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
 		// .translateString(name, b2tlaTranslator.getModuleString(),
 		// b2tlaTranslator.getConfigString());
