@@ -2,17 +2,25 @@ package de.tlc4b.ltl;
 
 
 import static de.tlc4b.util.TestUtil.compareEqualsConfig;
-import static de.tlc4b.util.TestUtil.compareLTL;
+import static de.tlc4b.util.TestUtil.compareLTLFormula;
 
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.exceptions.LTLParseException;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.exceptions.TypeErrorException;
 
 
 public class LtlFormulaTest {
 
+	@BeforeClass
+	public static void setUp(){
+		TLC4BGlobals.setTestingMode(true);
+	}
+	
 	@Test (expected = ScopeException.class)
 	public void testScopeException() throws Exception {
 		String machine = "MACHINE test\n"
@@ -21,7 +29,7 @@ public class LtlFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = x := 1"
 				+ "END";
-		compareLTL("", machine, "G{y = 1}");
+		compareLTLFormula("", machine, "G{y = 1}");
 	}
 	
 	@Test (expected = TypeErrorException.class)
@@ -32,234 +40,164 @@ public class LtlFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = x := 1"
 				+ "END";
-		compareLTL("", machine, "G{x = FALSE}");
+		compareLTLFormula("", machine, "G{x = FALSE}");
 	}
 	
 	@Test (expected = ScopeException.class) 
 	public void testUnkownOperation() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "END";
-		compareLTL("", machine, "e(foo)");
+		compareLTLFormula("", machine, "e(foo)");
 	}
 	
-	@Ignore
 	@Test 
 	public void testGobally() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "VARIABLES x\n"
-				+ "INVARIANT x = 1\n"
-				+ "INITIALISATION x := 1\n"
-				+ "OPERATIONS foo = x := 1"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "VARIABLES x\n"
-				+ "Invariant == x = 1\n"
-				+ "Init == x = 1\n"
-				+ "foo == x' = 1\n\n"
-				+ "Next == \\/ foo\n"
-				+ "Spec == Init /\\ [][Next]_<<x>> /\\ WF_<<x>>(Next)\n"
-				+ "ltl == [](x = 1)\n"
-				+ "====";
-		compareLTL(expected, machine, "G{x = 1}");
+		String machine = "MACHINE test END";
+		compareLTLFormula("[](1 = 1)", machine, "G{1 = 1}");
 	}
 	
-	@Ignore
 	@Test 
 	public void testFinally() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "VARIABLES x\n"
-				+ "INVARIANT x = 1\n"
-				+ "INITIALISATION x := 1\n"
-				+ "OPERATIONS foo = x := 1"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "VARIABLES x\n"
-				+ "Invariant == x = 1\n"
-				+ "Init == x = 1\n"
-				+ "foo == x' = 1\n\n"
-				+ "Next == \\/ foo\n"
-				+ "Spec == Init /\\ [][Next]_<<x>> /\\ WF_<<x>>(Next)\n"
-				+ "ltl == <>(x = 1)\n"
-				+ "====";
-		compareLTL(expected, machine, "F{x = 1}");
+		String machine = "MACHINE test END";
+		compareLTLFormula("<>(1=1)", machine, "F{1 = 1}");
 	}
+	
+	@Test 
+	public void testEnabled() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "OPERATIONS foo = skip \n"
+				+ "END";
+		compareLTLFormula("ENABLED(foo)", machine, "e(foo)");
+	}
+	
+	@Test  (expected = ScopeException.class)
+	public void testEnabledUnknownOperation() throws Exception {
+		String machine = "MACHINE test END";
+		compareLTLFormula("ENABLED(foo)", machine, "e(foo)");
+	}
+	
+	
 	
 	@Test 
 	public void testTrue() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == TRUE\n"
-				+ "====";
-		compareLTL(expected, machine, "true");
+		String machine = "MACHINE test END";
+		compareLTLFormula("TRUE", machine, "true");
 	}
 	
 	@Test 
 	public void testFalse() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == FALSE\n"
-				+ "====";
-		compareLTL(expected, machine, "false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("FALSE", machine, "false");
 	}
 	
 	@Test 
 	public void testImplication() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == FALSE => TRUE\n"
-				+ "====";
-		compareLTL(expected, machine, "false => true");
+		String machine = "MACHINE test END";
+		compareLTLFormula("FALSE => TRUE", machine, "false => true");
 	}
 	
 	@Test 
 	public void testAnd() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == TRUE /\\ FALSE\n"
-				+ "====";
-		compareLTL(expected, machine, "true & false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("TRUE /\\ FALSE", machine, "true & false");
 	}
 	
 	@Test 
 	public void testOr() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == TRUE \\/ FALSE\n"
-				+ "====";
-		compareLTL(expected, machine, "true or false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("TRUE \\/ FALSE", machine, "true or false");
 	}
 	
 	@Test 
 	public void testNegation() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\neg(TRUE)\n"
-				+ "====";
-		compareLTL(expected, machine, "not(true)");
+		String machine = "MACHINE test END";
+		compareLTLFormula("\\neg(TRUE)", machine, "not(true)");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testUntil() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "true U false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "true U false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testWeakUntil() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "true W false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "true W false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testRelease() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "true R false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "true R false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testHistory() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "H false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "H false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testOnce() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "O false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "O false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testYesterday() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "Y false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "Y false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testSince() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "true S false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "true S false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testTrigger() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "true T false");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "true T false");
 	}
 	
 	@Test (expected = ScopeException.class)
 	public void testAction() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		compareLTL("", machine, "[foo]");
+		String machine = "MACHINE test END";
+		compareLTLFormula("", machine, "[foo]");
 	}
 	
-	@Ignore
-	@Test 
-	public void testEnabled() throws Exception {
+	
+	@Test (expected = LTLParseException.class)
+	public void testWeakFairnessParseError() throws Exception {
 		String machine = "MACHINE test\n"
-				+ "VARIABLES x\n"
-				+ "INVARIANT x = 1\n"
-				+ "INITIALISATION x := 1\n"
-				+ "OPERATIONS foo = x := 1"
+				+ "OPERATIONS foo = skip\n"
 				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "VARIABLES x\n"
-				+ "Invariant == x = 1\n"
-				+ "Init == x = 1\n"
-				+ "foo == x' = 1\n\n"
-				+ "Next == \\/ foo\n"
-				+ "Spec == Init /\\ [][Next]_<<x>> /\\ WF_<<x>>(Next)\n"
-				+ "ltl == ENABLED(foo)\n"
-				+ "====";
-		compareLTL(expected, machine, "e(foo)");
+		compareLTLFormula("", machine, "WF(foo)");
 	}
 	
-	@Ignore
-	@Test 
+	@Test
+	public void testDeterministic() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
+				+ "END";
+	    String expected = "\\neg(ENABLED(foo),ENABLED(bar))/\\ \\neg(ENABLED(foo),ENABLED(bazz))/\\ \\neg(ENABLED(bar),ENABLED(bazz))";
+		compareLTLFormula(expected, machine, "deterministic(foo,bar,bazz)");
+	}
+	
+	@Test
 	public void testWeakFairness() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "VARIABLES x\n"
 				+ "INVARIANT x = 1\n"
 				+ "INITIALISATION x := 1\n"
-				+ "OPERATIONS foo = x := 1"
+				+ "OPERATIONS foo = skip\n"
 				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "VARIABLES x\n"
-				+ "Invariant == x = 1\n"
-				+ "Init == x = 1\n"
-				+ "foo == x' = 1\n\n"
-				+ "Next == \\/ foo\n"
-				+ "Spec == Init /\\ [][Next]_<<x>> /\\ WF_<<x>>(Next)\n"
-				+ "ltl == ENABLED(foo)\n"
-				+ "====";
-		compareLTL(expected, machine, "WF(foo)");
+		String expected = "([]<><<foo>>_vars\\/[]<>~ENABLED(foo)\\/[]<>ENABLED(foo/\\x'=x))=>TRUE";
+		compareLTLFormula(expected, machine, "WF(foo) => true");
 	}
 	
-	@Ignore
 	@Test 
 	public void testStrongFairness() throws Exception {
 		String machine = "MACHINE test\n"
@@ -268,57 +206,32 @@ public class LtlFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = x := 1"
 				+ "END";
-		
-		String expected = "---- MODULE test ----\n"
-				+ "VARIABLES x\n"
-				+ "Invariant == x = 1\n"
-				+ "Init == x = 1\n"
-				+ "foo == x' = 1\n\n"
-				+ "Next == \\/ foo\n"
-				+ "Spec == Init /\\ [][Next]_<<x>> /\\ WF_<<x>>(Next)\n"
-				+ "ltl == ENABLED(foo)\n"
-				+ "====";
-		compareLTL(expected, machine, "SF(foo)");
+		String expected = "([]<><<foo>>_vars\\/<>[]~ENABLED(foo)\\/[]<>ENABLED(foo/\\x'=x))=>TRUE";
+		compareLTLFormula(expected, machine, "SF(foo) => true");
 	}
 	
 	@Test 
 	public void testExistentialQuantification() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\E p \\in {1}: p = 1\n"
-				+ "====";
-		compareLTL(expected, machine, "#p.({p=1} & {p = 1})");
+		String machine = "MACHINE test END";
+		compareLTLFormula(" \\E p \\in {1}: p = 1", machine, "#p.({p=1} & {p = 1})");
 	}
 	
 	@Test 
 	public void testExistentialQuantification2() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\E p \\in {1}: 1 = 1 /\\ p = 1\n"
-				+ "====";
-		compareLTL(expected, machine, "#p.({p=1 & 1 = 1} & {p = 1})");
+		String machine = "MACHINE test END";
+		compareLTLFormula("\\E p \\in {1}: 1 = 1 /\\ p = 1", machine, "#p.({p=1 & 1 = 1} & {p = 1})");
 	}
 	
 	@Test 
 	public void testForallQuantification() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\A p \\in {1}: p = 1\n"
-				+ "====";
-		compareLTL(expected, machine, "!p.({p=1} => {p = 1})");
+		String machine = "MACHINE test END";
+		compareLTLFormula("\\A p \\in {1}: p = 1", machine, "!p.({p=1} => {p = 1})");
 	}
 	
 	@Test 
 	public void testForallQuantification2() throws Exception {
-		String machine = "MACHINE test\n"
-				+ "END";
-		String expected = "---- MODULE test ----\n"
-				+ "ltl == \\A p \\in {1}: 1 = 1 => p = 1\n"
-				+ "====";
-		compareLTL(expected, machine, "!p.({p=1 & 1=1 } => {p = 1})");
+		String machine = "MACHINE test END";
+		compareLTLFormula("\\A p \\in {1}: 1 = 1 => p = 1", machine, "!p.({p=1 & 1=1 } => {p = 1})");
 	}
 	
 	@Ignore

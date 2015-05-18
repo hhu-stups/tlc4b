@@ -1,5 +1,8 @@
 package de.tlc4b.ltl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
@@ -7,6 +10,7 @@ import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.node.AAndFair1Ltl;
 import de.be4.ltl.core.parser.node.AAndFair2Ltl;
 import de.be4.ltl.core.parser.node.AAndLtl;
+import de.be4.ltl.core.parser.node.ADetLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AFairnessImplicationLtl;
@@ -16,11 +20,13 @@ import de.be4.ltl.core.parser.node.AForallLtl;
 import de.be4.ltl.core.parser.node.AGloballyLtl;
 import de.be4.ltl.core.parser.node.AImpliesLtl;
 import de.be4.ltl.core.parser.node.ANotLtl;
+import de.be4.ltl.core.parser.node.AOpActions;
 import de.be4.ltl.core.parser.node.AOrLtl;
 import de.be4.ltl.core.parser.node.AStrongFairLtl;
 import de.be4.ltl.core.parser.node.ATrueLtl;
 import de.be4.ltl.core.parser.node.AUnparsedLtl;
 import de.be4.ltl.core.parser.node.AWeakFairLtl;
+import de.be4.ltl.core.parser.node.PActions;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.prettyprint.TLAPrinter;
 
@@ -35,10 +41,8 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		this.ltlFormulaVisitor = ltlFormulaVisitor;
 		this.tlaPrinter = tlaPrinter;
 		this.typeRestrictor = typeRestrictor;
-		
 
 		ltlFormulaVisitor.getLTLFormulaStart().apply(this);
-		
 	}
 
 	@Override
@@ -76,23 +80,21 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend(" /\\ ");
 		node.getRight().apply(this);
 	}
-	
-    @Override
-    public void caseAAndFair1Ltl(AAndFair1Ltl node)
-    {
-    	node.getLeft().apply(this);
-		tlaPrinter.moduleStringAppend(" /\\ ");
-		node.getRight().apply(this);
-    }
 
-    @Override
-    public void caseAAndFair2Ltl(AAndFair2Ltl node)
-    {
-    	node.getLeft().apply(this);
+	@Override
+	public void caseAAndFair1Ltl(AAndFair1Ltl node) {
+		node.getLeft().apply(this);
 		tlaPrinter.moduleStringAppend(" /\\ ");
 		node.getRight().apply(this);
-    }
-    
+	}
+
+	@Override
+	public void caseAAndFair2Ltl(AAndFair2Ltl node) {
+		node.getLeft().apply(this);
+		tlaPrinter.moduleStringAppend(" /\\ ");
+		node.getRight().apply(this);
+	}
+
 	@Override
 	public void caseAOrLtl(AOrLtl node) {
 		node.getLeft().apply(this);
@@ -130,7 +132,8 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAWeakFairLtl(AWeakFairLtl node) {
-		tlaPrinter.printWeakFairnessWithParameter(node.getOperation().getText());
+		tlaPrinter
+				.printWeakFairnessWithParameter(node.getOperation().getText());
 	}
 
 	@Override
@@ -148,8 +151,8 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		typeRestrictor.getRestrictedNode(id).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(": ");
 		Start start = (Start) ltlFormulaVisitor.getBAst(node);
-		APredicateParseUnit p = (APredicateParseUnit) start.getPParseUnit(); 
-		if(!typeRestrictor.isARemovedNode(p.getPredicate())){
+		APredicateParseUnit p = (APredicateParseUnit) start.getPParseUnit();
+		if (!typeRestrictor.isARemovedNode(p.getPredicate())) {
 			ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
 			tlaPrinter.moduleStringAppend(" /\\ ");
 		}
@@ -166,12 +169,33 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		typeRestrictor.getRestrictedNode(id).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(": ");
 		Start start = (Start) ltlFormulaVisitor.getBAst(node);
-		APredicateParseUnit p = (APredicateParseUnit) start.getPParseUnit(); 
-		if(!typeRestrictor.isARemovedNode(p.getPredicate())){
+		APredicateParseUnit p = (APredicateParseUnit) start.getPParseUnit();
+		if (!typeRestrictor.isARemovedNode(p.getPredicate())) {
 			ltlFormulaVisitor.getBAst(node).apply(tlaPrinter);
 			tlaPrinter.moduleStringAppend(" => ");
 		}
 		node.getLtl().apply(this);
+	}
+
+	@Override
+	public void caseADetLtl(ADetLtl node) {
+		List<PActions> copy = new ArrayList<PActions>(node.getArgs());
+		for (int i = 0; i < copy.size(); i++) {
+			AOpActions action1 = (AOpActions) copy.get(i);
+			for (int j = i+1; j < copy.size(); j++) {
+				if(! (i == 0 && j == 1)){
+					tlaPrinter.moduleStringAppend(" /\\ ");
+				}
+				tlaPrinter.moduleStringAppend("\\neg(ENABLED(");
+				tlaPrinter.moduleStringAppend(action1.getOperation().getText());
+				tlaPrinter.moduleStringAppend("), ENABLED(");
+				AOpActions action2 = (AOpActions) copy.get(j);
+				tlaPrinter.moduleStringAppend(action2.getOperation().getText());
+				tlaPrinter.moduleStringAppend("))");
+			}
+		}
+		
+
 	}
 
 }

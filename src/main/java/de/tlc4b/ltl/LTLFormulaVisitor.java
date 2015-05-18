@@ -21,6 +21,7 @@ import de.be4.ltl.core.parser.internal.LtlLexer;
 import de.be4.ltl.core.parser.lexer.Lexer;
 import de.be4.ltl.core.parser.lexer.LexerException;
 import de.be4.ltl.core.parser.node.AActionLtl;
+import de.be4.ltl.core.parser.node.AAndLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
@@ -293,4 +294,20 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 				"The '[...]' operator is not supported by TLC.");
 	}
 
+    @Override
+    public void caseAAndLtl(AAndLtl node)
+    {
+        inAAndLtl(node);
+        if(node.getLeft() != null)
+        {
+            node.getLeft().apply(this);
+        }
+        if(node.getRight() != null)
+        {
+            node.getRight().apply(this);
+            System.out.println(node.getRight().getClass());
+        }
+        outAAndLtl(node);
+    }
+	
 }

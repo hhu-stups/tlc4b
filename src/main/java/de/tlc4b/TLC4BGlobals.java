@@ -69,7 +69,6 @@ public class TLC4BGlobals {
 		runTestscript = false;
 		testingMode = false;
 		createTraceFile = true;
-
 	}
 
 	public static boolean isCreateTraceFile() {

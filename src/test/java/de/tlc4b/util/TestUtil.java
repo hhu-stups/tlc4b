@@ -64,15 +64,17 @@ public class TestUtil {
 				tlaString, configString);
 	}
 
-	public static void compareLTL(String expectedModule, String machine,
+
+	public static void compareLTLFormula(String expected, String machine,
 			String ltlFormula) throws Exception {
 		Translator b2tlaTranslator = new Translator(machine, ltlFormula);
 		b2tlaTranslator.translate();
+		String translatedLTLFormula = b2tlaTranslator.getTranslatedLTLFormula();
+		translatedLTLFormula = translatedLTLFormula.replaceAll("\\s", "");
+		expected = expected.replaceAll("\\s", "");
+		System.out.println(translatedLTLFormula);
 		System.out.println(b2tlaTranslator.getModuleString());
-		// String name = b2tlaTranslator.getMachineName();
-		// de.tla2b.translation.Tla2BTranslator.translateString(name,
-		// b2tlaTranslator.getModuleString(), null);
-		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
+		assertEquals(expected, translatedLTLFormula);
 	}
 
 	public static void checkMachine(String machine) throws Exception {
