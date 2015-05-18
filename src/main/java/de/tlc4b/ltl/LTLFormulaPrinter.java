@@ -188,7 +188,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 				}
 				tlaPrinter.moduleStringAppend("\\neg(ENABLED(");
 				tlaPrinter.moduleStringAppend(action1.getOperation().getText());
-				tlaPrinter.moduleStringAppend("), ENABLED(");
+				tlaPrinter.moduleStringAppend(") /\\ ENABLED(");
 				AOpActions action2 = (AOpActions) copy.get(j);
 				tlaPrinter.moduleStringAppend(action2.getOperation().getText());
 				tlaPrinter.moduleStringAppend("))");

@@ -182,7 +182,7 @@ public class LtlFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
 				+ "END";
-	    String expected = "\\neg(ENABLED(foo),ENABLED(bar))/\\ \\neg(ENABLED(foo),ENABLED(bazz))/\\ \\neg(ENABLED(bar),ENABLED(bazz))";
+	    String expected = "\\neg(ENABLED(foo) /\\ ENABLED(bar)) /\\ \\neg(ENABLED(foo)  /\\ ENABLED(bazz)) /\\ \\neg(ENABLED(bar) /\\ ENABLED(bazz))";
 		compareLTLFormula(expected, machine, "deterministic(foo,bar,bazz)");
 	}
 	
