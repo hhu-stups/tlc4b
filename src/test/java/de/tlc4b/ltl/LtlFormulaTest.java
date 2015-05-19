@@ -187,6 +187,24 @@ public class LtlFormulaTest {
 	}
 	
 	@Test
+	public void testDeadlock() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
+				+ "END";
+	    String expected = "\\neg(ENABLED(foo) \\/ ENABLED(bar) \\/ ENABLED(bazz))";
+		compareLTLFormula(expected, machine, "deadlock");
+	}
+	
+	@Test
+	public void testDeadlockOperationParameter() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "OPERATIONS foo(a) = SELECT a : 1..3 THEN skip END\n"
+				+ "END";
+	    String expected = "\\neg(ENABLED(\\E a \\in (1 .. 3) : foo(a)))";
+		compareLTLFormula(expected, machine, "deadlock");
+	}
+	
+	@Test
 	public void testWeakFairness() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "VARIABLES x\n"

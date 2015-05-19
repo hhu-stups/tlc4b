@@ -1,15 +1,18 @@
 package de.tlc4b.ltl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.Node;
+import de.be4.classicalb.core.parser.node.POperation;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.node.AAndFair1Ltl;
 import de.be4.ltl.core.parser.node.AAndFair2Ltl;
 import de.be4.ltl.core.parser.node.AAndLtl;
+import de.be4.ltl.core.parser.node.ADeadlockLtl;
 import de.be4.ltl.core.parser.node.ADetLtl;
 import de.be4.ltl.core.parser.node.AEnabledLtl;
 import de.be4.ltl.core.parser.node.AExistsLtl;
@@ -194,8 +197,27 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 				tlaPrinter.moduleStringAppend("))");
 			}
 		}
-		
-
 	}
 
+	
+    @Override
+    public void caseADeadlockLtl(ADeadlockLtl node)
+    {
+    	tlaPrinter.moduleStringAppend("\\neg(");
+    	
+    	
+    Iterator<POperation> itr = this.tlaPrinter.getTLAModule().getOperations().iterator();
+		while (itr.hasNext()) {
+			Node operation = itr.next();
+			tlaPrinter.moduleStringAppend("ENABLED(");
+			tlaPrinter.printOperationCall(operation);
+			tlaPrinter.moduleStringAppend(")");
+			if (itr.hasNext()) {
+				tlaPrinter.moduleStringAppend(" \\/ ");
+			}
+		}
+    	
+        tlaPrinter.moduleStringAppend(")");
+    }
+	
 }

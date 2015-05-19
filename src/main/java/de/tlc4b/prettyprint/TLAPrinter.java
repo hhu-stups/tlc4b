@@ -523,7 +523,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		moduleStringAppend("\n");
 	}
 
-	private void printOperationCall(Node operation) {
+	public void printOperationCall(Node operation) {
 		AOperation op = (AOperation) operation;
 		List<PExpression> newList = new ArrayList<PExpression>();
 		newList.addAll(op.getParameters());
@@ -2908,7 +2908,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	public String geTranslatedLTLFormula() {
-		return translatedLTLFormula.toString();
+		return this.translatedLTLFormula.toString();
 	}
 
+	public TLAModule getTLAModule(){
+		return this.tlaModule;
+	}
+	
 }
