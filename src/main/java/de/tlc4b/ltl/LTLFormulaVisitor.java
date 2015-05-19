@@ -309,5 +309,9 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
         }
         outAAndLtl(node);
     }
+    
+    protected MachineContext getMachineContext(){
+    	return this.machineContext;
+    }
 	
 }

@@ -1,7 +1,9 @@
 package de.tlc4b.ltl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
@@ -183,20 +185,55 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseADetLtl(ADetLtl node) {
 		List<PActions> copy = new ArrayList<PActions>(node.getArgs());
-		for (int i = 0; i < copy.size(); i++) {
-			AOpActions action1 = (AOpActions) copy.get(i);
-			for (int j = i + 1; j < copy.size(); j++) {
-				if (!(i == 0 && j == 1)) {
+		LinkedHashMap<String, Node> operations = ltlFormulaVisitor
+				.getMachineContext().getOperations();
+		if (copy.size() > 1) {
+			tlaPrinter.moduleStringAppend("(");
+			for (int i = 0; i < copy.size() - 1; i++) {
+				if (i != 0) {
 					tlaPrinter.moduleStringAppend(" /\\ ");
 				}
-				tlaPrinter.moduleStringAppend("\\neg(ENABLED(");
-				tlaPrinter.moduleStringAppend(action1.getOperation().getText());
-				tlaPrinter.moduleStringAppend(") /\\ ENABLED(");
-				AOpActions action2 = (AOpActions) copy.get(j);
-				tlaPrinter.moduleStringAppend(action2.getOperation().getText());
+				AOpActions action1 = (AOpActions) copy.get(i);
+				String action1Name = action1.getOperation().getText();
+				Node op1 = operations.get(action1Name);
+				tlaPrinter.moduleStringAppend("(ENABLED(");
+				tlaPrinter.printOperationCall(op1);
+				tlaPrinter.moduleStringAppend(") => \\neg(");
+				for (int j = i + 1; j < copy.size(); j++) {
+					AOpActions action2 = (AOpActions) copy.get(j);
+					String action2Name = action2.getOperation().getText();
+					Node op2 = operations.get(action2Name);
+					if (j != i + 1) {
+						tlaPrinter.moduleStringAppend(" \\/ ");
+					}
+					tlaPrinter.moduleStringAppend("ENABLED(");
+					tlaPrinter.printOperationCall(op2);
+					tlaPrinter.moduleStringAppend(")");
+				}
 				tlaPrinter.moduleStringAppend("))");
 			}
+			tlaPrinter.moduleStringAppend(")");
+		} else { // only the single operation should be enabled
+				AOpActions action1 = (AOpActions) copy.get(0);
+				String action1Name = action1.getOperation().getText();
+				Node op1 = operations.get(action1Name);
+				tlaPrinter.moduleStringAppend("(ENABLED(");
+				tlaPrinter.printOperationCall(op1);
+				tlaPrinter.moduleStringAppend(") => \\neg(");
+				ArrayList<Node> remainingOperations = new ArrayList<Node>(operations.values());
+				remainingOperations.remove(op1);
+				for (int i = 0; i < remainingOperations.size(); i++) {
+					if (i != 0) {
+						tlaPrinter.moduleStringAppend(" \\/ ");
+					}
+					Node op2 = remainingOperations.get(i);
+					tlaPrinter.moduleStringAppend("ENABLED(");
+					tlaPrinter.printOperationCall(op2);
+					tlaPrinter.moduleStringAppend(")");
+				}
+				tlaPrinter.moduleStringAppend("))");
 		}
+
 	}
 
 	@Override
