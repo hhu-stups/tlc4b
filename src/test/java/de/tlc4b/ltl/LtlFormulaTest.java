@@ -191,7 +191,7 @@ public class LtlFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
 				+ "END";
-	    String expected = "\\neg(ENABLED(foo) \\/ ENABLED(bar) \\/ ENABLED(bazz))";
+	    String expected = "\\neg(ENABLED(Next))";
 		compareLTLFormula(expected, machine, "deadlock");
 	}
 	
@@ -200,7 +200,7 @@ public class LtlFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo(a) = SELECT a : 1..3 THEN skip END\n"
 				+ "END";
-	    String expected = "\\neg(ENABLED(\\E a \\in (1 .. 3) : foo(a)))";
+	    String expected = "\\neg(ENABLED(Next))";
 		compareLTLFormula(expected, machine, "deadlock");
 	}
 	

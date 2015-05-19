@@ -185,8 +185,8 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		List<PActions> copy = new ArrayList<PActions>(node.getArgs());
 		for (int i = 0; i < copy.size(); i++) {
 			AOpActions action1 = (AOpActions) copy.get(i);
-			for (int j = i+1; j < copy.size(); j++) {
-				if(! (i == 0 && j == 1)){
+			for (int j = i + 1; j < copy.size(); j++) {
+				if (!(i == 0 && j == 1)) {
 					tlaPrinter.moduleStringAppend(" /\\ ");
 				}
 				tlaPrinter.moduleStringAppend("\\neg(ENABLED(");
@@ -199,25 +199,9 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		}
 	}
 
-	
-    @Override
-    public void caseADeadlockLtl(ADeadlockLtl node)
-    {
-    	tlaPrinter.moduleStringAppend("\\neg(");
-    	
-    	
-    Iterator<POperation> itr = this.tlaPrinter.getTLAModule().getOperations().iterator();
-		while (itr.hasNext()) {
-			Node operation = itr.next();
-			tlaPrinter.moduleStringAppend("ENABLED(");
-			tlaPrinter.printOperationCall(operation);
-			tlaPrinter.moduleStringAppend(")");
-			if (itr.hasNext()) {
-				tlaPrinter.moduleStringAppend(" \\/ ");
-			}
-		}
-    	
-        tlaPrinter.moduleStringAppend(")");
-    }
-	
+	@Override
+	public void caseADeadlockLtl(ADeadlockLtl node) {
+		tlaPrinter.moduleStringAppend("\\neg(ENABLED(Next))");
+	}
+
 }

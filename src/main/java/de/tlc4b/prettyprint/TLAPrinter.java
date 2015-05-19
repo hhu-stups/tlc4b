@@ -523,7 +523,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		moduleStringAppend("\n");
 	}
 
-	public void printOperationCall(Node operation) {
+	private void printOperationCall(Node operation) {
 		AOperation op = (AOperation) operation;
 		List<PExpression> newList = new ArrayList<PExpression>();
 		newList.addAll(op.getParameters());

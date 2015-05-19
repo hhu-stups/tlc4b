@@ -110,6 +110,10 @@ public class TLC4B {
 		System.out.println("Transitions fired: "
 				+ results.getNumberOfTransitions());
 		System.out.println("Result: " + results.getResultString());
+		String violatedDefinition = results.getViolatedDefinition();
+		if (violatedDefinition != null) {
+			System.out.print("Violated Definition: " + violatedDefinition);
+		}
 
 		if (results.hasTrace() && createTraceFile) {
 			String trace = results.getTrace();

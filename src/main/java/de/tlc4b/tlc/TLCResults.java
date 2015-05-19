@@ -14,6 +14,7 @@ import tlc2.tool.TLCStateInfo;
 public class TLCResults {
 
 	private TLCResult tlcResult;
+	private String violatedDefinition;
 	private Date startTime;
 	private Date endTime;
 
@@ -46,12 +47,16 @@ public class TLCResults {
 		return traceString;
 	}
 
+	public String getViolatedDefinition() {
+		return violatedDefinition;
+	}
+
 	public int getNumberOfTransitions() {
 		return numberOfTransitions;
 	}
 
 	public int getModelCheckingTime() {
-		if(endTime == null || startTime == null){
+		if (endTime == null || startTime == null) {
 			return -1;
 		}
 		return (int) (endTime.getTime() - startTime.getTime()) / 1000;
@@ -149,12 +154,14 @@ public class TLCResults {
 	}
 
 	private void evalErrorMessage(Message m) {
-//		System.out.println(------------------);
-//		System.out.print(m.getMessageCode() + " " + m.getParameters().length);
-//		for (int i = 0; i < m.getParameters().length; i++) {
-//			System.out.print(" " + m.getParameters()[i]);
-//		}
-//		System.out.println();
+		// System.out.println(------------------);
+		// System.out.print(m.getMessageCode() + " " +
+		// m.getParameters().length);
+		// for (int i = 0; i < m.getParameters().length; i++) {
+		// System.out.print(" " + m.getParameters()[i]);
+		// }
+		// System.out.println();
+
 		switch (m.getMessageCode()) {
 		case EC.TLC_INVARIANT_VIOLATED_INITIAL:
 		case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
@@ -162,15 +169,20 @@ public class TLCResults {
 				tlcResult = AssertionError;
 			} else if (m.getParameters()[0].equals("NotGoal")) {
 				tlcResult = Goal;
+			} else if (m.getParameters()[0].startsWith("ASSERT_LTL")) {
+				tlcResult = TemporalPropertyViolation;
 			} else {
-				tlcResult = TLCResult.InvariantViolation;
+				tlcResult = InvariantViolation;
+			}
+			if (m.getParameters().length > 0) {
+				violatedDefinition = m.getParameters()[0];
 			}
 			break;
 
 		case EC.TLC_INITIAL_STATE: {
 			String arg1 = m.getParameters()[0];
 			if (arg1.contains("Attempted to compute the number of elements in the overridden")) {
-
+				// TODO
 			}
 			tlcResult = EnumerationError;
 			return;
@@ -186,6 +198,9 @@ public class TLCResults {
 
 		case EC.TLC_TEMPORAL_PROPERTY_VIOLATED:
 			tlcResult = TLCResult.TemporalPropertyViolation;
+			if (m.getParameters().length > 0) {
+				violatedDefinition = m.getParameters()[0];
+			}
 			break;
 
 		case EC.TLC_ASSUMPTION_EVALUATION_ERROR:
