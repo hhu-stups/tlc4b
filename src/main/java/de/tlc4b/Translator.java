@@ -111,6 +111,10 @@ public class Translator {
 		MachineContext machineContext = new MachineContext(machineName, start,
 				ltlFormula, constantsSetup);
 		this.machineName = machineContext.getMachineName();
+		if(machineContext
+				.machineContainsOperations()){
+			TLC4BGlobals.setPrintCoverage(true);
+		}
 
 		Typechecker typechecker = new Typechecker(machineContext);
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
@@ -155,7 +159,8 @@ public class Translator {
 		TLAPrinter printer = new TLAPrinter(machineContext, typechecker,
 				unchangedVariablesFinder, precedenceCollector, usedModules,
 				typeRestrictor, generator.getTlaModule(),
-				generator.getConfigFile(), primedNodesMarker, renamer, invariantPreservationAnalysis);
+				generator.getConfigFile(), primedNodesMarker, renamer,
+				invariantPreservationAnalysis);
 		printer.start();
 		moduleString = printer.getStringbuilder().toString();
 		configString = printer.getConfigString().toString();
@@ -197,9 +202,8 @@ public class Translator {
 		return usedStandardModules;
 	}
 
-	public String getTranslatedLTLFormula(){
+	public String getTranslatedLTLFormula() {
 		return translatedLTLFormula;
 	}
 
-	
 }

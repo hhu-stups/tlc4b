@@ -14,6 +14,7 @@ public class TLC4BGlobals {
 	private static boolean proBconstantsSetup;
 	private static boolean partialInvariantEvaluation;
 	private static boolean useSymmetry;
+	private static boolean printCoverage;
 
 	private static boolean deleteFilesOnExit;
 
@@ -49,6 +50,7 @@ public class TLC4BGlobals {
 		checkWD = false;
 		partialInvariantEvaluation = false;
 		useSymmetry = false;
+		printCoverage = false;
 		setForceTLCToEvalConstants(true);
 
 		setProBconstantsSetup(false);
@@ -246,6 +248,14 @@ public class TLC4BGlobals {
 
 	public static void setSymmetryUse(boolean b) {
 		useSymmetry = b;
+	}
+	
+	public static void setPrintCoverage(boolean b){
+		printCoverage = b;
+	}
+	
+	public static boolean isPrintCoverage(){ 
+		return printCoverage;
 	}
 
 }

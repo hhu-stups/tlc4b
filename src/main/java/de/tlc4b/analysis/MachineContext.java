@@ -1090,6 +1090,10 @@ public class MachineContext extends DepthFirstAdapter {
 		return invariantMachineClause;
 	}
 
+	public boolean machineContainsOperations() {
+		return operations.size() > 0;
+	}
+
 	public AInitialisationMachineClause getInitialisationMachineClause() {
 		return initialisationMachineClause;
 	}
