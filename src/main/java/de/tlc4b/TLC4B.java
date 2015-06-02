@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import tlc2.TLCGlobals;
 import de.be4.classicalb.core.parser.exceptions.BException;
@@ -72,6 +76,7 @@ public class TLC4B {
 	}
 
 	private void printResults(TLCResults results, boolean createTraceFile) {
+		printOperationsCount(results);
 		// options
 		System.out.println("Used Options");
 		System.out.println("| Number of workers: " + TLC4BGlobals.getWorkers());
@@ -127,6 +132,22 @@ public class TLC4B {
 			}
 		}
 
+	}
+
+	private void printOperationsCount(TLCResults results) {
+		LinkedHashMap<String, Long> operationCount = results
+				.getOperationCount();
+		if (TLC4BGlobals.isPrintCoverage() && operationCount != null) {
+			System.out.println("---------- Coverage statistics ----------");
+
+			for (Entry<String, Long> entry : operationCount.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue().toString();
+				System.out.println(key + ": " + value);
+			}
+			System.out
+					.println("---------- End of coverage statistics ----------");
+		}
 	}
 
 	public static void test(String[] args, boolean deleteFiles)

@@ -103,15 +103,15 @@ public class TLCRunner {
 			list.add("-workers");
 			list.add("" + TLC4BGlobals.getWorkers());
 		}
-		
-		if(TLC4BGlobals.isPrintCoverage()){
+
+		if (TLC4BGlobals.isPrintCoverage()) {
 			list.add("-nowarning");
 			list.add("-coverage");
-			list.add(""+ 100);
+			list.add("" + 60);
 		}
 
-		//list.add("-config");
-		//list.add(machineName + ".cfg");
+		// list.add("-config");
+		// list.add(machineName + ".cfg");
 		list.add(machineName);
 		ToolIO.setUserDir(path.getPath());
 		String[] args = list.toArray(new String[list.size()]);

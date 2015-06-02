@@ -19,11 +19,15 @@ configurations { // configuration that holds jars to copy into lib
 	releaseJars 
 }
  
+configurations.all {
+ resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+ 
 def parser_version = '2.4.36-SNAPSHOT'
 
 dependencies {
 	//compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
-	compile (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT')
+	compile (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT', changing: true)
 	
 	compile (group: 'de.prob', name: 'prologlib', version: parser_version)
 	compile (group: 'de.prob', name: 'parserbase', version: parser_version)

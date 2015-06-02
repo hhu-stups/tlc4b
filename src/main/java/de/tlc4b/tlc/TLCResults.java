@@ -2,21 +2,35 @@ package de.tlc4b.tlc;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import de.tlc4b.TLC4BGlobals;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
+import tla2sany.semantic.ExprNode;
+import tla2sany.semantic.ExprOrOpArgNode;
+import tla2sany.semantic.ModuleNode;
+import tla2sany.semantic.OpApplNode;
+import tla2sany.semantic.OpDefNode;
+import tla2sany.semantic.SymbolNode;
+import tla2sany.st.Location;
 import tlc2.output.EC;
 import static tlc2.output.MP.*;
 import tlc2.output.Message;
 import tlc2.output.OutputCollector;
+import tlc2.tool.BuiltInOPs;
 import tlc2.tool.TLCStateInfo;
+import tlc2.tool.ToolGlobals;
 
-public class TLCResults {
+public class TLCResults implements ToolGlobals {
 
 	private TLCResult tlcResult;
 	private String violatedDefinition;
 	private Date startTime;
 	private Date endTime;
+	private LinkedHashMap<String, Long> operationsCount;
 
 	private int lengthOfTrace;
 	private String traceString;
@@ -32,6 +46,10 @@ public class TLCResults {
 
 	public boolean hasTrace() {
 		return lengthOfTrace > 0;
+	}
+
+	public LinkedHashMap<String, Long> getOperationCount() {
+		return operationsCount;
 	}
 
 	public TLCResults(TLCOutputInfo tlcOutputInfo) {
@@ -78,6 +96,67 @@ public class TLCResults {
 			tlcResult = InitialStateError;
 		}
 
+		if (TLC4BGlobals.isPrintCoverage() && OutputCollector.lineCount != null) {
+			evalCoverage();
+		}
+	}
+
+	private void evalCoverage() {
+		Hashtable<Integer, Long> lineCount = new Hashtable<Integer, Long>();
+		Set<Entry<Location, Long>> entrySet = OutputCollector.lineCount
+				.entrySet();
+		for (Entry<Location, Long> entry : entrySet) {
+			int endline = entry.getKey().endLine();
+			if (lineCount.containsKey(endline)) {
+				lineCount.put(endline,
+						Math.max(lineCount.get(endline), entry.getValue()));
+			} else {
+				lineCount.put(endline, entry.getValue());
+			}
+		}
+		ArrayList<OpDefNode> defs = findOperations(OutputCollector.moduleNode);
+		operationsCount = new LinkedHashMap<String, Long>();
+		for (OpDefNode opDefNode : defs) {
+			String operationName = opDefNode.getName().toString();
+			Long count = lineCount.get(opDefNode.getLocation().endLine());
+			if (count == null) {
+				count = 0L;
+			}
+			operationsCount.put(operationName, count);
+		}
+	}
+
+	private ArrayList<OpDefNode> findOperations(ModuleNode moduleNode) {
+
+		OpDefNode[] opDefs = moduleNode.getOpDefs();
+		ExprNode pred = null;
+		for (int i = opDefs.length - 1; i > 0; i--) {
+			OpDefNode def = opDefs[i];
+			if (def.getName().toString().equals("Next")) {
+				pred = def.getBody();
+				break;
+			}
+		}
+		OpApplNode dis = (OpApplNode) pred;
+		ArrayList<OpDefNode> operations = new ArrayList<OpDefNode>();
+		for (int i = 0; i < dis.getArgs().length; i++) {
+			operations.add(findOperation(dis.getArgs()[i]));
+		}
+		return operations;
+	}
+
+	private OpDefNode findOperation(ExprOrOpArgNode arg) {
+		OpApplNode op1 = (OpApplNode) arg;
+		SymbolNode opNode = op1.getOperator();
+		int opcode = BuiltInOPs.getOpCode(opNode.getName());
+		if (opcode == OPCODE_be) { // BoundedExists
+			return findOperation(op1.getArgs()[0]);
+		} else if (opNode instanceof OpDefNode) {
+			OpDefNode def = (OpDefNode) opNode;
+			return def;
+		} else {
+			throw new RuntimeException("Unkown Node");
+		}
 	}
 
 	private void evalTrace() {

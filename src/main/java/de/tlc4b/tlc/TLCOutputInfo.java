@@ -17,7 +17,7 @@ import de.tlc4b.tla.config.ModelValueAssignment;
 
 public class TLCOutputInfo {
 
-	Hashtable<String, String> namesMapping;
+	public Hashtable<String, String> namesMapping;
 	Hashtable<String, BType> typesTable;
 	Set<String> constants;
 	boolean constantSetup = false;
