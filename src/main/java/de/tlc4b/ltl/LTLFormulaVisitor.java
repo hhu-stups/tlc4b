@@ -163,7 +163,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		try {
 			start = parser.parse(bPredicate, false);
 		} catch (BException e) {
-			e.printStackTrace();
+			throw new LTLParseException(e.getMessage());
 		}
 
 		return start;

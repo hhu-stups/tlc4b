@@ -18,12 +18,12 @@ import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
 import static de.tlc4b.util.TestUtil.test;
 
 @RunWith(PolySuite.class)
-public class BasicsTest extends AbstractParseMachineTest {
+public class BasicTest extends AbstractParseMachineTest {
 
 	private final File machine;
 	private final TLCResult error;
 
-	public BasicsTest(File machine, TLCResult result) {
+	public BasicTest(File machine, TLCResult result) {
 		this.machine = machine;
 		this.error = result;
 	}

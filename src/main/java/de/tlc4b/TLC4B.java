@@ -37,7 +37,7 @@ public class TLC4B {
 	private String ltlFormula;
 	private String constantsSetup;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
 															// windows
 		TLC4B tlc4b = new TLC4B();
@@ -52,6 +52,10 @@ public class TLC4B {
 			System.out.println("Model checking time: 0 sec");
 			System.out.println("Result: " + e.getError());
 			return;
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+			System.out.println("Model checking time: 0 sec");
+			System.out.println("Result: " + "I/O Error");
 		}
 
 		if (TLC4BGlobals.isRunTLC()) {
