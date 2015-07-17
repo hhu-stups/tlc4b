@@ -63,8 +63,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	private final Hashtable<Node, ArrayList<Node>> restrictedNodeTable;
 	private final Hashtable<Node, ArrayList<Node>> subtractedNodeTable;
 
-	private final Hashtable<Node, ArrayList<Node>> restrictedCoupleTable;
-
 	public Node getRestrictedNode(Node node) {
 		return restrictedTypeNodeTable.get(node);
 	}
@@ -83,7 +81,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 		this.restrictedNodeTable = new Hashtable<Node, ArrayList<Node>>();
 		this.subtractedNodeTable = new Hashtable<Node, ArrayList<Node>>();
-		this.restrictedCoupleTable = new Hashtable<Node, ArrayList<Node>>();
 
 		this.identifierDependencies = new IdentifierDependencies(machineContext);
 
@@ -321,18 +318,6 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			analysePredicate(((APredicateParseUnit) n).getPredicate(), list,
 					ignoreList);
 			return;
-		}
-	}
-
-	private void putRestrictedTypeOfTuple(Node identifier,
-			PExpression restrictedType) {
-		ArrayList<Node> list = restrictedCoupleTable.get(identifier);
-		if (list == null) {
-			list = new ArrayList<Node>();
-			list.add(restrictedType);
-			restrictedCoupleTable.put(identifier, list);
-		} else {
-			list.add(restrictedType);
 		}
 	}
 

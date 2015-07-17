@@ -1,14 +1,11 @@
 package de.tlc4b.ltl;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.Node;
-import de.be4.classicalb.core.parser.node.POperation;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.ltl.core.parser.analysis.DepthFirstAdapter;
 import de.be4.ltl.core.parser.node.AAndFair1Ltl;

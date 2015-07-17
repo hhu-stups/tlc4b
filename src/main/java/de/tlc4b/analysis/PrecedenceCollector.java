@@ -4,12 +4,10 @@ import java.util.HashSet;
 import java.util.Hashtable;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.ACartesianProductExpression;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
-import de.be4.classicalb.core.parser.node.APowSubsetExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
