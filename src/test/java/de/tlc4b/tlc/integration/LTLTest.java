@@ -1,5 +1,7 @@
 package de.tlc4b.tlc.integration;
-
+/**
+ * If the result is not correctly detected in the TLC output, @see de.tlc4b.tlc.TLCResult .
+ * */
 import static org.junit.Assert.assertEquals;
 
 import org.junit.BeforeClass;
@@ -50,6 +52,12 @@ public class LTLTest {
 	public void testFairnessParameter() throws Exception {
 		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\Fairness_Parameter.mch" };
 		assertEquals(NoError, test(a));
+	}
+	
+	@Test
+	public void testLTLStatePropertyViolation() throws Exception{
+		String[] a = new String[] { ".\\src\\test\\resources\\ltl\\StatePropertyViolation.mch" };
+		assertEquals(TemporalPropertyViolation, test(a));
 	}
 
 }

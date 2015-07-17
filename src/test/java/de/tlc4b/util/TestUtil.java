@@ -208,7 +208,7 @@ public class TestUtil {
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
 		try {
-			tlc4b.progress(args);
+			tlc4b.process(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());

@@ -233,14 +233,6 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private void evalErrorMessage(Message m) {
-		// System.out.println(------------------);
-		// System.out.print(m.getMessageCode() + " " +
-		// m.getParameters().length);
-		// for (int i = 0; i < m.getParameters().length; i++) {
-		// System.out.print(" " + m.getParameters()[i]);
-		// }
-		// System.out.println();
-
 		switch (m.getMessageCode()) {
 		case EC.TLC_INVARIANT_VIOLATED_INITIAL:
 		case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
@@ -306,6 +298,8 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private TLCResult evaluatingParameter(String[] params) {
+		System.out.println(params.length);
+		System.out.println(params[0]);
 		for (int i = 0; i < params.length; i++) {
 			String s = params[i];
 			if (s.contains("not enumerable")) {
@@ -319,11 +313,13 @@ public class TLCResults implements ToolGlobals {
 			} else if (s.contains("which is not in the domain of the function")) {
 				return WellDefinednessError;
 			} else if (s.contains("tlc2.module.TLC.Assert")) {
-				return tlcResult = WellDefinednessError;
+				return WellDefinednessError;
 			} else if (s
 					.contains("CHOOSE x \\in S: P, but no element of S satisfied P")
 					&& s.contains("module FunctionsAsRelations")) {
 				return tlcResult = WellDefinednessError;
+			} else if (s.contains("The property of ASSERT_LTL")) {
+				return TemporalPropertyViolation;
 			}
 
 		}

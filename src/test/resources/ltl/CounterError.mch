@@ -1,4 +1,4 @@
-MACHINE CounterLTL
+MACHINE CounterError
 DEFINITIONS
 ASSERT_LTL_1 == "F {x = 12}"
 VARIABLES x

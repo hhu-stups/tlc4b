@@ -12,8 +12,6 @@ import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.btypes.BType;
 import de.tlc4b.tla.ConfigFile;
 import de.tlc4b.tla.TLAModule;
-import de.tlc4b.tla.config.ConfigFileAssignment;
-import de.tlc4b.tla.config.ModelValueAssignment;
 
 public class TLCOutputInfo {
 

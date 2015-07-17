@@ -109,6 +109,10 @@ public class TLCRunner {
 			list.add("-coverage");
 			list.add("" + 60);
 		}
+		
+		list.add("-maxSetSize");
+		list.add("100000000");
+
 
 		// list.add("-config");
 		// list.add(machineName + ".cfg");

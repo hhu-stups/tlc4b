@@ -14,7 +14,7 @@ import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.exceptions.TypeErrorException;
 
 
-public class LtlFormulaTest {
+public class LTLFormulaTest {
 
 	@BeforeClass
 	public static void setUp(){

@@ -4,8 +4,6 @@ import static de.tlc4b.util.TestUtil.compare;
 
 import org.junit.Test;
 
-import de.tlc4b.TLC4BGlobals;
-
 public class NumbersTest {
 
 	

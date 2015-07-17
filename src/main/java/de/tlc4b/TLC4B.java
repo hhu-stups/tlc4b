@@ -10,11 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
-import tlc2.TLCGlobals;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
@@ -45,7 +42,7 @@ public class TLC4B {
 															// windows
 		TLC4B tlc4b = new TLC4B();
 		try {
-			tlc4b.progress(args);
+			tlc4b.process(args);
 		} catch (BException e) {
 			System.err.println("***** Parsing Error *****");
 			System.err.println(e.getMessage());
@@ -159,7 +156,7 @@ public class TLC4B {
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
 		try {
-			tlc4b.progress(args);
+			tlc4b.process(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println(e.getMessage());
@@ -272,7 +269,7 @@ public class TLC4B {
 		}
 	}
 
-	public void progress(String[] args) throws IOException, BException {
+	public void process(String[] args) throws IOException, BException {
 		handleParameter(args);
 
 		System.out.print("Arguments: ");
