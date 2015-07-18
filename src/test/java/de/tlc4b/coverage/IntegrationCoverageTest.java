@@ -40,6 +40,7 @@ public class IntegrationCoverageTest extends AbstractParseMachineTest {
 		ignoreList.add("./src/test/resources/test/");
 		ignoreList.add("./src/test/resources/testing/");
 		ignoreList.add("./src/test/resources/todo/");
+		ignoreList.add("./src/test/resources/bugs/");
 		return getConfiguration2(list, ignoreList);
 	}
 

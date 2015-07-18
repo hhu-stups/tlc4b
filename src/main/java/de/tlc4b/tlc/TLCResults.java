@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.exceptions.NotSupportedException;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import tla2sany.semantic.ExprNode;
 import tla2sany.semantic.ExprOrOpArgNode;
@@ -114,7 +115,7 @@ public class TLCResults implements ToolGlobals {
 				lineCount.put(endline, entry.getValue());
 			}
 		}
-		ArrayList<OpDefNode> defs = findOperations(OutputCollector.moduleNode);
+		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.moduleNode);
 		operationsCount = new LinkedHashMap<String, Long>();
 		for (OpDefNode opDefNode : defs) {
 			String operationName = opDefNode.getName().toString();
@@ -126,36 +127,52 @@ public class TLCResults implements ToolGlobals {
 		}
 	}
 
-	private ArrayList<OpDefNode> findOperations(ModuleNode moduleNode) {
+	private ArrayList<OpDefNode> getActionsFromGeneratedModule(
+			ModuleNode moduleNode) {
+		// list of actions in the module
+		ArrayList<OpDefNode> actions = new ArrayList<OpDefNode>();
 
+		// get all definitions from the module
 		OpDefNode[] opDefs = moduleNode.getOpDefs();
+
+		// search for the definition with the name "Next"
 		ExprNode pred = null;
 		for (int i = opDefs.length - 1; i > 0; i--) {
+			// start the search from the end because "Next" is usually the last
+			// definition in the module
 			OpDefNode def = opDefs[i];
 			if (def.getName().toString().equals("Next")) {
 				pred = def.getBody();
 				break;
 			}
 		}
-		OpApplNode dis = (OpApplNode) pred;
-		ArrayList<OpDefNode> operations = new ArrayList<OpDefNode>();
-		for (int i = 0; i < dis.getArgs().length; i++) {
-			operations.add(findOperation(dis.getArgs()[i]));
+
+		if (pred == null) {
+			// this is the case if there aren't any actions in the module and
+			// consequently there is no "Next" definition
+			return actions;
 		}
-		return operations;
+		OpApplNode dis = (OpApplNode) pred;
+		for (int i = 0; i < dis.getArgs().length; i++) {
+			actions.add(findAction(dis.getArgs()[i]));
+		}
+		return actions;
 	}
 
-	private OpDefNode findOperation(ExprOrOpArgNode arg) {
+	private OpDefNode findAction(ExprOrOpArgNode arg) {
 		OpApplNode op1 = (OpApplNode) arg;
 		SymbolNode opNode = op1.getOperator();
 		int opcode = BuiltInOPs.getOpCode(opNode.getName());
 		if (opcode == OPCODE_be) { // BoundedExists
-			return findOperation(op1.getArgs()[0]);
+			return findAction(op1.getArgs()[0]);
 		} else if (opNode instanceof OpDefNode) {
 			OpDefNode def = (OpDefNode) opNode;
 			return def;
 		} else {
-			throw new RuntimeException("Unkown Node");
+			throw new NotSupportedException(
+					"Can not find action in next state relation. Unkown node: "
+							+ opNode.getClass());
+
 		}
 	}
 
@@ -298,8 +315,6 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private TLCResult evaluatingParameter(String[] params) {
-		System.out.println(params.length);
-		System.out.println(params[0]);
 		for (int i = 0; i < params.length; i++) {
 			String s = params[i];
 			if (s.contains("not enumerable")) {

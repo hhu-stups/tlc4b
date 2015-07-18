@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
@@ -43,14 +44,15 @@ public class StructType extends AbstractHasFollowers {
 	public String toString() {
 		StringBuffer res = new StringBuffer();
 		res.append("struct(");
-		
-		Iterator<String> keys = types.keySet().iterator();
-		if (!keys.hasNext())
+
+		Iterator<Entry<String, BType>> iterator = types.entrySet().iterator();
+		if (!iterator.hasNext())
 			res.append("...");
-		while (keys.hasNext()) {
-			String fieldName = (String) keys.next();
-			res.append(fieldName + ":" + types.get(fieldName));
-			if (keys.hasNext())
+		while (iterator.hasNext()) {
+			Entry<String, BType> next = iterator.next();
+			String fieldName = (String) next.getKey();
+			res.append(fieldName).append(":").append(next.getValue());
+			if (iterator.hasNext())
 				res.append(",");
 		}
 		res.append(")");
@@ -58,16 +60,19 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType) {
-		Iterator<String> itr = this.types.keySet().iterator();
-		while (itr.hasNext()) {
-			String name = itr.next();
-			BType t = this.types.get(name);
-			if (t == oldType) {
+		Iterator<Entry<String, BType>> iterator = this.types.entrySet()
+				.iterator();
+		while (iterator.hasNext()) {
+			Entry<String, BType> next = iterator.next();
+			String name = next.getKey();
+			BType type = next.getValue();
+			if (type == oldType) {
 				this.types.put(name, newType);
 				if (newType instanceof AbstractHasFollowers) {
 					((AbstractHasFollowers) newType).addFollower(this);
 				}
 			}
+
 		}
 	}
 
@@ -81,10 +86,13 @@ public class StructType extends AbstractHasFollowers {
 		}
 		if (other instanceof StructType) {
 			StructType s = (StructType) other;
-			Iterator<String> itr = s.types.keySet().iterator();
-			while (itr.hasNext()) {
-				String fieldName = (String) itr.next();
-				BType sType = s.types.get(fieldName);
+
+			Iterator<Entry<String, BType>> iterator = s.types.entrySet()
+					.iterator();
+			while (iterator.hasNext()) {
+				Entry<String, BType> next = iterator.next();
+				String fieldName = next.getKey();
+				BType sType = next.getValue();
 				if (this.types.containsKey(fieldName)) {
 					BType res = this.types.get(fieldName).unify(sType,
 							typechecker);
@@ -104,9 +112,9 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public boolean isUntyped() {
-		Iterator<String> itr = types.keySet().iterator();
-		while (itr.hasNext()) {
-			if (this.types.get(itr.next()).isUntyped()) {
+		Iterator<BType> iterator = types.values().iterator();
+		while (iterator.hasNext()) {
+			if (iterator.next().isUntyped()) {
 				return true;
 			}
 		}
@@ -142,10 +150,13 @@ public class StructType extends AbstractHasFollowers {
 					return false;
 				}
 			}
-			Iterator<String> itr2 = types.keySet().iterator();
-			while (itr2.hasNext()) {
-				String name = itr2.next();
-				if (!this.types.get(name).compare(s.types.get(name))) {
+			Iterator<Entry<String, BType>> iterator = types.entrySet()
+					.iterator();
+			while (iterator.hasNext()) {
+				Entry<String, BType> next = iterator.next();
+				String name = next.getKey();
+				BType value = next.getValue();
+				if (!this.types.get(name).compare(value)) {
 					return false;
 				}
 			}
@@ -174,14 +185,20 @@ public class StructType extends AbstractHasFollowers {
 	public String getTlaType() {
 		StringBuffer res = new StringBuffer();
 		res.append("[");
-		Iterator<String> keys = types.keySet().iterator();
-		if (!keys.hasNext())
+		Iterator<Entry<String, BType>> iterator = types.entrySet().iterator();
+		if (!iterator.hasNext()) {
 			res.append("...");
-		while (keys.hasNext()) {
-			String fieldName = (String) keys.next();
-			res.append(fieldName + ":" + types.get(fieldName));
-			if (keys.hasNext())
-				res.append(",");
+		} else {
+			while (iterator.hasNext()) {
+				Entry<String, BType> next = iterator.next();
+				String fieldName = next.getKey();
+				BType type = next.getValue();
+				res.append(fieldName);
+				res.append(":");
+				res.append(type);
+				if (iterator.hasNext())
+					res.append(",");
+			}
 		}
 		res.append("]");
 		return res.toString();
@@ -198,14 +215,18 @@ public class StructType extends AbstractHasFollowers {
 
 	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
 		ArrayList<PRecEntry> list = new ArrayList<PRecEntry>();
-		for (String name : types.keySet()) {
+
+		Set<Entry<String, BType>> entrySet = this.types.entrySet();
+		for (Entry<String, BType> entry : entrySet) {
+			String name = entry.getKey();
+			BType type = entry.getValue();
 			TIdentifierLiteral literal = new TIdentifierLiteral(name);
 			ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
 			idList.add(literal);
 			AIdentifierExpression id = new AIdentifierExpression(idList);
-			ARecEntry entry = new ARecEntry(id, types.get(name)
-					.createSyntaxTreeNode(typechecker));
-			list.add(entry);
+			ARecEntry recEntry = new ARecEntry(id,
+					type.createSyntaxTreeNode(typechecker));
+			list.add(recEntry);
 		}
 		AStructExpression node = new AStructExpression(list);
 		typechecker.setType(node, new SetType(this));

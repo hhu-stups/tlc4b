@@ -569,9 +569,10 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private ArrayList<MachineContext> lookupExtendedMachines() {
 		ArrayList<MachineContext> list = new ArrayList<MachineContext>();
-		for (String s : seenMachines.keySet()) {
-			AIdentifierExpression i = seenMachines.get(s);
-			if (i.getIdentifier().size() == 1) {
+		for( Entry<String, AIdentifierExpression> entry  : seenMachines.entrySet()){
+			String s = entry.getKey();
+			AIdentifierExpression value = entry.getValue();
+			if (value.getIdentifier().size() == 1) {
 				list.add(machineContextsTable.get(s));
 			}
 		}

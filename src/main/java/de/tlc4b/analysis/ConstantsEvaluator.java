@@ -55,15 +55,16 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	public LinkedHashMap<Node, Node> getValueOfIdentifierMap() {
 		return valueOfIdentifier;
 	}
-	
+
 	public Integer getIntValue(Node node) {
 		return integerValueTable.get(node);
 	}
 
-	public ArrayList<PExpression> getRangeOfIdentifier(Node con){;
+	public ArrayList<PExpression> getRangeOfIdentifier(Node con) {
+		;
 		return valuesOfConstantsFinder.rangeOfIdentifierTable.get(con);
 	}
-	
+
 	public ConstantsEvaluator(MachineContext machineContext) {
 		this.dependsOnIdentifierTable = new Hashtable<Node, HashSet<Node>>();
 		this.integerValueTable = new HashMap<Node, Integer>();
@@ -162,7 +163,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		@Override
 		public void caseAPredicateParseUnit(APredicateParseUnit node) {
 			defaultIn(node);
-			node.getPredicate();
+			node.getPredicate().apply(this);
 		}
 
 		@Override
@@ -194,7 +195,8 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			this.rangeOfIdentifierTable = new Hashtable<Node, ArrayList<PExpression>>();
 
 			this.identifiers = new HashSet<Node>();
-			this.identifiers.addAll(machineContext.getBMachineConstants().values());
+			this.identifiers.addAll(machineContext.getBMachineConstants()
+					.values());
 			this.identifiers.addAll(machineContext.getScalarParameter()
 					.values());
 
@@ -217,18 +219,19 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				if (machineContext.getConstantsSetup() instanceof ADisjunctPredicate) {
 					analyseConstantSetupPredicate(machineContext
 							.getConstantsSetup());
-					
+
 					for (Node con : this.identifiers) {
-						ArrayList<PExpression> list = rangeOfIdentifierTable.get(con);
-						if(list.size() == 1){
-							// there only one value for the constant con, hence con remains a constant 
+						ArrayList<PExpression> list = rangeOfIdentifierTable
+								.get(con);
+						if (list.size() == 1) {
+							// there only one value for the constant con, hence
+							// con remains a constant
 							valuesOfIdentifierTable.get(con).add(list.get(0));
 						}
 					}
-				}else{
+				} else {
 					analysePredicate(machineContext.getConstantsSetup(), true);
 				}
-				
 
 			}
 
@@ -260,20 +263,22 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				AEqualPredicate equals = (AEqualPredicate) constantsSetup;
 				PExpression left = equals.getLeft();
 				Node left_ref = machineContext.getReferences().get(left);
-				if(rangeOfIdentifierTable.containsKey(left_ref)){
+				if (rangeOfIdentifierTable.containsKey(left_ref)) {
 					System.out.println("hallo");
 				}
-				ArrayList<PExpression> currentRange = rangeOfIdentifierTable.get(left_ref);
+				ArrayList<PExpression> currentRange = rangeOfIdentifierTable
+						.get(left_ref);
 				boolean found = false;
 				for (PExpression pExpression : currentRange) {
-					if(pExpression.toString().equals(equals.getRight().toString())){
+					if (pExpression.toString().equals(
+							equals.getRight().toString())) {
 						found = true;
 					}
 				}
-				if(found == false){
+				if (found == false) {
 					currentRange.add((PExpression) equals.getRight());
 				}
-				
+
 			}
 
 		}

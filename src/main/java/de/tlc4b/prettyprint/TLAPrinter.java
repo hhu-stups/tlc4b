@@ -144,10 +144,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	public void printStrongFairness(String s) {
-		
+
 		moduleStringAppend(String
-						.format("([]<><<%s>>_vars \\/  <>[]~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
-								s, s, s));
+				.format("([]<><<%s>>_vars \\/  <>[]~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
+						s, s, s));
 		printVarsStuttering();
 		moduleStringAppend("))");
 
@@ -155,8 +155,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	public void printWeakFairness(String s) {
 		moduleStringAppend(String
-						.format("([]<><<%s>>_vars \\/  []<>~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
-								s, s, s));
+				.format("([]<><<%s>>_vars \\/  []<>~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
+						s, s, s));
 		printVarsStuttering();
 		moduleStringAppend("))");
 
@@ -275,20 +275,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 			configFileString.append("Init_action = Init_action\n");
 
 			ArrayList<POperation> operations = tlaModule.getOperations();
-			StringBuilder sb = new StringBuilder();
-			sb.append("{");
 			for (int i = 0; i < operations.size(); i++) {
 				AOperation node = (AOperation) operations.get(i);
 				String name = renamer.getNameOfRef(node);
 				configFileString.append(name + "_action = ");
 				configFileString.append(name + "_action");
 				configFileString.append("\n");
-				sb.append(name + "_action");
-				if (i < operations.size() - 1) {
-					sb.append(", ");
-				}
 			}
-			sb.append("}");
 			configFileString.append("\n");
 			configFileString.append("VIEW myView");
 		}
@@ -2909,7 +2902,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		return this.translatedLTLFormula.toString();
 	}
 
-	public TLAModule getTLAModule(){
+	public TLAModule getTLAModule() {
 		return this.tlaModule;
 	}
 }

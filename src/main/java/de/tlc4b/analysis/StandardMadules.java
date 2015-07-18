@@ -6,9 +6,9 @@ import java.util.Set;
 
 public final class StandardMadules {
 
-	private StandardMadules(){
+	private StandardMadules() {
 	}
-	
+
 	// Functions
 	public static final String FUNC_RANGE = "Range";
 	public static final String FUNC_IMAGE = "Image";
@@ -21,8 +21,7 @@ public final class StandardMadules {
 	public static final String FUNC_OVERRIDE = "Override";
 	public static final String FUNC_ASSIGN = "FuncAssign";
 
-	
-	public static final ArrayList<String> functions = new ArrayList<String>();
+	private static final ArrayList<String> functions = new ArrayList<String>();
 	static {
 		functions.add(FUNC_RANGE);
 		functions.add(FUNC_ID);
@@ -35,26 +34,29 @@ public final class StandardMadules {
 		functions.add(FUNC_ASSIGN);
 	}
 
+	public static final boolean isKeywordInModuleFunctions(String name) {
+		return functions.contains(name);
+	}
+
 	public static final String TOTAL_INJECTIVE_FUNCTION = "TotalInjFunc";
 	public static final String TOTAL_SURJECTIVE_FUNCTION = "TotalSurFunc";
 	public static final String TOTAL_BIJECTIVE_FUNCTION = "TotalBijFunc";
 
-	
 	/** Sets of Partial functions **/
 	public static final String PARTIAL_FUNCTION = "ParFunc";
 	public static final String PARTIAL_FUNCTION_ELEMENT_OF = "ParFuncEleOf";
 	public static final String ELEMENT_OF_PARTIAL_FUNCTION = "isEleOfParFunc";
-	
+
 	// injective
 	public static final String PARTIAL_INJECTIVE_FUNCTION = "ParInjFunc";
 	public static final String PARTIAL_INJECTIVE_FUNCTION_ELEMENT_OF = "ParInjFuncEleOf";
-	// surjective 
+	// surjective
 	public static final String PARTIAL_SURJECTIVE_FUNCTION = "ParSurFunc";
 	public static final String PARTIAL_SURJECTIVE_FUNCTION_ELEMENT_OF = "ParSurFuncEleOf";
 	// bijective
 	public static final String PARITAL_BIJECTIVE_FUNCTION = "ParBijFunc";
 	public static final String PARITAL_BIJECTIVE_FUNCTION_ELEMENT_OF = "ParBijFuncEleOf";
-	
+
 	// Relations
 	public static final String RELATIONS = "Relations";
 	public static final String REL_DOMAIN = "RelDomain";
@@ -107,6 +109,21 @@ public final class StandardMadules {
 	public static final String REL_PARTIAL_BIJECTIVE_FUNCTION = "RelParBijFunc";
 	public static final String REL_PARTIAL_BIJECTIVE_FUNCTION_ELEMENT_OF = "RelParBijFuncEleOf";
 
+	private final static Set<String> SequencesKeywords = new HashSet<String>();
+	static {
+		SequencesKeywords.add("Seq");
+		SequencesKeywords.add("Len");
+		SequencesKeywords.add("Append");
+		SequencesKeywords.add("Head");
+		SequencesKeywords.add("Tail");
+		SequencesKeywords.add("Subseq");
+		SequencesKeywords.add("SelectSeq");
+	}
+
+	public final static boolean isKeywordInModuleSequences(String name) {
+		return SequencesKeywords.contains(name);
+	}
+
 	// SequencesExtended
 	public static final String SEQUENCE_LAST_ELEMENT = "Last";
 	public static final String SEQUENCE_PREPEND_ELEMENT = "Prepend";
@@ -122,7 +139,7 @@ public final class StandardMadules {
 	public static final String SEQUENCE_TAKE_FIRST_ELEMENTS = "TakeFirstElements";
 	public static final String SEQUENCE_DROP_FIRST_ELEMENTS = "DropFirstElements";
 
-	public final static Set<String> SequencesExtendedKeywords = new HashSet<String>();
+	private final static Set<String> SequencesExtendedKeywords = new HashSet<String>();
 	static {
 		SequencesExtendedKeywords.add(SEQUENCE_LAST_ELEMENT);
 		SequencesExtendedKeywords.add(SEQUENCE_PREPEND_ELEMENT);
@@ -138,7 +155,11 @@ public final class StandardMadules {
 		SequencesExtendedKeywords.add(SEQUENCE_TAKE_FIRST_ELEMENTS);
 		SequencesExtendedKeywords.add(SEQUENCE_DROP_FIRST_ELEMENTS);
 	}
-	
+
+	public final static boolean isKeywordInModuleSequencesExtended(String name) {
+		return SequencesExtendedKeywords.contains(name);
+	}
+
 	// SequencesAsRelations
 	public static final String REL_SEQUENCE_SIZE = "RelSeqSize";
 	public static final String IS_REL_SEQUENCE = "isRelSeq";
@@ -179,8 +200,7 @@ public final class StandardMadules {
 	public static final String GENERAL_SUMMATION = "Sigma";
 	public static final String GENERAL_PRODUCT = "Pi";
 
-	public static final ArrayList<String> Relations = new ArrayList<String>();
-
+	private static final ArrayList<String> Relations = new ArrayList<String>();
 	static {
 		Relations.add(RELATIONS);
 		Relations.add(REL_DOMAIN);
@@ -203,6 +223,10 @@ public final class StandardMadules {
 		Relations.add(REL_TOTAL_INJECTIVE_FUNCTION);
 		Relations.add(REL_PARTIAL_FUNCTION);
 
+	}
+
+	public static final boolean containsNameFromModuleRelations(String name) {
+		return Relations.contains(name);
 	}
 
 }

@@ -106,7 +106,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 					PExpression e = (PExpression) id;
 					HashSet<PExpression> set = new HashSet<PExpression>();
 					set.add(e);
-					createRestrictedTypeofLocalVariables(set);
+					createRestrictedTypeofLocalVariables(set, true);
 				} else if (ltlNode instanceof AForallLtl) {
 					Node id = visitor.getLTLIdentifier(((AForallLtl) ltlNode)
 							.getForallIdentifier().getText());
@@ -117,7 +117,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 					PExpression e = (PExpression) id;
 					HashSet<PExpression> set = new HashSet<PExpression>();
 					set.add(e);
-					createRestrictedTypeofLocalVariables(set);
+					createRestrictedTypeofLocalVariables(set, true);
 				}
 				bNode.apply(this);
 			}
@@ -162,7 +162,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (Node param : list) {
 			set.add((PExpression) param);
 		}
-		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set));
+		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set), false);
 	}
 
 	@Override
@@ -175,7 +175,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		for (Node con : machineContext.getConstants().values()) {
 			set.add((PExpression) con);
 		}
-		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set));
+		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set), false);
 	}
 
 	public void analyseDisjunktionPredicate(PPredicate node, HashSet<Node> list) {
@@ -344,7 +344,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				.getImplication();
 		analysePredicate(implication.getLeft(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	@Override
@@ -357,7 +357,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	@Override
@@ -370,7 +370,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	@Override
@@ -384,7 +384,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	@Override
@@ -397,7 +397,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	@Override
@@ -410,7 +410,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
@@ -422,7 +422,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
@@ -434,7 +434,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	private Hashtable<Node, HashSet<PExpression>> expectedIdentifieListTable = new Hashtable<Node, HashSet<PExpression>>();
@@ -461,7 +461,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		if (node.getOperationBody() != null) {
 			node.getOperationBody().apply(this);
 		}
-		createRestrictedTypeofLocalVariables(list);
+		createRestrictedTypeofLocalVariables(list, false);
 	}
 
 	@Override
@@ -494,7 +494,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		list.addAll(getExpectedIdentifier(node));
 		analysePredicate(node.getWhere(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	@Override
@@ -508,7 +508,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		list.addAll(getExpectedIdentifier(node));
 		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(
-				node.getIdentifiers()));
+				node.getIdentifiers()), false);
 	}
 
 	private Hashtable<Node, Node> variablesHashTable;
@@ -527,11 +527,15 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				variablesHashTable.put(ref, e);
 			}
 			analysePredicate(node.getPredicate(), list, new HashSet<Node>());
-			createRestrictedTypeofLocalVariables(new HashSet<PExpression>(copy));
+			createRestrictedTypeofLocalVariables(new HashSet<PExpression>(copy), false);
 		}
 	}
 
-	private void createRestrictedTypeofLocalVariables(Set<PExpression> copy) {
+	private void createRestrictedTypeofLocalVariables(Set<PExpression> copy, boolean constant) {
+		//TODO if constant is true, only constant expressions should be used to restrict the type.
+		//This is required by the TLC model checker when checking an LTL formula.
+		
+		
 		for (PExpression e : copy) {
 			PExpression tree = null;
 			ArrayList<Node> restrictedList = restrictedNodeTable.get(e);
