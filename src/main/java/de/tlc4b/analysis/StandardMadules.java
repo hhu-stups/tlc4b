@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.tlc4b.prettyprint.TLAPrinter;
+
 public final class StandardMadules {
 
 	private StandardMadules() {
@@ -228,5 +230,37 @@ public final class StandardMadules {
 	public static final boolean containsNameFromModuleRelations(String name) {
 		return Relations.contains(name);
 	}
+	
+	/**
+	 * External Functions
+	 * 
+	 * All external functions must be defined in the standard module ExternalFunctions.tla
+	 * (src/main/resources/standardModules/).
+	 * The B machine must contain a definition declaring the external function.
+	 * The typing definition (e.g. EXTERNAL_FUNCTION_STRING_SPLIT == ((STRING*STRING) --> (INTEGER<->STRING));)
+	 * is not mandatory.
+	 * 
+	 * The B definitions will be ignored in the  {@link TLAPrinter}.
+	 * 
+	 * 
+	 */
+	
+	public static final String EXTERNAL_printf = "printf";
+	public static final String INT_TO_STRING = "INT_TO_STRING";
+	public static final String STRING_SPLIT = "STRING_SPLIT";
+	public static final String SORT_SET = "SORT_SET";
 
+	private static final ArrayList<String> ExternalFunctions = new ArrayList<String>();
+	static {
+		ExternalFunctions.add(EXTERNAL_printf);
+		ExternalFunctions.add(INT_TO_STRING);
+		ExternalFunctions.add(STRING_SPLIT);
+		ExternalFunctions.add(SORT_SET);
+	}
+
+	public static boolean isKeywordInModuleExternalFunctions(String name){
+		return ExternalFunctions.contains(name);
+	}
+	
+	
 }

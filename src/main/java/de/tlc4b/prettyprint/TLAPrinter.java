@@ -15,6 +15,7 @@ import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.PrecedenceCollector;
 import de.tlc4b.analysis.PrimedNodesMarker;
 import de.tlc4b.analysis.Renamer;
+import de.tlc4b.analysis.StandardMadules;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
@@ -241,10 +242,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 			this.configFileString.append("INVARIANT NotGoal\n");
 		}
 
-		if (TLC4BGlobals.isAssertion()) {
+		if (TLC4BGlobals.isAssertion() && tlaModule.hasInitPredicate()) {
 			for (int i = 0; i < configFile.getAssertionSize(); i++) {
-				this.configFileString.append("INVARIANT Assertion" + (i + 1)
-						+ "\n");
+				this.configFileString.append("INVARIANT Assertion")
+						.append(i + 1).append("\n");
 			}
 		}
 
@@ -278,8 +279,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 			for (int i = 0; i < operations.size(); i++) {
 				AOperation node = (AOperation) operations.get(i);
 				String name = renamer.getNameOfRef(node);
-				configFileString.append(name + "_action = ");
-				configFileString.append(name + "_action");
+				String actionName = name + "actions";
+				configFileString.append(actionName).append(" = ")
+						.append(actionName);
 				configFileString.append("\n");
 			}
 			configFileString.append("\n");
@@ -302,13 +304,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	private void printExtendedModules() {
-		if (usedStandardModules.getUsedModules().size() > 0) {
+		if (usedStandardModules.getExtendedModules().size() > 0) {
 			moduleStringAppend("EXTENDS ");
-			for (int i = 0; i < usedStandardModules.getUsedModules().size(); i++) {
+			for (int i = 0; i < usedStandardModules.getExtendedModules().size(); i++) {
 				if (i > 0) {
 					moduleStringAppend(", ");
 				}
-				moduleStringAppend(usedStandardModules.getUsedModules().get(i)
+				moduleStringAppend(usedStandardModules.getExtendedModules().get(i)
 						.toString());
 			}
 			moduleStringAppend("\n");
@@ -323,6 +325,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				def.getDefName().apply(this);
 				continue;
 			}
+			
 			def.getDefName().apply(this);
 			moduleStringAppend(" == ");
 			Node e = def.getDefinition();
@@ -449,7 +452,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 			if (assertions.size() == 0)
 				return;
 			for (int i = 0; i < assertions.size(); i++) {
-				moduleStringAppend("Assertion" + (i + 1) + " == ");
+				if (tlaModule.hasInitPredicate()) {
+					moduleStringAppend("Assertion" + (i + 1) + " == ");
+				} else {
+					moduleStringAppend("ASSUME Assertion" + (i + 1) + " == ");
+				}
 				assertions.get(i).apply(this);
 				moduleStringAppend("\n");
 			}
@@ -1108,6 +1115,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (name == null) {
 			name = Utils.getIdentifierAsString(node.getIdentifier());
 		}
+		if(name.equals(SORT_SET)){
+			moduleStringAppend("{}");
+			return;
+		}
 		moduleStringAppend(name);
 		if (primedNodesMarker.isPrimed(node)) {
 			moduleStringAppend("'");
@@ -1313,12 +1324,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
+		String oldName = node.getName().getText().trim();
+		if(StandardMadules.isKeywordInModuleExternalFunctions(oldName)){
+			return;
+		}
 		String name = renamer.getName(node);
 		if (null == name) {
 			name = node.getName().getText().trim();
 		}
 		moduleStringAppend(name);
-
 		List<PExpression> args = node.getParameters();
 		if (args.size() > 0) {
 			moduleStringAppend("(");
@@ -1354,6 +1368,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private void printBDefinition(String name, List<PExpression> args,
 			Node rightSide) {
+		if(StandardMadules.isKeywordInModuleExternalFunctions(name)){
+			return;
+		}
 		moduleStringAppend(name);
 		if (args.size() > 0) {
 			moduleStringAppend("(");
@@ -1760,7 +1777,26 @@ public class TLAPrinter extends DepthFirstAdapter {
 	// Function call
 	public void caseAFunctionExpression(AFunctionExpression node) {
 		inAFunctionExpression(node);
+		
+		
+		if(node.getIdentifier() instanceof AIdentifierExpression){
+			AIdentifierExpression id = (AIdentifierExpression) node.getIdentifier();
+			String name = Utils.getIdentifierAsString(id.getIdentifier());
+			if(name.equals(SORT_SET)){
+				moduleStringAppend(SORT_SET);
+				//node.getIdentifier().apply(this);
+				moduleStringAppend("(");
+				List<PExpression> copy = new ArrayList<PExpression>(
+						node.getParameters());
+				copy.get(0).apply(this);
+				moduleStringAppend(")");
+				return;
+				
+			}
 
+		}
+		
+		
 		BType type = this.typechecker.getType(node.getIdentifier());
 		if (type instanceof FunctionType) {
 			node.getIdentifier().apply(this);
@@ -1777,11 +1813,11 @@ public class TLAPrinter extends DepthFirstAdapter {
 		} else {
 
 			if (TLC4BGlobals.checkWelldefinedness()) {
-				moduleStringAppend(REL_CALL + "(");
+				moduleStringAppend(REL_CALL);
 			} else {
-				moduleStringAppend(REL_CALL_WITHOUT_WD_CHECK + "(");
+				moduleStringAppend(REL_CALL_WITHOUT_WD_CHECK);
 			}
-
+			moduleStringAppend("(");
 			node.getIdentifier().apply(this);
 			moduleStringAppend(", ");
 			List<PExpression> copy = new ArrayList<PExpression>(

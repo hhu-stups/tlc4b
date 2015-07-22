@@ -2,7 +2,7 @@ package de.tlc4b;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;
@@ -39,7 +39,7 @@ public class Translator {
 	private String machineName;
 	private String ltlFormula;
 	private PPredicate constantsSetup;
-	private ArrayList<STANDARD_MODULES> usedStandardModules;
+	private HashSet<STANDARD_MODULES> standardModulesToBeCreated;
 	private TLCOutputInfo tlcOutputInfo;
 	private String translatedLTLFormula;
 
@@ -149,7 +149,7 @@ public class Translator {
 		UsedStandardModules usedModules = new UsedStandardModules(start,
 				typechecker, typeRestrictor, generator.getTlaModule());
 
-		usedStandardModules = usedModules.getUsedModules();
+		standardModulesToBeCreated = usedModules.getStandardModulesToBeCreated();
 
 		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator
 				.getTlaModule().getOperations(), machineContext);
@@ -195,11 +195,11 @@ public class Translator {
 	}
 
 	public boolean containsUsedStandardModule(STANDARD_MODULES module) {
-		return usedStandardModules.contains(module);
+		return standardModulesToBeCreated.contains(module);
 	}
 
-	public ArrayList<UsedStandardModules.STANDARD_MODULES> getUsedStandardModule() {
-		return usedStandardModules;
+	public HashSet<UsedStandardModules.STANDARD_MODULES> getStandardModuleToBeCreated() {
+		return standardModulesToBeCreated;
 	}
 
 	public String getTranslatedLTLFormula() {

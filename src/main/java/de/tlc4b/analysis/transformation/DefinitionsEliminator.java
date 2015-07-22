@@ -20,14 +20,15 @@ import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
+import de.tlc4b.analysis.StandardMadules;
 
 /**
  * This class eliminates all definition calls in the MACHINE. A definition call
  * will be replaced by the right-hand side of the definition and all parameter
  * on the RHS are replaced by the arguments of the call.
  * 
- * Note: All parameters of a definition are replaced before calls of
- * sub-definitions are resolved. This behavior is similar to what ProB does by
+ * Note: All parameters of a definition are replaced before a call of a
+ * sub-definition is resolved. This behavior is similar to what ProB does when
  * eliminating all definitions.
  * 
  */
@@ -77,13 +78,18 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			if (e instanceof AExpressionDefinitionDefinition) {
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
-				if (name.startsWith("ASSERT_LTL") || name.startsWith("scope_")
-						|| name.startsWith("SET_PREF_"))
+				if (name.startsWith("ASSERT_LTL")
+						|| name.startsWith("scope_")
+						|| name.startsWith("SET_PREF_")
+						|| StandardMadules
+								.isKeywordInModuleExternalFunctions(name))
 					continue;
 			} else if (e instanceof APredicateDefinitionDefinition) {
 				String name = ((APredicateDefinitionDefinition) e).getName()
 						.getText().toString();
-				if (name.equals("GOAL"))
+				if (name.equals("GOAL")
+						|| StandardMadules
+								.isKeywordInModuleExternalFunctions(name))
 					continue;
 			}
 			e.replaceBy(null);
@@ -117,14 +123,22 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 
 	@Override
 	public void caseADefinitionExpression(ADefinitionExpression node) {
-		String name = node.getDefLiteral().getText();
-		PDefinition def = definitionsTable.get(name);
 
+		String name = node.getDefLiteral().getText();
+		ArrayList<PExpression> arguments = new ArrayList<PExpression>(
+				node.getParameters());
+		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
+			for (PExpression arg : arguments) {
+				arg.apply(this);
+			}
+			return;
+		}
+
+		PDefinition def = definitionsTable.get(name);
 		AExpressionDefinitionDefinition clone = (AExpressionDefinitionDefinition) def
 				.clone();
 		Hashtable<String, PExpression> context = new Hashtable<String, PExpression>();
-		ArrayList<PExpression> arguments = new ArrayList<PExpression>(
-				node.getParameters());
+
 		for (int i = 0; i < clone.getParameters().size(); i++) {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
@@ -144,11 +158,19 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 		String name = node.getDefLiteral().getText();
 		PDefinition def = definitionsTable.get(name);
 
+		ArrayList<PExpression> arguments = new ArrayList<PExpression>(
+				node.getParameters());
+		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
+			for (PExpression arg : arguments) {
+				arg.apply(this);
+			}
+			return;
+		}
+
 		APredicateDefinitionDefinition clone = (APredicateDefinitionDefinition) def
 				.clone();
 		Hashtable<String, PExpression> context = new Hashtable<String, PExpression>();
-		ArrayList<PExpression> arguments = new ArrayList<PExpression>(
-				node.getParameters());
+
 		for (int i = 0; i < clone.getParameters().size(); i++) {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);

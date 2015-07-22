@@ -16,11 +16,8 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.tlc4b.TLC4BGlobals;
 
 /**
- * 
- * 
- * 
  * @author hansen
- * 
+ * In this class we search for preferences set in the definitions clause, e.g. minint or maxint.
  */
 
 public class DefinitionsAnalyser extends DepthFirstAdapter {

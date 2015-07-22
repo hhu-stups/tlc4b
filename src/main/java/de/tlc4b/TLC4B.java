@@ -17,6 +17,7 @@ import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.exceptions.TLC4BException;
+import de.tlc4b.exceptions.TranslationException;
 import de.tlc4b.tlc.TLCOutputInfo;
 import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.util.StopWatch;
@@ -105,8 +106,8 @@ public class TLC4B {
 		System.out.println("--------------------------------");
 		System.out.println("Parsing time: " + StopWatch.getRunTime("Parsing")
 				+ " ms");
-		System.out.println("Translation time: " + StopWatch.getRunTime("Pure")
-				+ " ms");
+		System.out.println("Translation time: "
+				+ StopWatch.getRunTime("Translation") + " ms");
 		System.out.println("Model checking time: "
 				+ results.getModelCheckingTime() + " sec");
 		// System.out.println("Number of workers: " +
@@ -290,13 +291,15 @@ public class TLC4B {
 			translator = new Translator(machineFileNameWithoutFileExtension,
 					mainfile, this.ltlFormula, this.constantsSetup);
 			StopWatch.stop("Parsing");
-			StopWatch.start("Pure");
+			System.out.println("Parsing Completed.");
+			StopWatch.start("Translation");
 			translator.translate();
 			this.tlaModule = translator.getModuleString();
 			this.config = translator.getConfigString();
 			this.tlcOutputInfo = translator.getTLCOutputInfo();
 			createFiles();
-			StopWatch.stop("Pure");
+			StopWatch.stop("Translation");
+			System.out.println("Translation Completed.");
 		}
 
 	}
@@ -355,63 +358,9 @@ public class TLC4B {
 	}
 
 	private void createStandardModules() {
-		if (translator.getUsedStandardModule().contains(
-				STANDARD_MODULES.Relations)) {
-			createStandardModule(buildDir,
-					STANDARD_MODULES.Relations.toString());
-		}
-
-		if (translator.getUsedStandardModule().contains(
-				STANDARD_MODULES.Functions)) {
-			createStandardModule(buildDir,
-					STANDARD_MODULES.Functions.toString());
-		}
-
-		if (translator.getUsedStandardModule().contains(
-				STANDARD_MODULES.BBuiltIns)) {
-			createStandardModule(buildDir,
-					STANDARD_MODULES.BBuiltIns.toString());
-		}
-
-		if (translator.getUsedStandardModule().contains(
-				STANDARD_MODULES.FunctionsAsRelations)) {
-			createStandardModule(buildDir,
-					STANDARD_MODULES.FunctionsAsRelations.toString());
-			if (!translator.getUsedStandardModule().contains(
-					STANDARD_MODULES.Functions)) {
-				createStandardModule(buildDir,
-						STANDARD_MODULES.Functions.toString());
-			}
-		}
-
-		if (translator.getUsedStandardModule().contains(
-				STANDARD_MODULES.SequencesExtended)) {
-			createStandardModule(buildDir,
-					STANDARD_MODULES.SequencesExtended.toString());
-		}
-
-		if (translator.getUsedStandardModule().contains(
-				STANDARD_MODULES.SequencesAsRelations)) {
-			createStandardModule(buildDir,
-					STANDARD_MODULES.SequencesAsRelations.toString());
-
-			if (!translator.getUsedStandardModule().contains(
-					STANDARD_MODULES.Relations)) {
-				createStandardModule(buildDir,
-						STANDARD_MODULES.Relations.toString());
-			}
-
-			if (!translator.getUsedStandardModule().contains(
-					STANDARD_MODULES.FunctionsAsRelations)) {
-				createStandardModule(buildDir,
-						STANDARD_MODULES.FunctionsAsRelations.toString());
-			}
-
-			if (!translator.getUsedStandardModule().contains(
-					STANDARD_MODULES.Functions)) {
-				createStandardModule(buildDir,
-						STANDARD_MODULES.Functions.toString());
-			}
+		for (STANDARD_MODULES module : translator
+				.getStandardModuleToBeCreated()) {
+			createStandardModule(buildDir, module.toString());
 		}
 	}
 
@@ -433,6 +382,14 @@ public class TLC4B {
 						.getClassLoader()
 						.getResourceAsStream("standardModules/" + name + ".tla");
 			}
+
+			if (is == null) {
+				// should never happen
+				throw new TranslationException(
+						"Unable to determine the source of the standard module: "
+								+ name);
+			}
+
 			fos = new FileOutputStream(file);
 
 			int read = 0;

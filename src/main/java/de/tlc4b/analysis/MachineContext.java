@@ -414,6 +414,7 @@ public class MachineContext extends DepthFirstAdapter {
 				return;
 			}
 		}
+		
 		throw new ScopeException("Unkown definition: '" + name
 				+ "' at position: " + node.getStartPos());
 	}

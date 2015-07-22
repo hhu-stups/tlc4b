@@ -14,6 +14,7 @@ import de.be4.classicalb.core.parser.node.ACardExpression;
 import de.be4.classicalb.core.parser.node.AClosureExpression;
 import de.be4.classicalb.core.parser.node.ACompositionExpression;
 import de.be4.classicalb.core.parser.node.AConcatExpression;
+import de.be4.classicalb.core.parser.node.ADefinitionPredicate;
 import de.be4.classicalb.core.parser.node.ADirectProductExpression;
 import de.be4.classicalb.core.parser.node.ADivExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
@@ -106,7 +107,7 @@ import de.tlc4b.tla.TLAModule;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations,
+		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations, ExternalFunctions
 	}
 
 	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
@@ -122,22 +123,21 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		modules.add(STANDARD_MODULES.FunctionsAsRelations);
 		modules.add(STANDARD_MODULES.SequencesExtended);
 		modules.add(STANDARD_MODULES.SequencesAsRelations);
+		modules.add(STANDARD_MODULES.ExternalFunctions);
 	}
 
-	private final Set<STANDARD_MODULES> usedStandardModules;
+	private final Set<STANDARD_MODULES> extendedStandardModules;
 	private final Typechecker typechecker;
 
 	public UsedStandardModules(Start start, Typechecker typechecker,
 			TypeRestrictor typeRestrictor, TLAModule tlaModule) {
-		this.usedStandardModules = new HashSet<STANDARD_MODULES>();
+		this.extendedStandardModules = new HashSet<STANDARD_MODULES>();
 		this.typechecker = typechecker;
 
-		
-		
 		if (TLC4BGlobals.useSymmetry()) {
-			usedStandardModules.add(STANDARD_MODULES.TLC);
+			extendedStandardModules.add(STANDARD_MODULES.TLC);
 		}
-		
+
 		List<PDefinition> definitions = tlaModule.getAllDefinitions();
 		if (definitions != null) {
 			for (PDefinition pDefinition : definitions) {
@@ -151,9 +151,9 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		start.apply(this);
 	}
 
-	public ArrayList<STANDARD_MODULES> getUsedModules() {
+	public ArrayList<STANDARD_MODULES> getExtendedModules() {
 		ArrayList<STANDARD_MODULES> list = new ArrayList<STANDARD_MODULES>(
-				usedStandardModules);
+				extendedStandardModules);
 		if (list.contains(STANDARD_MODULES.Integers)) {
 			list.remove(STANDARD_MODULES.Naturals);
 		}
@@ -163,22 +163,66 @@ public class UsedStandardModules extends DepthFirstAdapter {
 				Integer i2 = Integer.valueOf(modules.indexOf(s2));
 				return i1.compareTo(i2);
 			}
-		}
-
-		);
+		});
 		return list;
 	}
 
-	/**
-	 * Bounded Variables
-	 * 
-	 */
-
+	public HashSet<STANDARD_MODULES> getStandardModulesToBeCreated(){
+		// dependencies of standard modules 
+		HashSet<STANDARD_MODULES> res = new HashSet<STANDARD_MODULES>();
+		for (STANDARD_MODULES module : extendedStandardModules) {
+			switch (module) {
+			case ExternalFunctions:
+				res.add(STANDARD_MODULES.ExternalFunctions);
+				break;
+			case FunctionsAsRelations:
+				res.add(STANDARD_MODULES.FunctionsAsRelations);
+				res.add(STANDARD_MODULES.Functions);
+				break;
+			case SequencesAsRelations:
+				res.add(STANDARD_MODULES.SequencesAsRelations);
+				res.add(STANDARD_MODULES.Relations);
+				res.add(STANDARD_MODULES.FunctionsAsRelations);
+				res.add(STANDARD_MODULES.Functions);
+				break;
+			case BBuiltIns:
+				res.add(STANDARD_MODULES.BBuiltIns);
+				break;
+			case Functions:
+				res.add(STANDARD_MODULES.Functions);
+				break;
+			case Relations:
+				res.add(STANDARD_MODULES.Relations);
+				break;
+			case Sequences:
+				break;
+			case SequencesExtended:
+				res.add(STANDARD_MODULES.SequencesExtended);
+				break;
+			default:
+				break;
+			}
+			
+		}
+		return res;
+	}
 	@Override
 	public void inAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
 		if (TLC4BGlobals.isForceTLCToEvalConstants()) {
-			usedStandardModules.add(STANDARD_MODULES.TLC);
+			extendedStandardModules.add(STANDARD_MODULES.TLC);
+		}
+		String name = node.getName().getText().trim();
+		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
+			extendedStandardModules.add(STANDARD_MODULES.ExternalFunctions);
+		}
+	}
+
+	@Override
+	public void inADefinitionPredicate(ADefinitionPredicate node) {
+		String name = node.getDefLiteral().getText().trim();
+		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
+			extendedStandardModules.add(STANDARD_MODULES.ExternalFunctions);
 		}
 	}
 
@@ -188,72 +232,72 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	@Override
 	public void caseANaturalSetExpression(ANaturalSetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	@Override
 	public void caseANatural1SetExpression(ANatural1SetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	@Override
 	public void caseANatSetExpression(ANatSetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	@Override
 	public void caseANat1SetExpression(ANat1SetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inALessEqualPredicate(ALessEqualPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inALessPredicate(ALessPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAGreaterEqualPredicate(AGreaterEqualPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAGreaterPredicate(AGreaterPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAAddExpression(AAddExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAIntervalExpression(AIntervalExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inADivExpression(ADivExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAPowerOfExpression(APowerOfExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAModuloExpression(AModuloExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Naturals);
+		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
 	public void inAMinusOrSetSubtractExpression(
 			AMinusOrSetSubtractExpression node) {
 		BType t = typechecker.getType(node);
 		if (t instanceof IntegerType) {
-			usedStandardModules.add(STANDARD_MODULES.Naturals);
+			extendedStandardModules.add(STANDARD_MODULES.Naturals);
 		}
 	}
 
 	public void inAMultOrCartExpression(AMultOrCartExpression node) {
 		BType t = typechecker.getType(node);
 		if (t instanceof IntegerType) {
-			usedStandardModules.add(STANDARD_MODULES.Naturals);
+			extendedStandardModules.add(STANDARD_MODULES.Naturals);
 		} else {
 			// usedStandardModules.add(STANDARD_MODULES.RelationsNew);
 		}
@@ -264,26 +308,26 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 */
 
 	public void inAIntSetExpression(AIntSetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Integers);
+		extendedStandardModules.add(STANDARD_MODULES.Integers);
 	}
 
 	public void inAIntegerSetExpression(AIntegerSetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Integers);
+		extendedStandardModules.add(STANDARD_MODULES.Integers);
 	}
 
 	public void inAUnaryMinusExpression(AUnaryMinusExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Integers);
+		extendedStandardModules.add(STANDARD_MODULES.Integers);
 	}
 
 	public void inAMinIntExpression(AMinIntExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Integers);
+		extendedStandardModules.add(STANDARD_MODULES.Integers);
 	}
 
 	/**
 	 * FiniteSets
 	 */
 	public void inACardExpression(ACardExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.FiniteSets);
+		extendedStandardModules.add(STANDARD_MODULES.FiniteSets);
 	}
 
 	/**
@@ -291,57 +335,57 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 */
 
 	public void inAMinExpression(AMinExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAMaxExpression(AMaxExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inASuccessorExpression(ASuccessorExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAPredecessorExpression(APredecessorExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAPow1SubsetExpression(APow1SubsetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAFinSubsetExpression(AFinSubsetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAFin1SubsetExpression(AFin1SubsetExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inANotSubsetPredicate(ANotSubsetPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inANotSubsetStrictPredicate(ANotSubsetStrictPredicate node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAGeneralIntersectionExpression(
 			AGeneralIntersectionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAQuantifiedIntersectionExpression(
 			AQuantifiedIntersectionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
 	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
@@ -354,9 +398,9 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	private void setOfFunctions(Node node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.Functions);
+			extendedStandardModules.add(STANDARD_MODULES.Functions);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
 		}
 	}
 
@@ -405,7 +449,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		}
 		BType type = typechecker.getType(node.getIdentifier());
 		if (type instanceof SetType) {
-			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
 		}
 
 	}
@@ -413,7 +457,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	public void inATotalFunctionExpression(ATotalFunctionExpression node) {
 		SetType type = (SetType) typechecker.getType(node);
 		if (type.getSubtype() instanceof SetType) {
-			usedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.FunctionsAsRelations);
 		}
 	}
 
@@ -424,27 +468,27 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	private void evalFunctionOrRelation(Node node) {
 		BType t = typechecker.getType(node);
 		if (t instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.Functions);
+			extendedStandardModules.add(STANDARD_MODULES.Functions);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
+			extendedStandardModules.add(STANDARD_MODULES.Relations);
 		}
 	}
 
 	public void inARelationsExpression(ARelationsExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inADomainExpression(ADomainExpression node) {
 		BType t = typechecker.getType(node.getExpression());
 		if (!(t instanceof FunctionType)) {
-			usedStandardModules.add(STANDARD_MODULES.Relations);
+			extendedStandardModules.add(STANDARD_MODULES.Relations);
 		}
 	}
 
 	public void inASetExtensionExpression(ASetExtensionExpression node) {
 		BType t = typechecker.getType(node);
 		if (t instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.TLC);
+			extendedStandardModules.add(STANDARD_MODULES.TLC);
 		}
 	}
 
@@ -492,52 +536,52 @@ public class UsedStandardModules extends DepthFirstAdapter {
 				BType type = typechecker.getType(((AFunctionExpression) e)
 						.getIdentifier());
 				if (type instanceof SetType) {
-					usedStandardModules.add(STANDARD_MODULES.Relations);
+					extendedStandardModules.add(STANDARD_MODULES.Relations);
 				} else {
-					usedStandardModules.add(STANDARD_MODULES.Functions);
+					extendedStandardModules.add(STANDARD_MODULES.Functions);
 				}
 			}
 		}
 	}
 
 	public void inADirectProductExpression(ADirectProductExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAParallelProductExpression(AParallelProductExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inACompositionExpression(ACompositionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAFirstProjectionExpression(AFirstProjectionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inASecondProjectionExpression(ASecondProjectionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAIterationExpression(AIterationExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAClosureExpression(AClosureExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inAReflexiveClosureExpression(AReflexiveClosureExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inATransFunctionExpression(ATransFunctionExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	public void inATransRelationExpression(ATransRelationExpression node) {
-		usedStandardModules.add(STANDARD_MODULES.Relations);
+		extendedStandardModules.add(STANDARD_MODULES.Relations);
 	}
 
 	/**
@@ -547,9 +591,9 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	public void inASeqExpression(ASeqExpression node) {
 		SetType type = (SetType) typechecker.getType(node);
 		if (type.getSubtype() instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.Sequences);
+			extendedStandardModules.add(STANDARD_MODULES.Sequences);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
 
@@ -564,9 +608,9 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	private void evalSequenceOrRelation(Node node) {
 		BType type = typechecker.getType(node);
 		if (type instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.Sequences);
+			extendedStandardModules.add(STANDARD_MODULES.Sequences);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
 
@@ -585,36 +629,36 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	private void evalSequenceExtendedOrRelation(Node node) {
 		BType type = typechecker.getType(node);
 		if (type instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesExtended);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
 
 	public void inAIseqExpression(AIseqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesExtended);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
 
 	public void inASeq1Expression(ASeq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesExtended);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
 
 	public void inAIseq1Expression(AIseq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof FunctionType) {
-			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesExtended);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		}
 	}
 
@@ -633,9 +677,9 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	public void inAPermExpression(APermExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			usedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesAsRelations);
 		} else {
-			usedStandardModules.add(STANDARD_MODULES.SequencesExtended);
+			extendedStandardModules.add(STANDARD_MODULES.SequencesExtended);
 		}
 	}
 

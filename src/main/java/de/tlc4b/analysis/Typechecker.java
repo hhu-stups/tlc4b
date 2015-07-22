@@ -286,9 +286,15 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		node.getRhs().apply(this);
 	}
 
+	
+	
 	@Override
 	public void caseADefinitionExpression(ADefinitionExpression node) {
 		BType expected = getType(node);
+		String name = node.getDefLiteral().getText().toString();
+		if(StandardMadules.isKeywordInModuleExternalFunctions(name)){
+			
+		}
 		Node originalDef = referenceTable.get(node);
 		BType found = getType(originalDef);
 

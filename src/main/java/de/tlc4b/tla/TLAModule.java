@@ -20,7 +20,7 @@ public class TLAModule {
 	protected final ArrayList<POperation> operations;
 	private ArrayList<PDefinition> bDefinitions;
 	private final ArrayList<Node> assertions;
-	
+
 	private ArrayList<PDefinition> allDefinitions;
 
 	public TLAModule() {
@@ -33,46 +33,47 @@ public class TLAModule {
 		this.bDefinitions = new ArrayList<PDefinition>();
 		this.assertions = new ArrayList<Node>();
 		this.invariants = new ArrayList<Node>();
-		
+
 		this.allDefinitions = new ArrayList<PDefinition>();
 
 	}
 
-	public void sortAllDefinitions(MachineContext machineContext){
-		DefinitionsOrder defOrder = new DefinitionsOrder(machineContext, this.allDefinitions);
+	public void sortAllDefinitions(MachineContext machineContext) {
+		DefinitionsOrder defOrder = new DefinitionsOrder(machineContext,
+				this.allDefinitions);
 		this.allDefinitions = defOrder.getAllDefinitions();
 	}
-	
-	public void addToAllDefinitions(PDefinition def){
+
+	public void addToAllDefinitions(PDefinition def) {
 		this.allDefinitions.add(def);
 	}
-	
-	public ArrayList<PDefinition> getAllDefinitions(){
+
+	public ArrayList<PDefinition> getAllDefinitions() {
 		return allDefinitions;
 	}
-	
-	public ArrayList<Node> getAssertions(){
+
+	public ArrayList<Node> getAssertions() {
 		return assertions;
 	}
-	
-	public void addAssertion(Node node){
+
+	public void addAssertion(Node node) {
 		assertions.add(node);
 	}
-	
+
 	public void addAssume(Node node) {
 		if (!assumes.contains(node))
 			assumes.add(node);
 	}
 
-	public void addInit(Node node){
-		if(!initPredicates.contains(node))
+	public void addInit(Node node) {
+		if (!initPredicates.contains(node))
 			initPredicates.add(node);
 	}
-	
-	public boolean isInitPredicate(Node node){
+
+	public boolean isInitPredicate(Node node) {
 		return initPredicates.contains(node);
 	}
-	
+
 	public String getModuleName() {
 		return moduleName;
 	}
@@ -105,12 +106,16 @@ public class TLAModule {
 		return invariants;
 	}
 
-	public void setBDefinitions(ArrayList<PDefinition> defs){
+	public void setBDefinitions(ArrayList<PDefinition> defs) {
 		this.bDefinitions = defs;
 	}
-	
+
 	public ArrayList<PDefinition> getBDefinitions() {
 		return bDefinitions;
+	}
+
+	public boolean hasInitPredicate() {
+		return this.initPredicates.size() > 0;
 	}
 
 }

@@ -7,13 +7,13 @@ import org.junit.Test;
 public class ClausesTest {
 
 	
-	@Test //TODO include config
+	@Test
 	public void testAssertion() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "ASSERTIONS 1 = 1\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "Assertions == \\/ 1 = 1\n"
+				+ "ASSUME Assertion1 == 1 = 1\n"
 				+ "======";
 		compare(expected, machine);
 	}
@@ -24,7 +24,8 @@ public class ClausesTest {
 				+ "ASSERTIONS 1 = 1; 2 = 2\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "Assertions == \\/ 1 = 1 \\/ 2 = 2\n"
+				+ "ASSUME Assertion1 == 1 = 1\n"
+				+ "ASSUME Assertion2 == 2 = 2\n"
 				+ "======";
 		compare(expected, machine);
 	}
