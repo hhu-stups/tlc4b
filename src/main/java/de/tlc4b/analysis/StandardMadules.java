@@ -240,7 +240,7 @@ public final class StandardMadules {
 	 * The typing definition (e.g. EXTERNAL_FUNCTION_STRING_SPLIT == ((STRING*STRING) --> (INTEGER<->STRING));)
 	 * is not mandatory.
 	 * 
-	 * The B definitions will be ignored in the  {@link TLAPrinter}.
+	 * The B definitions will be ignored in the {@link TLAPrinter}.
 	 * 
 	 * 
 	 */
@@ -249,6 +249,7 @@ public final class StandardMadules {
 	public static final String INT_TO_STRING = "INT_TO_STRING";
 	public static final String STRING_SPLIT = "STRING_SPLIT";
 	public static final String SORT_SET = "SORT_SET";
+	public static final String STRING_APPEND = "STRING_APPEND";
 
 	private static final ArrayList<String> ExternalFunctions = new ArrayList<String>();
 	static {
@@ -256,6 +257,7 @@ public final class StandardMadules {
 		ExternalFunctions.add(INT_TO_STRING);
 		ExternalFunctions.add(STRING_SPLIT);
 		ExternalFunctions.add(SORT_SET);
+		ExternalFunctions.add(STRING_APPEND);
 	}
 
 	public static boolean isKeywordInModuleExternalFunctions(String name){
