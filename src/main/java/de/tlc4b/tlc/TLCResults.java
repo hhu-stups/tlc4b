@@ -10,12 +10,14 @@ import java.util.Set;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.exceptions.NotSupportedException;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
+import tla2sany.semantic.AssumeNode;
 import tla2sany.semantic.ExprNode;
 import tla2sany.semantic.ExprOrOpArgNode;
 import tla2sany.semantic.ModuleNode;
 import tla2sany.semantic.OpApplNode;
 import tla2sany.semantic.OpDefNode;
 import tla2sany.semantic.SymbolNode;
+import tla2sany.semantic.ThmOrAssumpDefNode;
 import tla2sany.st.Location;
 import tlc2.output.EC;
 import static tlc2.output.MP.*;
@@ -97,15 +99,16 @@ public class TLCResults implements ToolGlobals {
 			tlcResult = InitialStateError;
 		}
 
-		if (TLC4BGlobals.isPrintCoverage() && OutputCollector.lineCount != null) {
+		if (TLC4BGlobals.isPrintCoverage()
+				&& OutputCollector.getLineCountTable().size() != 0) {
 			evalCoverage();
 		}
 	}
 
 	private void evalCoverage() {
 		Hashtable<Integer, Long> lineCount = new Hashtable<Integer, Long>();
-		Set<Entry<Location, Long>> entrySet = OutputCollector.lineCount
-				.entrySet();
+		Set<Entry<Location, Long>> entrySet = OutputCollector
+				.getLineCountTable().entrySet();
 		for (Entry<Location, Long> entry : entrySet) {
 			int endline = entry.getKey().endLine();
 			if (lineCount.containsKey(endline)) {
@@ -115,7 +118,8 @@ public class TLCResults implements ToolGlobals {
 				lineCount.put(endline, entry.getValue());
 			}
 		}
-		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.moduleNode);
+		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector
+				.getModuleNode());
 		operationsCount = new LinkedHashMap<String, Long>();
 		for (OpDefNode opDefNode : defs) {
 			String operationName = opDefNode.getName().toString();
@@ -281,6 +285,31 @@ public class TLCResults implements ToolGlobals {
 			break;
 
 		case EC.TLC_ASSUMPTION_FALSE:
+			// get the violated assumption expr from the OutputCollector
+			ExprNode violatedAssumptionExpr = OutputCollector
+					.getViolatedAssumption();
+			if (violatedAssumptionExpr != null) {
+				// try to find the assume node contain the expr in order to get
+				// the name of the assumption
+				ModuleNode moduleNode = OutputCollector.getModuleNode();
+				AssumeNode[] assumptions = moduleNode.getAssumptions();
+				for (AssumeNode assumeNode : assumptions) {
+					if (assumeNode.getAssume() == violatedAssumptionExpr) {
+						ThmOrAssumpDefNode def = assumeNode.getDef();
+						// if the assumption is a named assumption, def is
+						// unequal null
+						// All B assertions are represented as named assumptions
+						// in the TLA module
+						if (def != null
+								&& def.getName().toString()
+										.startsWith("Assertion")) {
+							tlcResult = TLCResult.AssertionError;
+							return;
+						}
+					}
+				}
+			}
+			// otherwise, it is normal properties error
 			tlcResult = TLCResult.PropertiesError;
 			break;
 
@@ -307,9 +336,6 @@ public class TLCResults implements ToolGlobals {
 
 		case EC.GENERAL:
 			tlcResult = evaluatingParameter(m.getParameters());
-			break;
-
-		default:
 			break;
 		}
 	}
