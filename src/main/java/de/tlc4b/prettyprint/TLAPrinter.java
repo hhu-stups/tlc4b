@@ -310,8 +310,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 				if (i > 0) {
 					moduleStringAppend(", ");
 				}
-				moduleStringAppend(usedStandardModules.getExtendedModules().get(i)
-						.toString());
+				moduleStringAppend(usedStandardModules.getExtendedModules()
+						.get(i).toString());
 			}
 			moduleStringAppend("\n");
 		}
@@ -325,7 +325,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				def.getDefName().apply(this);
 				continue;
 			}
-			
+
 			def.getDefName().apply(this);
 			moduleStringAppend(" == ");
 			Node e = def.getDefinition();
@@ -1115,7 +1115,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (name == null) {
 			name = Utils.getIdentifierAsString(node.getIdentifier());
 		}
-		if(name.equals(SORT_SET)){
+		if (StandardMadules.isAbstractConstant(name)) {
+			// in order to pass the member check
 			moduleStringAppend("{}");
 			return;
 		}
@@ -1325,7 +1326,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
 		String oldName = node.getName().getText().trim();
-		if(StandardMadules.isKeywordInModuleExternalFunctions(oldName)){
+		if (StandardMadules.isKeywordInModuleExternalFunctions(oldName)) {
 			return;
 		}
 		String name = renamer.getName(node);
@@ -1368,7 +1369,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private void printBDefinition(String name, List<PExpression> args,
 			Node rightSide) {
-		if(StandardMadules.isKeywordInModuleExternalFunctions(name)){
+		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
 			return;
 		}
 		moduleStringAppend(name);
@@ -1777,26 +1778,26 @@ public class TLAPrinter extends DepthFirstAdapter {
 	// Function call
 	public void caseAFunctionExpression(AFunctionExpression node) {
 		inAFunctionExpression(node);
-		
-		
-		if(node.getIdentifier() instanceof AIdentifierExpression){
-			AIdentifierExpression id = (AIdentifierExpression) node.getIdentifier();
+
+		if (node.getIdentifier() instanceof AIdentifierExpression) {
+			AIdentifierExpression id = (AIdentifierExpression) node
+					.getIdentifier();
 			String name = Utils.getIdentifierAsString(id.getIdentifier());
-			if(name.equals(SORT_SET)){
-				moduleStringAppend(SORT_SET);
-				//node.getIdentifier().apply(this);
+			if (StandardMadules.isAbstractConstant(name)) {
+
+				moduleStringAppend(name);
+				// node.getIdentifier().apply(this);
 				moduleStringAppend("(");
 				List<PExpression> copy = new ArrayList<PExpression>(
 						node.getParameters());
 				copy.get(0).apply(this);
 				moduleStringAppend(")");
 				return;
-				
+
 			}
 
 		}
-		
-		
+
 		BType type = this.typechecker.getType(node.getIdentifier());
 		if (type instanceof FunctionType) {
 			node.getIdentifier().apply(this);
@@ -2130,6 +2131,20 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 
 		outAComprehensionSetExpression(node);
+	}
+
+	@Override
+	public void caseAEventBComprehensionSetExpression(
+			AEventBComprehensionSetExpression node) {
+		inAEventBComprehensionSetExpression(node);
+
+		moduleStringAppend("{");
+		node.getExpression().apply(this);
+		moduleStringAppend(": ");
+		node.getPredicates().apply(this);
+		moduleStringAppend("}");
+
+		outAEventBComprehensionSetExpression(node);
 	}
 
 	private void printAuxiliaryVariables(int size) {
@@ -2704,7 +2719,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAIseqExpression(AIseqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			if (node.parent() instanceof AMemberPredicate
+			
+			if (isElementOfRecursive(node.parent())
 					&& !typeRestrictor.isARemovedNode(node.parent())) {
 				moduleStringAppend(REL_INJECTIVE_SEQUENCE_ELEMENT_OF);
 			} else {

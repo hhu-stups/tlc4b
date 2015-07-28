@@ -30,7 +30,7 @@ public class MachineParameterTest {
 				+ "Next == 1 = 2 /\\ UNCHANGED <<a>>\n"
 				+ "======";
 		String expectedConfig = "INIT Init\nNEXT Next";
-		compareConfig(expectedModule, expectedConfig, machine);
+		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -55,7 +55,7 @@ public class MachineParameterTest {
 				+ "CONSTANTS AA\n"
 				+ "======";
 		String expectedConfig = "CONSTANTS AA = {AA1, AA2, AA3}";
-		compareConfig(expectedModule, expectedConfig, machine);
+		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class MachineParameterTest {
 				+ "ASSUME Cardinality(B) = 2\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS B = {B1, B2, B3}";
-		compareConfig(expectedModule, expectedConfig, machine);
+		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 }

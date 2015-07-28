@@ -288,18 +288,19 @@ public class TLC4B {
 		handleMainFileName();
 		if (TLC4BGlobals.isTranslate()) {
 			StopWatch.start("Parsing");
+			System.out.println("Parsing...");
 			translator = new Translator(machineFileNameWithoutFileExtension,
 					mainfile, this.ltlFormula, this.constantsSetup);
 			StopWatch.stop("Parsing");
-			System.out.println("Parsing Completed.");
+			
 			StopWatch.start("Translation");
+			System.out.println("Translating...");
 			translator.translate();
 			this.tlaModule = translator.getModuleString();
 			this.config = translator.getConfigString();
 			this.tlcOutputInfo = translator.getTLCOutputInfo();
 			createFiles();
 			StopWatch.stop("Translation");
-			System.out.println("Translation Completed.");
 		}
 
 	}

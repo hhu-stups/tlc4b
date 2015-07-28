@@ -14,11 +14,11 @@ import de.tlc4b.util.PolySuite.Config;
 import de.tlc4b.util.PolySuite.Configuration;
 
 @RunWith(PolySuite.class)
-public class IntegrationCoverageTest extends AbstractParseMachineTest {
+public class CoverageTest extends AbstractParseMachineTest {
 
 	private final File machine;
 
-	public IntegrationCoverageTest(File machine, TLCResult result) {
+	public CoverageTest(File machine, TLCResult result) {
 		this.machine = machine;
 	}
 

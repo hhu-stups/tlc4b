@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import util.ToolIO;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tla2b.exceptions.TLA2BException;
@@ -25,6 +26,7 @@ public class TestUtil {
 	public static void compare(String expectedModule, String machine)
 			throws Exception {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
+		ToolIO.setMode(ToolIO.TOOL);
 
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
@@ -112,7 +114,7 @@ public class TestUtil {
 		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
 	}
 
-	public static void compareConfig(String expectedModule,
+	public static void compareModuleAndConfig(String expectedModule,
 			String expectedConfig, String machine) throws Exception {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
@@ -120,6 +122,12 @@ public class TestUtil {
 		System.out.println(b2tlaTranslator.getModuleString());
 		System.out.println(b2tlaTranslator.getConfigString());
 
+		
+		//TODO include config file in back translation from TLA+ to B
+		
+		
+		
+		
 		// String name = b2tlaTranslator.getMachineName();
 		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
 		// .translateString(name, b2tlaTranslator.getModuleString(),

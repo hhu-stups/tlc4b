@@ -1,10 +1,7 @@
 package de.tlc4b.analysis;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -29,6 +26,7 @@ import de.be4.classicalb.core.parser.node.ADefinitionPredicate;
 import de.be4.classicalb.core.parser.node.ADefinitionSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
 import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
+import de.be4.classicalb.core.parser.node.AEventBComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AExistsPredicate;
 import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AForallPredicate;
@@ -54,7 +52,6 @@ import de.be4.classicalb.core.parser.node.ARecEntry;
 import de.be4.classicalb.core.parser.node.ARecordFieldExpression;
 import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.ASetsContextClause;
-import de.be4.classicalb.core.parser.node.ASetsMachineClause;
 import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
 import de.be4.classicalb.core.parser.node.Node;
@@ -68,6 +65,8 @@ import de.be4.classicalb.core.parser.node.PSet;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.analysis.transformation.DefinitionsSorter;
+import de.tlc4b.analysis.transformation.MachineClauseSorter;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
@@ -83,8 +82,8 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private boolean constantSetupInTraceFile = false;
 	// machine identifier
-	private final LinkedHashMap<String, Node> setParameter;
-	private final LinkedHashMap<String, Node> scalarParameter;
+	private final LinkedHashMap<String, Node> machineSetParameter;
+	private final LinkedHashMap<String, Node> machineScalarParameter;
 
 	private final LinkedHashMap<String, Node> deferredSets;
 	private final LinkedHashMap<String, Node> enumeratedSets;
@@ -129,8 +128,8 @@ public class MachineContext extends DepthFirstAdapter {
 			this.ltlVisitors.add(ltlVisitor);
 		}
 
-		this.setParameter = new LinkedHashMap<String, Node>();
-		this.scalarParameter = new LinkedHashMap<String, Node>();
+		this.machineSetParameter = new LinkedHashMap<String, Node>();
+		this.machineScalarParameter = new LinkedHashMap<String, Node>();
 
 		this.deferredSets = new LinkedHashMap<String, Node>();
 		this.enumeratedSets = new LinkedHashMap<String, Node>();
@@ -210,17 +209,17 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private void exist(LinkedList<TIdentifierLiteral> list) {
 		String name = Utils.getIdentifierAsString(list);
-		existString(name);
+		identifierAlreadyExists(name);
 	}
 
-	private void existString(String name) {
+	private void identifierAlreadyExists(String name) {
 		if (constants.containsKey(name) || variables.containsKey(name)
 				|| operations.containsKey(name)
 				|| deferredSets.containsKey(name)
 				|| enumeratedSets.containsKey(name)
 				|| enumValues.containsKey(name)
-				|| setParameter.containsKey(name)
-				|| scalarParameter.containsKey(name)
+				|| machineSetParameter.containsKey(name)
+				|| machineScalarParameter.containsKey(name)
 				|| seenMachines.containsKey(name)
 				|| definitions.containsKey(name)) {
 			throw new ScopeException("Duplicate identifier: '" + name + "'");
@@ -236,13 +235,14 @@ public class MachineContext extends DepthFirstAdapter {
 		if (node.getHeader() != null) {
 			node.getHeader().apply(this);
 		}
-		List<PMachineClause> copy = new ArrayList<PMachineClause>(
-				node.getMachineClauses());
-		PMachineClauseComparator comperator = new PMachineClauseComparator();
+		
+		
+		List<PMachineClause> machineClauses = node.getMachineClauses();
 		// Sort the machine clauses: declarations clauses first, then
 		// properties clauses
-		Collections.sort(copy, comperator);
-		for (PMachineClause e : copy) {
+		MachineClauseSorter.sortMachineClauses(start);
+		
+		for (PMachineClause e : machineClauses) {
 			e.apply(this);
 		}
 	}
@@ -263,9 +263,9 @@ public class MachineContext extends DepthFirstAdapter {
 			String name = Utils.getIdentifierAsString(p.getIdentifier());
 			exist(p.getIdentifier());
 			if (Character.isUpperCase(name.charAt(0))) {
-				this.setParameter.put(name, p);
+				this.machineSetParameter.put(name, p);
 			} else {
-				this.scalarParameter.put(name, p);
+				this.machineScalarParameter.put(name, p);
 			}
 		}
 	}
@@ -283,6 +283,8 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
 		definitionMachineClause = node;
+		DefinitionsSorter.sortDefinitions(node);
+		
 		List<PDefinition> copy = node.getDefinitions();
 
 		/*
@@ -341,7 +343,7 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	private void evalDefinitionName(String name, Node node) {
-		existString(name);
+		identifierAlreadyExists(name);
 		definitions.put(name, node);
 	}
 
@@ -586,8 +588,8 @@ public class MachineContext extends DepthFirstAdapter {
 		this.constraintMachineClause = node;
 
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
-		this.contextTable.add(this.scalarParameter);
-		this.contextTable.add(this.setParameter);
+		this.contextTable.add(this.machineScalarParameter);
+		this.contextTable.add(this.machineSetParameter);
 		if (node.getPredicates() != null) {
 			node.getPredicates().apply(this);
 		}
@@ -890,6 +892,22 @@ public class MachineContext extends DepthFirstAdapter {
 		node.getPredicates().apply(this);
 		contextTable.remove(contextTable.size() - 1);
 	}
+	
+	@Override
+	public void caseAEventBComprehensionSetExpression(AEventBComprehensionSetExpression node){
+		contextTable.add(new LinkedHashMap<String, Node>());
+		{
+			List<PExpression> copy = new ArrayList<PExpression>(
+					node.getIdentifiers());
+			for (PExpression e : copy) {
+				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
+			}
+		}
+		node.getPredicates().apply(this);
+		
+		node.getExpression().apply(this);
+		contextTable.remove(contextTable.size() - 1);
+	}
 
 	@Override
 	public void caseAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
@@ -991,11 +1009,11 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	public LinkedHashMap<String, Node> getSetParamter() {
-		return setParameter;
+		return machineSetParameter;
 	}
 
 	public LinkedHashMap<String, Node> getScalarParameter() {
-		return scalarParameter;
+		return machineScalarParameter;
 	}
 
 	public ArrayList<Node> getConstantArrayList() {
@@ -1126,42 +1144,3 @@ public class MachineContext extends DepthFirstAdapter {
 
 }
 
-class PMachineClauseComparator implements Comparator<PMachineClause>,
-		Serializable {
-
-	private static final long serialVersionUID = 2606332412649258695L;
-	private static Hashtable<Object, Integer> priority = new Hashtable<Object, Integer>();
-	static {
-		// declarations clauses
-
-		priority.put(ASeesMachineClause.class, 12);
-		priority.put(ASetsMachineClause.class, 11);
-		priority.put(AAbstractConstantsMachineClause.class, 10);
-		priority.put(AConstantsMachineClause.class, 9);
-		priority.put(AVariablesMachineClause.class, 8);
-		priority.put(AConcreteVariablesMachineClause.class, 7);
-		priority.put(ADefinitionsMachineClause.class, 6);
-
-		// properties clauses
-		priority.put(AConstraintsMachineClause.class, 5);
-		priority.put(APropertiesMachineClause.class, 4);
-		priority.put(AInvariantMachineClause.class, 3);
-		priority.put(AAssertionsMachineClause.class, 2);
-		priority.put(AOperationsMachineClause.class, 1);
-		priority.put(AInitialisationMachineClause.class, 0);
-	}
-
-	public int compare(PMachineClause arg0, PMachineClause arg1) {
-		if (priority.get(arg0.getClass()).intValue() < priority.get(
-				arg1.getClass()).intValue()) {
-			return 1;
-		}
-		if (priority.get(arg0.getClass()).intValue() > priority.get(
-				arg1.getClass()).intValue()) {
-			return -1;
-		}
-
-		return 0;
-	}
-
-}

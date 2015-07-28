@@ -37,7 +37,11 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	private Hashtable<String, PDefinition> definitionsTable;
 	private ArrayList<Hashtable<String, PExpression>> contextStack;
 
-	public DefinitionsEliminator(Start node) {
+	public static void eliminateDefinitions(Start start){
+		new DefinitionsEliminator(start);
+	}
+	
+	private DefinitionsEliminator(Start node) {
 		DefinitionCollector collector = new DefinitionCollector(node);
 		definitionsTable = collector.getDefinitions();
 		contextStack = new ArrayList<Hashtable<String, PExpression>>();
@@ -61,9 +65,19 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
-		List<PDefinition> copy = new ArrayList<PDefinition>(
+		/**
+		 * Definitions from other definitions files were injected into the
+		 * DefinitionsCLause. However, their parent was not correctly set to the
+		 * DefinitionsClause. Hence e.replaceBy(null) would not eliminate them.
+		 * Therefore, we have to create a new list and have to the use the
+		 * setDefinitions method form {link ADefinitionsMachineClause}.
+		 **/
+
+		List<PDefinition> newDefinitionsList = new ArrayList<PDefinition>();
+		List<PDefinition> oldDefinitionsList = new ArrayList<PDefinition>(
 				node.getDefinitions());
-		for (PDefinition e : copy) {
+		for (PDefinition e : oldDefinitionsList) {
+			// replace all definitions calls inside the definitions bodies
 			if (e instanceof AExpressionDefinitionDefinition) {
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
@@ -74,26 +88,39 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			}
 			e.apply(this);
 		}
-		for (PDefinition e : copy) {
+
+		// add certain definitions to the new definitions list in order to
+		// obtain them for the translation
+		for (PDefinition e : oldDefinitionsList) {
+
 			if (e instanceof AExpressionDefinitionDefinition) {
+
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
 				if (name.startsWith("ASSERT_LTL")
 						|| name.startsWith("scope_")
 						|| name.startsWith("SET_PREF_")
 						|| StandardMadules
-								.isKeywordInModuleExternalFunctions(name))
-					continue;
+								.isKeywordInModuleExternalFunctions(name)) {
+
+					newDefinitionsList.add(e);
+				}
 			} else if (e instanceof APredicateDefinitionDefinition) {
 				String name = ((APredicateDefinitionDefinition) e).getName()
 						.getText().toString();
 				if (name.equals("GOAL")
 						|| StandardMadules
-								.isKeywordInModuleExternalFunctions(name))
-					continue;
+								.isKeywordInModuleExternalFunctions(name)) {
+					newDefinitionsList.add(e);
+				}
 			}
-			e.replaceBy(null);
 		}
+		for (PDefinition def : newDefinitionsList) {
+			// we have delete all parents of the definitions in order to set
+			// them in the next step (seems to be a bug in SabbleCC)
+			def.replaceBy(null);
+		}
+		node.setDefinitions(newDefinitionsList);
 	}
 
 	@Override
@@ -123,7 +150,6 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 
 	@Override
 	public void caseADefinitionExpression(ADefinitionExpression node) {
-
 		String name = node.getDefLiteral().getText();
 		ArrayList<PExpression> arguments = new ArrayList<PExpression>(
 				node.getParameters());

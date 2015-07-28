@@ -230,39 +230,53 @@ public final class StandardMadules {
 	public static final boolean containsNameFromModuleRelations(String name) {
 		return Relations.contains(name);
 	}
-	
+
 	/**
 	 * External Functions
 	 * 
-	 * All external functions must be defined in the standard module ExternalFunctions.tla
-	 * (src/main/resources/standardModules/).
-	 * The B machine must contain a definition declaring the external function.
-	 * The typing definition (e.g. EXTERNAL_FUNCTION_STRING_SPLIT == ((STRING*STRING) --> (INTEGER<->STRING));)
-	 * is not mandatory.
+	 * All external functions must be defined in the standard module
+	 * ExternalFunctions.tla (src/main/resources/standardModules/). The B
+	 * machine must contain a definition declaring the external function. The
+	 * typing definition (e.g. EXTERNAL_FUNCTION_STRING_SPLIT ==
+	 * ((STRING*STRING) --> (INTEGER<->STRING));) is not mandatory.
 	 * 
 	 * The B definitions will be ignored in the {@link TLAPrinter}.
 	 * 
 	 * 
 	 */
-	
+
 	public static final String EXTERNAL_printf = "printf";
 	public static final String INT_TO_STRING = "INT_TO_STRING";
 	public static final String STRING_SPLIT = "STRING_SPLIT";
 	public static final String SORT_SET = "SORT_SET";
 	public static final String STRING_APPEND = "STRING_APPEND";
+	public static final String STRING_TO_INT = "STRING_TO_INT";
+	public static final String DECIMAL_TO_INT = "DECIMAL_TO_INT";
 
 	private static final ArrayList<String> ExternalFunctions = new ArrayList<String>();
 	static {
 		ExternalFunctions.add(EXTERNAL_printf);
 		ExternalFunctions.add(INT_TO_STRING);
 		ExternalFunctions.add(STRING_SPLIT);
-		ExternalFunctions.add(SORT_SET);
 		ExternalFunctions.add(STRING_APPEND);
+		ExternalFunctions.add(STRING_TO_INT);
+
+		ExternalFunctions.add(SORT_SET);
+		ExternalFunctions.add(DECIMAL_TO_INT);
 	}
 
-	public static boolean isKeywordInModuleExternalFunctions(String name){
+	public static boolean isAbstractConstant(String name) {
+		if (name.equals(SORT_SET) 
+				|| name.equals(DECIMAL_TO_INT)) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public static boolean isKeywordInModuleExternalFunctions(String name) {
 		return ExternalFunctions.contains(name);
 	}
-	
-	
+
 }

@@ -343,7 +343,9 @@ public class TLCResults implements ToolGlobals {
 	private TLCResult evaluatingParameter(String[] params) {
 		for (int i = 0; i < params.length; i++) {
 			String s = params[i];
-			if (s.contains("not enumerable")) {
+			if (s == null) {
+				break;
+			} else if (s.contains("not enumerable")) {
 				return EnumerationError;
 			} else if (s.contains("The invariant of Assertion")) {
 				return AssertionError;

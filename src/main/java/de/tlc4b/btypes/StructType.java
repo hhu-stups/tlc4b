@@ -97,13 +97,19 @@ public class StructType extends AbstractHasFollowers {
 					BType res = this.types.get(fieldName).unify(sType,
 							typechecker);
 					this.types.put(fieldName, res);
-				} else {
-					if (sType instanceof AbstractHasFollowers) {
-						((AbstractHasFollowers) sType).addFollower(this);
+					if(res instanceof AbstractHasFollowers){
+						((AbstractHasFollowers) res).addFollower(this);
 					}
+				} else {
 					this.types.put(fieldName, sType);
+					if (sType instanceof AbstractHasFollowers) {
+						AbstractHasFollowers f = (AbstractHasFollowers) sType;
+						f.deleteFollower(other);
+						f.addFollower(this);
+					}
 				}
 			}
+			((StructType) other).setFollowersTo(this, typechecker);
 			complete = this.complete || s.complete;
 			return this;
 

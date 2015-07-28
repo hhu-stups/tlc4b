@@ -37,6 +37,7 @@ public class BasicTest extends AbstractParseMachineTest {
 	@Config
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
+		list.add(new TestPair(NoError, "./src/test/resources/composition/sees"));
 		list.add(new TestPair(NoError, "./src/test/resources/basics"));
 		list.add(new TestPair(NoError, "./src/test/resources/laws"));
 		return getConfiguration(list);

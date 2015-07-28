@@ -72,6 +72,30 @@ public class SetsTest {
 		assertEquals("POW(INTEGER*BOOL)", t.constants.get("k").toString());
 	}
 	
+	@Test
+	public void testEventBSetComprehension() throws BException {
+		String machine = "MACHINE test\n" 
+				+ "CONSTANTS k,k2,k3 \n"
+				+ "PROPERTIES k = {x,y| x = k2(k3) & y : {TRUE}} & k2(2)=1\n" 
+				+ "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("POW(INTEGER*BOOL)", t.constants.get("k").toString());
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k2").toString());
+		assertEquals("INTEGER", t.constants.get("k3").toString());
+	}
+	
+	@Test
+	public void testEventBSetComprehension2() throws BException {
+		String machine = "MACHINE test\n" 
+				+ "CONSTANTS k,k2 \n"
+				+ "PROPERTIES k = {a,b| a : k2 & b = a'foo} & k2={rec(foo:\"123\",bar:TRUE)}\n" 
+				+ "END";
+		TestTypechecker t = new TestTypechecker(machine);
+		assertEquals("POW(struct(foo:STRING,bar:BOOL)*STRING)", t.constants.get("k").toString());
+		assertEquals("POW(struct(foo:STRING,bar:BOOL))", t.constants.get("k2").toString());
+	}
+	
+	
 	@Test (expected = TypeErrorException.class)
 	public void testSetComprehensionException() throws BException {
 		String machine = "MACHINE test\n"

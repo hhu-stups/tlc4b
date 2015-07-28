@@ -2,7 +2,6 @@ package de.tlc4b.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -58,7 +57,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 		checkLTLFormulas();
 		checkConstantsSetup();
-		
+
 	}
 
 	private void checkLTLFormulas() {
@@ -133,9 +132,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		{
 			List<PMachineClause> copy = new ArrayList<PMachineClause>(
 					node.getMachineClauses());
-			PMachineClauseComparator comperator = new PMachineClauseComparator();
-			// Sort the machine clauses
-			Collections.sort(copy, comperator);
 			for (PMachineClause e : copy) {
 				e.apply(this);
 			}
@@ -286,15 +282,10 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		node.getRhs().apply(this);
 	}
 
-	
-	
 	@Override
 	public void caseADefinitionExpression(ADefinitionExpression node) {
 		BType expected = getType(node);
-		String name = node.getDefLiteral().getText().toString();
-		if(StandardMadules.isKeywordInModuleExternalFunctions(name)){
-			
-		}
+		// String name = node.getDefLiteral().getText().toString();
 		Node originalDef = referenceTable.get(node);
 		BType found = getType(originalDef);
 
@@ -309,7 +300,8 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getParameters());
 		for (int i = 0; i < params.size(); i++) {
-			setType(copy.get(i), getType(params.get(i)));
+			BType type = getType(params.get(i));
+			setType(copy.get(i), type);
 			copy.get(i).apply(this);
 		}
 	}
@@ -440,12 +432,15 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
 		Node originalIdentifier = referenceTable.get(node);
 		BType expected = getType(node);
+
 		if (expected == null) {
 			System.out.println("Not implemented in Typechecker:"
 					+ node.parent().getClass());
 			throw new RuntimeException(node + " Pos: " + node.getStartPos());
 		}
 		BType found = getType(originalIdentifier);
+
+		String name = Utils.getIdentifierAsString(node.getIdentifier());
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
@@ -453,7 +448,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 					+ "' , found '" + found + "' at identifier " + node + "\n"
 					+ node.getStartPos());
 		}
-
 	}
 
 	@Override
@@ -1281,6 +1275,61 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
 		setType(node.getPredicates(), BoolType.getInstance());
 		node.getPredicates().apply(this);
+
+	}
+
+	@Override
+	public void caseAEventBComprehensionSetExpression(
+			AEventBComprehensionSetExpression node) {
+		List<PExpression> copy = new ArrayList<PExpression>(
+				node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			setType(v, new UntypedType());
+		}
+
+		setType(node.getPredicates(), BoolType.getInstance());
+		node.getPredicates().apply(this);
+
+		setType(node.getExpression(), new UntypedType());
+		node.getExpression().apply(this);
+
+
+		BType found = new SetType(getType(node.getExpression()));
+
+		BType expected = getType(node);
+		try {
+			found.unify(expected, this);
+		} catch (UnificationException e) {
+			throw new TypeErrorException("Excepted '" + expected + "' , found "
+					+ found + "'");
+		}
+		
+		
+//		List<PExpression> copy = new ArrayList<PExpression>(
+//				node.getIdentifiers());
+//		for (PExpression e : copy) {
+//			AIdentifierExpression v = (AIdentifierExpression) e;
+//			UntypedType u = new UntypedType();
+//			setType(v, u);
+//		}
+//		
+//		setType(node.getPredicates(), BoolType.getInstance());
+//		node.getPredicates().apply(this);
+//		
+//		setType(node.getExpression(), new UntypedType());
+//		node.getExpression().apply(this);
+//		
+//		BType expr = getType(node.getExpression());
+//		System.out.println(getType(node.getExpression()));
+//
+//		BType expected = getType(node);
+//		SetType set = new SetType(getType(node.getExpression()));
+//		unify(expected, set, node);
+//		BType type = getType(node);
+//		System.out.println(getType(node));
+
+
 	}
 
 	public static BType makePair(ArrayList<BType> list) {
@@ -1373,11 +1422,11 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "'");
 		}
-		
+
 		setType(node.getExpression(), new UntypedType());
 		node.getExpression().apply(this);
 		BType type = getType(node.getExpression());
-		if (! (type instanceof FunctionType)){
+		if (!(type instanceof FunctionType)) {
 			new SetType(new UntypedType()).unify(type, this);
 		}
 	}
@@ -1813,6 +1862,9 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		for (PExpression e : copy) {
 			setType(e, new UntypedType());
 			e.apply(this);
+		}
+		
+		for (PExpression e : copy) {
 			list.add(getType(e));
 		}
 
@@ -2377,7 +2429,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		}
 		BType expected = getType(node);
 		try {
-			found.unify(expected, this);
+			unify(expected, found, node);
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "'");
@@ -2391,17 +2443,19 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		String fieldName = Utils.getIdentifierAsString(i.getIdentifier());
 		s.add(fieldName, new UntypedType());
 		setType(node.getRecord(), s);
+
 		node.getRecord().apply(this);
 
 		BType found = ((StructType) getType(node.getRecord()))
 				.getType(fieldName);
 		BType expected = getType(node);
 		try {
-			found.unify(expected, this);
+			unify(expected, found, node);
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "'");
 		}
+
 	}
 
 	@Override

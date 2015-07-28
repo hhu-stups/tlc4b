@@ -56,7 +56,12 @@ public class SetType extends AbstractHasFollowers {
 
 	@Override
 	public String toString() {
-		return "POW(" + subtype + ")";
+		if(this.equals(subtype)){
+			return "POW(recursive call)";
+		}else{
+			return "POW(" + subtype + ")";
+		}
+		
 	}
 
 	public boolean isUntyped() {
@@ -81,6 +86,9 @@ public class SetType extends AbstractHasFollowers {
 
 	@Override
 	public boolean contains(BType other) {
+		if(this.equals(subtype)){
+			return true;
+		}
 		if (this.subtype.equals(other)) {
 			return true;
 		}

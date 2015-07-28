@@ -3,6 +3,7 @@ package de.tlc4b;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;
@@ -22,9 +23,12 @@ import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.analysis.transformation.DefinitionsEliminator;
+import de.tlc4b.analysis.transformation.SeesEliminator;
+import de.tlc4b.analysis.transformation.SetComprehensionOptimizer;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.analysis.unchangedvariables.InvariantPreservationAnalysis;
 import de.tlc4b.analysis.unchangedvariables.UnchangedVariablesFinder;
+import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.prettyprint.TLAPrinter;
 import de.tlc4b.tla.Generator;
 import de.tlc4b.tlc.TLCOutputInfo;
@@ -34,6 +38,7 @@ public class Translator {
 
 	private String machineString;
 	private Start start;
+	private Map<String, Start> parsedMachines;
 	private String moduleString;
 	private String configString;
 	private String machineName;
@@ -64,12 +69,16 @@ public class Translator {
 	}
 
 	public Translator(String machineName, File machineFile, String ltlFormula,
-			String constantSetup) throws IOException, BException {
+			String constantSetup) throws BException, IOException {
 		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
 
 		BParser parser = new BParser(machineName);
-		start = parser.parseFile(machineFile, false);
+		try {
+			start = parser.parseFile(machineFile, false);
+		} catch (NoClassDefFoundError e) {
+			throw new TLC4BIOException("Definitions file cannot be found.");
+		}
 
 		// Definitions of definitions files are injected in the ast of the main
 		// machine
@@ -77,6 +86,8 @@ public class Translator {
 				machineFile.getParent(), parser.getContentProvider());
 		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions(),
 				parser.getPragmas());
+		
+		parsedMachines = rml.getParsedMachines();
 
 		if (constantSetup != null) {
 			BParser con = new BParser();
@@ -104,15 +115,18 @@ public class Translator {
 	}
 
 	public void translate() {
+		// ast transformation
+		SeesEliminator.eliminateSeesClauses(start, parsedMachines);
+
 		new NotSupportedConstructs(start);
+		DefinitionsEliminator.eliminateDefinitions(start);
 
-		new DefinitionsEliminator(start);
-
+		SetComprehensionOptimizer.optimizeSetComprehensions(start);
+		
 		MachineContext machineContext = new MachineContext(machineName, start,
 				ltlFormula, constantsSetup);
 		this.machineName = machineContext.getMachineName();
-		if(machineContext
-				.machineContainsOperations()){
+		if (machineContext.machineContainsOperations()) {
 			TLC4BGlobals.setPrintCoverage(true);
 		}
 
@@ -149,7 +163,8 @@ public class Translator {
 		UsedStandardModules usedModules = new UsedStandardModules(start,
 				typechecker, typeRestrictor, generator.getTlaModule());
 
-		standardModulesToBeCreated = usedModules.getStandardModulesToBeCreated();
+		standardModulesToBeCreated = usedModules
+				.getStandardModulesToBeCreated();
 
 		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator
 				.getTlaModule().getOperations(), machineContext);
