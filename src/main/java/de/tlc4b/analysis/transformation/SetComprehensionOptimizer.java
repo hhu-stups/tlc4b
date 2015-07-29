@@ -3,9 +3,11 @@ package de.tlc4b.analysis.transformation;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.ABooleanTrueExpression;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.ACoupleExpression;
@@ -14,12 +16,30 @@ import de.be4.classicalb.core.parser.node.AEqualPredicate;
 import de.be4.classicalb.core.parser.node.AEventBComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AMemberPredicate;
+import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
+import de.tlc4b.util.UtilMethods;
 
+/**
+ * This class performs an AST transformation on set comprehension nodes. For
+ * example the expression {a,b| a = b & b : 1..10} will be replaced by the
+ * Event-B set comprehension {b. b : 1..10 | b |-> b}. Moreover, if the parent
+ * of a set comprehension is a domain expression, this will also be used for the
+ * optimization, e.g. {a,b| a = b + 1 & b : 1..10} will be replaced by {b. b :
+ * 1..10 | b + 1}
+ * 
+ * @author hansen
+ * 
+ */
 public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
+	/**
+	 * The method called by the translator.
+	 * 
+	 * @param start
+	 */
 	public static void optimizeSetComprehensions(Start start) {
 		SetComprehensionOptimizer optimizer = new SetComprehensionOptimizer();
 		start.apply(optimizer);
@@ -27,63 +47,6 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 	@Override
 	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
-		if (node.parent() instanceof ADomainExpression) {
-			LinkedList<PExpression> identifiers = node.getIdentifiers();
-
-			final ArrayList<String> list = new ArrayList<String>();
-			final AIdentifierExpression last = (AIdentifierExpression) identifiers
-					.getLast();
-			for (int i = 0; i < identifiers.size() - 1; i++) {
-				AIdentifierExpression id = (AIdentifierExpression) identifiers
-						.get(i);
-				String name = Utils.getIdentifierAsString(id.getIdentifier());
-				list.add(name);
-			}
-
-			Hashtable<String, PExpression> values = new Hashtable<String, PExpression>();
-			ArrayList<AEqualPredicate> equalList = new ArrayList<AEqualPredicate>();
-			analysePredicate(node.getPredicates(), list, values, equalList);
-
-			if (values.keySet().containsAll(list)) {
-				// delete nodes
-				new NodesRemover(node.getPredicates(), equalList, values);
-
-				AEventBComprehensionSetExpression eventBcomprehension = new AEventBComprehensionSetExpression();
-				ArrayList<PExpression> ids = new ArrayList<PExpression>();
-				ids.add(last);
-				eventBcomprehension.setIdentifiers(ids);
-
-				ACoupleExpression couple = new ACoupleExpression();
-
-				ArrayList<PExpression> exprs = new ArrayList<PExpression>();
-				for (int i = 0; i < list.size(); i++) {
-					exprs.add(values.get(list.get(i)));
-				}
-				couple.setList(exprs);
-				eventBcomprehension.setExpression(couple);
-
-				AMemberPredicate member = new AMemberPredicate();
-				member.setLeft((AIdentifierExpression) last.clone());
-				AComprehensionSetExpression compre = new AComprehensionSetExpression();
-				ArrayList<PExpression> ids2 = new ArrayList<PExpression>();
-				ids2.add((AIdentifierExpression) last.clone());
-				compre.setIdentifiers(ids2);
-				compre.setPredicates(node.getPredicates());
-				member.setRight(compre);
-				eventBcomprehension.setPredicates(member);
-
-				node.parent().replaceBy(eventBcomprehension);
-
-				eventBcomprehension.apply(this);
-			}
-		}
-
-		if (node.parent() != null)
-			testGeneric(node);
-
-	}
-
-	private void testGeneric(AComprehensionSetExpression node) {
 		final LinkedList<PExpression> identifiers = node.getIdentifiers();
 		final ArrayList<String> list = new ArrayList<String>();
 		final Hashtable<String, AIdentifierExpression> identifierTable = new Hashtable<String, AIdentifierExpression>();
@@ -98,65 +61,116 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 		Hashtable<String, PExpression> values = new Hashtable<String, PExpression>();
 		ArrayList<AEqualPredicate> equalList = new ArrayList<AEqualPredicate>();
 		analysePredicate(node.getPredicates(), list, values, equalList);
-		if (values.size() > 0 && list.size()-values.size() > 0) {
+
+		ArrayList<ADomainExpression> parentDomainExprsList = collectParentDomainExpression(node
+				.parent());
+
+		// The set comprehension will be optimized if there is an equal node (
+		// {x,y| x =
+		// 1..} ) or the parent node is a domain expression (dom({..})).
+		// There must be less equal nodes than quantified variables, otherwise
+		// there
+		// is no remaining variable to be quantified.
+		// Moreover, the TLA+ syntax is restricted to non-nested tuples in a set
+		// comprehension ({v : <<a,b>> \in S}.
+		// Hence, there must be at most two remaining variables.
+		// If these conditions are not fulfilled, the AST transformation will
+		// not be applied.
+		// However, other optimization techniques may be applicable.
+
+		if ((values.size() > 0 || parentDomainExprsList.size() > 0)
+				&& values.size() < list.size()
+				&& list.size() - values.size() <= 2) {
+
 			// delete nodes
 			new NodesRemover(node.getPredicates(), equalList, values);
 
-			AEventBComprehensionSetExpression eventBcomprehension = new AEventBComprehensionSetExpression();
+			int max = Math.min(list.size() - 1, parentDomainExprsList.size());
+			int exprCount = list.size() - max;
+
+			// {ids. ids2 \in {ids3 \in S: P } | exprs}
 			ArrayList<PExpression> ids = new ArrayList<PExpression>();
 			ArrayList<PExpression> ids2 = new ArrayList<PExpression>();
 			ArrayList<PExpression> ids3 = new ArrayList<PExpression>();
-			for (String p : list) {
-				if (!values.containsKey(p)) {
-					PExpression clone = (PExpression) identifierTable.get(p)
-							.clone();
-					ids.add(clone);
-					PExpression clone2 = (PExpression) identifierTable.get(p)
-							.clone();
-					ids2.add(clone2);
-					PExpression clone3 = (PExpression) identifierTable.get(p)
-							.clone();
-					ids3.add(clone3);
-				}
-			}
-			eventBcomprehension.setIdentifiers(ids);
-
-			ACoupleExpression couple = new ACoupleExpression();
 			ArrayList<PExpression> exprs = new ArrayList<PExpression>();
 			for (int i = 0; i < list.size(); i++) {
 				String name = list.get(i);
-				if (values.containsKey(name)) {
-					exprs.add(values.get(name));
-				} else {
-					PExpression clone = (PExpression) identifierTable.get(name)
-							.clone();
-					exprs.add(clone);
+
+				// expression list
+				if (i < exprCount) {
+					if (values.containsKey(name)) {
+						exprs.add(values.get(name));
+					} else {
+						PExpression clone = (PExpression) identifierTable.get(
+								name).clone();
+						exprs.add(clone);
+					}
 				}
 
+				// remaining quantified variables
+				if (!values.containsKey(name)) {
+					PExpression clone = (PExpression) identifierTable.get(name)
+							.clone();
+					ids.add(clone);
+					PExpression clone2 = (PExpression) identifierTable
+							.get(name).clone();
+					ids2.add(clone2);
+					PExpression clone3 = (PExpression) identifierTable
+							.get(name).clone();
+					ids3.add(clone3);
+				}
 			}
+
+			AEventBComprehensionSetExpression eventBcomprehension = new AEventBComprehensionSetExpression();
+			ACoupleExpression couple = new ACoupleExpression();
 			couple.setList(exprs);
 			eventBcomprehension.setExpression(couple);
-
 			AMemberPredicate member = new AMemberPredicate();
-			if (ids2.size() > 1) {
-				ACoupleExpression couple2 = new ACoupleExpression();
-				couple2.setList(ids2);
-				member.setLeft(couple2);
-			} else {
-				member.setLeft(ids2.get(0));
-			}
-
 			AComprehensionSetExpression compre = new AComprehensionSetExpression();
+			eventBcomprehension.setIdentifiers(ids);
+			if (ids.size() == 1) {
+				member.setLeft(ids2.get(0));
+			} else {
+				ACoupleExpression couple2 = new ACoupleExpression(ids2);
+				member.setLeft(couple2);
+			}
 			compre.setIdentifiers(ids3);
 			compre.setPredicates(node.getPredicates());
 			member.setRight(compre);
+
 			eventBcomprehension.setPredicates(member);
-
 			node.replaceBy(eventBcomprehension);
-
-			eventBcomprehension.apply(this);
+			// eventBcomprehension.apply(this);
 		}
 
+	}
+
+	/**
+	 * This method collects all {@link ADomainExpression} which are direct
+	 * parents of the the set comprehension. For example the set comprehension
+	 * in k = dom(dom({a,b,c| ..}) has 2 preceding dom expression. All preceding
+	 * dom expression nodes are collected in the parameter domExprList.
+	 * 
+	 * @param node
+	 * @return
+	 */
+
+	private ArrayList<ADomainExpression> collectParentDomainExpression(Node node) {
+		if (node instanceof ADomainExpression) {
+			ArrayList<ADomainExpression> domExprList = collectParentDomainExpression(node
+					.parent());
+			domExprList.set(0, (ADomainExpression) node); // prepend the node
+			return domExprList;
+		} else {
+			return new ArrayList<ADomainExpression>();
+		}
+
+	}
+
+	private void setSourcePosition(AComprehensionSetExpression from,
+			AEventBComprehensionSetExpression to) {
+		to.setStartPos(from.getStartPos());
+		to.setEndPos(from.getEndPos());
 	}
 
 	private void analysePredicate(PPredicate predicate, ArrayList<String> list,
@@ -172,16 +186,10 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getLeft();
 				String name = Utils.getIdentifierAsString(id.getIdentifier());
-				if (list.contains(name) && !values.containsKey(name)) {
-					if (equal.getRight() instanceof AIdentifierExpression) {
-						AIdentifierExpression id2 = (AIdentifierExpression) equal
-								.getRight();
-						String name2 = Utils.getIdentifierAsString(id2
-								.getIdentifier());
-						if (values.containsKey(name2)){
-							return;
-						}
-					}
+
+				if (list.contains(name)
+						&& !DependenciesDetector.expressionContainsIdentifier(
+								equal.getRight(), values.keySet())) {
 					equalList.add(equal);
 					values.put(name, equal.getRight());
 				}
@@ -190,21 +198,42 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getRight();
 				String name = Utils.getIdentifierAsString(id.getIdentifier());
-				if (list.contains(name) && !values.containsKey(name)) {
-					if (equal.getLeft() instanceof AIdentifierExpression) {
-						AIdentifierExpression id2 = (AIdentifierExpression) equal
-								.getLeft();
-						String name2 = Utils.getIdentifierAsString(id2
-								.getIdentifier());
-						if (values.contains(name2))
-							return;
-					}
+				if (list.contains(name)
+						&& !DependenciesDetector.expressionContainsIdentifier(
+								equal.getLeft(), values.keySet())) {
 					equalList.add(equal);
 					values.put(name, equal.getLeft());
 				}
 			}
 
 		}
+
+	}
+
+	static class DependenciesDetector extends DepthFirstAdapter {
+		private final Set<String> names;
+		private boolean hasDependency = false;
+
+		private DependenciesDetector(Set<String> names) {
+			this.names = names;
+		}
+
+		@Override
+		public void caseAIdentifierExpression(AIdentifierExpression node) {
+			String name = Utils.getIdentifierAsString(node.getIdentifier());
+			if (names.contains(name)) {
+				hasDependency = true;
+			}
+		}
+
+		static boolean expressionContainsIdentifier(PExpression node,
+				Set<String> names) {
+			DependenciesDetector dependenciesDetector = new DependenciesDetector(
+					names);
+			node.apply(dependenciesDetector);
+			return dependenciesDetector.hasDependency;
+		}
+
 	}
 
 	class NodesRemover extends DepthFirstAdapter {

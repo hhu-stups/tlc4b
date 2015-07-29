@@ -1294,42 +1294,10 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getExpression(), new UntypedType());
 		node.getExpression().apply(this);
 
-
 		BType found = new SetType(getType(node.getExpression()));
 
 		BType expected = getType(node);
-		try {
-			found.unify(expected, this);
-		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found "
-					+ found + "'");
-		}
-		
-		
-//		List<PExpression> copy = new ArrayList<PExpression>(
-//				node.getIdentifiers());
-//		for (PExpression e : copy) {
-//			AIdentifierExpression v = (AIdentifierExpression) e;
-//			UntypedType u = new UntypedType();
-//			setType(v, u);
-//		}
-//		
-//		setType(node.getPredicates(), BoolType.getInstance());
-//		node.getPredicates().apply(this);
-//		
-//		setType(node.getExpression(), new UntypedType());
-//		node.getExpression().apply(this);
-//		
-//		BType expr = getType(node.getExpression());
-//		System.out.println(getType(node.getExpression()));
-//
-//		BType expected = getType(node);
-//		SetType set = new SetType(getType(node.getExpression()));
-//		unify(expected, set, node);
-//		BType type = getType(node);
-//		System.out.println(getType(node));
-
-
+		unify(expected, found, node);
 	}
 
 	public static BType makePair(ArrayList<BType> list) {
@@ -1863,7 +1831,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(e, new UntypedType());
 			e.apply(this);
 		}
-		
+
 		for (PExpression e : copy) {
 			list.add(getType(e));
 		}
@@ -2175,7 +2143,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected + "' , found "
 					+ found + "' at " + node.getClass().getSimpleName() + "\n "
-					+ node.getStartPos());
+					+ node.getStartPos() + ":" + node.getEndPos());
 		}
 	}
 

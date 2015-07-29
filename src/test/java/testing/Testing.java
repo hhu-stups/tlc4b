@@ -30,15 +30,18 @@ public class Testing extends AbstractParseMachineTest{
 
 	@Test
 	public void testRunTLC() throws Exception {
-		String[] a = new String[] { machine.getPath()};
-		TLC4B.main(a);
-		//assertEquals(error, B2TLA.test(a,false));
+		if (!machine.getName().contains("Mch2")) {
+			return;
+		}
+		
+		String[] a = new String[] { machine.getPath() };
+		TLC4B.test(a, false);
 	}
 
 	@Config
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
-		list.add(new TestPair(NoError, "./src/test/resources/Testing"));
+		list.add(new TestPair(NoError, "/Users/hansen/git/thales/EngineeringRules-Generic/"));
 		return getConfiguration(list);
 	}
 }

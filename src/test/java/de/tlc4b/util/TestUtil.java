@@ -31,16 +31,15 @@ public class TestUtil {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
 		System.out.println(b2tlaTranslator.getModuleString());
-		/**
-		 * create standard modules BBuildins
-		 */
+		
+		//TODO  create standard modules BBuildins
+		 
 
 		String moduleName = b2tlaTranslator.getMachineName();
 		String str1 = translateTLA2B(moduleName,
 				b2tlaTranslator.getModuleString());
 
 		String str2 = translateTLA2B(moduleName, expectedModule);
-
 		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
 		// .translateString(name, b2tlaTranslator.getModuleString(), null);
 		// StringBuilder sb2 = de.tla2b.translation.Tla2BTranslator
