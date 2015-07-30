@@ -1,13 +1,14 @@
 package de.tlc4b.analysis.transformation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.ABooleanTrueExpression;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.ACoupleExpression;
@@ -20,7 +21,6 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
-import de.tlc4b.util.UtilMethods;
 
 /**
  * This class performs an AST transformation on set comprehension nodes. For
@@ -47,6 +47,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 	@Override
 	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
+
 		final LinkedList<PExpression> identifiers = node.getIdentifiers();
 		final ArrayList<String> list = new ArrayList<String>();
 		final Hashtable<String, AIdentifierExpression> identifierTable = new Hashtable<String, AIdentifierExpression>();
@@ -77,7 +78,6 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 		// If these conditions are not fulfilled, the AST transformation will
 		// not be applied.
 		// However, other optimization techniques may be applicable.
-
 		if ((values.size() > 0 || parentDomainExprsList.size() > 0)
 				&& values.size() < list.size()
 				&& list.size() - values.size() <= 2) {
@@ -139,10 +139,18 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			member.setRight(compre);
 
 			eventBcomprehension.setPredicates(member);
-			node.replaceBy(eventBcomprehension);
+			setSourcePosition(node, eventBcomprehension);
+			if (parentDomainExprsList.size() > 0) {
+				ADomainExpression aDomainExpression = parentDomainExprsList
+						.get(max - 1);
+				aDomainExpression.replaceBy(eventBcomprehension);
+			} else {
+				node.replaceBy(eventBcomprehension);
+			}
 			// eventBcomprehension.apply(this);
+		} else {
+			// node.getPredicates().apply(this);
 		}
-
 	}
 
 	/**
@@ -159,7 +167,8 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 		if (node instanceof ADomainExpression) {
 			ArrayList<ADomainExpression> domExprList = collectParentDomainExpression(node
 					.parent());
-			domExprList.set(0, (ADomainExpression) node); // prepend the node
+			domExprList.add(0, (ADomainExpression) node); // prepend the
+															// node
 			return domExprList;
 		} else {
 			return new ArrayList<ADomainExpression>();
@@ -186,10 +195,11 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getLeft();
 				String name = Utils.getIdentifierAsString(id.getIdentifier());
-
+				Set<String> names = new HashSet<String>(values.keySet());
+				names.add(name);
 				if (list.contains(name)
 						&& !DependenciesDetector.expressionContainsIdentifier(
-								equal.getRight(), values.keySet())) {
+								equal.getRight(), names)) {
 					equalList.add(equal);
 					values.put(name, equal.getRight());
 				}
@@ -198,9 +208,11 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getRight();
 				String name = Utils.getIdentifierAsString(id.getIdentifier());
+				Set<String> names = new HashSet<String>(values.keySet());
+				names.add(name);
 				if (list.contains(name)
 						&& !DependenciesDetector.expressionContainsIdentifier(
-								equal.getLeft(), values.keySet())) {
+								equal.getLeft(), names)) {
 					equalList.add(equal);
 					values.put(name, equal.getLeft());
 				}

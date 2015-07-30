@@ -1892,7 +1892,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 	}
 
-	private boolean isElementOfRecursive(Node node) {
+	private boolean recursiveIsElementOfTest(Node node) {
 		Node parent = node.parent();
 		if (parent instanceof AMemberPredicate
 				&& !typeRestrictor.isARemovedNode(parent)
@@ -1900,8 +1900,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 			return true;
 		} else {
 			String clazz = parent.getClass().getName();
+			// todo include all expressions which have an "element of"
+			// translation
 			if (clazz.contains("Total") || clazz.contains("Partial")) {
-				return isElementOfRecursive(node.parent());
+				return recursiveIsElementOfTest(node.parent());
 			} else
 				return false;
 		}
@@ -1914,7 +1916,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (subtype instanceof FunctionType) {
 			moduleStringAppend(funcName);
 		} else {
-			if (isElementOfRecursive(node)) {
+			if (recursiveIsElementOfTest(node)) {
 				moduleStringAppend(relEleOfName);
 			} else {
 				moduleStringAppend(relName);
@@ -1973,7 +1975,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 				moduleStringAppend(funcName);
 			}
 		} else {
-			if (isElementOfRecursive(node)) {
+			if (recursiveIsElementOfTest(node)) {
 				moduleStringAppend(relEleOfName);
 			} else {
 				moduleStringAppend(relName);
@@ -2719,8 +2721,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAIseqExpression(AIseqExpression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			
-			if (isElementOfRecursive(node.parent())
+
+			if (recursiveIsElementOfTest(node.parent())
 					&& !typeRestrictor.isARemovedNode(node.parent())) {
 				moduleStringAppend(REL_INJECTIVE_SEQUENCE_ELEMENT_OF);
 			} else {
@@ -2743,15 +2745,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAIseq1Expression(AIseq1Expression node) {
 		SetType set = (SetType) typechecker.getType(node);
 		if (set.getSubtype() instanceof SetType) {
-			if (node.parent() instanceof AMemberPredicate
-					&& !typeRestrictor.isARemovedNode(node.parent())) {
+			if (recursiveIsElementOfTest(node)) {
 				moduleStringAppend(REL_INJECTIVE_SEQUENCE_1_ELEMENT_OF);
 			} else {
 				moduleStringAppend(REL_INJECTIVE_SEQUENCE_1);
 			}
 		} else {
-			if (node.parent() instanceof AMemberPredicate
-					&& !typeRestrictor.isARemovedNode(node.parent())) {
+			if (recursiveIsElementOfTest(node)) {
 				moduleStringAppend(INJECTIVE_SEQUENCE_1_ELEMENT_OF);
 			} else {
 				moduleStringAppend(INJECTIVE_SEQUENCE_1);

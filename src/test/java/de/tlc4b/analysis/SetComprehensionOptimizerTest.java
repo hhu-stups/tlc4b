@@ -75,4 +75,38 @@ public class SetComprehensionOptimizerTest {
 				+ "======";
 		compare(expected, machine);
 	}
+	
+	@Test
+	public void testDomain() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES dom({x,y|  x : 1..10 & x = y}) /= {} \n" + "END";
+		String expected = "---- MODULE test----\n" 
+				+ "EXTENDS Naturals\n"
+				+ "ASSUME {y: y \\in {y \\in ((1 .. 10)): TRUE}} # {} \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testDoubleDomain() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES dom(dom({a,b,c|  a = 1 & b = 1 & c : 1..10 })) /= {} \n" + "END";
+		String expected = "---- MODULE test----\n" 
+				+ "EXTENDS Naturals\n"
+				+ "ASSUME {1: c \\in {c \\in ((1 .. 10)): TRUE}} # {} \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Test
+	public void testSelfDependency() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {x,y|  y : 1..10 & x = x + 1 -1} /= {} \n" + "END";
+		String expected = "---- MODULE test----\n" 
+				+ "EXTENDS Integers\n"
+				+ "ASSUME {<<x, y>> \\in ((Int) \\times ((1 .. 10))): x = (x + 1) - 1} # {} \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
 }
