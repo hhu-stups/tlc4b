@@ -293,11 +293,9 @@ public class TLCResults implements ToolGlobals {
 			// get the violated assumption expr from the OutputCollector
 			ArrayList<ExprNode> violatedAssumptions = OutputCollector
 					.getViolatedAssumptions();
-			System.out.println(violatedAssumptions.size());
 			if (violatedAssumptions.size() > 0) {
 				// try to find the assume node contain the expr in order to get
 				// the name of the assumption
-
 				for (ExprNode exprNode : violatedAssumptions) {
 					AssumeNode assumeNode = findAssumeNode(exprNode);
 					ThmOrAssumpDefNode def = assumeNode.getDef();
@@ -315,7 +313,7 @@ public class TLCResults implements ToolGlobals {
 
 				}
 			}
-			if(tlcResult!= null){
+			if(tlcResult == null){
 				// otherwise, it is normal properties error
 				tlcResult = TLCResult.PropertiesError;
 			}

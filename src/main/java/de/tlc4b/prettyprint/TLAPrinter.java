@@ -464,7 +464,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 						moduleStringAppend(name);
 						moduleStringAppend(" == ");
 					} else {
-						moduleStringAppend(name);
 						moduleStringAppend("Assertion" + (i + 1) + " == ");
 					}
 				} else {
