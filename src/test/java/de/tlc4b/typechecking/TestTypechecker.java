@@ -25,7 +25,7 @@ public class TestTypechecker {
 		Start start = parser.parse(machine, false);
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		System.out.println(ast2String2.toString());
+		//System.out.println(ast2String2.toString());
 		MachineContext c = new MachineContext(null, start, null, null);
 		Typechecker t = new Typechecker(c);
 

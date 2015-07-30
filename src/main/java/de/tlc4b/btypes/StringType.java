@@ -52,8 +52,8 @@ public class StringType implements BType {
 		return "STRING";
 	}
 
-	public boolean containsIntegerType() {
-		return false;
+	public boolean containsInfiniteType() {
+		return true;
 	}
 
 	public PExpression createSyntaxTreeNode(Typechecker typechecker) {

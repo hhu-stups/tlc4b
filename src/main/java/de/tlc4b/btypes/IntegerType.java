@@ -59,7 +59,7 @@ public class IntegerType implements BType {
 		return false;
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		return true;
 	}
 

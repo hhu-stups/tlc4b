@@ -452,12 +452,31 @@ public class TLAPrinter extends DepthFirstAdapter {
 			if (assertions.size() == 0)
 				return;
 			for (int i = 0; i < assertions.size(); i++) {
-				if (tlaModule.hasInitPredicate()) {
-					moduleStringAppend("Assertion" + (i + 1) + " == ");
-				} else {
-					moduleStringAppend("ASSUME Assertion" + (i + 1) + " == ");
+				Node assertion = assertions.get(i);
+				String name = null;
+				if (assertion instanceof ALabelPredicate) {
+					ALabelPredicate label = (ALabelPredicate) assertion;
+					name = label.getName().getText();
 				}
-				assertions.get(i).apply(this);
+
+				if (tlaModule.hasInitPredicate()) {
+					if (name != null) {
+						moduleStringAppend(name);
+						moduleStringAppend(" == ");
+					} else {
+						moduleStringAppend(name);
+						moduleStringAppend("Assertion" + (i + 1) + " == ");
+					}
+				} else {
+					moduleStringAppend("ASSUME ");
+					if (name != null) {
+						moduleStringAppend(name);
+						moduleStringAppend(" == ");
+					} else {
+						moduleStringAppend("Assertion" + (i + 1) + " == ");
+					}
+				}
+				assertion.apply(this);
 				moduleStringAppend("\n");
 			}
 		}

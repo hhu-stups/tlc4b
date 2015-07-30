@@ -118,7 +118,12 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	public BType getType(Node node) {
-		return types.get(node);
+		BType res = types.get(node);
+		if (res == null) {
+			new TypeErrorException("Node '" + node + "' has not type.\n"
+					+ node.getStartPos());
+		}
+		return res;
 	}
 
 	@Override
@@ -445,7 +450,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected
-					+ "' , found '" + found + "' at identifier " + node + "\n"
+					+ "' , found '" + found + "' at identifier " + name + "\n"
 					+ node.getStartPos());
 		}
 	}
@@ -1127,6 +1132,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
+			System.out.println(node.parent().getClass());
 			throw new TypeErrorException("Excepted '" + getType(node)
 					+ "' , found 'BOOL' in ' <=> '");
 		}
@@ -2476,6 +2482,11 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			throw new TypeErrorException("Excepted '" + getType(node)
 					+ "' , found " + found + "'");
 		}
+	}
+
+	public void inALabelPredicate(ALabelPredicate node) {
+		BType type = getType(node);
+		setType(node.getPredicate(), type);
 	}
 
 }

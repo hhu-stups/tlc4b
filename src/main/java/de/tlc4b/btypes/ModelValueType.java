@@ -61,7 +61,7 @@ public class ModelValueType implements BType {
 		return name;
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		return false;
 	}
 

@@ -123,9 +123,9 @@ public class FunctionType extends AbstractHasFollowers {
 		return "[" + domain.getTlaType() + " -> " + range.getTlaType() + "]";
 	}
 
-	public boolean containsIntegerType() {
-		return this.domain.containsIntegerType()
-				|| this.range.containsIntegerType();
+	public boolean containsInfiniteType() {
+		return this.domain.containsInfiniteType()
+				|| this.range.containsInfiniteType();
 	}
 
 	public PExpression createSyntaxTreeNode(Typechecker typechecker) {

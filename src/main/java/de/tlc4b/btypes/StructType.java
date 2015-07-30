@@ -210,10 +210,10 @@ public class StructType extends AbstractHasFollowers {
 		return res.toString();
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		Iterator<BType> iterator = this.types.values().iterator();
 		while (iterator.hasNext()) {
-			if (iterator.next().containsIntegerType())
+			if (iterator.next().containsInfiniteType())
 				return true;
 		}
 		return false;

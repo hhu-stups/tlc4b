@@ -31,15 +31,15 @@ public class TestUtil {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
 		System.out.println(b2tlaTranslator.getModuleString());
-		
-		//TODO  create standard modules BBuildins
-		 
+
+		// TODO create standard modules BBuildins
 
 		String moduleName = b2tlaTranslator.getMachineName();
-		String str1 = translateTLA2B(moduleName,
-				b2tlaTranslator.getModuleString());
+		String str1 = de.tla2bAst.Translator.translateModuleString(moduleName,
+				b2tlaTranslator.getModuleString(), null);
 
-		String str2 = translateTLA2B(moduleName, expectedModule);
+		String str2 = de.tla2bAst.Translator.translateModuleString(moduleName,
+				expectedModule, null);
 		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
 		// .translateString(name, b2tlaTranslator.getModuleString(), null);
 		// StringBuilder sb2 = de.tla2b.translation.Tla2BTranslator
@@ -53,8 +53,7 @@ public class TestUtil {
 		// assertEquals(sb2.toString(), sb1.toString());
 	}
 
-	public static String translateTLA2B(String moduleName, String tlaString)
-			throws TLA2BException {
+	public static String translateTLA2B(String moduleName, String tlaString) throws TLA2BException {
 		return de.tla2bAst.Translator.translateModuleString(moduleName,
 				tlaString, null);
 	}
@@ -64,7 +63,6 @@ public class TestUtil {
 		return de.tla2bAst.Translator.translateModuleString(moduleName,
 				tlaString, configString);
 	}
-
 
 	public static void compareLTLFormula(String expected, String machine,
 			String ltlFormula) throws Exception {
@@ -121,12 +119,8 @@ public class TestUtil {
 		System.out.println(b2tlaTranslator.getModuleString());
 		System.out.println(b2tlaTranslator.getConfigString());
 
-		
-		//TODO include config file in back translation from TLA+ to B
-		
-		
-		
-		
+		// TODO include config file in back translation from TLA+ to B
+
 		// String name = b2tlaTranslator.getMachineName();
 		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
 		// .translateString(name, b2tlaTranslator.getModuleString(),

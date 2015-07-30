@@ -79,7 +79,6 @@ public class SeesEliminator extends DepthFirstAdapter {
 
 			PParseUnit pParseUnit = main.getPParseUnit();
 			AAbstractMachineParseUnit machineParseUnit = (AAbstractMachineParseUnit) pParseUnit;
-			System.out.println(machineParseUnit.getHeader());
 
 			for (PMachineClause machineClause : machineParseUnit
 					.getMachineClauses()) {

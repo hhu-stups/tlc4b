@@ -223,7 +223,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		return null;
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		return false;
 	}
 

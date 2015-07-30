@@ -90,9 +90,8 @@ public class TLCRunner {
 	}
 
 	public static void runTLC(String machineName, File path) {
-
-		System.out.println("--------------------------------");
-
+		MP.println("--------------------------------");
+		MP.TLCOutputStream.changeOutputStream();
 		ToolIO.setMode(ToolIO.SYSTEM);
 
 		ArrayList<String> list = new ArrayList<String>();
@@ -131,10 +130,10 @@ public class TLCRunner {
 		}
 		// System.setOut(systemOut);
 		// ArrayList<String> messages = btlcStream.getArrayList();
-
-		System.out.println("--------------------------------");
 		closeThreads();
 		// return messages;
+		MP.TLCOutputStream.resetOutputStream();
+		MP.println("--------------------------------");
 	}
 
 	private static void closeThreads() {

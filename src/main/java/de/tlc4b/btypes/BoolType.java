@@ -47,7 +47,7 @@ public class BoolType implements BType {
 		return "BOOLEAN";
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		return false;
 	}
 

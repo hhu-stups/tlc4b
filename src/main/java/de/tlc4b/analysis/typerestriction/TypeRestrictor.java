@@ -52,6 +52,7 @@ import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.btypes.BType;
 import de.tlc4b.exceptions.NotSupportedException;
 import de.tlc4b.ltl.LTLFormulaVisitor;
+import de.tlc4b.util.UtilMethods;
 
 public class TypeRestrictor extends DepthFirstAdapter {
 
@@ -552,17 +553,19 @@ public class TypeRestrictor extends DepthFirstAdapter {
 					conType = typechecker.getType(machineContext
 							.getReferenceNode(e));
 				}
-				if (conType.containsIntegerType()
+				if (conType.containsInfiniteType()
 						&& !(e.parent() instanceof ALambdaExpression)
 						&& !(e.parent() instanceof AComprehensionSetExpression)) {
 					AIdentifierExpression id = (AIdentifierExpression) e;
 					String localVariableName = Utils.getIdentifierAsString(id
 							.getIdentifier());
 					throw new NotSupportedException(
-							"Unable to restrict the type of the variable '"
+							"Unable to restrict the type '"
+									+ conType
+									+ "' of identifier '"
 									+ localVariableName
 									+ "' to a finite set. TLC is not able to handle infinite sets.\n"
-									+ e.getStartPos());
+									+ UtilMethods.getPositionAsString(e));
 				}
 
 				tree = conType.createSyntaxTreeNode(typechecker);

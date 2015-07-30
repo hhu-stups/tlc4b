@@ -8,6 +8,6 @@ public interface BType extends ITypeConstants{
 	public boolean isUntyped();
 	public boolean compare(BType other);
 	public String getTlaType();
-	public boolean containsIntegerType();
+	public boolean containsInfiniteType();
 	public PExpression createSyntaxTreeNode(Typechecker typechecker);
 }

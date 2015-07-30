@@ -59,7 +59,7 @@ public class IntegerOrSetType extends AbstractHasFollowers {
 		return null;
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		return false;
 	}
 

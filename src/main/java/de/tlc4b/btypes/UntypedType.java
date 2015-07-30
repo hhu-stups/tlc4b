@@ -28,7 +28,7 @@ public class UntypedType extends AbstractHasFollowers {
 		return this.toString();
 	}
 
-	public boolean containsIntegerType() {
+	public boolean containsInfiniteType() {
 		return false;
 	}
 

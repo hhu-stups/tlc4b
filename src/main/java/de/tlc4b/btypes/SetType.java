@@ -102,8 +102,8 @@ public class SetType extends AbstractHasFollowers {
 		return "SUBSET(" + subtype.getTlaType() + ")";
 	}
 
-	public boolean containsIntegerType() {
-		return this.subtype.containsIntegerType();
+	public boolean containsInfiniteType() {
+		return this.subtype.containsInfiniteType();
 	}
 
 	public PExpression createSyntaxTreeNode(Typechecker typechecker) {

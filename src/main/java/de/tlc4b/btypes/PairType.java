@@ -129,9 +129,9 @@ public class PairType extends AbstractHasFollowers {
 		return res;
 	}
 
-	public boolean containsIntegerType() {
-		return this.first.containsIntegerType()
-				|| this.second.containsIntegerType();
+	public boolean containsInfiniteType() {
+		return this.first.containsInfiniteType()
+				|| this.second.containsInfiniteType();
 	}
 
 	public PExpression createSyntaxTreeNode(Typechecker typechecker) {

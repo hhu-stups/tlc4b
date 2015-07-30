@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
 import de.be4.classicalb.core.parser.node.ADomainExpression;
+import de.be4.classicalb.core.parser.node.ALabelPredicate;
 import de.be4.classicalb.core.parser.node.AMinusOrSetSubtractExpression;
 import de.be4.classicalb.core.parser.node.AMultOrCartExpression;
 import de.be4.classicalb.core.parser.node.Node;
@@ -56,21 +57,18 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AUnionExpression", 8, 8, true);
 		put("ASetSubtractionExpression", 8, 8, false);
 		put("AIntervalExpression", 9, 9, true);
-		
+
 		put("ACartesianProductExpression", 8, 13, false);
-		
+
 		put("AAddExpression", 10, 10, true);
-		
-		
+
 		put("AModuloExpression", 10, 11, true);
 		put("AUnaryMinusExpression", 12, 12, false);
 		put("AConcatExpression", 13, 13, true);
 		put("ADivExpression", 13, 13, false);
-		
-		
+
 		put("AFunctionExpression", 20, 20, false);
-		
-		
+
 	}
 
 	private Precedence getPrecedence(Node node) {
@@ -113,13 +111,18 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 
 	@Override
 	public void defaultIn(final Node node) {
+		Node parent = node.parent();
 		Precedence p = getPrecedence(node);
 		if (p != null) {
 			precedenceTable.put(node, p);
+			if (parent instanceof ALabelPredicate) {
+				parent = parent.parent();
+			}
 
-			if (node.parent() != null) {
-				Precedence parent = precedenceTable.get(node.parent());
-				if (Precedence.makeBrackets(p, parent)) {
+			if (parent != null) {
+				Precedence parentPrecedence = precedenceTable
+						.get(node.parent());
+				if (Precedence.makeBrackets(p, parentPrecedence)) {
 					brackets.add(node);
 				}
 			}
@@ -154,16 +157,16 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			brackets.add(node);
 		}
 	}
-	
+
 	@Override
-	public void inADomainExpression(ADomainExpression node)  {
+	public void inADomainExpression(ADomainExpression node) {
 		BType type = typechecker.getType(node.getExpression());
 
 		Precedence p;
 		if (type instanceof FunctionType) {
 			// Function
 			p = new Precedence("ADomainExpression", 9, 9, false);
-		
+
 			precedenceTable.put(node, p);
 
 			Precedence parent = precedenceTable.get(node.parent());

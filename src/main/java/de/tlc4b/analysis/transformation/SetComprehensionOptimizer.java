@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.Utils;

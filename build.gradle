@@ -7,8 +7,6 @@ apply plugin: 'findbugs'
 project.version = '1.0.0-SNAPSHOT'
 project.group = 'de.prob'
 
-sourceCompatibility = 1.5
-
 repositories {
 	mavenCentral()
 	maven {
@@ -24,7 +22,7 @@ configurations.all {
  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
  
-def parser_version = '2.4.36-SNAPSHOT'
+def parser_version = '2.5.0-SNAPSHOT'
 
 dependencies {
 	//compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
@@ -36,8 +34,6 @@ dependencies {
 	compile (group: 'de.prob', name: 'ltlparser', version: parser_version)
 	
 	//compile(group: 'de.prob', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
-
-
 
 	testCompile (group: 'junit', name: 'junit', version: '4.11')
     testCompile (group: 'de.prob', name: 'tla2bAST', version: '1.0.5-SNAPSHOT')
@@ -91,7 +87,6 @@ jar	{
 jar {
     manifest {
         attributes "Main-Class" : 'de.tlc4b.TLC4B'
-        attributes "Class-Path": 'tlatools.jar'
     }
 }
 

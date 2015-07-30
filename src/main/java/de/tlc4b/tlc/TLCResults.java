@@ -34,6 +34,7 @@ public class TLCResults implements ToolGlobals {
 	private Date startTime;
 	private Date endTime;
 	private LinkedHashMap<String, Long> operationsCount;
+	private ArrayList<String> violatedAssertions = new ArrayList<String>();
 
 	private int lengthOfTrace;
 	private String traceString;
@@ -72,6 +73,10 @@ public class TLCResults implements ToolGlobals {
 		return violatedDefinition;
 	}
 
+	public ArrayList<String> getViolatedAssertions(){
+		return this.violatedAssertions;
+	}
+	
 	public int getNumberOfTransitions() {
 		return numberOfTransitions;
 	}
@@ -286,31 +291,34 @@ public class TLCResults implements ToolGlobals {
 
 		case EC.TLC_ASSUMPTION_FALSE:
 			// get the violated assumption expr from the OutputCollector
-			ExprNode violatedAssumptionExpr = OutputCollector
-					.getViolatedAssumption();
-			if (violatedAssumptionExpr != null) {
+			ArrayList<ExprNode> violatedAssumptions = OutputCollector
+					.getViolatedAssumptions();
+			System.out.println(violatedAssumptions.size());
+			if (violatedAssumptions.size() > 0) {
 				// try to find the assume node contain the expr in order to get
 				// the name of the assumption
-				ModuleNode moduleNode = OutputCollector.getModuleNode();
-				AssumeNode[] assumptions = moduleNode.getAssumptions();
-				for (AssumeNode assumeNode : assumptions) {
-					if (assumeNode.getAssume() == violatedAssumptionExpr) {
-						ThmOrAssumpDefNode def = assumeNode.getDef();
-						// if the assumption is a named assumption, def is
-						// unequal null
-						// All B assertions are represented as named assumptions
-						// in the TLA module
-						if (def != null
-								&& def.getName().toString()
-										.startsWith("Assertion")) {
-							tlcResult = TLCResult.AssertionError;
-							return;
+
+				for (ExprNode exprNode : violatedAssumptions) {
+					AssumeNode assumeNode = findAssumeNode(exprNode);
+					ThmOrAssumpDefNode def = assumeNode.getDef();
+					// if the assumption is a named assumption, def is
+					// unequal null
+					// All B assertions are represented as named assumptions
+					// in the TLA module
+					if (def != null) {
+						String assertionName = def.getName().toString();
+						if(!violatedAssertions.contains(assertionName)){
+							this.violatedAssertions.add(assertionName);
 						}
+						tlcResult = TLCResult.AssertionError;
 					}
+
 				}
 			}
-			// otherwise, it is normal properties error
-			tlcResult = TLCResult.PropertiesError;
+			if(tlcResult!= null){
+				// otherwise, it is normal properties error
+				tlcResult = TLCResult.PropertiesError;
+			}
 			break;
 
 		case EC.TLC_TEMPORAL_PROPERTY_VIOLATED:
@@ -338,6 +346,17 @@ public class TLCResults implements ToolGlobals {
 			tlcResult = evaluatingParameter(m.getParameters());
 			break;
 		}
+	}
+
+	private AssumeNode findAssumeNode(ExprNode exprNode) {
+		ModuleNode moduleNode = OutputCollector.getModuleNode();
+		AssumeNode[] assumptions = moduleNode.getAssumptions();
+		for (AssumeNode assumeNode : assumptions) {
+			if (assumeNode.getAssume() == exprNode) {
+				return assumeNode;
+			}
+		}
+		return null;
 	}
 
 	private TLCResult evaluatingParameter(String[] params) {

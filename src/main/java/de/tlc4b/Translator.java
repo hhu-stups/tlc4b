@@ -84,8 +84,7 @@ public class Translator {
 		// machine
 		final RecursiveMachineLoader rml = new RecursiveMachineLoader(
 				machineFile.getParent(), parser.getContentProvider());
-		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions(),
-				parser.getPragmas());
+		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions());
 		
 		parsedMachines = rml.getParsedMachines();
 
