@@ -154,6 +154,7 @@ public class TLC4B {
 
 	public static void test(String[] args, boolean deleteFiles)
 			throws Exception {
+		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4BGlobals.setCreateTraceFile(false);
