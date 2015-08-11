@@ -17,28 +17,7 @@ LOCAL SPLIT1(s,c,start,i) ==
 STRING_SPLIT(s, c) == SPLIT1(s,c,1,1)
 
 
-LOCAL DIGIT_TO_STRING(x) ==
-    CASE x = 0 -> "0"
-    [] x = 1 -> "1"
-    [] x= 2 -> "2"
-    [] x = 3 -> "3"
-    [] x = 4 -> "4"
-    [] x= 5 -> "5"
-    [] x= 6 -> "6"
-    [] x= 7 -> "7"
-    [] x=8 -> "8"
-    [] x=9 -> "9"
-
-RECURSIVE INT_TO_STRING1(_)
-LOCAL INT_TO_STRING1(i) ==
-  IF i < 10
-  THEN DIGIT_TO_STRING(i)
-  ELSE INT_TO_STRING1(i\div10) \o DIGIT_TO_STRING(i%10)
-
-INT_TO_STRING(i) ==
-  IF i < 0
-  THEN "-" \o INT_TO_STRING1(-i)
-  ELSE INT_TO_STRING1(i)
+INT_TO_STRING(i) == ToString(i)
 
 LOCAL Max(S) == CHOOSE x \in S : \A p \in S : x >= p
 RECURSIVE SORT_SET(_)

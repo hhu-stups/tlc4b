@@ -458,28 +458,33 @@ public class TLAPrinter extends DepthFirstAdapter {
 					ALabelPredicate label = (ALabelPredicate) assertion;
 					name = label.getName().getText();
 				}
+				
+				if(name == null){
+					name = "Assertion" + (i + 1);
+				}
+				
 
 				if (tlaModule.hasInitPredicate()) {
-					if (name != null) {
 						moduleStringAppend(name);
 						moduleStringAppend(" == ");
-					} else {
-						moduleStringAppend("Assertion" + (i + 1) + " == ");
-					}
 				} else {
 					moduleStringAppend("ASSUME ");
-					if (name != null) {
 						moduleStringAppend(name);
 						moduleStringAppend(" == ");
-					} else {
-						moduleStringAppend("Assertion" + (i + 1) + " == ");
-					}
 				}
+				//assertionMode = true;
+				//assertionName = name;
+				//parameterCounter = 0;
 				assertion.apply(this);
+				//assertionMode = false;
 				moduleStringAppend("\n");
 			}
 		}
 	}
+
+	private static boolean assertionMode = false;
+	private static String assertionName = null;
+	private static Integer parameterCounter = 0;
 
 	private void printInit() {
 		ArrayList<Node> inits = this.tlaModule.getInitPredicates();
@@ -1267,19 +1272,76 @@ public class TLAPrinter extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 
+		int start = parameterCounter;
+		int end = parameterCounter + copy.size();
+		parameterCounter = end + 1;
+		if (assertionMode) {
+
+			moduleStringAppend("(");
+			moduleStringAppend("TLCSet(");
+			moduleStringAppend(""+start);
+			moduleStringAppend(", TRUE) /\\ ");
+			for (int i = start; i < end; i++) {
+				moduleStringAppend("TLCSet(");
+				moduleStringAppend("" + (i + 1));
+				moduleStringAppend(", \"NULL\")");
+				moduleStringAppend(" /\\ ");
+			}
+		}
+
 		moduleStringAppend("\\A ");
 		for (int i = 0; i < copy.size(); i++) {
 			PExpression e = copy.get(i);
 			e.apply(this);
 			moduleStringAppend(" \\in ");
 			typeRestrictor.getRestrictedNode(e).apply(this);
-			;
 			if (i < copy.size() - 1) {
 				moduleStringAppend(", ");
 			}
 		}
 		moduleStringAppend(" : ");
-		node.getImplication().apply(this);
+		if (assertionMode) {
+			int j = start;
+			for (int i = 0; i < copy.size(); i++) {
+				PExpression e = copy.get(i);
+				moduleStringAppend("TLCSet(");
+				moduleStringAppend("" + (i + 1));
+				moduleStringAppend(", ");
+				e.apply(this);
+				moduleStringAppend(")");
+				moduleStringAppend(" /\\ ");
+				j ++;
+			}
+
+			assertionMode = false;
+			
+			moduleStringAppend(" IF ");
+			node.getImplication().apply(this);
+			moduleStringAppend(" THEN TRUE ");
+			moduleStringAppend(" ELSE SaveValue(<< \"");
+			moduleStringAppend(assertionName);
+			moduleStringAppend("\", ");
+			for (int i = start; i < end; i++) {
+				moduleStringAppend("TLCGet(");
+				moduleStringAppend("" + (i + 1));
+				moduleStringAppend(")");
+				if(i<copy.size()-1){
+					moduleStringAppend(", ");
+				}
+				
+			}
+			moduleStringAppend(" >>) ");
+			moduleStringAppend("/\\ TLCSet(");
+			moduleStringAppend(""+start);
+			moduleStringAppend(", FALSE)");
+			moduleStringAppend(")");
+			moduleStringAppend(" /\\ TLCGet(");
+			moduleStringAppend("" + start);
+			moduleStringAppend(")");
+		} else {
+			node.getImplication().apply(this);
+		}
+
 		outAForallPredicate(node);
 	}
 

@@ -120,6 +120,7 @@ public class Translator {
 		new NotSupportedConstructs(start);
 		DefinitionsEliminator.eliminateDefinitions(start);
 
+		//TODO move set comprehension optimizer behind the type checker
 		SetComprehensionOptimizer.optimizeSetComprehensions(start);
 		
 		MachineContext machineContext = new MachineContext(machineName, start,
@@ -132,7 +133,7 @@ public class Translator {
 		Typechecker typechecker = new Typechecker(machineContext);
 		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
 				machineContext);
-
+		
 		ConstantsEliminator constantsEliminator = new ConstantsEliminator(
 				machineContext);
 		constantsEliminator.start();
@@ -146,12 +147,14 @@ public class Translator {
 
 		TypeRestrictor typeRestrictor = new TypeRestrictor(start,
 				machineContext, typechecker);
-
+		
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
 				start, typechecker, machineContext, typeRestrictor);
 
 		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
 				machineContext);
+		
+		
 
 		Generator generator = new Generator(machineContext, typeRestrictor,
 				constantsEvaluator, deferredSetSizeCalculator, typechecker);

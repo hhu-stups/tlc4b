@@ -15,6 +15,8 @@ public class TLC4BGlobals {
 	private static boolean partialInvariantEvaluation;
 	private static boolean useSymmetry;
 	private static boolean printCoverage;
+	
+	private static boolean checkOnlyMainAssertions;
 
 	private static boolean deleteFilesOnExit;
 
@@ -52,6 +54,7 @@ public class TLC4BGlobals {
 		useSymmetry = false;
 		printCoverage = false;
 		forceTLCToEvalConstants = false;
+		checkOnlyMainAssertions = true;
 
 		proBconstantsSetup = false;
 
@@ -256,6 +259,10 @@ public class TLC4BGlobals {
 
 	public static boolean isPrintCoverage() {
 		return printCoverage;
+	}
+	
+	public static boolean isCheckOnlyMainAssertions(){
+		return checkOnlyMainAssertions;
 	}
 
 }

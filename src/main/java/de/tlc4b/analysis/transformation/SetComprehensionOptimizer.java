@@ -146,9 +146,9 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			} else {
 				node.replaceBy(eventBcomprehension);
 			}
-			// eventBcomprehension.apply(this);
+			eventBcomprehension.apply(this);
 		} else {
-			// node.getPredicates().apply(this);
+			node.getPredicates().apply(this);
 		}
 	}
 
@@ -289,11 +289,11 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				}
 			}
 		}
-
+		
 		@Override
 		public void caseAIdentifierExpression(AIdentifierExpression node) {
 			String name = Utils.getIdentifierAsString(node.getIdentifier());
-
+			//todo the name is not a unique of the node 
 			PExpression value = values.get(name);
 			if (value != null) {
 				node.replaceBy((PExpression) value.clone());

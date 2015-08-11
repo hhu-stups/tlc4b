@@ -2,6 +2,7 @@ package de.tlc4b.analysis;
 
 import static de.tlc4b.util.TestUtil.compare;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SetComprehensionOptimizerTest {
@@ -76,6 +77,7 @@ public class SetComprehensionOptimizerTest {
 		compare(expected, machine);
 	}
 	
+	
 	@Test
 	public void testDomain() throws Exception {
 		String machine = "MACHINE test\n"
@@ -86,6 +88,31 @@ public class SetComprehensionOptimizerTest {
 				+ "======";
 		compare(expected, machine);
 	}
+	
+	@Ignore
+	@Test
+	public void testDomain2() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {a,b| a : 1..3 & b = dom({x,y|  y : 1..10 & x = y+1}) } /= {} \n" + "END";
+		String expected = "---- MODULE test----\n" 
+				+ "EXTENDS Naturals\n"
+				+ "ASSUME {<<a, {y + 1: y \\in {y \\in ((1 .. 10)): TRUE}}>>: a \\in {a \\in ((1 .. 3)): TRUE}} # {} \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
+	@Ignore
+	@Test
+	public void testDomain3() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES {a,b| a = 1 & b = dom({a,b|  a : 1..10 & a = b+1}) } /= {} \n" + "END";
+		String expected = "---- MODULE test----\n" 
+				+ "EXTENDS Naturals\n"
+				+ "ASSUME {<<a, {y + 1: y \\in {y \\in ((1 .. 10)): TRUE}}>>: a \\in {a \\in ((1 .. 3)): TRUE}} # {} \n"
+				+ "======";
+		compare(expected, machine);
+	}
+	
 	
 	@Test
 	public void testDoubleDomain() throws Exception {

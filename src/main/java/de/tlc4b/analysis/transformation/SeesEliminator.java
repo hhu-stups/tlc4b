@@ -10,6 +10,7 @@ import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
+import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
@@ -20,7 +21,9 @@ import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.PParseUnit;
+import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
+import de.tlc4b.TLC4BGlobals;
 
 public class SeesEliminator extends DepthFirstAdapter {
 
@@ -52,13 +55,14 @@ public class SeesEliminator extends DepthFirstAdapter {
 		LinkedList<PExpression> machineNames = node.getMachineNames();
 		for (PExpression pExpression : machineNames) {
 			AIdentifierExpression id = (AIdentifierExpression) pExpression;
-			String machineName = Utils.getIdentifierAsString(id
-					.getIdentifier());
-			if(!resolvedMachines.contains(machineName)){
+			String machineName = Utils
+					.getIdentifierAsString(id.getIdentifier());
+			if (!resolvedMachines.contains(machineName)) {
 				resolvedMachines.add(machineName);
 				Start start = parsedMachines.get(machineName);
 				DefinitionsEliminator.eliminateDefinitions(start);
-				eliminateSeenMachinesRecursively(start, parsedMachines, resolvedMachines);
+				eliminateSeenMachinesRecursively(start, parsedMachines,
+						resolvedMachines);
 				new MachineClauseAdder(main, start);
 				if (node.parent() != null) {
 					node.replaceBy(null);
@@ -195,6 +199,36 @@ public class SeesEliminator extends DepthFirstAdapter {
 				}
 				main.setDefinitions(newDefinitionsList);
 			}
+		}
+
+		public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
+			if (TLC4BGlobals.isCheckOnlyMainAssertions())
+				return;
+			AAssertionsMachineClause main = (AAssertionsMachineClause) machineClauseHashMap
+					.get(node.getClass());
+			if (main == null) {
+				additionalMachineClauseList.add(node);
+			} else {
+				ArrayList<PPredicate> old = new ArrayList<PPredicate>(
+						main.getPredicates());
+				ArrayList<PPredicate> newList = new ArrayList<PPredicate>();
+				for (PPredicate p : old) {
+					p.replaceBy(null); // delete parent
+					newList.add(p);
+				}
+				ArrayList<PPredicate> otherAssertions = new ArrayList<PPredicate>(
+						node.getPredicates());
+
+				for (PPredicate p : otherAssertions) {
+					if (p.parent() != null) {
+						p.replaceBy(null); // delete parent
+					}
+					newList.add(p);
+
+				}
+				main.setPredicates(newList);
+			}
+
 		}
 
 	}

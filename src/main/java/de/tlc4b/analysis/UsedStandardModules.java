@@ -107,7 +107,7 @@ import de.tlc4b.tla.TLAModule;
 public class UsedStandardModules extends DepthFirstAdapter {
 
 	public static enum STANDARD_MODULES {
-		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations, ExternalFunctions
+		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations, ExternalFunctions, Foo
 	}
 
 	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
@@ -167,8 +167,8 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		return list;
 	}
 
-	public HashSet<STANDARD_MODULES> getStandardModulesToBeCreated(){
-		// dependencies of standard modules 
+	public HashSet<STANDARD_MODULES> getStandardModulesToBeCreated() {
+		// dependencies of standard modules
 		HashSet<STANDARD_MODULES> res = new HashSet<STANDARD_MODULES>();
 		for (STANDARD_MODULES module : extendedStandardModules) {
 			switch (module) {
@@ -202,10 +202,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 			default:
 				break;
 			}
-			
+
 		}
 		return res;
 	}
+
 	@Override
 	public void inAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
