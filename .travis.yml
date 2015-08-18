@@ -1,3 +1,19 @@
 language: java
+script: gradle tlc4b uploadArchives
+before_install:
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out secring.gpg
+  -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in pubring.gpg.enc -out pubring.gpg
+  -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in gradle.properties.enc -out
+  gradle.properties -d
 
-script: gradle tlc4b
+after_success: find build/tlc4b/TLC4B.jar -type f -exec
+  curl -u $FTP_USER:$FTP_PASS --ftp-create-dirs -T {} ftp://cobra.cs.uni-duesseldorf.de/upload/{}
+  \;
+
+env:
+  global:
+  - secure: EnIo0zaQsHATGH8S5L1W0EHtqgV2kx6bfSgxyhz7XU+xw5y2JLDn+Y3ZaX7EcMK25RkgM8nld5Se72QmpienkP7tQlb5KHdwC10KgwbHDq+IP9q+ZMD2V1MsMRdTilW/eTZ0SUohlV5g4t3KqIe8l3Hs1dzNL0YmCMtXwYHdfwk=
+  - secure: bmYNI5HVzwZWjd9FIPc7XDwgwXnvFbZDLNBksMk/pLTuSeu14ke0pvo4L9krJXAeQAIYzWXnanUPMBS2TQEM+p4pVVDZ0RAT4f4PEWjAIIGnWTZc6fzTfUixUcFKDlV0iXFKLKkJTYLNcsi7WL0Bn1//c8kxZ4bnfZD8Y3I1vjo=
+  - secure: gVRyw9BQ/ZYBZ7sV8b16jva8ofkJ457bjpVtarGhn3gSzKbPo2J/gJ3AKTuOeodBBibAhun/x6IciqDuC14wf/sZrS8VUGDC7uYxKO04s2LOPjlen7yn9dJL16PpM2rzhrMna4GA5p7lXIoAVMZ7fGXp1uDdg/0Pg6kS6L05NDw=

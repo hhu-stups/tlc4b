@@ -20,30 +20,30 @@ repositories {
 }
 
 configurations { // configuration that holds jars to copy into lib
-	releaseJars 
+	releaseJars
 }
- 
+
 configurations.all {
  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
- 
+
 def parser_version = '2.5.0-SNAPSHOT'
 
 dependencies {
 	//compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
-	compile (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT', changing: true)
-	
+	compile (group: 'de.hhu.stups', name: 'tlatools', version: '1.0.0')
+
 	compile (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)
 	compile (group: 'de.hhu.stups', name: 'parserbase', version: parser_version)
 	compile (group: 'de.hhu.stups', name: 'bparser', version: parser_version)
 	compile (group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
-	
+
 	//compile(group: 'de.prob', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
 
 	testCompile (group: 'junit', name: 'junit', version: '4.11')
-    testCompile (group: 'de.prob', name: 'tla2bAST', version: '1.0.5-SNAPSHOT')
+    testCompile (group: 'de.prob', name: 'tla2bAST', version: '1.0.5')
 
-	releaseJars (group: 'de.tla', name: 'tlatools', version: '1.0.0-SNAPSHOT')
+	releaseJars (group: 'de.hhu.stups', name: 'tlatools', version: '1.0.0')
 	releaseJars (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)
 	releaseJars (group: 'de.hhu.stups', name: 'parserbase', version: parser_version)
 	releaseJars (group: 'de.hhu.stups', name: 'bparser', version: parser_version)
@@ -64,7 +64,7 @@ jacocoTestReport {
 }
 
 
-test { 
+test {
 	exclude('de/tlc4b/tlc/integration/probprivate')
 	exclude('testing')
 	//exclude('de/tlc4b/tlc/integration')
@@ -75,7 +75,7 @@ task integrationTests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
 	//include('de/tlc4b/tlc/integration/probprivate/**')
-	include('de/tlc4b/**')	
+	include('de/tlc4b/**')
 }
 
 // type 'gradle integrationTests jacocoIntegrationTestReport' in order to run the jacoco code coverage analysis
@@ -109,12 +109,82 @@ tasks.withType(FindBugs) {
 	// disable findbugs by default
 	// in order to run findbugs type 'gradle tlc4b findbugsMain findbugsTest'
 	task -> enabled = gradle.startParameter.taskNames.contains(task.name)
-	
+
     reports {
         xml.enabled = false
         html.enabled = true
     }
-	
+
 	ignoreFailures = true
 }
 
+
+if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+
+apply plugin: 'signing'
+
+signing {
+    sign configurations.archives
+}
+
+
+task javadocJar(type: Jar) {
+	 classifier = 'javadoc'
+	 from javadoc
+}
+
+task sourcesJar(type: Jar) {
+	 classifier = 'sources'
+	 from sourceSets.main.allSource
+}
+
+artifacts {
+	 archives javadocJar, sourcesJar
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'TLC integration into ProB'
+        packaging 'jar'
+        // optionally artifactId can be defined here
+        description "Use the TLC model checker within ProB."
+        url 'https://github.com/hhu-stups/tlc4b'
+
+        licenses {
+          license {
+            name 'Eclipse Public License, Version 2.1'
+            url 'https://www.eclipse.org/legal/epl-v10.html'
+          }
+        }
+
+        scm {
+          connection 'scm:git:git://github.com/hhu-stups/tlc4b.git'
+          developerConnection 'scm:git:git@github.com:hhu-stups/tlc4b.git'
+          url 'https://github.com/bendisposto/hhu-stups/tlc4b'
+        }
+
+
+        developers {
+          developer {
+            id 'bendisposto'
+            name 'Jens Bendisposto'
+            email 'jens@bendisposto.de'
+          }
+        }
+      }
+    }
+  }
+}
+}
