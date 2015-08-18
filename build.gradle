@@ -5,7 +5,7 @@ apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 
 project.version = '1.0.0-SNAPSHOT'
-project.group = 'de.prob'
+project.group = 'de.hhu.stups'
 
 repositories {
 	mavenCentral()
