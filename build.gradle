@@ -5,7 +5,7 @@ apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 
 project.version = '1.0.0-SNAPSHOT'
-project.group = 'de.prob'
+project.group = 'de.hhu.stups'
 
 repositories {
 	mavenCentral()
@@ -38,10 +38,10 @@ dependencies {
 	compile (group: 'de.hhu.stups', name: 'bparser', version: parser_version)
 	compile (group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
 
-	//compile(group: 'de.prob', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
+	//compile(group: 'de.hhu.stups', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
 
 	testCompile (group: 'junit', name: 'junit', version: '4.11')
-  testCompile (group: 'de.prob', name: 'tla2bAST', version: '1.0.7-SNAPSHOT')
+  testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.0.7-SNAPSHOT')
 
 	releaseJars (group: 'de.hhu.stups', name: 'tlatools', version: '1.0.0')
 	releaseJars (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)
