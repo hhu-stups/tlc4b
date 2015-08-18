@@ -99,7 +99,7 @@ jar {
 task tlc4b(dependsOn: build) << {
 	copy {
 		from('build/libs/')
-		into('build/tlc4b')
+		into('.')
 		include('tlc4b-'+project.version+'.jar')
 		rename('tlc4b-(.+)', 'TLC4B.jar')
 	}
