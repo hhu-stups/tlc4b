@@ -1301,7 +1301,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 		moduleStringAppend(" : ");
 		if (assertionMode) {
-			int j = start;
 			for (int i = 0; i < copy.size(); i++) {
 				PExpression e = copy.get(i);
 				moduleStringAppend("TLCSet(");
@@ -1310,7 +1309,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 				e.apply(this);
 				moduleStringAppend(")");
 				moduleStringAppend(" /\\ ");
-				j ++;
 			}
 
 			assertionMode = false;

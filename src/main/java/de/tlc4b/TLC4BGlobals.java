@@ -54,7 +54,7 @@ public class TLC4BGlobals {
 		useSymmetry = false;
 		printCoverage = false;
 		forceTLCToEvalConstants = false;
-		checkOnlyMainAssertions = true;
+		checkOnlyMainAssertions = false;
 
 		proBconstantsSetup = false;
 

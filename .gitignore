@@ -1,1 +1,14 @@
 local.*
+/bin
+states
+.classpath
+.project
+build.xml
+TODO.txt
+.gradle
+.settings
+build
+src/test/java/testing
+src/test/resources/other
+src/test/resources/testing
+src/test/resources/todo
