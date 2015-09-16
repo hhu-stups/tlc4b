@@ -172,7 +172,49 @@ public class TLC4B {
 			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
 					tlc4b.buildDir);
 			MP.TLCOutputStream.resetOutputStream();
-			;
+			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
+			results.evalResults();
+			tlc4b.printResults(results, false);
+
+			System.exit(0);
+		}
+	}
+
+	public static void testString(String machineString, boolean deleteFiles)
+			throws Exception {
+		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
+															// windows
+		TLC4BGlobals.resetGlobals();
+		TLC4BGlobals.setDeleteOnExit(deleteFiles);
+		TLC4BGlobals.setCreateTraceFile(false);
+		TLC4BGlobals.setTestingMode(true);
+		// B2TLAGlobals.setCleanup(true);
+		TLC4B tlc4b = new TLC4B();
+		tlc4b.buildDir = new File("temp/");
+
+		tlc4b.machineFileNameWithoutFileExtension = "Test";
+
+		StopWatch.start(PARSING_TIME);
+		MP.print("Parsing... ");
+		tlc4b.translator = new Translator(machineString);
+		StopWatch.stop(PARSING_TIME);
+		println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
+
+		StopWatch.start(TRANSLATION_TIME);
+		MP.print("Translating... ");
+		tlc4b.translator.translate();
+		tlc4b.tlaModule = tlc4b.translator.getModuleString();
+		tlc4b.config = tlc4b.translator.getConfigString();
+		tlc4b.tlcOutputInfo = tlc4b.translator.getTLCOutputInfo();
+		StopWatch.stop(TRANSLATION_TIME);
+		println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
+		tlc4b.createFiles();
+
+		if (TLC4BGlobals.isRunTLC()) {
+			MP.TLCOutputStream.changeOutputStream();
+			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
+					tlc4b.buildDir);
+			MP.TLCOutputStream.resetOutputStream();
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
 			tlc4b.printResults(results, false);
@@ -276,7 +318,6 @@ public class TLC4B {
 	}
 
 	public void process(String[] args) throws IOException, BException {
-		handleParameter(args);
 
 		MP.print("Arguments: ");
 		for (int i = 0; i < args.length; i++) {
@@ -285,6 +326,8 @@ public class TLC4B {
 			MP.print(" ");
 		}
 		println("");
+
+		handleParameter(args);
 
 		handleMainFileName();
 		if (TLC4BGlobals.isTranslate()) {
@@ -310,7 +353,7 @@ public class TLC4B {
 	}
 
 	private void handleMainFileName() {
-		// the following is fix to handle incorrect file names
+		// the following lines fix incorrect file names
 		filename = filename.replace("\\", File.separator);
 		filename = filename.replace("/", File.separator);
 		if (!filename.toLowerCase().endsWith(".mch")) {

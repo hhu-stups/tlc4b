@@ -11,6 +11,7 @@ import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.ASeesModelClause;
 import de.be4.classicalb.core.parser.node.ASequenceSubstitution;
 import de.be4.classicalb.core.parser.node.AUsesMachineClause;
+import de.be4.classicalb.core.parser.node.AVarSubstitution;
 import de.be4.classicalb.core.parser.node.AWhileSubstitution;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.exceptions.NotSupportedException;
@@ -25,12 +26,11 @@ public class NotSupportedConstructs extends DepthFirstAdapter {
 		throw new NotSupportedException(
 				"Refines clause is currently not supported.");
 	}
-	
-    public void inASeesMachineClause(ASeesMachineClause node)
-    {
-    	throw new NotSupportedException(
+
+	public void inASeesMachineClause(ASeesMachineClause node) {
+		throw new NotSupportedException(
 				"SEES clause is currently not supported.");
-    }
+	}
 
 	public void inAUsesMachineClause(AUsesMachineClause node) {
 		throw new NotSupportedException(
@@ -62,19 +62,29 @@ public class NotSupportedConstructs extends DepthFirstAdapter {
 				"IMPORTS clause is currently not supported.");
 	}
 
+	/**
+	 * Substitutions
+	 */
+
 	public void inAWhileSubstitution(AWhileSubstitution node) {
 		throw new NotSupportedException(
 				"While substitutions are currently not supported.");
 	}
 
-	public void inACaseSubstitution(ACaseSubstitution node) {
-		throw new NotSupportedException(
-				"Case substitutions are currently not supported.");
-	}
-
 	public void inASequenceSubstitution(ASequenceSubstitution node) {
 		throw new NotSupportedException(
 				"Sequence substitutions ';' are currently not supported.");
+	}
+
+	public void inAVarSubstitution(AVarSubstitution node) {
+		throw new NotSupportedException(
+				"VAR substitutions are currently not supported.");
+	}
+
+	public void inACaseSubstitution(ACaseSubstitution node) {
+		// TODO it is possible to support this substitution
+		throw new NotSupportedException(
+				"Case substitutions are currently not supported.");
 	}
 
 }

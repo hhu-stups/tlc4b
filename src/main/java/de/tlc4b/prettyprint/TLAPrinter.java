@@ -1637,9 +1637,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseADivExpression(ADivExpression node) {
 		inADivExpression(node);
+		moduleStringAppend(B_DIVISION);
+		moduleStringAppend("(");
 		node.getLeft().apply(this);
-		moduleStringAppend(" \\div ");
+		moduleStringAppend(", ");
 		node.getRight().apply(this);
+		moduleStringAppend(")");
 		outADivExpression(node);
 	}
 
@@ -1654,13 +1657,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAModuloExpression(AModuloExpression node) {
-		/**
-		 * TODO a mod b: IF a < 0 THEN ERROR ELSE a % b
-		 */
+
 		inAModuloExpression(node);
+		moduleStringAppend(B_MODULO);
+		moduleStringAppend("(");
 		node.getLeft().apply(this);
-		moduleStringAppend(" % ");
+		moduleStringAppend(", ");
 		node.getRight().apply(this);
+		moduleStringAppend(")");
 		outAModuloExpression(node);
 	}
 

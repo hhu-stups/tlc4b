@@ -275,15 +275,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
-	public void inADivExpression(ADivExpression node) {
-		extendedStandardModules.add(STANDARD_MODULES.Naturals);
-	}
-
 	public void inAPowerOfExpression(APowerOfExpression node) {
-		extendedStandardModules.add(STANDARD_MODULES.Naturals);
-	}
-
-	public void inAModuloExpression(AModuloExpression node) {
 		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
@@ -343,6 +335,14 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}
 
+	public void inAModuloExpression(AModuloExpression node) {
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+	}
+	
+	public void inADivExpression(ADivExpression node) {
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+	}
+	
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
 		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}

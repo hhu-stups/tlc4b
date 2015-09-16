@@ -44,7 +44,7 @@ dependencies {
 	//compile(group: 'de.hhu.stups', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
 
 	testCompile (group: 'junit', name: 'junit', version: '4.11')
-  testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.0.8-SNAPSHOT')
+	testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.0.8-SNAPSHOT')
 
 	releaseJars (group: 'de.hhu.stups', name: 'tlatools', version: '1.0.0')
 	releaseJars (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)

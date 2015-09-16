@@ -23,12 +23,12 @@ import de.tlc4b.tlc.TLCResults.TLCResult;
 
 public class TestUtil {
 
-	public static void compare(String expectedModule, String machine)
+	public static void compare(String expectedModule, String machineString)
 			throws Exception {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
 		ToolIO.setMode(ToolIO.TOOL);
 
-		Translator b2tlaTranslator = new Translator(machine);
+		Translator b2tlaTranslator = new Translator(machineString);
 		b2tlaTranslator.translate();
 		System.out.println(b2tlaTranslator.getModuleString());
 
@@ -53,7 +53,8 @@ public class TestUtil {
 		// assertEquals(sb2.toString(), sb1.toString());
 	}
 
-	public static String translateTLA2B(String moduleName, String tlaString) throws TLA2BException {
+	public static String translateTLA2B(String moduleName, String tlaString)
+			throws TLA2BException {
 		return de.tla2bAst.Translator.translateModuleString(moduleName,
 				tlaString, null);
 	}
@@ -150,10 +151,22 @@ public class TestUtil {
 		return translator.getModuleString();
 	}
 
+	public static TLCResult testString(String machineString) throws IOException {
+		String[] args = new String[] { machineString };
+		String runnerClassName = TLC4BRunnerTestString.class.getCanonicalName();
+
+		return runTLC(runnerClassName, args);
+	}
+	
 	public static TLCResult test(String[] args) throws IOException {
+		String runnerClassName = TLC4BTester.class.getCanonicalName();
+		return runTLC(runnerClassName, args);
+	}
+
+	private static TLCResult runTLC(String runnerClassName, String[] args)
+			throws IOException {
 		System.out.println("Starting JVM...");
-		final Process p = startJVM("", TLC4BTester.class.getCanonicalName(),
-				args);
+		final Process p = startJVM("", runnerClassName, args);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
 		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
@@ -176,7 +189,10 @@ public class TestUtil {
 		}
 		System.out.println("No result found.");
 		return null;
+
 	}
+
+
 
 	private static Process startJVM(final String optionsAsString,
 			final String mainClass, final String[] arguments)
