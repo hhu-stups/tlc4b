@@ -127,13 +127,6 @@ public class ArithmeticTest {
 		compare(expected, machine);
 	}
 
-	@Test
-	public void testPower() throws Exception {
-		String machine = "MACHINE test\n" + "PROPERTIES 1 = 1 ** 1\n" + "END";
-		String expected = "---- MODULE test----\n" + "EXTENDS Naturals \n"
-				+ "ASSUME 1 = 1 ^ 1 \n" + "======";
-		compare(expected, machine);
-	}
 
 	@Test
 	public void testUnaryMinus() throws Exception {
