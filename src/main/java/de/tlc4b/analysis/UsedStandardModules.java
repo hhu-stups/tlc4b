@@ -275,9 +275,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		extendedStandardModules.add(STANDARD_MODULES.Naturals);
 	}
 
-	public void inAPowerOfExpression(APowerOfExpression node) {
-		extendedStandardModules.add(STANDARD_MODULES.Naturals);
-	}
 
 	public void inAMinusOrSetSubtractExpression(
 			AMinusOrSetSubtractExpression node) {
@@ -327,6 +324,10 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	 * BBuiltIns
 	 */
 
+	public void inAPowerOfExpression(APowerOfExpression node) {
+		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
+	}
+	
 	public void inAMinExpression(AMinExpression node) {
 		extendedStandardModules.add(STANDARD_MODULES.BBuiltIns);
 	}

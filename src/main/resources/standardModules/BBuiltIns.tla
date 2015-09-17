@@ -12,6 +12,7 @@ succ[x \in Int] == x + 1
 
 pred[x \in Int] == x - 1
  \* The predecessor function
+BPowerOf(a,b) == IF a = 0 /\ b = 0 THEN 1 ELSE a ^ b
 
 BDivision(a,b) ==
   CASE a >= 0 /\ b > 0 -> a \div b
@@ -19,21 +20,38 @@ BDivision(a,b) ==
     [] a >= 0 /\ b < 0 -> -(a \div (-b))
     [] a < 0 /\ b < 0 -> (-a) \div (-b)
     [] b = 0 -> Assert(FALSE, "Error: Division by zero.")
+    [] OTHER -> Assert(FALSE, "Error: Modulo Operator.")
 \* Rules from AtelierB reference manual (see page 40)
 
 BModulo(a,b) ==
-  IF a > 0 /\ b > 0
+  IF a >= 0 /\ b > 0
   THEN a % b
   ELSE Assert(FALSE, "Error: Both operands of the modulo operator must be natural numbers.")
 
 RECURSIVE Sigma(_)
-Sigma(S) == LET e == CHOOSE e \in S: TRUE
-            IN IF  S = {} THEN 0 ELSE e[2] + Sigma(S \ {e})
+Sigma(S) ==
+  IF S = {} THEN 0
+  ELSE
+    LET
+      e == CHOOSE e \in S: TRUE
+      newS == S \ {e}
+    IN
+      IF newS = {}
+      THEN e[2]
+      ELSE e[2] + Sigma(S \ {e})
  \* The sum of all second components of pairs which are elements of S
 
 RECURSIVE Pi(_)
-Pi(S) == LET e == CHOOSE e \in S: TRUE
-         IN IF  S = {} THEN 0 ELSE e[2] + Pi(S \ {e})
+Pi(S) ==
+  IF S = {} THEN 0
+  ELSE
+    LET
+      e == CHOOSE e \in S: TRUE
+      newS == S \ {e}
+    IN
+      IF newS = {}
+      THEN e[2]
+      ELSE e[2] * Pi(S \ {e})
  \* The product of all second components of pairs which are elements of S
 
 Pow1(S) == (SUBSET S) \ {{}}

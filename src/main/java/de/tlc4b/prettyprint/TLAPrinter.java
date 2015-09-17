@@ -458,25 +458,24 @@ public class TLAPrinter extends DepthFirstAdapter {
 					ALabelPredicate label = (ALabelPredicate) assertion;
 					name = label.getName().getText();
 				}
-				
-				if(name == null){
+
+				if (name == null) {
 					name = "Assertion" + (i + 1);
 				}
-				
 
 				if (tlaModule.hasInitPredicate()) {
-						moduleStringAppend(name);
-						moduleStringAppend(" == ");
+					moduleStringAppend(name);
+					moduleStringAppend(" == ");
 				} else {
 					moduleStringAppend("ASSUME ");
-						moduleStringAppend(name);
-						moduleStringAppend(" == ");
+					moduleStringAppend(name);
+					moduleStringAppend(" == ");
 				}
-				//assertionMode = true;
-				//assertionName = name;
-				//parameterCounter = 0;
+				// assertionMode = true;
+				// assertionName = name;
+				// parameterCounter = 0;
 				assertion.apply(this);
-				//assertionMode = false;
+				// assertionMode = false;
 				moduleStringAppend("\n");
 			}
 		}
@@ -1279,7 +1278,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 			moduleStringAppend("(");
 			moduleStringAppend("TLCSet(");
-			moduleStringAppend(""+start);
+			moduleStringAppend("" + start);
 			moduleStringAppend(", TRUE) /\\ ");
 			for (int i = start; i < end; i++) {
 				moduleStringAppend("TLCSet(");
@@ -1312,7 +1311,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 
 			assertionMode = false;
-			
+
 			moduleStringAppend(" IF ");
 			node.getImplication().apply(this);
 			moduleStringAppend(" THEN TRUE ");
@@ -1323,14 +1322,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 				moduleStringAppend("TLCGet(");
 				moduleStringAppend("" + (i + 1));
 				moduleStringAppend(")");
-				if(i<copy.size()-1){
+				if (i < copy.size() - 1) {
 					moduleStringAppend(", ");
 				}
-				
+
 			}
 			moduleStringAppend(" >>) ");
 			moduleStringAppend("/\\ TLCSet(");
-			moduleStringAppend(""+start);
+			moduleStringAppend("" + start);
 			moduleStringAppend(", FALSE)");
 			moduleStringAppend(")");
 			moduleStringAppend(" /\\ TLCGet(");
@@ -1648,11 +1647,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAPowerOfExpression(APowerOfExpression node) {
-		inAPowerOfExpression(node);
+		moduleStringAppend(B_POWER_Of);
+		moduleStringAppend("(");
 		node.getLeft().apply(this);
-		moduleStringAppend(" ^ ");
+		moduleStringAppend(", ");
 		node.getRight().apply(this);
-		outAPowerOfExpression(node);
+		moduleStringAppend(")");
 	}
 
 	@Override

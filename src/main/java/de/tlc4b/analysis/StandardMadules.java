@@ -198,6 +198,7 @@ public final class StandardMadules {
 	public static final String POW_1 = "Pow1";
 	public static final String FINITE_SUBSETS = "Fin";
 	public static final String FINITE_1_SUBSETS = "Fin1";
+	public static final String B_POWER_Of = "BPowerOf";
 	public static final String B_MODULO = "BModulo"; 
 	public static final String B_DIVISION = "BDivision"; 
 
