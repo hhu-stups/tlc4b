@@ -84,7 +84,7 @@ public class Translator {
 		// machine
 		final RecursiveMachineLoader rml = new RecursiveMachineLoader(
 				machineFile.getParent(), parser.getContentProvider());
-		rml.loadAllMachines(machineFile, start, null, parser.getDefinitions());
+		rml.loadAllMachines(machineFile, start, parser.getSourcePositions(), parser.getDefinitions());
 		
 		parsedMachines = rml.getParsedMachines();
 
@@ -146,7 +146,7 @@ public class Translator {
 				unchangedVariablesFinder);
 
 		TypeRestrictor typeRestrictor = new TypeRestrictor(start,
-				machineContext, typechecker);
+				machineContext, typechecker, constantsEvaluator);
 		
 		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
 				start, typechecker, machineContext, typeRestrictor);
@@ -159,8 +159,6 @@ public class Translator {
 		Generator generator = new Generator(machineContext, typeRestrictor,
 				constantsEvaluator, deferredSetSizeCalculator, typechecker);
 		generator.generate();
-
-		generator.getTlaModule().sortAllDefinitions(machineContext);
 
 		UsedStandardModules usedModules = new UsedStandardModules(start,
 				typechecker, typeRestrictor, generator.getTlaModule());

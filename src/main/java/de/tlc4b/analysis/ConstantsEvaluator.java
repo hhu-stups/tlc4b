@@ -31,7 +31,7 @@ import de.be4.classicalb.core.parser.node.PPredicate;
  * 
  */
 public class ConstantsEvaluator extends DepthFirstAdapter {
-	private Hashtable<Node, HashSet<Node>> dependsOnIdentifierTable;
+	private LinkedHashMap<Node, HashSet<Node>> dependsOnIdentifierTable;
 	private MachineContext machineContext;
 	private ValuesOfIdentifierFinder valuesOfConstantsFinder;
 	private HashMap<Node, Integer> integerValueTable;
@@ -61,12 +61,11 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	}
 
 	public ArrayList<PExpression> getRangeOfIdentifier(Node con) {
-		;
 		return valuesOfConstantsFinder.rangeOfIdentifierTable.get(con);
 	}
 
 	public ConstantsEvaluator(MachineContext machineContext) {
-		this.dependsOnIdentifierTable = new Hashtable<Node, HashSet<Node>>();
+		this.dependsOnIdentifierTable = new LinkedHashMap<Node, HashSet<Node>>();
 		this.integerValueTable = new HashMap<Node, Integer>();
 		this.machineContext = machineContext;
 		this.propertiesList = new ArrayList<Node>();
@@ -95,7 +94,6 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		this.valueOfIdentifier = new LinkedHashMap<Node, Node>();
 
 		evalIdentifier(machineContext.getConstants().values());
-
 		evalIdentifier(machineContext.getScalarParameter().values());
 	}
 
@@ -110,8 +108,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 					continue;
 				HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable
 						.get(id);
+
 				for (Node val : idValues) {
 					HashSet<Node> idsInVal = dependsOnIdentifierTable.get(val);
+					idsInVal.remove(id);
 					if (idsInVal.size() == 0) {
 						valueOfIdentifier.put(id, val);
 						removeIdentifier(ids, id);
@@ -195,8 +195,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			this.rangeOfIdentifierTable = new Hashtable<Node, ArrayList<PExpression>>();
 
 			this.identifiers = new HashSet<Node>();
-			this.identifiers.addAll(machineContext.getBMachineConstants()
-					.values());
+			this.identifiers.addAll(machineContext.getConstants().values());
 			this.identifiers.addAll(machineContext.getScalarParameter()
 					.values());
 
@@ -219,7 +218,6 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				if (machineContext.getConstantsSetup() instanceof ADisjunctPredicate) {
 					analyseConstantSetupPredicate(machineContext
 							.getConstantsSetup());
-
 					for (Node con : this.identifiers) {
 						ArrayList<PExpression> list = rangeOfIdentifierTable
 								.get(con);
@@ -264,7 +262,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				PExpression left = equals.getLeft();
 				Node left_ref = machineContext.getReferences().get(left);
 				if (rangeOfIdentifierTable.containsKey(left_ref)) {
-					System.out.println("hallo");
+					// TODO
 				}
 				ArrayList<PExpression> currentRange = rangeOfIdentifierTable
 						.get(left_ref);

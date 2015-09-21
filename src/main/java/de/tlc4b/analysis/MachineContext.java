@@ -64,6 +64,7 @@ import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.PSet;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
+import de.tlc4b.MP;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.transformation.DefinitionsSorter;
 import de.tlc4b.analysis.transformation.MachineClauseSorter;
@@ -180,7 +181,7 @@ public class MachineContext extends DepthFirstAdapter {
 			try {
 				visitor.start();
 			} catch (ScopeException e) {
-				System.out.println("Warning: LTL formula '" + visitor.getName()
+				MP.println("Warning: LTL formula '" + visitor.getName()
 						+ "' cannot be checked by TLC.");
 				notSupportedLTLFormulas.add(visitor);
 			}
@@ -235,13 +236,12 @@ public class MachineContext extends DepthFirstAdapter {
 		if (node.getHeader() != null) {
 			node.getHeader().apply(this);
 		}
-		
-		
+
 		List<PMachineClause> machineClauses = node.getMachineClauses();
 		// Sort the machine clauses: declarations clauses first, then
 		// properties clauses
 		MachineClauseSorter.sortMachineClauses(start);
-		
+
 		for (PMachineClause e : machineClauses) {
 			e.apply(this);
 		}
@@ -284,7 +284,7 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
 		definitionMachineClause = node;
 		DefinitionsSorter.sortDefinitions(node);
-		
+
 		List<PDefinition> copy = node.getDefinitions();
 
 		/*
@@ -416,7 +416,7 @@ public class MachineContext extends DepthFirstAdapter {
 				return;
 			}
 		}
-		
+
 		throw new ScopeException("Unkown definition: '" + name
 				+ "' at position: " + node.getStartPos());
 	}
@@ -572,7 +572,8 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private ArrayList<MachineContext> lookupExtendedMachines() {
 		ArrayList<MachineContext> list = new ArrayList<MachineContext>();
-		for( Entry<String, AIdentifierExpression> entry  : seenMachines.entrySet()){
+		for (Entry<String, AIdentifierExpression> entry : seenMachines
+				.entrySet()) {
 			String s = entry.getKey();
 			AIdentifierExpression value = entry.getValue();
 			if (value.getIdentifier().size() == 1) {
@@ -892,9 +893,10 @@ public class MachineContext extends DepthFirstAdapter {
 		node.getPredicates().apply(this);
 		contextTable.remove(contextTable.size() - 1);
 	}
-	
+
 	@Override
-	public void caseAEventBComprehensionSetExpression(AEventBComprehensionSetExpression node){
+	public void caseAEventBComprehensionSetExpression(
+			AEventBComprehensionSetExpression node) {
 		contextTable.add(new LinkedHashMap<String, Node>());
 		{
 			List<PExpression> copy = new ArrayList<PExpression>(
@@ -904,7 +906,7 @@ public class MachineContext extends DepthFirstAdapter {
 			}
 		}
 		node.getPredicates().apply(this);
-		
+
 		node.getExpression().apply(this);
 		contextTable.remove(contextTable.size() - 1);
 	}
@@ -1143,4 +1145,3 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 }
-

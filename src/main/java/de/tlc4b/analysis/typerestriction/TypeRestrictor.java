@@ -47,6 +47,7 @@ import de.be4.classicalb.core.parser.node.Start;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
 import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.analysis.ConstantsEvaluator;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.btypes.BType;
@@ -59,6 +60,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	private final MachineContext machineContext;
 	private final IdentifierDependencies identifierDependencies;
 	private final Typechecker typechecker;
+	private final ConstantsEvaluator constantsEvaluator;
 
 	private final Hashtable<Node, Node> restrictedTypeNodeTable;
 	private final HashSet<Node> removedNodes;
@@ -75,9 +77,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	}
 
 	public TypeRestrictor(Start start, MachineContext machineContext,
-			Typechecker typechecker) {
+			Typechecker typechecker, ConstantsEvaluator constantsEvaluator) {
 		this.machineContext = machineContext;
 		this.typechecker = typechecker;
+		this.constantsEvaluator = constantsEvaluator;
 
 		this.restrictedTypeNodeTable = new Hashtable<Node, Node>();
 		this.removedNodes = new HashSet<Node>();
@@ -140,7 +143,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			list.add(expression);
 			restrictedNodeTable.put(identifier, list);
 		} else {
-			list.add(expression);
+			if (!list.contains(expression)) {
+				list.add(expression);
+			}
 		}
 	}
 
@@ -171,14 +176,20 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	@Override
 	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
-		HashSet<Node> list = new HashSet<Node>();
-		list.addAll(machineContext.getConstants().values());
-
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
 		HashSet<PExpression> set = new HashSet<PExpression>();
 		for (Node con : machineContext.getConstants().values()) {
 			set.add((PExpression) con);
+			Node valueOfConstant = constantsEvaluator.getValueOfConstant(con);
+			if(valueOfConstant!= null){
+				removedNodes.add(valueOfConstant.parent());
+			}
+			
 		}
+		HashSet<Node> list = new HashSet<Node>();
+		list.addAll(machineContext.getConstants().values());
+		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
+		
+
 		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set),
 				false);
 	}
@@ -545,6 +556,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		// formula.
 
 		for (PExpression e : copy) {
+			if (constantsEvaluator.getValueOfIdentifierMap().containsKey(e)) {
+				continue;
+			}
+
 			PExpression tree = null;
 			ArrayList<Node> restrictedList = restrictedNodeTable.get(e);
 			if (restrictedList == null) {

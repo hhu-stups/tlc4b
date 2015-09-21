@@ -4,27 +4,27 @@ import java.util.ArrayList;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.POperation;
-import de.tlc4b.analysis.DefinitionsOrder;
+import de.tlc4b.analysis.DefinitionsSorter;
 import de.tlc4b.analysis.MachineContext;
 
 public class TLAModule {
 
 	protected String moduleName;
 
-	protected final ArrayList<TLADefinition> definitions;
+	protected final ArrayList<TLADefinition> tlaDefinitions;
 	protected final ArrayList<Node> constants;
 	protected final ArrayList<Node> assumes;
 	protected final ArrayList<Node> variables;
 	protected final ArrayList<Node> invariants;
 	private final ArrayList<Node> initPredicates;
 	protected final ArrayList<POperation> operations;
-	private ArrayList<PDefinition> bDefinitions;
+	private  ArrayList<PDefinition> bDefinitions;
 	private final ArrayList<Node> assertions;
 
-	private ArrayList<PDefinition> allDefinitions;
+	protected ArrayList<PDefinition> allDefinitions;
 
 	public TLAModule() {
-		this.definitions = new ArrayList<TLADefinition>();
+		this.tlaDefinitions = new ArrayList<TLADefinition>();
 		this.constants = new ArrayList<Node>();
 		this.assumes = new ArrayList<Node>();
 		this.variables = new ArrayList<Node>();
@@ -36,12 +36,6 @@ public class TLAModule {
 
 		this.allDefinitions = new ArrayList<PDefinition>();
 
-	}
-
-	public void sortAllDefinitions(MachineContext machineContext) {
-		DefinitionsOrder defOrder = new DefinitionsOrder(machineContext,
-				this.allDefinitions);
-		this.allDefinitions = defOrder.getAllDefinitions();
 	}
 
 	public void addToAllDefinitions(PDefinition def) {
@@ -78,8 +72,8 @@ public class TLAModule {
 		return moduleName;
 	}
 
-	public ArrayList<TLADefinition> getDefinitions() {
-		return definitions;
+	public ArrayList<TLADefinition> getTLADefinitions() {
+		return tlaDefinitions;
 	}
 
 	public ArrayList<Node> getConstants() {

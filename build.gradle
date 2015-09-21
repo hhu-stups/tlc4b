@@ -22,19 +22,16 @@ repositories {
 	}
 }
 
-configurations { // configuration that holds jars to copy into lib
-	releaseJars
-}
-
 configurations.all {
  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 def parser_version = '2.5.0-SNAPSHOT'
+def tlatools_version = '1.0.2-SNAPSHOT'
 
 dependencies {
 	//compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
-	compile (group: 'de.hhu.stups', name: 'tlatools', version: '1.0.2-SNAPSHOT')
+	compile (group: 'de.hhu.stups', name: 'tlatools', version: tlatools_version)
 
 	compile (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)
 	compile (group: 'de.hhu.stups', name: 'parserbase', version: parser_version)
@@ -45,12 +42,6 @@ dependencies {
 
 	testCompile (group: 'junit', name: 'junit', version: '4.11')
 	testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.0.8-SNAPSHOT')
-
-	releaseJars (group: 'de.hhu.stups', name: 'tlatools', version: '1.0.0')
-	releaseJars (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)
-	releaseJars (group: 'de.hhu.stups', name: 'parserbase', version: parser_version)
-	releaseJars (group: 'de.hhu.stups', name: 'bparser', version: parser_version)
-	releaseJars (group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
 }
 
 jacoco {
@@ -86,25 +77,27 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
 	sourceSets sourceSets.main
 	//executionData files('build/jacoco/integrationTests.exec')
 	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
- }
-
-jar { from sourceSets.main.allJava }
-jar	{
-	from configurations.releaseJars.collect { it.isDirectory() ? it : zipTree(it) }
-}
-jar {
-    manifest {
-        attributes "Main-Class" : 'de.tlc4b.TLC4B'
-    }
 }
 
+task createJar(type: Jar, dependsOn: build){
+	archiveName = 'TLC4B.jar'
+	//from sourceSets.main.allJava
+	from sourceSets.main.output
+	//from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	exclude('**/*.java')
+	manifest {
+		attributes "Main-Class" : 'de.tlc4b.TLC4B'
+	}
+}
 
-task tlc4b(dependsOn: build) << {
+task tlc4b(dependsOn: createJar) << {
 	copy {
 		from('build/libs/')
 		into('.')
-		include('tlc4b-'+project.version+'.jar')
-		rename('tlc4b-(.+)', 'TLC4B.jar')
+		include('TLC4B.jar')
+		//include('tlc4b-'+project.version+'.jar')
+		//rename('tlc4b-(.+)', 'TLC4B.jar')
 	}
 }
 

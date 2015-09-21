@@ -41,7 +41,8 @@ public class MP {
 
 		@Override
 		public void print(String s) {
-			super.print("TLC: " + s);
+			s = s.replaceAll("\n", "\n> ");
+			super.print("> " + s);
 		}
 	}
 

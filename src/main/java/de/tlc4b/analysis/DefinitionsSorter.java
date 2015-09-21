@@ -21,7 +21,7 @@ import de.be4.classicalb.core.parser.node.PDefinition;
  * @author hansen
  */
 
-public class DefinitionsOrder extends DepthFirstAdapter {
+public class DefinitionsSorter extends DepthFirstAdapter {
 	private MachineContext machineContext;
 	private Hashtable<Node, HashSet<Node>> dependenciesTable;
 	private HashSet<Node> current;
@@ -32,7 +32,7 @@ public class DefinitionsOrder extends DepthFirstAdapter {
 		return allDefinitions;
 	}
 
-	public DefinitionsOrder(MachineContext machineContext,
+	public DefinitionsSorter(MachineContext machineContext,
 			ArrayList<PDefinition> allDefinitions) {
 		this.machineContext = machineContext;
 		dependenciesTable = new Hashtable<Node, HashSet<Node>>();

@@ -31,6 +31,7 @@ import de.be4.classicalb.core.parser.node.PPredicate;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.ConstantsEvaluator;
 import de.tlc4b.analysis.DefinitionsAnalyser;
+import de.tlc4b.analysis.DefinitionsSorter;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
@@ -67,8 +68,9 @@ public class Generator extends DepthFirstAdapter {
 		evalSetValuedParameter();
 		evalScalarParameter();
 		evalMachineSets();
-		evalConstants();
 		evalDefinitions();
+		evalConstants();
+		
 		evalInvariant();
 		evalOperations();
 		evalGoal();
@@ -141,12 +143,13 @@ public class Generator extends DepthFirstAdapter {
 
 			Node value = idValueTable.get(param);
 			if (value != null) {
-				tlaModule.definitions.add(new TLADefinition(param, value));
+				tlaModule.tlaDefinitions.add(new TLADefinition(param, value));
 				continue;
 			}
 			Integer intValue = constantsEvaluator.getIntValue(param);
 			if (intValue != null) {
-				tlaModule.definitions.add(new TLADefinition(param, intValue));
+				tlaModule.tlaDefinitions
+						.add(new TLADefinition(param, intValue));
 				continue;
 			}
 
@@ -202,7 +205,7 @@ public class Generator extends DepthFirstAdapter {
 			Node n = itr2.next();
 			AEnumeratedSetSet e = (AEnumeratedSetSet) n;
 			TLADefinition def = new TLADefinition(e, e);
-			this.tlaModule.definitions.add(def);
+			this.tlaModule.tlaDefinitions.add(def);
 			List<PExpression> copy = new ArrayList<PExpression>(e.getElements());
 			for (PExpression element : copy) {
 				this.tlaModule.constants.add(element);
@@ -216,9 +219,11 @@ public class Generator extends DepthFirstAdapter {
 		ADefinitionsMachineClause node = machineContext
 				.getDefinitionMachineClause();
 		if (node != null) {
-			for (PDefinition def : node.getDefinitions()) {
-				this.tlaModule.addToAllDefinitions(def);
-			}
+			ArrayList<PDefinition> bDefinitions = new ArrayList<PDefinition>(
+					node.getDefinitions());
+			DefinitionsSorter defOrder = new DefinitionsSorter(machineContext,
+					bDefinitions);
+			this.tlaModule.allDefinitions.addAll(defOrder.getAllDefinitions());
 		}
 	}
 
@@ -249,7 +254,7 @@ public class Generator extends DepthFirstAdapter {
 
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
 					con.getIdentifier().get(0), new LinkedList<PExpression>(),
-					(PExpression) value);//.clone());
+					(PExpression) value);// .clone());
 			machineContext.addReference(exprDef, con);
 
 			this.tlaModule.addToAllDefinitions(exprDef);
@@ -304,9 +309,9 @@ public class Generator extends DepthFirstAdapter {
 			}
 
 		} else {
-			if (machineContext.getConstantsSetup() == null){
+			if (machineContext.getConstantsSetup() == null) {
 				tlaModule.assumes
-				.addAll(constantsEvaluator.getPropertiesList());
+						.addAll(constantsEvaluator.getPropertiesList());
 			}
 			tlaModule.addAssume(propertiesPerdicate);
 		}
@@ -328,9 +333,10 @@ public class Generator extends DepthFirstAdapter {
 			this.tlaModule.variables.add(e);
 		}
 	}
-	
+
 	@Override
-	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
+	public void caseAConcreteVariablesMachineClause(
+			AConcreteVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<PExpression>(
 				node.getIdentifiers());
 		for (PExpression e : copy) {

@@ -318,15 +318,15 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	private void printDefinitions() {
-		ArrayList<TLADefinition> definitions = tlaModule.getDefinitions();
+		ArrayList<TLADefinition> definitions = tlaModule.getTLADefinitions();
 		for (int i = 0; i < definitions.size(); i++) {
 			TLADefinition def = definitions.get(i);
 			if (def.getDefName() instanceof AEnumeratedSetSet) {
 				def.getDefName().apply(this);
 				continue;
 			}
-
 			def.getDefName().apply(this);
+			
 			moduleStringAppend(" == ");
 			Node e = def.getDefinition();
 			if (e == null) {
@@ -384,9 +384,12 @@ public class TLAPrinter extends DepthFirstAdapter {
 			return;
 
 		for (int i = 0; i < list.size(); i++) {
-			moduleStringAppend("ASSUME ");
-			list.get(i).apply(this);
-			moduleStringAppend("\n");
+			Node node = list.get(i);
+			if(!typeRestrictor.isARemovedNode(node)){
+				moduleStringAppend("ASSUME ");
+				list.get(i).apply(this);
+				moduleStringAppend("\n");
+			}
 		}
 
 	}
