@@ -73,7 +73,7 @@ NotStrictSubset(S, T) == ~ (S \subset T)
 
 RECURSIVE Inter(_)
 Inter(S) ==
-  IF Assert(S = {}, "Error: Applied the inter operator to an empty set.")
+  IF Assert(S /= {}, "Error: Applied the inter operator to an empty set.")
 	THEN
     LET e == (CHOOSE e \in S: TRUE)
     IN  IF  Cardinality(S) = 1
