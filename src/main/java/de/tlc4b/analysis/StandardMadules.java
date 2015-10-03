@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.tlc4b.prettyprint.TLAPrinter;
 
 public final class StandardMadules {
 
@@ -199,8 +198,8 @@ public final class StandardMadules {
 	public static final String FINITE_SUBSETS = "Fin";
 	public static final String FINITE_1_SUBSETS = "Fin1";
 	public static final String B_POWER_Of = "BPowerOf";
-	public static final String B_MODULO = "BModulo"; 
-	public static final String B_DIVISION = "BDivision"; 
+	public static final String B_MODULO = "BModulo";
+	public static final String B_DIVISION = "BDivision";
 
 	public static final String GENERAL_SUMMATION = "Sigma";
 	public static final String GENERAL_PRODUCT = "Pi";
@@ -234,7 +233,7 @@ public final class StandardMadules {
 		return Relations.contains(name);
 	}
 
-	/**
+	/*
 	 * External Functions
 	 * 
 	 * All external functions must be defined in the standard module
@@ -244,8 +243,6 @@ public final class StandardMadules {
 	 * ((STRING*STRING) --> (INTEGER<->STRING));) is not mandatory.
 	 * 
 	 * The B definitions will be ignored in the {@link TLAPrinter}.
-	 * 
-	 * 
 	 */
 
 	public static final String EXTERNAL_printf = "printf";
@@ -269,8 +266,7 @@ public final class StandardMadules {
 	}
 
 	public static boolean isAbstractConstant(String name) {
-		if (name.equals(SORT_SET) 
-				|| name.equals(DECIMAL_TO_INT)) {
+		if (name.equals(SORT_SET) || name.equals(DECIMAL_TO_INT)) {
 			return true;
 		} else {
 			return false;

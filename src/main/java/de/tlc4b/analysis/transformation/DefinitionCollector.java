@@ -17,35 +17,32 @@ import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.Start;
 
 /**
- * This class only collects all Definitions of a Machine. Definitions of other files which are included are not contained.
- *  
- * @author Dominik Hansen <Dominik.Hansen at hhu.de>
- *
+ * This class only collects all Definitions of a Machine. Definitions of other
+ * files which are included are not contained.
  */
-
 
 public class DefinitionCollector extends DepthFirstAdapter {
 
 	private Hashtable<String, PDefinition> definitionsTable;
 	private ADefinitionsMachineClause definitionsMachineClause;
 
-	public Hashtable<String, PDefinition> getDefinitions(){
+	public Hashtable<String, PDefinition> getDefinitions() {
 		return new Hashtable<String, PDefinition>(definitionsTable);
 	}
-	public ADefinitionsMachineClause getDefinitionsMachineClause(){
+
+	public ADefinitionsMachineClause getDefinitionsMachineClause() {
 		return this.definitionsMachineClause;
 	}
-	
+
 	public DefinitionCollector(Start tree) {
 		definitionsTable = new Hashtable<String, PDefinition>();
 		tree.apply(this);
 	}
-	
+
 	@Override
 	public void inADefinitionsMachineClause(ADefinitionsMachineClause node) {
 		this.definitionsMachineClause = node;
 	}
-	
 
 	@Override
 	public void caseAPredicateDefinitionDefinition(
@@ -85,7 +82,6 @@ public class DefinitionCollector extends DepthFirstAdapter {
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 	}
-
 
 	@Override
 	public void caseAInitialisationMachineClause(

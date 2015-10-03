@@ -21,23 +21,19 @@ import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
 
-/**
+/*
  * This class performs an AST transformation on set comprehension nodes. For
  * example the expression {a,b| a = b & b : 1..10} will be replaced by the
  * Event-B set comprehension {b. b : 1..10 | b |-> b}. Moreover, if the parent
  * of a set comprehension is a domain expression, this will also be used for the
  * optimization, e.g. {a,b| a = b + 1 & b : 1..10} will be replaced by {b. b :
  * 1..10 | b + 1}
- * 
- * @author hansen
- * 
  */
 public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 	/**
 	 * The method called by the translator.
-	 * 
-	 * @param start
+	 * @param start start node of abstract syntax tree
 	 */
 	public static void optimizeSetComprehensions(Start start) {
 		SetComprehensionOptimizer optimizer = new SetComprehensionOptimizer();
@@ -166,8 +162,8 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 		if (node instanceof ADomainExpression) {
 			ArrayList<ADomainExpression> domExprList = collectParentDomainExpression(node
 					.parent());
-			domExprList.add(0, (ADomainExpression) node); // prepend the
-															// node
+			// prepend the node
+			domExprList.add(0, (ADomainExpression) node);
 			return domExprList;
 		} else {
 			return new ArrayList<ADomainExpression>();
@@ -289,11 +285,11 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				}
 			}
 		}
-		
+
 		@Override
 		public void caseAIdentifierExpression(AIdentifierExpression node) {
 			String name = Utils.getIdentifierAsString(node.getIdentifier());
-			//todo the name is not a unique of the node 
+			// todo the name is not a unique of the node
 			PExpression value = values.get(name);
 			if (value != null) {
 				node.replaceBy((PExpression) value.clone());

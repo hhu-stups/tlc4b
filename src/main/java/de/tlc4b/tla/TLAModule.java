@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.POperation;
-import de.tlc4b.analysis.DefinitionsSorter;
-import de.tlc4b.analysis.MachineContext;
 
 public class TLAModule {
 

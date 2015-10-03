@@ -34,6 +34,10 @@ PROPERTIES
 & FIN1({1}) = {{1}}
 & FIN1({1,2}) = {{1}, {2}, {1,2}}
 
+/* generalised intersection over sets of sets */
+& inter({{1},{1,2},{1,3}}) = {1}
+& inter({{1},{2},{1,3}}) = {}
+
 /* Quantified intersection */
 & INTER(z).(z: {1,2}| {z}) = {}
 & INTER(x1).(x1: {2,4}| {y1 | y1 : 0..10 & y1 <= x1}) = {0,1,2}

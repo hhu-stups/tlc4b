@@ -36,9 +36,6 @@ import de.tlc4b.exceptions.SubstitutionException;
  * assignments for each node inside a operation body. Missing variables
  * assignments correspond to unchanged variables in TLA+. B definitions or the
  * initialisation are not visited by this class.
- * 
- * @author Dominik Hansen <Dominik.Hansen at hhu.de>
- * 
  */
 
 public class UnchangedVariablesFinder extends DepthFirstAdapter {
