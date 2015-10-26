@@ -1,5 +1,5 @@
 language: java
-script: gradle tlc4b uploadArchives
+script: gradle uploadArchives
 before_install:
 - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out secring.gpg
   -d
