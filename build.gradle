@@ -80,28 +80,6 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
 	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 }
 
-task createJar(type: Jar, dependsOn: build){
-	archiveName = 'TLC4B.jar'
-	//from sourceSets.main.allJava
-	from sourceSets.main.output
-	//from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	exclude('**/*.java')
-	manifest {
-		attributes "Main-Class" : 'de.tlc4b.TLC4B'
-	}
-}
-
-task tlc4b(dependsOn: createJar) << {
-	copy {
-		from('build/libs/')
-		into('.')
-		include('TLC4B.jar')
-		//include('tlc4b-'+project.version+'.jar')
-		//rename('tlc4b-(.+)', 'TLC4B.jar')
-	}
-}
-
 tasks.withType(FindBugs) {
 	// disable findbugs by default
 	// in order to run findbugs type 'gradle tlc4b findbugsMain findbugsTest'
