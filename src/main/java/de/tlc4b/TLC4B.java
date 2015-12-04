@@ -41,8 +41,9 @@ public class TLC4B {
 	private String constantsSetup;
 
 	public static void main(String[] args) {
-		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
-															// windows
+		System.setProperty("apple.awt.UIElement", "true");
+		// avoiding pop up window
+
 		TLC4B tlc4b = new TLC4B();
 		try {
 			tlc4b.process(args);
