@@ -49,7 +49,7 @@ public class TLC4BGlobals {
 		checkInvariant = true;
 		checkAssertion = true;
 		checkLTL = true;
-		checkWD = false;
+		checkWD = true;
 		partialInvariantEvaluation = false;
 		useSymmetry = false;
 		printCoverage = false;
