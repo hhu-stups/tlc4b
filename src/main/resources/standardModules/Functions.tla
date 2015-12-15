@@ -1,5 +1,5 @@
 ----------------------------- MODULE Functions -----------------------------
-EXTENDS FiniteSets
+EXTENDS FiniteSets, TLC
 
 Range(f) == {f[x] : x \in DOMAIN f}
  \* The range of the function f
@@ -31,7 +31,8 @@ Inverse(f) == {<<f[x],x>>: x \in DOMAIN f}
 Override(f, g) == [x \in (DOMAIN f) \cup DOMAIN g |-> IF x \in DOMAIN g THEN g[x] ELSE f[x]]
  \* Overwriting of the function f with the function g
 
-FuncAssign(f, d, e) == [f EXCEPT ![d] = e]
+FuncAssign(f, d, e) ==  d :> e @@ f
+ \* [x \in (DOMAIN f) \cup {d} |-> IF x = d THEN e ELSE f[x]]
  \* Overwriting the function f at index d with value e
 
 TotalInjFunc(S, T) == {f \in [S -> T]:
