@@ -82,7 +82,7 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
 
 tasks.withType(FindBugs) {
 	// disable findbugs by default
-	// in order to run findbugs type 'gradle tlc4b findbugsMain findbugsTest'
+	// in order to run findbugs type 'gradle build findbugsMain findbugsTest'
 	task -> enabled = gradle.startParameter.taskNames.contains(task.name)
 
     reports {

@@ -14,10 +14,11 @@ import de.be4.classicalb.core.parser.node.AIntervalExpression;
 import de.be4.classicalb.core.parser.node.AUnaryMinusExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.exceptions.TranslationException;
 
 /**
- * @author hansen
- * In this class we search for preferences set in the definitions clause, e.g. minint or maxint.
+ * @author hansen In this class we search for preferences set in the definitions
+ *         clause, e.g. minint or maxint.
  */
 
 public class DefinitionsAnalyser extends DepthFirstAdapter {
@@ -34,7 +35,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 		HashSet<Node> deferredSets = new HashSet<Node>(machineContext
 				.getDeferredSets().values());
 
-		findMaxMin();
+		findDefaultSizesInDefinitions();
 
 		if (deferredSets.size() == 0)
 			return;
@@ -74,8 +75,23 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 		}
 	}
 
-	private void findMaxMin() {
-		Node node = machineContext.getDefinitions().get("SET_PREF_MAXINT");
+	private void findDefaultSizesInDefinitions() {
+		Node node = machineContext.getDefinitions().get(
+				"SET_PREF_DEFAULT_SETSIZE");
+		if (null != node) {
+			try {
+				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
+				AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
+				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
+				TLC4BGlobals.setDEFERRED_SET_SIZE(value);
+			} catch (ClassCastException e) {
+				throw new TranslationException(
+						"Unable to determine the default set size from definition SET_PREF_DEFAULT_SETSIZE: "
+								+ node.getEndPos());
+			}
+		}
+
+		node = machineContext.getDefinitions().get("SET_PREF_MAXINT");
 		if (null != node) {
 			try {
 				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
@@ -83,7 +99,9 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
 				TLC4BGlobals.setMAX_INT(value);
 			} catch (ClassCastException e) {
-
+				throw new TranslationException(
+						"Unable to determine MAXINT from definition SET_PREF_MAXINT: "
+								+ node.getEndPos());
 			}
 		}
 
@@ -93,17 +111,19 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
 				AIntegerExpression sizeExpr = null;
 				Integer value = null;
-				if (d.getRhs() instanceof AUnaryMinusExpression){
-					AUnaryMinusExpression minus = (AUnaryMinusExpression) d.getRhs();
+				if (d.getRhs() instanceof AUnaryMinusExpression) {
+					AUnaryMinusExpression minus = (AUnaryMinusExpression) d
+							.getRhs();
 					sizeExpr = (AIntegerExpression) minus.getExpression();
-					value = - Integer.parseInt(sizeExpr.getLiteral().getText());
-				}else{
+					value = -Integer.parseInt(sizeExpr.getLiteral().getText());
+				} else {
 					sizeExpr = (AIntegerExpression) d.getRhs();
 					value = Integer.parseInt(sizeExpr.getLiteral().getText());
 				}
 				TLC4BGlobals.setMIN_INT(value);
 			} catch (ClassCastException e) {
-				e.printStackTrace();
+				throw new TranslationException(
+						"Unable to determine the MININT from definition SET_PREF_MININT: " + node.getEndPos());
 			}
 		}
 	}
