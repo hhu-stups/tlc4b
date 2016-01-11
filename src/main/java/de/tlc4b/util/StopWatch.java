@@ -9,7 +9,7 @@ public class StopWatch {
 	private static final Hashtable<Watches, Long> runTime = new Hashtable<Watches, Long>();
 	
 	public enum Watches{
-		PARSING_TIME, TRANSLATION_TIME, TLC_TIME, OVERALL_TIME
+		PARSING_TIME, TRANSLATION_TIME, TLC_TIME, OVERALL_TIME, MODEL_CHECKING_TIME
 	}
 	
 	public static void start(Watches watch){

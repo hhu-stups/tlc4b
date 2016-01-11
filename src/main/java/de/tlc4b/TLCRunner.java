@@ -1,5 +1,7 @@
 package de.tlc4b;
 
+import static de.tlc4b.util.StopWatch.Watches.MODEL_CHECKING_TIME;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.tlc4b.util.StopWatch;
 import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
@@ -90,6 +93,7 @@ public class TLCRunner {
 	}
 
 	public static void runTLC(String machineName, File path) {
+		StopWatch.start(MODEL_CHECKING_TIME);
 		MP.println("--------------------------------");
 		MP.TLCOutputStream.changeOutputStream();
 		ToolIO.setMode(ToolIO.SYSTEM);
@@ -134,6 +138,7 @@ public class TLCRunner {
 		// return messages;
 		MP.TLCOutputStream.resetOutputStream();
 		MP.println("--------------------------------");
+		StopWatch.stop(MODEL_CHECKING_TIME);
 	}
 
 	private static void closeThreads() {

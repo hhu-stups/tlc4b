@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -30,6 +31,7 @@ public class TLC4B {
 	private File mainfile;
 	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
+	private String logFileString;
 
 	private File buildDir;
 
@@ -67,10 +69,11 @@ public class TLC4B {
 
 				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
 						tlc4b.buildDir);
-
 				TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
 				tlc4b.printResults(results, TLC4BGlobals.isCreateTraceFile());
+				Log log = new Log(tlc4b, results);
+				tlc4b.createLogFile(log);
 				System.exit(0);
 
 			} catch (NoClassDefFoundError e) {
@@ -219,7 +222,6 @@ public class TLC4B {
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
 			tlc4b.printResults(results, false);
-
 			System.exit(0);
 		}
 	}
@@ -259,6 +261,14 @@ public class TLC4B {
 				TLC4BGlobals.setDeleteOnExit(true);
 			} else if (args[index].toLowerCase().equals("-parinveval")) {
 				TLC4BGlobals.setPartialInvariantEvaluation(true);
+			} else if (args[index].toLowerCase().equals("-log")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new TLC4BIOException(
+							"Error: File requiered after option '-log'.");
+				}
+				logFileString = args[index];
+
 			} else if (args[index].toLowerCase().equals("-maxint")) {
 				index = index + 1;
 				if (index == args.length) {
@@ -382,6 +392,26 @@ public class TLC4B {
 		}
 	}
 
+	private void createLogFile(Log log) {
+		if (logFileString != null) {
+			File logFile = new File(logFileString);
+			FileWriter fw;
+			boolean fileExists = logFile.exists();
+			try {
+				fw = new FileWriter(logFile, true); // the true will append the
+													// new data
+				if (!fileExists) {
+					fw.write(log.getCSVFieldNamesLine());
+				}
+				fw.write(log.getCSVValueLine());
+				fw.close();
+				println("Log file: " + logFile.getAbsolutePath());
+			} catch (IOException e) {
+				new TLC4BIOException(e.getLocalizedMessage());
+			}
+		}
+	}
+
 	private void createFiles() {
 		boolean dirCreated = buildDir.mkdir();
 		if (dirCreated && TLC4BGlobals.isDeleteOnExit()) {
@@ -403,6 +433,7 @@ public class TLC4B {
 			println("Configuration file '" + configFile.getAbsolutePath()
 					+ "' created.");
 		}
+
 		createStandardModules();
 	}
 
@@ -501,4 +532,8 @@ public class TLC4B {
 		return machineFileNameWithoutFileExtension;
 	}
 
+	public File getMainFile(){
+		return this.mainfile;
+	}
+	
 }
