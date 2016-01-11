@@ -93,6 +93,16 @@ tasks.withType(FindBugs) {
 	ignoreFailures = true
 }
 
+task createJar(type: Jar, dependsOn: build){
+	archiveName = 'TLC4B.jar'
+	from sourceSets.main.output
+	from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	exclude('**/*.java')
+	manifest {
+		attributes "Main-Class" : 'de.tlc4b.TLC4B'
+	}
+}
+
 
 if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
 
