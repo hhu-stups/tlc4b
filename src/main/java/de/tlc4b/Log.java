@@ -35,7 +35,9 @@ public class Log {
 		long modelCheckingTime = StopWatch
 				.getRunTime(Watches.MODEL_CHECKING_TIME);
 		fieldValues.add(String.valueOf(modelCheckingTime));
-
+		
+		fieldNames.add("TLC Result");
+		fieldValues.add(tlcResults.getResultString());
 	}
 
 	public String getCSVValueLine() {
