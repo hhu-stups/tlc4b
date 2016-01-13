@@ -277,7 +277,16 @@ public class TLC4B {
 				}
 				int maxint = Integer.parseInt(args[index]);
 				TLC4BGlobals.setMAX_INT(maxint);
-			} else if (args[index].toLowerCase().equals("-minint")) {
+			} else if (args[index].toLowerCase().equals("-default_setsize")) {
+				index = index + 1;
+				if (index == args.length) {
+					throw new TLC4BIOException(
+							"Error: Number requiered after option '-default_setsize'.");
+				}
+				int deferredSetSize = Integer.parseInt(args[index]);
+				TLC4BGlobals.setDEFERRED_SET_SIZE(deferredSetSize);
+			} 
+			else if (args[index].toLowerCase().equals("-minint")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
