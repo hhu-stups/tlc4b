@@ -26,7 +26,7 @@ configurations.all {
  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-def parser_version = '2.5.2-SNAPSHOT'
+def parser_version = '2.5.1'
 def tlatools_version = '1.0.2-SNAPSHOT'
 
 dependencies {
