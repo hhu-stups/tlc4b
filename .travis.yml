@@ -1,5 +1,5 @@
 language: java
-script: gradle uploadArchives
+script: gradle build
 before_install:
 - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out secring.gpg
   -d
@@ -7,7 +7,7 @@ before_install:
   -d
 - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in gradle.properties.enc -out
   gradle.properties -d
-
+after_success: "[ $TRAVIS_BRANCH = 'master' ] && gradle uploadArchives"
 env:
   global:
   - secure: EnIo0zaQsHATGH8S5L1W0EHtqgV2kx6bfSgxyhz7XU+xw5y2JLDn+Y3ZaX7EcMK25RkgM8nld5Se72QmpienkP7tQlb5KHdwC10KgwbHDq+IP9q+ZMD2V1MsMRdTilW/eTZ0SUohlV5g4t3KqIe8l3Hs1dzNL0YmCMtXwYHdfwk=
