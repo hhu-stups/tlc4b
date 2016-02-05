@@ -1196,6 +1196,17 @@ public class TLAPrinter extends DepthFirstAdapter {
 		node.getRight().apply(this);
 		outANotEqualPredicate(node);
 	}
+	
+	@Override
+	public void caseAIfThenElseExpression(AIfThenElseExpression node) {
+		moduleStringAppend("(IF ");
+		node.getCondition().apply(this);
+		moduleStringAppend(" THEN ");
+		node.getThen().apply(this);
+		moduleStringAppend(" ELSE ");
+		node.getElse().apply(this);
+		moduleStringAppend(")");
+	}
 
 	@Override
 	public void caseAConjunctPredicate(AConjunctPredicate node) {

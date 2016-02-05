@@ -472,6 +472,20 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	@Override
+	public void caseAIfThenElseExpression(AIfThenElseExpression node) {
+		setType(node.getCondition(), BoolType.getInstance());
+		node.getCondition().apply(this);
+		
+		UntypedType x = new UntypedType();
+		setType(node.getThen(), x);
+		setType(node.getElse(), x);
+		node.getThen().apply(this);
+		node.getElse().apply(this);
+		BType found = getType(node.getThen());
+		unify(getType(node), found, node);
+	}
+
+	@Override
 	public void caseANotEqualPredicate(ANotEqualPredicate node) {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
