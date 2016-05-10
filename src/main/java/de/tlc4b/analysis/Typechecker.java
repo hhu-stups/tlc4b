@@ -1225,6 +1225,9 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	}
 
 	private boolean compareElementsOfList(ArrayList<Node> list) {
+		if(list.size() == 1){
+			return true;
+		}
 		try {
 			if (list.get(0) instanceof AIntegerExpression) {
 				HashSet<Integer> set = new HashSet<Integer>();

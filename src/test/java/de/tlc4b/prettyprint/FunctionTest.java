@@ -62,8 +62,8 @@ public class FunctionTest {
 				+ "PROPERTIES {(1|->2|->3)} = %a,b.(a = b | a+b)\n"
 				+ "END";
 		String expected = "---- MODULE test ----\n"
-				+ "EXTENDS Integers\n"
-				+ "ASSUME {<<<<1, 2>>,3>>} = {<<<<a, b>>, a + b>> : <<a, b>> \\in { <<a, b>> \\in ((Int) \\times (Int)) : a = b}}\n"
+				+ "EXTENDS Integers, TLC\n"
+				+ "ASSUME (<<1, 2>>:>3) = [<<a, b>> \\in {<<a, b>> \\in ((Int) \\times (Int)) : a = b} |-> a + b] \n"
 				+ "====";
 		compare(expected, machine);
 	}
