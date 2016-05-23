@@ -62,7 +62,7 @@ test {
 }
 
 
-task integrationTests(type: Test){
+task regressionTests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
 	//include('de/tlc4b/tlc/integration/probprivate/**')
