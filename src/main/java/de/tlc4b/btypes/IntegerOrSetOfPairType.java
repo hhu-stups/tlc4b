@@ -32,7 +32,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType, ITypechecker typechecker) {
-		if(second.followers.contains(first)){
+		if(second.getFollowers().contains(first)){
 			System.out.println("integerOrsetOfPair");
 			throw new RuntimeException();
 		}

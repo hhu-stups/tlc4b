@@ -31,9 +31,8 @@ import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 
 /**
- * TODO we need a second run over ast to check if all local variables have a
+ * TODO we need a second run over the AST to check if all local variables have a
  * type. This run should be performed after the normal model checking task.
- * 
  */
 public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 
