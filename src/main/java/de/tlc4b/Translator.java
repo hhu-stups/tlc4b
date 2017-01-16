@@ -111,7 +111,6 @@ public class Translator {
 	}
 
 	public void translate() {
-
 		UnsupportedConstructsFinder unsupportedConstructsFinder = new UnsupportedConstructsFinder(start);
 		unsupportedConstructsFinder.find();
 
@@ -123,7 +122,15 @@ public class Translator {
 		// TODO move set comprehension optimizer behind the type checker
 		SetComprehensionOptimizer.optimizeSetComprehensions(start);
 
-		MachineContext machineContext = new MachineContext(machineName, start, ltlFormula, constantsSetup);
+		MachineContext machineContext = new MachineContext(machineName, start);
+		if (ltlFormula != null) {
+			machineContext.addLTLFromula(this.ltlFormula);
+		}
+		if (this.constantsSetup != null) {
+			machineContext.setConstantSetupPredicate(constantsSetup);
+		}
+		machineContext.analyseMachine();
+
 		this.machineName = machineContext.getMachineName();
 		if (machineContext.machineContainsOperations()) {
 			TLC4BGlobals.setPrintCoverage(true);

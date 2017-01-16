@@ -75,30 +75,24 @@ import de.tlc4b.ltl.LTLFormulaVisitor;
 public class MachineContext extends DepthFirstAdapter {
 
 	private String machineName;
-	private PMachineHeader header;
 	private final Start start;
-	private final Hashtable<String, MachineContext> machineContextsTable;
-	private final ArrayList<LTLFormulaVisitor> ltlVisitors;
-	private final PPredicate constantsSetup;
 
-	private boolean constantSetupInTraceFile = false;
-	// machine identifier
+	private final ArrayList<LTLFormulaVisitor> ltlVisitors;
+	private PPredicate constantsSetupPredicate;
+	private boolean hasConstants = false;
+
 	private final LinkedHashMap<String, Node> machineSetParameter;
 	private final LinkedHashMap<String, Node> machineScalarParameter;
-
 	private final LinkedHashMap<String, Node> deferredSets;
 	private final LinkedHashMap<String, Node> enumeratedSets;
 	private final LinkedHashMap<String, Node> enumValues;
-
-	private LinkedHashMap<String, Node> constants;
-	private final LinkedHashMap<String, Node> bMachineConstants;
-
 	private final LinkedHashMap<String, Node> variables;
+	private final LinkedHashMap<String, Node> constants;
 	private final LinkedHashMap<String, Node> definitions;
 	private final LinkedHashMap<String, Node> operations;
 	private final LinkedHashMap<String, AIdentifierExpression> seenMachines;
 
-	// machine clauses
+	private PMachineHeader header;
 	private AAbstractMachineParseUnit abstractMachineParseUnit;
 	private AConstraintsMachineClause constraintMachineClause;
 	private ASeesMachineClause seesMachineClause;
@@ -108,25 +102,17 @@ public class MachineContext extends DepthFirstAdapter {
 	private AInvariantMachineClause invariantMachineClause;
 	private AInitialisationMachineClause initialisationMachineClause;
 	private AOperationsMachineClause operationMachineClause;
-	private AAssertionsMachineClause assertionMachineClause;
+	private AAssertionsMachineClause assertiondMachineClause;
 
 	private ArrayList<LinkedHashMap<String, Node>> contextTable;
 
 	protected final Hashtable<Node, Node> referencesTable;
 
-	public MachineContext(String machineName, Start start, String ltlFormula, PPredicate constantsSetup) {
+	public MachineContext(final String machineName, final Start start) {
 		this.start = start;
 		this.machineName = machineName;
-		this.constantsSetup = constantsSetup;
 		this.referencesTable = new Hashtable<Node, Node>();
 		this.ltlVisitors = new ArrayList<LTLFormulaVisitor>();
-
-		LTLFormulaVisitor ltlVisitor = null;
-		if (null != ltlFormula) {
-			ltlVisitor = new LTLFormulaVisitor("ltl", this);
-			ltlVisitor.parseLTLString(ltlFormula);
-			this.ltlVisitors.add(ltlVisitor);
-		}
 
 		this.machineSetParameter = new LinkedHashMap<String, Node>();
 		this.machineScalarParameter = new LinkedHashMap<String, Node>();
@@ -135,28 +121,34 @@ public class MachineContext extends DepthFirstAdapter {
 		this.enumeratedSets = new LinkedHashMap<String, Node>();
 		this.enumValues = new LinkedHashMap<String, Node>();
 		this.constants = new LinkedHashMap<String, Node>();
-		this.bMachineConstants = new LinkedHashMap<String, Node>();
 		this.variables = new LinkedHashMap<String, Node>();
 		this.definitions = new LinkedHashMap<String, Node>();
 		this.operations = new LinkedHashMap<String, Node>();
 		this.seenMachines = new LinkedHashMap<String, AIdentifierExpression>();
+	}
 
-		this.machineContextsTable = new Hashtable<String, MachineContext>();
-		start.apply(this);
-
-		checkLTLFormulas();
-
+	public void analyseMachine() {
+		this.start.apply(this);
 		checkConstantsSetup();
+		checkLTLFormulas();
+	}
+
+	public void addLTLFromula(final String ltlFormula) {
+		LTLFormulaVisitor ltlVisitor = new LTLFormulaVisitor("ltl", this);
+		ltlVisitor.parseLTLString(ltlFormula);
+		this.ltlVisitors.add(ltlVisitor);
+	}
+
+	public void setConstantSetupPredicate(final PPredicate constantsSetup) {
+		this.constantsSetupPredicate = constantsSetup;
 	}
 
 	private void checkConstantsSetup() {
-		if (constantsSetup == null) {
+		if (constantsSetupPredicate == null) {
 			return;
 		}
-
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
-
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 			contextTable.add(s.getDeferredSets());
@@ -165,8 +157,7 @@ public class MachineContext extends DepthFirstAdapter {
 			contextTable.add(s.getConstants());
 			contextTable.add(s.getDefinitions());
 		}
-		constantsSetup.apply(this);
-
+		constantsSetupPredicate.apply(this);
 	}
 
 	private void checkLTLFormulas() {
@@ -174,17 +165,17 @@ public class MachineContext extends DepthFirstAdapter {
 			ltlVisitors.get(0).start();
 			return;
 		}
-		ArrayList<LTLFormulaVisitor> notSupportedLTLFormulas = new ArrayList<LTLFormulaVisitor>();
+		ArrayList<LTLFormulaVisitor> formulasNotSupportedByTLC = new ArrayList<LTLFormulaVisitor>();
 		for (int i = 0; i < ltlVisitors.size(); i++) {
 			LTLFormulaVisitor visitor = ltlVisitors.get(i);
 			try {
 				visitor.start();
 			} catch (ScopeException e) {
 				MP.println("Warning: LTL formula '" + visitor.getName() + "' cannot be checked by TLC.");
-				notSupportedLTLFormulas.add(visitor);
+				formulasNotSupportedByTLC.add(visitor);
 			}
 		}
-		ltlVisitors.removeAll(notSupportedLTLFormulas);
+		ltlVisitors.removeAll(formulasNotSupportedByTLC);
 	}
 
 	public void checkLTLBPredicate(LTLBPredicate ltlbPredicate) {
@@ -310,7 +301,7 @@ public class MachineContext extends DepthFirstAdapter {
 		 */
 		copy.removeAll(definitionsToRemove);
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 			contextTable.add(s.getDeferredSets());
@@ -442,20 +433,19 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
-		constantSetupInTraceFile = true;
+		hasConstants = true;
 		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			AIdentifierExpression c = (AIdentifierExpression) e;
 			String name = Utils.getIdentifierAsString(c.getIdentifier());
 			exist(c.getIdentifier());
 			constants.put(name, c);
-			bMachineConstants.put(name, c);
 		}
 	}
 
 	@Override
 	public void caseAAbstractConstantsMachineClause(AAbstractConstantsMachineClause node) {
-		constantSetupInTraceFile = true;
+		hasConstants = true;
 		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			AIdentifierExpression c = (AIdentifierExpression) e;
@@ -523,15 +513,8 @@ public class MachineContext extends DepthFirstAdapter {
 		throw new ScopeException("Unkown Identifier: '" + name + "' at position: " + node.getStartPos());
 	}
 
-	private ArrayList<MachineContext> lookupExtendedMachines() {
+	private ArrayList<MachineContext> lookupReferencedMachines() {
 		ArrayList<MachineContext> list = new ArrayList<MachineContext>();
-		for (Entry<String, AIdentifierExpression> entry : seenMachines.entrySet()) {
-			String s = entry.getKey();
-			AIdentifierExpression value = entry.getValue();
-			if (value.getIdentifier().size() == 1) {
-				list.add(machineContextsTable.get(s));
-			}
-		}
 		list.add(this);
 		return list;
 	}
@@ -551,14 +534,13 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		this.propertiesMachineClause = node;
-		constantSetupInTraceFile = true;
+		hasConstants = true;
 		/**
 		 * check identifier scope in properties clauses
 		 */
 
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
-
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 			contextTable.add(s.getDeferredSets());
@@ -567,7 +549,6 @@ public class MachineContext extends DepthFirstAdapter {
 			contextTable.add(s.getConstants());
 			contextTable.add(s.getDefinitions());
 		}
-
 		if (node.getPredicates() != null) {
 			node.getPredicates().apply(this);
 		}
@@ -579,7 +560,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 			this.contextTable.add(s.getSetParamter());
@@ -596,10 +577,10 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
-		this.assertionMachineClause = node;
+		this.assertiondMachineClause = node;
 
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 			this.contextTable.add(s.getSetParamter());
@@ -624,7 +605,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
 
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 
@@ -646,7 +627,7 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAOperationsMachineClause(AOperationsMachineClause node) {
 		this.operationMachineClause = node;
 		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
-		ArrayList<MachineContext> list = lookupExtendedMachines();
+		ArrayList<MachineContext> list = lookupReferencedMachines();
 		for (int i = 0; i < list.size(); i++) {
 			MachineContext s = list.get(i);
 			this.contextTable.add(s.getSetParamter());
@@ -937,16 +918,12 @@ public class MachineContext extends DepthFirstAdapter {
 		return header;
 	}
 
-	public Start getTree() {
+	public Start getStartNode() {
 		return start;
 	}
 
 	public LinkedHashMap<String, Node> getSetParamter() {
-		return machineSetParameter;
-	}
-
-	public LinkedHashMap<String, Node> getScalarParameter() {
-		return machineScalarParameter;
+		return new LinkedHashMap<>(machineSetParameter);
 	}
 
 	public ArrayList<Node> getConstantArrayList() {
@@ -957,36 +934,40 @@ public class MachineContext extends DepthFirstAdapter {
 		return list;
 	}
 
+	public LinkedHashMap<String, Node> getScalarParameter() {
+		return new LinkedHashMap<>(machineScalarParameter);
+	}
+
 	public LinkedHashMap<String, Node> getConstants() {
 		return constants;
 	}
 
 	public LinkedHashMap<String, Node> getDefinitions() {
-		return definitions;
+		return new LinkedHashMap<>(definitions);
 	}
 
 	public LinkedHashMap<String, Node> getVariables() {
-		return variables;
+		return new LinkedHashMap<>(variables);
 	}
 
 	public LinkedHashMap<String, Node> getOperations() {
-		return operations;
+		return new LinkedHashMap<>(operations);
 	}
 
 	public LinkedHashMap<String, Node> getDeferredSets() {
-		return deferredSets;
+		return new LinkedHashMap<>(deferredSets);
 	}
 
 	public LinkedHashMap<String, Node> getEnumeratedSets() {
-		return enumeratedSets;
+		return new LinkedHashMap<>(enumeratedSets);
 	}
 
 	public LinkedHashMap<String, Node> getEnumValues() {
-		return enumValues;
+		return new LinkedHashMap<>(enumValues);
 	}
 
 	public LinkedHashMap<String, AIdentifierExpression> getSeenMachines() {
-		return seenMachines;
+		return new LinkedHashMap<>(seenMachines);
 	}
 
 	protected Hashtable<Node, Node> getReferences() {
@@ -1004,10 +985,6 @@ public class MachineContext extends DepthFirstAdapter {
 	public ArrayList<LTLFormulaVisitor> getLTLFormulas() {
 		return ltlVisitors;
 	}
-
-	/*
-	 * machine clauses getter
-	 */
 
 	public AAbstractMachineParseUnit getAbstractMachineParseUnit() {
 		return abstractMachineParseUnit;
@@ -1030,7 +1007,7 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	public AAssertionsMachineClause getAssertionMachineClause() {
-		return assertionMachineClause;
+		return assertiondMachineClause;
 	}
 
 	public void setPropertiesMachineClaus(APropertiesMachineClause propertiesMachineClause) {
@@ -1062,15 +1039,11 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	public PPredicate getConstantsSetup() {
-		return constantsSetup;
+		return constantsSetupPredicate;
 	}
 
-	public boolean constantSetupInTraceFile() {
-		return constantSetupInTraceFile;
-	}
-
-	public LinkedHashMap<String, Node> getBMachineConstants() {
-		return bMachineConstants;
+	public boolean hasConstants() {
+		return hasConstants;
 	}
 
 }

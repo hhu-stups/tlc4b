@@ -111,7 +111,7 @@ public class Renamer extends DepthFirstAdapter {
 
 		evalDefinitions();
 
-		machineContext.getTree().apply(this);
+		machineContext.getStartNode().apply(this);
 	}
 
 	private void evalEnumValues() {

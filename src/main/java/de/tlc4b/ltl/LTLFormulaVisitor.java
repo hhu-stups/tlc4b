@@ -70,23 +70,21 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	public void parseDefinition(AExpressionDefinitionDefinition def) {
 		if (!(def.getRhs() instanceof AStringExpression)) {
-			throw new LTLParseException(
-					"Error: LTL formula is not in a string representation.");
+			throw new LTLParseException("Error: LTL formula is not in a string representation.");
 		}
 		AStringExpression stringNode = (AStringExpression) def.getRhs();
 		this.ltlFormula = stringNode.getContent().getText();
 		try {
-			this.ltlFormulaStart = parse(ltlFormula);
+			this.ltlFormulaStart = parseLTLFormula(ltlFormula);
 		} catch (Exception e) {
-			String line = "Parsing definition " + name + " (line "
-					+ def.getStartPos().getLine() + "):\n";
-			throw new LTLParseException(line + e.getMessage());
+			String message = "Parsing definition " + name + " (line " + def.getStartPos().getLine() + "):\n";
+			throw new LTLParseException(message + e.getMessage());
 		}
 	}
 
-	public void parseLTLString(String ltlString) {
+	public void parseLTLString(final String ltlString) {
 		try {
-			this.ltlFormulaStart = parse(ltlString);
+			this.ltlFormulaStart = parseLTLFormula(ltlString);
 		} catch (Exception e) {
 			throw new LTLParseException(e.getMessage());
 		}
@@ -108,8 +106,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		return ltlNodeToBNodeTable;
 	}
 
-	public de.be4.classicalb.core.parser.node.Node getBAst(
-			de.be4.ltl.core.parser.node.Node unparsedLtl) {
+	public de.be4.classicalb.core.parser.node.Node getBAst(de.be4.ltl.core.parser.node.Node unparsedLtl) {
 		return ltlNodeToBNodeTable.get(unparsedLtl);
 	}
 
@@ -125,14 +122,12 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		return ltlFormulaStart;
 	}
 
-	public void printLTLFormula(TLAPrinter tlaPrinter,
-			TypeRestrictor typeRestrictor) {
+	public void printLTLFormula(TLAPrinter tlaPrinter, TypeRestrictor typeRestrictor) {
 		// LTLFormulaPrinter ltlFormulaPrinter =
 		new LTLFormulaPrinter(tlaPrinter, this, typeRestrictor);
 	}
 
-	public static Start parse(String ltlFormula) throws ParserException,
-			LexerException, IOException {
+	public static Start parseLTLFormula(String ltlFormula) throws ParserException, LexerException, IOException {
 		StringReader reader = new StringReader(ltlFormula);
 		PushbackReader r = new PushbackReader(reader);
 		Lexer l = new LtlLexer(r);
@@ -144,13 +139,11 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	@Override
 	public void caseAUnparsedLtl(AUnparsedLtl node) {
-		de.be4.classicalb.core.parser.node.Start start = parseBPredicate(node
-				.getPredicate().getText());
+		de.be4.classicalb.core.parser.node.Start start = parseBPredicate(node.getPredicate().getText());
 
 		ltlNodeToBNodeTable.put(node, start);
 
-		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(),
-				start);
+		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(), start);
 		this.bPredicates.add(ltlBPredicate);
 
 		machineContext.checkLTLBPredicate(ltlBPredicate);
@@ -171,19 +164,17 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	@Override
 	public void caseAExistsLtl(AExistsLtl node) {
-		handleQuantification(node, node.getExistsIdentifier().getText(), node
-				.getPredicate().getText(), node.getLtl());
+		handleQuantification(node, node.getExistsIdentifier().getText(), node.getPredicate().getText(), node.getLtl());
 
 	}
 
 	@Override
 	public void caseAForallLtl(AForallLtl node) {
-		handleQuantification(node, node.getForallIdentifier().getText(), node
-				.getPredicate().getText(), node.getLtl());
+		handleQuantification(node, node.getForallIdentifier().getText(), node.getPredicate().getText(), node.getLtl());
 	}
 
-	private void handleQuantification(de.be4.ltl.core.parser.node.Node node,
-			String parameterName, String bPredicateString, PLtl ltl) {
+	private void handleQuantification(de.be4.ltl.core.parser.node.Node node, String parameterName,
+			String bPredicateString, PLtl ltl) {
 		// create an identifier (b ast node) for the parameter of the
 		// quantification
 		List<TIdentifierLiteral> list = new ArrayList<TIdentifierLiteral>();
@@ -204,8 +195,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 		// collect all identifiers which can be used in the bPredicate and
 		// verify the bPredicate
-		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(),
-				start);
+		LTLBPredicate ltlBPredicate = new LTLBPredicate(getUnifiedContext(), start);
 		this.bPredicates.add(ltlBPredicate);
 		machineContext.checkLTLBPredicate(ltlBPredicate);
 
@@ -250,68 +240,56 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	}
 
 	public void inAUntilLtl(AUntilLtl node) {
-		throw new ScopeException(
-				"The 'until' operator is not supported by TLC.");
+		throw new ScopeException("The 'until' operator is not supported.");
 	}
 
 	public void inAWeakuntilLtl(AWeakuntilLtl node) {
-		throw new ScopeException(
-				"The 'weak until' operator is not supported by TLC.");
+		throw new ScopeException("The 'weak until' operator is not supported.");
 	}
 
 	public void inAReleaseLtl(AReleaseLtl node) {
-		throw new ScopeException(
-				"The 'release' operator is not supported by TLC.");
+		throw new ScopeException("The 'release' operator is not supported.");
 	}
 
 	public void inASinceLtl(ASinceLtl node) {
-		throw new ScopeException(
-				"The 'since' operator is not supported by TLC.");
+		throw new ScopeException("The 'since' operator is not supported.");
 	}
 
 	public void inATriggerLtl(ATriggerLtl node) {
-		throw new ScopeException(
-				"The 'trigger' operator is not supported by TLC.");
+		throw new ScopeException("The 'trigger' operator is not supported.");
 	}
 
 	public void inAHistoricallyLtl(AHistoricallyLtl node) {
-		throw new ScopeException(
-				"The 'history' operator is not supported by TLC.");
+		throw new ScopeException("The 'history' operator is not supported.");
 	}
 
 	public void inAOnceLtl(AOnceLtl node) {
-		throw new ScopeException("The 'once' operator is not supported by TLC.");
+		throw new ScopeException("The 'once' operator is not supported.");
 	}
 
 	public void inAYesterdayLtl(AYesterdayLtl node) {
-		throw new ScopeException(
-				"The 'yesterday' operator is not supported by TLC.");
+		throw new ScopeException("The 'yesterday' operator is not supported.");
 	}
 
 	@Override
 	public void caseAActionLtl(AActionLtl node) {
-		throw new ScopeException(
-				"The '[...]' operator is not supported by TLC.");
+		throw new ScopeException("The '[...]' operator is not supported.");
 	}
 
-    @Override
-    public void caseAAndLtl(AAndLtl node)
-    {
-        inAAndLtl(node);
-        if(node.getLeft() != null)
-        {
-            node.getLeft().apply(this);
-        }
-        if(node.getRight() != null)
-        {
-            node.getRight().apply(this);
-            System.out.println(node.getRight().getClass());
-        }
-        outAAndLtl(node);
-    }
-    
-    protected MachineContext getMachineContext(){
-    	return this.machineContext;
-    }
-	
+	@Override
+	public void caseAAndLtl(AAndLtl node) {
+		inAAndLtl(node);
+		if (node.getLeft() != null) {
+			node.getLeft().apply(this);
+		}
+		if (node.getRight() != null) {
+			node.getRight().apply(this);
+		}
+		outAAndLtl(node);
+	}
+
+	public MachineContext getMachineContext() {
+		return this.machineContext;
+	}
+
 }

@@ -188,28 +188,6 @@ public class StructType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public String getTlaType() {
-		StringBuffer res = new StringBuffer();
-		res.append("[");
-		Iterator<Entry<String, BType>> iterator = types.entrySet().iterator();
-		if (!iterator.hasNext()) {
-			res.append("...");
-		} else {
-			while (iterator.hasNext()) {
-				Entry<String, BType> next = iterator.next();
-				String fieldName = next.getKey();
-				BType type = next.getValue();
-				res.append(fieldName);
-				res.append(":");
-				res.append(type);
-				if (iterator.hasNext())
-					res.append(",");
-			}
-		}
-		res.append("]");
-		return res.toString();
-	}
-
 	public boolean containsInfiniteType() {
 		Iterator<BType> iterator = this.types.values().iterator();
 		while (iterator.hasNext()) {
@@ -219,7 +197,7 @@ public class StructType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		ArrayList<PRecEntry> list = new ArrayList<PRecEntry>();
 
 		Set<Entry<String, BType>> entrySet = this.types.entrySet();
@@ -231,7 +209,7 @@ public class StructType extends AbstractHasFollowers {
 			idList.add(literal);
 			AIdentifierExpression id = new AIdentifierExpression(idList);
 			ARecEntry recEntry = new ARecEntry(id,
-					type.createSyntaxTreeNode(typechecker));
+					type.createASTNode(typechecker));
 			list.add(recEntry);
 		}
 		AStructExpression node = new AStructExpression(list);

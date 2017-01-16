@@ -40,11 +40,6 @@ public class IntegerType implements BType {
 		return "INTEGER";
 	}
 	
-	public String getTlaType() {
-		return TLC4BGlobals.getMIN_INT() + ".." + TLC4BGlobals.getMAX_INT();
-	}
-
-	
 	
 	public boolean isUntyped() {
 		return false;
@@ -63,7 +58,7 @@ public class IntegerType implements BType {
 		return true;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		AIntegerSetExpression node = new AIntegerSetExpression();
 		typechecker.setType(node, new SetType(this));
 		return node;

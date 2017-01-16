@@ -49,7 +49,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	public AssignedVariablesFinder(MachineContext machineContext) {
 		this.assignedVariablesTable = new Hashtable<Node, HashSet<Node>>();
 		this.machineContext = machineContext;
-		machineContext.getTree().apply(this);
+		machineContext.getStartNode().apply(this);
 
 	}
 

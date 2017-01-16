@@ -219,15 +219,11 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 			return false;
 	}
 
-	public String getTlaType() {
-		return null;
-	}
-
 	public boolean containsInfiniteType() {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		return null;
 	}
 
