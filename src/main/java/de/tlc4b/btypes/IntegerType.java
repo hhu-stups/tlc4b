@@ -2,7 +2,6 @@ package de.tlc4b.btypes;
 
 import de.be4.classicalb.core.parser.node.AIntegerSetExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
 
