@@ -149,9 +149,8 @@ public class TestUtil {
 	}
 
 	public static TLCResult testString(String machineString) throws IOException {
-		String[] args = new String[] { machineString };
 		String runnerClassName = TLC4BRunnerTestString.class.getCanonicalName();
-
+		String[] args = new String[] { machineString };
 		return runTLC(runnerClassName, args);
 	}
 
