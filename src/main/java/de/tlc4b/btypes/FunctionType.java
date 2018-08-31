@@ -81,6 +81,7 @@ public class FunctionType extends AbstractHasFollowers {
 			setRange(newType);
 	}
 
+	@Override
 	public boolean compare(BType other) {
 		if (other instanceof UntypedType)
 			return true;
@@ -119,19 +120,17 @@ public class FunctionType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public String getTlaType() {
-		return "[" + domain.getTlaType() + " -> " + range.getTlaType() + "]";
-	}
-
+	@Override
 	public boolean containsInfiniteType() {
 		return this.domain.containsInfiniteType()
 				|| this.range.containsInfiniteType();
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	@Override
+	public PExpression createASTNode(Typechecker typechecker) {
 		APartialFunctionExpression node = new APartialFunctionExpression(
-				domain.createSyntaxTreeNode(typechecker),
-				range.createSyntaxTreeNode(typechecker));
+				domain.createASTNode(typechecker),
+				range.createASTNode(typechecker));
 		typechecker.setType(node, new SetType(this));
 		
 		return node;

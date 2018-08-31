@@ -4,7 +4,7 @@ apply plugin: 'maven'
 apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 
-project.version = '1.0.2-SNAPSHOT'
+project.version = '1.0.3-SNAPSHOT'
 project.group = 'de.hhu.stups'
 
 project.sourceCompatibility = '1.7'
@@ -16,18 +16,14 @@ repositories {
 		name "sonatype snapshots"
 		url "https://oss.sonatype.org/content/repositories/snapshots"
 	}
-	maven {
-		name "cobra"
-		url "http://cobra.cs.uni-duesseldorf.de/artifactory/repo"
-	}
 }
 
 configurations.all {
  resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-def parser_version = '2.5.2-SNAPSHOT'
-def tlatools_version = '1.0.2-SNAPSHOT'
+def parser_version = '2.5.1'
+def tlatools_version = '1.0.2'
 
 dependencies {
 	//compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
@@ -41,8 +37,8 @@ dependencies {
 
 	//compile(group: 'de.hhu.stups', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
 
-	testCompile (group: 'junit', name: 'junit', version: '4.11')
-	testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.0.8-SNAPSHOT')
+	testCompile (group: 'junit', name: 'junit', version: '4.12')
+	testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.0.8')
 }
 
 jacoco {
@@ -66,7 +62,7 @@ test {
 }
 
 
-task integrationTests(type: Test){
+task regressionTests(type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
 	//include('de/tlc4b/tlc/integration/probprivate/**')

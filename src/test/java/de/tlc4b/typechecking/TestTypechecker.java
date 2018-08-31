@@ -25,30 +25,27 @@ public class TestTypechecker {
 		Start start = parser.parse(machine, false);
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
-		//System.out.println(ast2String2.toString());
-		MachineContext c = new MachineContext(null, start, null, null);
+		// System.out.println(ast2String2.toString());
+		MachineContext c = new MachineContext(null, start);
+		c.analyseMachine();
 		Typechecker t = new Typechecker(c);
 
 		for (String name : c.getSetParamter().keySet()) {
-			parameters.put(name,
-					t.getType(c.getSetParamter().get(name)));
+			parameters.put(name, t.getType(c.getSetParamter().get(name)));
 		}
-		
+
 		for (String name : c.getScalarParameter().keySet()) {
-			parameters.put(name,
-					t.getType(c.getScalarParameter().get(name)));
+			parameters.put(name, t.getType(c.getScalarParameter().get(name)));
 		}
 
 		for (String name : c.getConstants().keySet()) {
 			constants.put(name, t.getType(c.getConstants().get(name)));
 		}
-		
+
 		for (String name : c.getVariables().keySet()) {
 			variables.put(name, t.getType(c.getVariables().get(name)));
 		}
-		
 
 	}
-	
-	
+
 }

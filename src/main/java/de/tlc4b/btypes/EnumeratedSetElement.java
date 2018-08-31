@@ -8,10 +8,10 @@ import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
 
-public class ModelValueType implements BType {
+public class EnumeratedSetElement implements BType {
 	private String name;
 
-	public ModelValueType(String name) {
+	public EnumeratedSetElement(String name) {
 		this.name = name;
 	}
 
@@ -23,8 +23,8 @@ public class ModelValueType implements BType {
 		if (!this.compare(other)) {
 			throw new UnificationException();
 		}
-		if (other instanceof ModelValueType) {
-			if (((ModelValueType) other).getName().equals(this.name)) {
+		if (other instanceof EnumeratedSetElement) {
+			if (((EnumeratedSetElement) other).getName().equals(this.name)) {
 				return this;
 			} else {
 				throw new UnificationException();
@@ -49,23 +49,19 @@ public class ModelValueType implements BType {
 	public boolean compare(BType other) {
 		if (other instanceof UntypedType)
 			return true;
-		if (other instanceof ModelValueType) {
-			if (((ModelValueType) other).getName().equals(this.name)) {
+		if (other instanceof EnumeratedSetElement) {
+			if (((EnumeratedSetElement) other).getName().equals(this.name)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public String getTlaType() {
-		return name;
-	}
-
 	public boolean containsInfiniteType() {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		TIdentifierLiteral literal = new TIdentifierLiteral(name);
 		ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
 		idList.add(literal);

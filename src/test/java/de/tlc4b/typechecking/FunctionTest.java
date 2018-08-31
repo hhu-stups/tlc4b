@@ -22,6 +22,17 @@ public class FunctionTest {
 		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k").toString());
 	}
 	
+	@Test
+	public void testOverride() throws BException {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS k,k2,p \n"
+				+ "PROPERTIES p = 1 & k =  %x.(x : {1} | 1) & k2 = k <+ {1|->2}\n"
+				+ "END";
+		TestTypechecker t =  new TestTypechecker(machine);
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k").toString());
+		assertEquals("FUNC(INTEGER,INTEGER)", t.constants.get("k2").toString());
+	}
+	
 	
 	@Test
 	public void testSetOperatorOnFunction() throws BException {

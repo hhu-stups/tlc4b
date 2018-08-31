@@ -74,7 +74,7 @@ public class Generator extends DepthFirstAdapter {
 		evalInvariant();
 		evalOperations();
 		evalGoal();
-		machineContext.getTree().apply(this);
+		machineContext.getStartNode().apply(this);
 
 		evalSpec();
 	}

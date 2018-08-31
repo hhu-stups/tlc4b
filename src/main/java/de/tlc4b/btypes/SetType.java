@@ -34,8 +34,7 @@ public class SetType extends AbstractHasFollowers {
 		}
 		if (other instanceof SetType) {
 			((SetType) other).setFollowersTo(this, typechecker);
-			this.subtype = this.subtype.unify(((SetType) other).subtype,
-					typechecker);
+			this.subtype = this.subtype.unify(((SetType) other).subtype, typechecker);
 			return this;
 		}
 
@@ -56,12 +55,12 @@ public class SetType extends AbstractHasFollowers {
 
 	@Override
 	public String toString() {
-		if(this.equals(subtype)){
+		if (this.equals(subtype)) {
 			return "POW(recursive call)";
-		}else{
+		} else {
 			return "POW(" + subtype + ")";
 		}
-		
+
 	}
 
 	public boolean isUntyped() {
@@ -75,8 +74,7 @@ public class SetType extends AbstractHasFollowers {
 
 		if (other instanceof UntypedType)
 			return true;
-		if (other instanceof IntegerOrSetType
-				|| other instanceof IntegerOrSetOfPairType) {
+		if (other instanceof IntegerOrSetType || other instanceof IntegerOrSetOfPairType) {
 			return true;
 		} else if (other instanceof FunctionType) {
 			return other.compare(this);
@@ -86,7 +84,7 @@ public class SetType extends AbstractHasFollowers {
 
 	@Override
 	public boolean contains(BType other) {
-		if(this.equals(subtype)){
+		if (this.equals(subtype)) {
 			return true;
 		}
 		if (this.subtype.equals(other)) {
@@ -98,16 +96,12 @@ public class SetType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public String getTlaType() {
-		return "SUBSET(" + subtype.getTlaType() + ")";
-	}
-
 	public boolean containsInfiniteType() {
 		return this.subtype.containsInfiniteType();
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
-		APowSubsetExpression node = new APowSubsetExpression(subtype.createSyntaxTreeNode(typechecker));
+	public PExpression createASTNode(Typechecker typechecker) {
+		APowSubsetExpression node = new APowSubsetExpression(subtype.createASTNode(typechecker));
 		typechecker.setType(node, this);
 		return node;
 	}

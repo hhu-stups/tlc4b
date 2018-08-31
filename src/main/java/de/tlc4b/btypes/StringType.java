@@ -48,15 +48,11 @@ public class StringType implements BType {
 		return false;
 	}
 
-	public String getTlaType() {
-		return "STRING";
-	}
-
 	public boolean containsInfiniteType() {
 		return true;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		AStringSetExpression node = new AStringSetExpression();
 		typechecker.setType(node, new SetType(this));
 		return node;

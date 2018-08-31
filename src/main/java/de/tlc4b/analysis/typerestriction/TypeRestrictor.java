@@ -583,7 +583,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 									+ UtilMethods.getPositionAsString(e));
 				}
 
-				tree = conType.createSyntaxTreeNode(typechecker);
+				tree = conType.createASTNode(typechecker);
 			} else {
 				tree = (PExpression) restrictedList.get(0);
 				for (int i = 1; i < restrictedList.size(); i++) {

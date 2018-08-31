@@ -87,7 +87,7 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		this.unchangedVariablesTable = new Hashtable<Node, HashSet<Node>>();
 		this.unchangedVariablesNull = new Hashtable<Node, HashSet<Node>>();
 
-		c.getTree().apply(this);
+		c.getStartNode().apply(this);
 	}
 
 	@Override

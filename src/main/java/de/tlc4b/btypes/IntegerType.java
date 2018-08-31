@@ -2,7 +2,6 @@ package de.tlc4b.btypes;
 
 import de.be4.classicalb.core.parser.node.AIntegerSetExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
 
@@ -40,11 +39,6 @@ public class IntegerType implements BType {
 		return "INTEGER";
 	}
 	
-	public String getTlaType() {
-		return TLC4BGlobals.getMIN_INT() + ".." + TLC4BGlobals.getMAX_INT();
-	}
-
-	
 	
 	public boolean isUntyped() {
 		return false;
@@ -63,7 +57,7 @@ public class IntegerType implements BType {
 		return true;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		AIntegerSetExpression node = new AIntegerSetExpression();
 		typechecker.setType(node, new SetType(this));
 		return node;

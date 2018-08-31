@@ -32,7 +32,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType, ITypechecker typechecker) {
-		if(second.followers.contains(first)){
+		if(second.getFollowers().contains(first)){
 			System.out.println("integerOrsetOfPair");
 			throw new RuntimeException();
 		}
@@ -219,15 +219,11 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 			return false;
 	}
 
-	public String getTlaType() {
-		return null;
-	}
-
 	public boolean containsInfiniteType() {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		return null;
 	}
 

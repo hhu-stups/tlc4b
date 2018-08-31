@@ -120,24 +120,15 @@ public class PairType extends AbstractHasFollowers {
 		return false;
 	}
 
-	public String getTlaType() {
-		String res = first.getTlaType() + " \\times ";
-		if (second instanceof PairType) {
-			res += "(" + second.getTlaType() + ")";
-		} else
-			res += second.getTlaType();
-		return res;
-	}
-
 	public boolean containsInfiniteType() {
 		return this.first.containsInfiniteType()
 				|| this.second.containsInfiniteType();
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		ACartesianProductExpression node = new ACartesianProductExpression(
-				first.createSyntaxTreeNode(typechecker),
-				second.createSyntaxTreeNode(typechecker));
+				first.createASTNode(typechecker),
+				second.createASTNode(typechecker));
 		typechecker.setType(node, new SetType(this));
 		return node;
 	}

@@ -15,7 +15,7 @@ import de.tlc4b.analysis.ConstantsEliminator;
 import de.tlc4b.analysis.ConstantsEvaluator;
 import de.tlc4b.analysis.DefinitionsAnalyser;
 import de.tlc4b.analysis.MachineContext;
-import de.tlc4b.analysis.NotSupportedConstructs;
+import de.tlc4b.analysis.UnsupportedConstructsFinder;
 import de.tlc4b.analysis.PrecedenceCollector;
 import de.tlc4b.analysis.PrimedNodesMarker;
 import de.tlc4b.analysis.Renamer;
@@ -57,8 +57,7 @@ public class Translator {
 		// System.out.println(ast2String2.toString());
 	}
 
-	public Translator(String machineString, String ltlFormula)
-			throws BException {
+	public Translator(String machineString, String ltlFormula) throws BException {
 		this.machineString = machineString;
 		this.ltlFormula = ltlFormula;
 		BParser parser = new BParser("Testing");
@@ -68,8 +67,8 @@ public class Translator {
 		// System.out.println(ast2String2.toString());
 	}
 
-	public Translator(String machineName, File machineFile, String ltlFormula,
-			String constantSetup) throws BException, IOException {
+	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
+			throws BException, IOException {
 		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
 
@@ -82,10 +81,10 @@ public class Translator {
 
 		// Definitions of definitions files are injected in the ast of the main
 		// machine
-		final RecursiveMachineLoader rml = new RecursiveMachineLoader(
-				machineFile.getParent(), parser.getContentProvider());
+		final RecursiveMachineLoader rml = new RecursiveMachineLoader(machineFile.getParent(),
+				parser.getContentProvider());
 		rml.loadAllMachines(machineFile, start, parser.getSourcePositions(), parser.getDefinitions());
-		
+
 		parsedMachines = rml.getParsedMachines();
 
 		if (constantSetup != null) {
@@ -94,13 +93,11 @@ public class Translator {
 			try {
 				start2 = con.parse("#FORMULA " + constantSetup, false);
 			} catch (BException e) {
-				System.err
-						.println("An error occured while parsing the constants setup predicate.");
+				System.err.println("An error occured while parsing the constants setup predicate.");
 				throw e;
 			}
 
-			APredicateParseUnit parseUnit = (APredicateParseUnit) start2
-					.getPParseUnit();
+			APredicateParseUnit parseUnit = (APredicateParseUnit) start2.getPParseUnit();
 			this.constantsSetup = parseUnit.getPredicate();
 
 			final Ast2String ast2String2 = new Ast2String();
@@ -114,75 +111,73 @@ public class Translator {
 	}
 
 	public void translate() {
+		UnsupportedConstructsFinder unsupportedConstructsFinder = new UnsupportedConstructsFinder(start);
+		unsupportedConstructsFinder.find();
+
 		// ast transformation
 		SeesEliminator.eliminateSeesClauses(start, parsedMachines);
 
-		new NotSupportedConstructs(start);
 		DefinitionsEliminator.eliminateDefinitions(start);
 
-		//TODO move set comprehension optimizer behind the type checker
+		// TODO move set comprehension optimizer behind the type checker
 		SetComprehensionOptimizer.optimizeSetComprehensions(start);
-		
-		MachineContext machineContext = new MachineContext(machineName, start,
-				ltlFormula, constantsSetup);
+
+		MachineContext machineContext = new MachineContext(machineName, start);
+		if (ltlFormula != null) {
+			machineContext.addLTLFromula(this.ltlFormula);
+		}
+		if (this.constantsSetup != null) {
+			machineContext.setConstantSetupPredicate(constantsSetup);
+		}
+		machineContext.analyseMachine();
+
 		this.machineName = machineContext.getMachineName();
 		if (machineContext.machineContainsOperations()) {
 			TLC4BGlobals.setPrintCoverage(true);
 		}
 
 		Typechecker typechecker = new Typechecker(machineContext);
-		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(
-				machineContext);
-		
-		ConstantsEliminator constantsEliminator = new ConstantsEliminator(
-				machineContext);
+		UnchangedVariablesFinder unchangedVariablesFinder = new UnchangedVariablesFinder(machineContext);
+
+		ConstantsEliminator constantsEliminator = new ConstantsEliminator(machineContext);
 		constantsEliminator.start();
 
-		ConstantsEvaluator constantsEvaluator = new ConstantsEvaluator(
-				machineContext);
+		ConstantsEvaluator constantsEvaluator = new ConstantsEvaluator(machineContext);
 
-		InvariantPreservationAnalysis invariantPreservationAnalysis = new InvariantPreservationAnalysis(
-				machineContext, constantsEvaluator.getInvariantList(),
-				unchangedVariablesFinder);
+		InvariantPreservationAnalysis invariantPreservationAnalysis = new InvariantPreservationAnalysis(machineContext,
+				constantsEvaluator.getInvariantList(), unchangedVariablesFinder);
 
-		TypeRestrictor typeRestrictor = new TypeRestrictor(start,
-				machineContext, typechecker, constantsEvaluator);
-		
-		PrecedenceCollector precedenceCollector = new PrecedenceCollector(
-				start, typechecker, machineContext, typeRestrictor);
+		TypeRestrictor typeRestrictor = new TypeRestrictor(start, machineContext, typechecker, constantsEvaluator);
 
-		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(
-				machineContext);
-		
-		
+		PrecedenceCollector precedenceCollector = new PrecedenceCollector(start, typechecker, machineContext,
+				typeRestrictor);
 
-		Generator generator = new Generator(machineContext, typeRestrictor,
-				constantsEvaluator, deferredSetSizeCalculator, typechecker);
+		DefinitionsAnalyser deferredSetSizeCalculator = new DefinitionsAnalyser(machineContext);
+
+		Generator generator = new Generator(machineContext, typeRestrictor, constantsEvaluator,
+				deferredSetSizeCalculator, typechecker);
 		generator.generate();
 
-		UsedStandardModules usedModules = new UsedStandardModules(start,
-				typechecker, typeRestrictor, generator.getTlaModule());
+		UsedStandardModules usedModules = new UsedStandardModules(start, typechecker, typeRestrictor,
+				generator.getTlaModule());
 
-		standardModulesToBeCreated = usedModules
-				.getStandardModulesToBeCreated();
+		standardModulesToBeCreated = usedModules.getStandardModulesToBeCreated();
 
-		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator
-				.getTlaModule().getOperations(), machineContext);
+		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator.getTlaModule().getOperations(),
+				machineContext);
 		primedNodesMarker.start();
 
 		Renamer renamer = new Renamer(machineContext);
-		TLAPrinter printer = new TLAPrinter(machineContext, typechecker,
-				unchangedVariablesFinder, precedenceCollector, usedModules,
-				typeRestrictor, generator.getTlaModule(),
-				generator.getConfigFile(), primedNodesMarker, renamer,
-				invariantPreservationAnalysis);
+		TLAPrinter printer = new TLAPrinter(machineContext, typechecker, unchangedVariablesFinder, precedenceCollector,
+				usedModules, typeRestrictor, generator.getTlaModule(), generator.getConfigFile(), primedNodesMarker,
+				renamer, invariantPreservationAnalysis);
 		printer.start();
 		moduleString = printer.getStringbuilder().toString();
 		configString = printer.getConfigString().toString();
 		translatedLTLFormula = printer.geTranslatedLTLFormula();
 
-		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer, typechecker,
-				generator.getTlaModule(), generator.getConfigFile());
+		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer, typechecker, generator.getTlaModule(),
+				generator.getConfigFile());
 	}
 
 	public String getMachineString() {

@@ -43,15 +43,11 @@ public class BoolType implements BType {
 			return false;
 	}
 
-	public String getTlaType() {
-		return "BOOLEAN";
-	}
-
 	public boolean containsInfiniteType() {
 		return false;
 	}
 
-	public PExpression createSyntaxTreeNode(Typechecker typechecker) {
+	public PExpression createASTNode(Typechecker typechecker) {
 		ABoolSetExpression node = new ABoolSetExpression();
 		typechecker.setType(node, new SetType(this));
 		return node;
