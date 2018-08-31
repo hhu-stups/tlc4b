@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.PrecedenceCollector;
@@ -717,7 +717,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	private void printNormalAssignment(PExpression left, PExpression right) {
 		AIdentifierExpression id = (AIdentifierExpression) left;
-		String name = Utils.getIdentifierAsString(id.getIdentifier());
+		String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 		if (!machineContext.getVariables().containsKey(name)) {
 			moduleStringAppend("TRUE");
 		} else {
@@ -1138,7 +1138,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		inAIdentifierExpression(node);
 		String name = renamer.getNameOfRef(node);
 		if (name == null) {
-			name = Utils.getIdentifierAsString(node.getIdentifier());
+			name = Utils.getTIdentifierListAsString(node.getIdentifier());
 		}
 		if (StandardMadules.isAbstractConstant(name)) {
 			// in order to pass the member check
@@ -1156,7 +1156,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void caseAPrimedIdentifierExpression(APrimedIdentifierExpression node) {
 		String name = renamer.getNameOfRef(node);
 		if (name == null) {
-			name = Utils.getIdentifierAsString(node.getIdentifier());
+			name = Utils.getTIdentifierListAsString(node.getIdentifier());
 		}
 		moduleStringAppend(name);
 	}
@@ -1878,7 +1878,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (node.getIdentifier() instanceof AIdentifierExpression) {
 			AIdentifierExpression id = (AIdentifierExpression) node
 					.getIdentifier();
-			String name = Utils.getIdentifierAsString(id.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 			if (StandardMadules.isAbstractConstant(name)) {
 
 				moduleStringAppend(name);

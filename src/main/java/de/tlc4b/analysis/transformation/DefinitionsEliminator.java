@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.ADefinitionExpression;
@@ -20,6 +19,7 @@ import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.analysis.StandardMadules;
 
 /**
@@ -136,7 +136,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 		for (int i = 0; i < clone.getParameters().size(); i++) {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
-			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
+			String paramName = Utils.getTIdentifierListAsString(p.getIdentifier());
 
 			Node arg = arguments.get(i);
 			arg.apply(this);
@@ -168,7 +168,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 		for (int i = 0; i < clone.getParameters().size(); i++) {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
-			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
+			String paramName = Utils.getTIdentifierListAsString(p.getIdentifier());
 			Node arg = arguments.get(i);
 			arg.apply(this);
 			context.put(paramName, node.getParameters().get(i));
@@ -200,7 +200,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 		for (int i = 0; i < clone.getParameters().size(); i++) {
 			AIdentifierExpression p = (AIdentifierExpression) clone
 					.getParameters().get(i);
-			String paramName = Utils.getIdentifierAsString(p.getIdentifier());
+			String paramName = Utils.getTIdentifierListAsString(p.getIdentifier());
 
 			Node arg = arguments.get(i);
 			arg.apply(this);
@@ -218,7 +218,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
 		if (contextStack.size() == 0)
 			return;
-		String name = Utils.getIdentifierAsString(node.getIdentifier());
+		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 
 		for (int i = contextStack.size() - 1; i >= 0; i--) {
 			Hashtable<String, PExpression> context = contextStack.get(i);

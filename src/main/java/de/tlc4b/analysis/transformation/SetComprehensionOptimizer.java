@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Set;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
@@ -20,6 +19,7 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.util.Utils;
 
 /*
  * This class performs an AST transformation on set comprehension nodes. For
@@ -49,7 +49,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 		for (int i = 0; i < identifiers.size(); i++) {
 			AIdentifierExpression id = (AIdentifierExpression) identifiers
 					.get(i);
-			String name = Utils.getIdentifierAsString(id.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 			list.add(name);
 			identifierTable.put(name, id);
 		}
@@ -189,7 +189,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			if (equal.getLeft() instanceof AIdentifierExpression) {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getLeft();
-				String name = Utils.getIdentifierAsString(id.getIdentifier());
+				String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 				Set<String> names = new HashSet<String>(values.keySet());
 				names.add(name);
 				if (list.contains(name)
@@ -202,7 +202,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 					&& equal.getRight() instanceof AIdentifierExpression) {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getRight();
-				String name = Utils.getIdentifierAsString(id.getIdentifier());
+				String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 				Set<String> names = new HashSet<String>(values.keySet());
 				names.add(name);
 				if (list.contains(name)
@@ -227,7 +227,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 		@Override
 		public void caseAIdentifierExpression(AIdentifierExpression node) {
-			String name = Utils.getIdentifierAsString(node.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 			if (names.contains(name)) {
 				hasDependency = true;
 			}
@@ -288,7 +288,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 		@Override
 		public void caseAIdentifierExpression(AIdentifierExpression node) {
-			String name = Utils.getIdentifierAsString(node.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 			// todo the name is not a unique of the node
 			PExpression value = values.get(name);
 			if (value != null) {

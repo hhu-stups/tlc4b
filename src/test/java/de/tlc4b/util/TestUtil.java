@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import util.ToolIO;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tla2b.exceptions.TLA2BException;
@@ -52,8 +53,14 @@ public class TestUtil {
 	public static void tryTranslating(final String machineString) throws BException {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
 		ToolIO.setMode(ToolIO.TOOL);
-		Translator b2tlaTranslator = new Translator(machineString);
-		b2tlaTranslator.translate();
+		Translator b2tlaTranslator;
+		try {
+			b2tlaTranslator = new Translator(machineString);
+			b2tlaTranslator.translate();
+		} catch (BCompoundException e) {
+			throw e.getFirstException();
+		}
+
 	}
 
 	public static String translateTLA2B(String moduleName, String tlaString) throws TLA2BException {
@@ -135,17 +142,26 @@ public class TestUtil {
 	}
 
 	public static void compareEquals(String expected, String machine) throws BException {
-		Translator b2tlaTranslator = new Translator(machine);
-		b2tlaTranslator.translate();
-		System.out.println(b2tlaTranslator.getModuleString());
-		assertEquals(expected, b2tlaTranslator.getModuleString());
+		try {
+			Translator b2tlaTranslator = new Translator(machine);
+			b2tlaTranslator.translate();
+			System.out.println(b2tlaTranslator.getModuleString());
+			assertEquals(expected, b2tlaTranslator.getModuleString());
+		} catch (BCompoundException e) {
+			throw e.getFirstException();
+		}
+
 	}
 
 	public static String translate(String machine) throws BException {
-		Translator translator = new Translator(machine);
-		translator.translate();
-		System.out.println(translator.getModuleString());
-		return translator.getModuleString();
+		try {
+			Translator translator = new Translator(machine);
+			translator.translate();
+			System.out.println(translator.getModuleString());
+			return translator.getModuleString();
+		} catch (BCompoundException e) {
+			throw e.getFirstException();
+		}
 	}
 
 	public static TLCResult testString(String machineString) throws IOException {

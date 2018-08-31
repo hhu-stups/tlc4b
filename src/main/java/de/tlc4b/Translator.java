@@ -7,7 +7,7 @@ import java.util.Map;
 
 import de.be4.classicalb.core.parser.BParser;
 import de.be4.classicalb.core.parser.analysis.prolog.RecursiveMachineLoader;
-import de.be4.classicalb.core.parser.exceptions.BException;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.APredicateParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
@@ -48,7 +48,7 @@ public class Translator {
 	private TLCOutputInfo tlcOutputInfo;
 	private String translatedLTLFormula;
 
-	public Translator(String machineString) throws BException {
+	public Translator(String machineString) throws BCompoundException {
 		this.machineString = machineString;
 		BParser parser = new BParser("Testing");
 		start = parser.parse(machineString, false);
@@ -57,7 +57,7 @@ public class Translator {
 		// System.out.println(ast2String2.toString());
 	}
 
-	public Translator(String machineString, String ltlFormula) throws BException {
+	public Translator(String machineString, String ltlFormula) throws BCompoundException {
 		this.machineString = machineString;
 		this.ltlFormula = ltlFormula;
 		BParser parser = new BParser("Testing");
@@ -68,7 +68,7 @@ public class Translator {
 	}
 
 	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
-			throws BException, IOException {
+			throws BCompoundException, IOException {
 		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
 
@@ -83,7 +83,7 @@ public class Translator {
 		// machine
 		final RecursiveMachineLoader rml = new RecursiveMachineLoader(machineFile.getParent(),
 				parser.getContentProvider());
-		rml.loadAllMachines(machineFile, start, parser.getSourcePositions(), parser.getDefinitions());
+		rml.loadAllMachines(machineFile, start, parser.getDefinitions());
 
 		parsedMachines = rml.getParsedMachines();
 
@@ -92,7 +92,7 @@ public class Translator {
 			Start start2 = null;
 			try {
 				start2 = con.parse("#FORMULA " + constantSetup, false);
-			} catch (BException e) {
+			} catch (BCompoundException e) {
 				System.err.println("An error occured while parsing the constants setup predicate.");
 				throw e;
 			}

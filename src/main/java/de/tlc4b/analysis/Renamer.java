@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
@@ -30,6 +29,7 @@ import de.be4.classicalb.core.parser.node.AVarSubstitution;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.util.Utils;
 
 public class Renamer extends DepthFirstAdapter {
 	private final MachineContext machineContext;
@@ -216,7 +216,7 @@ public class Renamer extends DepthFirstAdapter {
 
 	private String renameIdentifier(Node node) {
 		AIdentifierExpression id = (AIdentifierExpression) node;
-		String name = Utils.getIdentifierAsString(id.getIdentifier());
+		String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 		String newName = incName(name);
 		namesTable.put(id, newName);
 		return newName;

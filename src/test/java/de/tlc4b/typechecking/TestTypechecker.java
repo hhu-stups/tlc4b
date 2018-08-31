@@ -3,6 +3,7 @@ package de.tlc4b.typechecking;
 import java.util.Hashtable;
 
 import de.be4.classicalb.core.parser.BParser;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.exceptions.BException;
 import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.analysis.MachineContext;
@@ -22,7 +23,12 @@ public class TestTypechecker {
 		variables = new Hashtable<String, BType>();
 
 		BParser parser = new BParser("Test");
-		Start start = parser.parse(machine, false);
+		Start start;
+		try {
+			start = parser.parse(machine, false);
+		} catch (BCompoundException e) {
+			throw e.getFirstException();
+		}
 		final Ast2String ast2String2 = new Ast2String();
 		start.apply(ast2String2);
 		// System.out.println(ast2String2.toString());
