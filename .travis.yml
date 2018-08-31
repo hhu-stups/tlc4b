@@ -1,4 +1,5 @@
 language: java
+sudo: true
 script: gradle build
 before_install:
 - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out secring.gpg

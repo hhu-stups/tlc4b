@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.be4.classicalb.core.parser.BParser;
-import de.be4.classicalb.core.parser.exceptions.BException;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.AStringExpression;
@@ -155,7 +155,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		de.be4.classicalb.core.parser.node.Start start = null;
 		try {
 			start = parser.parse(bPredicate, false);
-		} catch (BException e) {
+		} catch (BCompoundException e) {
 			throw new LTLParseException(e.getMessage());
 		}
 

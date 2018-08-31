@@ -13,7 +13,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
-import de.be4.classicalb.core.parser.exceptions.BException;
+import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.exceptions.TLC4BIOException;
@@ -49,7 +49,7 @@ public class TLC4B {
 		TLC4B tlc4b = new TLC4B();
 		try {
 			tlc4b.process(args);
-		} catch (BException e) {
+		} catch (BCompoundException e) {
 			printlnErr("***** Parsing Error *****");
 			printlnErr(e.getMessage());
 			return;
@@ -337,7 +337,7 @@ public class TLC4B {
 		}
 	}
 
-	public void process(String[] args) throws IOException, BException {
+	public void process(String[] args) throws IOException, BCompoundException {
 
 		MP.print("Arguments: ");
 		for (int i = 0; i < args.length; i++) {

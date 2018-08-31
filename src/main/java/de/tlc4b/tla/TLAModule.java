@@ -9,14 +9,14 @@ public class TLAModule {
 
 	protected String moduleName;
 
-	protected final ArrayList<TLADefinition> tlaDefinitions;
+	private final ArrayList<TLADefinition> tlaDefinitions;
 	protected final ArrayList<Node> constants;
 	protected final ArrayList<Node> assumes;
 	protected final ArrayList<Node> variables;
 	protected final ArrayList<Node> invariants;
 	private final ArrayList<Node> initPredicates;
 	protected final ArrayList<POperation> operations;
-	private  ArrayList<PDefinition> bDefinitions;
+	private ArrayList<PDefinition> bDefinitions;
 	private final ArrayList<Node> assertions;
 
 	protected ArrayList<PDefinition> allDefinitions;
@@ -110,4 +110,7 @@ public class TLAModule {
 		return this.initPredicates.size() > 0;
 	}
 
+	public void addTLADefinition(TLADefinition defintion) {
+		this.tlaDefinitions.add(defintion);
+	}
 }

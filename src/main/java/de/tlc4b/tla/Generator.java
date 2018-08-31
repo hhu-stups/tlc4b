@@ -70,7 +70,7 @@ public class Generator extends DepthFirstAdapter {
 		evalMachineSets();
 		evalDefinitions();
 		evalConstants();
-		
+
 		evalInvariant();
 		evalOperations();
 		evalGoal();
@@ -143,13 +143,12 @@ public class Generator extends DepthFirstAdapter {
 
 			Node value = idValueTable.get(param);
 			if (value != null) {
-				tlaModule.tlaDefinitions.add(new TLADefinition(param, value));
+				tlaModule.addTLADefinition(new TLADefinition(param, value));
 				continue;
 			}
 			Integer intValue = constantsEvaluator.getIntValue(param);
 			if (intValue != null) {
-				tlaModule.tlaDefinitions
-						.add(new TLADefinition(param, intValue));
+				tlaModule.addTLADefinition(new TLADefinition(param, intValue));
 				continue;
 			}
 
@@ -205,7 +204,7 @@ public class Generator extends DepthFirstAdapter {
 			Node n = itr2.next();
 			AEnumeratedSetSet e = (AEnumeratedSetSet) n;
 			TLADefinition def = new TLADefinition(e, e);
-			this.tlaModule.tlaDefinitions.add(def);
+			this.tlaModule.addTLADefinition(def);
 			List<PExpression> copy = new ArrayList<PExpression>(e.getElements());
 			for (PExpression element : copy) {
 				this.tlaModule.constants.add(element);

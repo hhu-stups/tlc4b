@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
 import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
@@ -44,6 +43,7 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.be4.ltl.core.parser.node.AExistsLtl;
 import de.be4.ltl.core.parser.node.AForallLtl;
 import de.tlc4b.TLC4BGlobals;
@@ -572,7 +572,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 						&& !(e.parent() instanceof ALambdaExpression)
 						&& !(e.parent() instanceof AComprehensionSetExpression)) {
 					AIdentifierExpression id = (AIdentifierExpression) e;
-					String localVariableName = Utils.getIdentifierAsString(id
+					String localVariableName = Utils.getTIdentifierListAsString(id
 							.getIdentifier());
 					throw new NotSupportedException(
 							"Unable to restrict the type '"

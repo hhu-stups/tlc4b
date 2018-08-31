@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.btypes.AbstractHasFollowers;
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.BoolType;
@@ -135,7 +135,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		List<PExpression> copy = new ArrayList<PExpression>(node.getParameters());
 		for (PExpression e : copy) {
 			AIdentifierExpression p = (AIdentifierExpression) e;
-			String name = Utils.getIdentifierAsString(p.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(p.getIdentifier());
 
 			if (Character.isUpperCase(name.charAt(0))) {
 
@@ -160,7 +160,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseAEnumeratedSetSet(AEnumeratedSetSet node) {
 		List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(node.getIdentifier());
 
-		String setName = Utils.getIdentifierAsString(copy);
+		String setName = Utils.getTIdentifierListAsString(copy);
 		SetType set = new SetType(new EnumeratedSetElement(setName));
 		setType(node, set);
 		List<PExpression> copy2 = new ArrayList<PExpression>(node.getElements());
@@ -172,7 +172,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	@Override
 	public void caseADeferredSetSet(ADeferredSetSet node) {
 		List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(node.getIdentifier());
-		String name = Utils.getIdentifierAsString(copy);
+		String name = Utils.getTIdentifierListAsString(copy);
 		setType(node, new SetType(new EnumeratedSetElement(name)));
 	}
 
@@ -399,7 +399,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		Node identifierDeclarationNode = referenceTable.get(node);
 		BType found = getType(identifierDeclarationNode);
 
-		String name = Utils.getIdentifierAsString(node.getIdentifier());
+		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
@@ -421,6 +421,20 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getRight(), x);
 		node.getLeft().apply(this);
 		node.getRight().apply(this);
+	}
+
+	@Override
+	public void caseAIfThenElseExpression(AIfThenElseExpression node) {
+		setType(node.getCondition(), BoolType.getInstance());
+		node.getCondition().apply(this);
+		
+		UntypedType x = new UntypedType();
+		setType(node.getThen(), x);
+		setType(node.getElse(), x);
+		node.getThen().apply(this);
+		node.getElse().apply(this);
+		BType found = getType(node.getThen());
+		unify(getType(node), found, node);
 	}
 
 	@Override
@@ -2246,7 +2260,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			e.getValue().apply(this);
 
 			AIdentifierExpression i = (AIdentifierExpression) e.getIdentifier();
-			String name = Utils.getIdentifierAsString(i.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(i.getIdentifier());
 			found.add(name, getType(e.getValue()));
 		}
 		BType expected = getType(node);
@@ -2261,7 +2275,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseARecordFieldExpression(ARecordFieldExpression node) {
 		StructType s = new StructType();
 		AIdentifierExpression i = (AIdentifierExpression) node.getIdentifier();
-		String fieldName = Utils.getIdentifierAsString(i.getIdentifier());
+		String fieldName = Utils.getTIdentifierListAsString(i.getIdentifier());
 		s.add(fieldName, new UntypedType());
 		setType(node.getRecord(), s);
 
@@ -2289,7 +2303,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			e.getValue().apply(this);
 
 			AIdentifierExpression i = (AIdentifierExpression) e.getIdentifier();
-			String name = Utils.getIdentifierAsString(i.getIdentifier());
+			String name = Utils.getTIdentifierListAsString(i.getIdentifier());
 			BType t = ((SetType) getType(e.getValue())).getSubtype();
 			s.add(name, t);
 		}

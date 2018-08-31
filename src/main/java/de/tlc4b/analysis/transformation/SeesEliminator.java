@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
@@ -23,6 +22,7 @@ import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.PParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.TLC4BGlobals;
 
 public class SeesEliminator extends DepthFirstAdapter {
@@ -56,7 +56,7 @@ public class SeesEliminator extends DepthFirstAdapter {
 		for (PExpression pExpression : machineNames) {
 			AIdentifierExpression id = (AIdentifierExpression) pExpression;
 			String machineName = Utils
-					.getIdentifierAsString(id.getIdentifier());
+					.getTIdentifierListAsString(id.getIdentifier());
 			if (!resolvedMachines.contains(machineName)) {
 				resolvedMachines.add(machineName);
 				Start start = parsedMachines.get(machineName);

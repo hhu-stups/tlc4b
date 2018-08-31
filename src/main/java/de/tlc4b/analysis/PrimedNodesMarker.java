@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import de.be4.classicalb.core.parser.Utils;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesElementOfSubstitution;
@@ -14,6 +13,7 @@ import de.be4.classicalb.core.parser.node.APrimedIdentifierExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.POperation;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.exceptions.ScopeException;
 
 public class PrimedNodesMarker extends DepthFirstAdapter {
@@ -97,7 +97,7 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 				return;
 			}
 		}
-		String name = Utils.getIdentifierAsString(node.getIdentifier());
+		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 		throw new ScopeException("Unkown identifier: '"+name+"$0'");
 	}
 
