@@ -14,3 +14,6 @@ src/test/resources/testing
 src/test/resources/todo
 TLC4B.jar
 temp
+out/
+src/test/**/*.tla
+src/test/**/*.cfg
