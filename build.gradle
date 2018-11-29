@@ -1,8 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'jacoco'
-apply plugin: 'findbugs'
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven'
+    id 'jacoco'
+    id 'findbugs'
+}
 
 project.version = '1.0.4-SNAPSHOT'
 project.group = 'de.hhu.stups'
