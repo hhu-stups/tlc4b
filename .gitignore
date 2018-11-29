@@ -17,3 +17,4 @@ temp
 out/
 src/test/**/*.tla
 src/test/**/*.cfg
+public_examples
