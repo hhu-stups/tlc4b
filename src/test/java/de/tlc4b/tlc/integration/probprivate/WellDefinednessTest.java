@@ -37,7 +37,7 @@ public class WellDefinednessTest extends AbstractParseMachineTest  {
 		@Config
 		public static Configuration getConfig() {
 			final ArrayList<TestPair> list = new ArrayList<TestPair>();
-			list.add(new TestPair(WellDefinednessError, "../prob_examples/public_examples/TLC/WellDefinednessError"));
+			list.add(new TestPair(WellDefinednessError, "public_examples/TLC/WellDefinednessError"));
 			return getConfiguration(list);
 		}
 }
