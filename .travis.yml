@@ -11,6 +11,3 @@ after_success: "[ $TRAVIS_BRANCH = 'master' ] && ./gradlew --no-daemon uploadArc
 env:
   global:
   - secure: EnIo0zaQsHATGH8S5L1W0EHtqgV2kx6bfSgxyhz7XU+xw5y2JLDn+Y3ZaX7EcMK25RkgM8nld5Se72QmpienkP7tQlb5KHdwC10KgwbHDq+IP9q+ZMD2V1MsMRdTilW/eTZ0SUohlV5g4t3KqIe8l3Hs1dzNL0YmCMtXwYHdfwk=
-notifications:
-  slack:
-    secure: VWTQE6Z6o9Xz4gZ1SOUKroz5g+exD//+FUdd6wM0tLESFhqqrfwR1dyZHIbQJpcC8KROQD5Bip6vihhACBmr+NU6nPwoNN7fJ9Dvgqt4xG4NEk3+VpVCQVfRDJF4IhHqRFx4K+9fV5I2Kr93G39U/N92lMLk/RkyoaUyju85uwM=
