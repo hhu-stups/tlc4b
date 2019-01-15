@@ -1,10 +1,13 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'jacoco'
-apply plugin: 'findbugs'
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'maven'
+    id 'jacoco'
+    id 'findbugs'
+    id "de.undercouch.download" version "3.4.3"
+}
 
-project.version = '1.0.3'
+project.version = '1.0.4'
 project.group = 'de.hhu.stups'
 
 project.sourceCompatibility = '1.7'
@@ -46,11 +49,12 @@ jacoco {
     reportsDir = file("$buildDir/JacocoReports")
 }
 
+
 jacocoTestReport {
     reports {
         xml.enabled false
         csv.enabled false
-        html.destination "${buildDir}/jacocoHtml"
+        html.destination file("${buildDir}/jacocoHtml")
     }
 }
 
@@ -61,13 +65,28 @@ test {
 	//exclude('de/tlc4b/tlc/integration')
 }
 
+task downloadPublicExamples(type: Download) {
+  src 'https://www3.hhu.de/stups/downloads/prob/source/ProB_public_examples.tgz'
+  dest buildDir
+  onlyIfModified true
+}
 
-task regressionTests(type: Test){
+task extractPublicExamples(dependsOn: downloadPublicExamples, type: Copy) {
+  from tarTree(resources.gzip("${buildDir}/ProB_public_examples.tgz"))
+  into projectDir
+}
+
+clean {
+  delete "${projectDir}/public_examples"
+}
+
+task regressionTests(dependsOn: extractPublicExamples, type: Test){
 	doFirst{ println("Running integration tests") }
 	scanForTestClasses = true
 	//include('de/tlc4b/tlc/integration/probprivate/**')
 	include('de/tlc4b/**')
 }
+check.dependsOn(regressionTests)
 
 // type 'gradle integrationTests jacocoIntegrationTestReport' in order to run the jacoco code coverage analysis
 task jacocoIntegrationTestReport(type: JacocoReport) {

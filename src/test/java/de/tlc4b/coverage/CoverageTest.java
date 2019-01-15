@@ -32,7 +32,7 @@ public class CoverageTest extends AbstractParseMachineTest {
 	public static Configuration getConfig() {
 		final ArrayList<String> list = new ArrayList<String>();
 		final ArrayList<String> ignoreList = new ArrayList<String>();
-		list.add("../prob_examples/public_examples/TLC/");
+		list.add("public_examples/TLC/");
 
 		list.add("./src/test/resources/");
 		ignoreList.add("./src/test/resources/compound/");

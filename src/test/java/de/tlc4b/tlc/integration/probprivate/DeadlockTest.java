@@ -38,7 +38,7 @@ public class DeadlockTest extends AbstractParseMachineTest {
 	public static Configuration getConfig() {
 		final ArrayList<TestPair> list = new ArrayList<TestPair>();
 		list.add(new TestPair(Deadlock,
-				"../prob_examples/public_examples/TLC/Deadlock"));
+				"public_examples/TLC/Deadlock"));
 		return getConfiguration(list);
 	}
 }
