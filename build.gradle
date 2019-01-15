@@ -7,7 +7,7 @@ plugins {
     id "de.undercouch.download" version "3.4.3"
 }
 
-project.version = '1.0.4-SNAPSHOT'
+project.version = '1.0.4'
 project.group = 'de.hhu.stups'
 
 project.sourceCompatibility = '1.7'
