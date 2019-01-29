@@ -1,5 +1,5 @@
 language: java
-script: ./gradlew --no-daemon --console verbose --stacktrace build
+script: TERM=dumb ./gradlew --no-daemon --console verbose --stacktrace build
 before_install:
 - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in secring.gpg.enc -out secring.gpg
   -d
