@@ -1,4 +1,4 @@
 TLC4B
 =====
 
-[![Build Status](https://travis-ci.org/hhu-stups/tlc4b.svg)](https://travis-ci.org/hhu-stups/tlc4b)
+[![GitLab CI](https://gitlab.cs.uni-duesseldorf.de/%{project_path}/badges/%{default_branch}/pipeline.svg)](https://gitlab.cs.uni-duesseldorf.de/%{project_path}/pipelines)
