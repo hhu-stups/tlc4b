@@ -13,6 +13,10 @@ project.group = 'de.hhu.stups'
 project.sourceCompatibility = '1.7'
 project.targetCompatibility = '1.7'
 
+wrapper {
+	gradleVersion = "4.10.3"
+}
+
 repositories {
 	mavenCentral()
 	maven {
