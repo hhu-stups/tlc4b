@@ -1,13 +1,16 @@
 plugins {
 	id 'java'
 	id 'eclipse'
-	id 'maven'
 	id 'jacoco'
+	id "maven-publish"
+	id "signing"
 	id "de.undercouch.download" version "3.4.3"
 }
 
 project.version = '1.0.5-SNAPSHOT'
 project.group = 'de.hhu.stups'
+
+final isSnapshot = project.version.endsWith("-SNAPSHOT")
 
 project.sourceCompatibility = '1.7'
 project.targetCompatibility = '1.7'
@@ -45,6 +48,11 @@ dependencies {
 
 	testCompile (group: 'junit', name: 'junit', version: '4.12')
 	testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.1.0')
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
 }
 
 jacoco {
@@ -108,75 +116,55 @@ task createJar(type: Jar, dependsOn: build){
 	}
 }
 
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
 
-if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
-	apply plugin: 'signing'
+			pom {
+				name = "TLC integration into ProB"
+				description = "Use the TLC model checker within ProB."
+				url = "https://github.com/hhu-stups/tlc4b"
 
-	signing {
-		sign configurations.archives
-	}
-
-	javadoc {
-		failOnError = false
-	}
-
-	task javadocJar(type: Jar) {
-		classifier = 'javadoc'
-		from javadoc
-	}
-
-	task sourcesJar(type: Jar) {
-		classifier = 'sources'
-		from sourceSets.main.allSource
-	}
-
-	artifacts {
-		archives javadocJar, sourcesJar
-	}
-
-	uploadArchives {
-		repositories {
-			mavenDeployer {
-				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
+				licenses {
+					license {
+						name = "Eclipse Public License, Version 2.1"
+						url = "https://www.eclipse.org/legal/epl-v10.html"
+					}
 				}
 
-				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-					authentication(userName: ossrhUsername, password: ossrhPassword)
+				scm {
+					connection = "scm:git:git://github.com/hhu-stups/tlc4b.git"
+					developerConnection = "scm:git:git@github.com:hhu-stups/tlc4b.git"
+					url = "https://github.com/bendisposto/hhu-stups/tlc4b"
 				}
 
-				pom.project {
-					name 'TLC integration into ProB'
-					packaging 'jar'
-					// optionally artifactId can be defined here
-					description "Use the TLC model checker within ProB."
-					url 'https://github.com/hhu-stups/tlc4b'
-
-					licenses {
-						license {
-							name 'Eclipse Public License, Version 2.1'
-							url 'https://www.eclipse.org/legal/epl-v10.html'
-						}
-					}
-
-					scm {
-						connection 'scm:git:git://github.com/hhu-stups/tlc4b.git'
-						developerConnection 'scm:git:git@github.com:hhu-stups/tlc4b.git'
-						url 'https://github.com/bendisposto/hhu-stups/tlc4b'
-					}
-
-
-					developers {
-						developer {
-							id 'bendisposto'
-							name 'Jens Bendisposto'
-							email 'jens@bendisposto.de'
-						}
+				developers {
+					developer {
+						id = "bendisposto"
+						name = "Jens Bendisposto"
+						email = "jens@bendisposto.de"
 					}
 				}
 			}
 		}
 	}
+
+	repositories {
+		maven {
+			final releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+			final snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+			url isSnapshot ? snapshotsRepoUrl : releasesRepoUrl
+			if (project.hasProperty("ossrhUsername") && project.hasProperty("ossrhPassword")) {
+				credentials {
+					username project.ossrhUsername
+					password project.ossrhPassword
+				}
+			}
+		}
+	}
+}
+
+signing {
+	sign publishing.publications.mavenJava
 }
