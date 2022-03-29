@@ -3,7 +3,6 @@ plugins {
 	id 'eclipse'
 	id 'maven'
 	id 'jacoco'
-	id 'findbugs'
 	id "de.undercouch.download" version "3.4.3"
 }
 
@@ -97,19 +96,6 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
 	sourceSets sourceSets.main
 	//executionData files('build/jacoco/integrationTests.exec')
 	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-}
-
-tasks.withType(FindBugs) {
-	// disable findbugs by default
-	// in order to run findbugs type 'gradle build findbugsMain findbugsTest'
-	task -> enabled = gradle.startParameter.taskNames.contains(task.name)
-
-	reports {
-		xml.enabled = false
-		html.enabled = true
-	}
-
-	ignoreFailures = true
 }
 
 task createJar(type: Jar, dependsOn: build){
