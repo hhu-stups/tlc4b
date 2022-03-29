@@ -55,6 +55,16 @@ java {
 	withJavadocJar()
 }
 
+javadoc {
+	// Needed because of:
+	// .../bparser-2.9.14.jar(de/be4/classicalb/core/parser/exceptions/PreParseException.java):3: error: cannot access Token
+	//   bad source file: .../bparser-2.9.14.jar(de/be4/classicalb/core/preparser/node/Token.java)
+	//    file does not contain class de.be4.classicalb.core.preparser.node.Token
+	//    Please remove or make sure it appears in the correct subdirectory of the sourcepath.
+	// FIXME Can this be fixed by updating the parser?
+	failOnError = false
+}
+
 jacoco {
 	toolVersion = "0.8.7"
 	reportsDirectory = file("$buildDir/JacocoReports")
