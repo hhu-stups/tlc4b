@@ -182,7 +182,7 @@ public class LTLFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
 				+ "END";
-	    String expected = "((ENABLED(foo) => \\neg(ENABLED(bar) \\/ ENABLED(bazz))) /\\ (ENABLED(bar) => \\neg(ENABLED(bazz))))";
+		String expected = "((ENABLED(foo) => \\neg(ENABLED(bar) \\/ ENABLED(bazz))) /\\ (ENABLED(bar) => \\neg(ENABLED(bazz))))";
 		compareLTLFormula(expected, machine, "deterministic(foo,bar,bazz)");
 	}
 	
@@ -192,7 +192,7 @@ public class LTLFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
 				+ "END";
-	    String expected = "(ENABLED(foo) => \\neg(ENABLED(bar) \\/ ENABLED(bazz)))";
+		String expected = "(ENABLED(foo) => \\neg(ENABLED(bar) \\/ ENABLED(bazz)))";
 		compareLTLFormula(expected, machine, "deterministic(foo)");
 	}
 	
@@ -201,7 +201,7 @@ public class LTLFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo = skip; bar = skip; bazz = skip\n"
 				+ "END";
-	    String expected = "\\neg(ENABLED(Next))";
+		String expected = "\\neg(ENABLED(Next))";
 		compareLTLFormula(expected, machine, "deadlock");
 	}
 	
@@ -210,7 +210,7 @@ public class LTLFormulaTest {
 		String machine = "MACHINE test\n"
 				+ "OPERATIONS foo(a) = SELECT a : 1..3 THEN skip END\n"
 				+ "END";
-	    String expected = "\\neg(ENABLED(Next))";
+		String expected = "\\neg(ENABLED(Next))";
 		compareLTLFormula(expected, machine, "deadlock");
 	}
 	

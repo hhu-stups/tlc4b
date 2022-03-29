@@ -82,9 +82,9 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
 				if (name.startsWith("ASSERT_LTL")
-				        || name.startsWith("scope_")
+						|| name.startsWith("scope_")
 						|| name.startsWith("SET_PREF_")
-				        || name.equals("VISB_JSON_FILE")
+						|| name.equals("VISB_JSON_FILE")
 						|| name.startsWith("ANIMATION_FUNCTION")
 						|| name.startsWith("ANIMATION_IMG"))
 					continue;
@@ -103,8 +103,8 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 				if (name.startsWith("ASSERT_LTL")
 						|| name.startsWith("scope_")
 						|| name.startsWith("SET_PREF_")
-				        || name.equals("VISB_JSON_FILE")
-				        || name.startsWith("ANIMATION_FUNCTION")
+						|| name.equals("VISB_JSON_FILE")
+						|| name.startsWith("ANIMATION_FUNCTION")
 						|| name.startsWith("ANIMATION_IMG")
 						|| StandardMadules
 								.isKeywordInModuleExternalFunctions(name)) {

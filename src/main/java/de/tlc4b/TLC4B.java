@@ -377,7 +377,7 @@ public class TLC4B {
 		filename = filename.replace("\\", File.separator);
 		filename = filename.replace("/", File.separator);
 		if (!filename.toLowerCase().endsWith(".mch") &&
-		    !filename.toLowerCase().endsWith(".sys")) {
+				!filename.toLowerCase().endsWith(".sys")) {
 			filename = filename + ".mch";
 		}
 
