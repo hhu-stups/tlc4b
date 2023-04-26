@@ -99,6 +99,8 @@ task extractPublicExamples(dependsOn: downloadPublicExamples, type: Copy) {
 
 clean {
 	delete "${projectDir}/public_examples"
+	delete "${projectDir}/states"
+	delete "${projectDir}/temp"
 }
 
 task regressionTests(dependsOn: extractPublicExamples, type: Test){
