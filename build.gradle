@@ -94,11 +94,11 @@ task downloadPublicExamples(type: Download) {
 
 task extractPublicExamples(dependsOn: downloadPublicExamples, type: Copy) {
 	from tarTree(resources.gzip("${buildDir}/ProB_public_examples.tgz"))
-	into projectDir
+	into "${buildDir}/prob_examples"
 }
 
 clean {
-	delete "${projectDir}/public_examples"
+	delete "${projectDir}/public_examples" // now extracted into build, but previous versions placed it at top level
 	delete "${projectDir}/states"
 	delete "${projectDir}/temp"
 }
