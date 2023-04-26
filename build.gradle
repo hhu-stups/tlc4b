@@ -87,7 +87,7 @@ test {
 }
 
 task downloadPublicExamples(type: Download) {
-	src 'https://www3.hhu.de/stups/downloads/prob/source/ProB_public_examples.tgz'
+	src 'https://stups.hhu-hosting.de/downloads/prob/source/ProB_public_examples.tgz'
 	dest buildDir
 	onlyIfModified true
 }
