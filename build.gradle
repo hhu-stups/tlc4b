@@ -95,6 +95,7 @@ task downloadPublicExamples(type: Download) {
 task extractPublicExamples(dependsOn: downloadPublicExamples, type: Copy) {
 	from tarTree(resources.gzip("${buildDir}/ProB_public_examples.tgz"))
 	into "${buildDir}/prob_examples"
+	include "public_examples/TLC/**"
 }
 
 clean {
