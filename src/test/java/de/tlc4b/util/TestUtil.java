@@ -1,8 +1,5 @@
 package de.tlc4b.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,15 +9,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import util.ToolIO;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.exceptions.BException;
-import de.be4.classicalb.core.parser.node.Start;
 import de.tla2b.exceptions.TLA2BException;
 import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.Translator;
 import de.tlc4b.tlc.TLCResults.TLCResult;
+
+import util.ToolIO;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestUtil {
 
@@ -94,17 +94,10 @@ public class TestUtil {
 		// b2tlaTranslator.getModuleString(), null);
 	}
 
-	public static void print(Start start) {
-		final Ast2String ast2String2 = new Ast2String();
-		start.apply(ast2String2);
-		System.out.println(ast2String2.toString());
-	}
-
 	public static void compareEqualsConfig(String expectedModule, String expectedConfig, String machine)
 			throws Exception {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
-		// print(b2tlaTranslator.getStart());
 		System.out.println(b2tlaTranslator.getModuleString());
 		System.out.println(b2tlaTranslator.getConfigString());
 
@@ -121,7 +114,6 @@ public class TestUtil {
 			throws Exception {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
-		// print(b2tlaTranslator.getStart());
 		System.out.println(b2tlaTranslator.getModuleString());
 		System.out.println(b2tlaTranslator.getConfigString());
 

@@ -9,7 +9,6 @@ import de.be4.classicalb.core.parser.node.Start;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.btypes.BType;
-import de.tlc4b.util.Ast2String;
 
 public class TestTypechecker {
 
@@ -29,9 +28,7 @@ public class TestTypechecker {
 		} catch (BCompoundException e) {
 			throw e.getFirstException();
 		}
-		final Ast2String ast2String2 = new Ast2String();
-		start.apply(ast2String2);
-		// System.out.println(ast2String2.toString());
+
 		MachineContext c = new MachineContext(null, start);
 		c.analyseMachine();
 		Typechecker t = new Typechecker(c);
