@@ -161,8 +161,6 @@ public class TestUtil {
 		final Process p = startJVM("", runnerClassName, args);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
-		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
-		errOut.start();
 		try {
 			p.waitFor();
 		} catch (InterruptedException e) {
@@ -197,6 +195,7 @@ public class TestUtil {
 		command.addAll(Arrays.asList(arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		processBuilder.redirectErrorStream(true);
 		Process process = processBuilder.start();
 		return process;
 	}
