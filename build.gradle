@@ -100,16 +100,6 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
 	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 }
 
-task createJar(type: Jar, dependsOn: build){
-	archiveFileName = 'TLC4B.jar'
-	from sourceSets.main.output
-	from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-	exclude('**/*.java')
-	manifest {
-		attributes "Main-Class" : 'de.tlc4b.TLC4B'
-	}
-}
-
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
