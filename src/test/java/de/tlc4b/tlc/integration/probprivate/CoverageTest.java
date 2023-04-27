@@ -1,4 +1,4 @@
-package de.tlc4b.coverage;
+package de.tlc4b.tlc.integration.probprivate;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -102,9 +102,7 @@ clean {
 
 task regressionTests(dependsOn: extractPublicExamples, type: Test){
 	doFirst{ println("Running integration tests") }
-	scanForTestClasses = true
-	//include('de/tlc4b/tlc/integration/probprivate/**')
-	include('de/tlc4b/**')
+	include('de/tlc4b/tlc/integration/probprivate/**')
 }
 check.dependsOn(regressionTests)
 
