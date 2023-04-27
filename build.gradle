@@ -1,61 +1,66 @@
 plugins {
-    id 'java'
-    id 'eclipse'
-    id 'maven'
-    id 'jacoco'
-    id 'findbugs'
-    id "de.undercouch.download" version "3.4.3"
+	id 'java'
+	id 'eclipse'
+	id 'jacoco'
+	id "maven-publish"
+	id "signing"
+	id "de.undercouch.download" version "5.4.0"
 }
 
-project.version = '1.0.4'
+project.version = '1.0.5'
 project.group = 'de.hhu.stups'
 
-project.sourceCompatibility = '1.7'
-project.targetCompatibility = '1.7'
+final isSnapshot = project.version.endsWith("-SNAPSHOT")
 
 repositories {
-  mavenCentral()
-    maven {
-      name "sonatype snapshots"
-      url "https://oss.sonatype.org/content/repositories/snapshots"
-    }
+	mavenCentral()
+	if (isSnapshot) {
+		maven {
+			name "sonatype snapshots"
+			url "https://oss.sonatype.org/content/repositories/snapshots"
+		}
+	}
 }
 
 configurations.all {
- resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-def parser_version = '2.9.12'
+def parser_version = '2.9.25'
 def tlatools_version = '1.0.2'
 
 dependencies {
-	//compile (group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
-	compile 'commons-cli:commons-cli:1.2'
-	compile (group: 'de.hhu.stups', name: 'tlatools', version: tlatools_version)
+	//implementation(group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
+	implementation(group: 'commons-cli', name: 'commons-cli', version: '1.5.0')
+	implementation(group: 'de.hhu.stups', name: 'tlatools', version: tlatools_version)
 
-	compile (group: 'de.hhu.stups', name: 'prologlib', version: parser_version)
-	compile (group: 'de.hhu.stups', name: 'parserbase', version: parser_version)
-	compile (group: 'de.hhu.stups', name: 'bparser', version: parser_version)
-	compile (group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
+	implementation(group: 'de.hhu.stups', name: 'bparser', version: parser_version)
+	implementation(group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
 
-	//compile(group: 'de.hhu.stups', name: 'de.prob.core.kernel', version: '2.0.0-milestone-13-SNAPSHOT')
+	testImplementation(group: 'junit', name: 'junit', version: '4.13.2')
+	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: '1.1.3')
+}
 
-	testCompile (group: 'junit', name: 'junit', version: '4.12')
-	testCompile (group: 'de.hhu.stups', name: 'tla2bAST', version: '1.1.0')
+java {
+	project.sourceCompatibility = JavaVersion.VERSION_1_7
+	project.targetCompatibility = JavaVersion.VERSION_1_7
+	
+	withSourcesJar()
+	withJavadocJar()
 }
 
 jacoco {
-    toolVersion = "0.7.1.201405082137"
-    reportsDir = file("$buildDir/JacocoReports")
+	toolVersion = "0.8.7"
+	reportsDirectory = file("$buildDir/JacocoReports")
 }
 
 
 jacocoTestReport {
-    reports {
-        xml.enabled false
-        csv.enabled false
-        html.destination file("${buildDir}/jacocoHtml")
-    }
+	reports {
+		xml.required = false
+		csv.required = false
+		html.destination file("${buildDir}/jacocoHtml")
+	}
 }
 
 
@@ -66,25 +71,25 @@ test {
 }
 
 task downloadPublicExamples(type: Download) {
-  src 'https://www3.hhu.de/stups/downloads/prob/source/ProB_public_examples.tgz'
-  dest buildDir
-  onlyIfModified true
+	src 'https://stups.hhu-hosting.de/downloads/prob/source/ProB_public_examples.tgz'
+	dest buildDir
+	onlyIfModified true
 }
 
 task extractPublicExamples(dependsOn: downloadPublicExamples, type: Copy) {
-  from tarTree(resources.gzip("${buildDir}/ProB_public_examples.tgz"))
-  into projectDir
+	from tarTree(resources.gzip("${buildDir}/ProB_public_examples.tgz"))
+	into "${buildDir}/prob_examples"
+	include "public_examples/TLC/**"
 }
 
 clean {
-  delete "${projectDir}/public_examples"
+	delete "${projectDir}/public_examples" // now extracted into build, but previous versions placed it at top level
+	delete "${projectDir}/states"
+	delete "${projectDir}/temp"
 }
 
-task regressionTests(dependsOn: extractPublicExamples, type: Test){
-	doFirst{ println("Running integration tests") }
-	scanForTestClasses = true
-	//include('de/tlc4b/tlc/integration/probprivate/**')
-	include('de/tlc4b/**')
+task regressionTests(dependsOn: extractPublicExamples, type: Test) {
+	include('de/tlc4b/tlc/integration/probprivate/**')
 }
 check.dependsOn(regressionTests)
 
@@ -95,21 +100,8 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
 	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 }
 
-tasks.withType(FindBugs) {
-	// disable findbugs by default
-	// in order to run findbugs type 'gradle build findbugsMain findbugsTest'
-	task -> enabled = gradle.startParameter.taskNames.contains(task.name)
-
-    reports {
-        xml.enabled = false
-        html.enabled = true
-    }
-
-	ignoreFailures = true
-}
-
 task createJar(type: Jar, dependsOn: build){
-	archiveName = 'TLC4B.jar'
+	archiveFileName = 'TLC4B.jar'
 	from sourceSets.main.output
 	from {configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 	exclude('**/*.java')
@@ -118,76 +110,57 @@ task createJar(type: Jar, dependsOn: build){
 	}
 }
 
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
 
-if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+			pom {
+				name = "TLC integration into ProB"
+				description = "Use the TLC model checker within ProB."
+				url = "https://github.com/hhu-stups/tlc4b"
 
-apply plugin: 'signing'
+				licenses {
+					license {
+						name = "Eclipse Public License, Version 2.1"
+						url = "https://www.eclipse.org/legal/epl-v10.html"
+					}
+				}
+
+				scm {
+					connection = "scm:git:git://github.com/hhu-stups/tlc4b.git"
+					developerConnection = "scm:git:git@github.com:hhu-stups/tlc4b.git"
+					url = "https://github.com/bendisposto/hhu-stups/tlc4b"
+				}
+
+				developers {
+					developer {
+						id = "bendisposto"
+						name = "Jens Bendisposto"
+						email = "jens@bendisposto.de"
+					}
+				}
+			}
+		}
+	}
+
+	repositories {
+		maven {
+			final releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+			final snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+			url isSnapshot ? snapshotsRepoUrl : releasesRepoUrl
+			if (project.hasProperty("ossrhUsername") && project.hasProperty("ossrhPassword")) {
+				credentials {
+					username project.ossrhUsername
+					password project.ossrhPassword
+				}
+			}
+		}
+	}
+}
+
+ext."signing.secretKeyRingFile" = rootProject.file("secring.gpg").absolutePath
 
 signing {
-    sign configurations.archives
-}
-
-javadoc {
-	failOnError = false
-}
-
-task javadocJar(type: Jar) {
-	 classifier = 'javadoc'
-	 from javadoc
-}
-
-task sourcesJar(type: Jar) {
-	 classifier = 'sources'
-	 from sourceSets.main.allSource
-}
-
-artifacts {
-	 archives javadocJar, sourcesJar
-}
-
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
-      }
-
-      pom.project {
-        name 'TLC integration into ProB'
-        packaging 'jar'
-        // optionally artifactId can be defined here
-        description "Use the TLC model checker within ProB."
-        url 'https://github.com/hhu-stups/tlc4b'
-
-        licenses {
-          license {
-            name 'Eclipse Public License, Version 2.1'
-            url 'https://www.eclipse.org/legal/epl-v10.html'
-          }
-        }
-
-        scm {
-          connection 'scm:git:git://github.com/hhu-stups/tlc4b.git'
-          developerConnection 'scm:git:git@github.com:hhu-stups/tlc4b.git'
-          url 'https://github.com/bendisposto/hhu-stups/tlc4b'
-        }
-
-
-        developers {
-          developer {
-            id 'bendisposto'
-            name 'Jens Bendisposto'
-            email 'jens@bendisposto.de'
-          }
-        }
-      }
-    }
-  }
-}
+	sign publishing.publications.mavenJava
 }

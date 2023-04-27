@@ -1,8 +1,5 @@
 package de.tlc4b.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,42 +9,46 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import util.ToolIO;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.exceptions.BException;
-import de.be4.classicalb.core.parser.node.Start;
+import de.tla2b.exceptions.FrontEndException;
 import de.tla2b.exceptions.TLA2BException;
 import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.Translator;
 import de.tlc4b.tlc.TLCResults.TLCResult;
 
+import util.ToolIO;
+
+import static org.junit.Assert.assertEquals;
+
 public class TestUtil {
 
-	public static void compare(final String expectedModule, final String machineString) throws Exception {
+	public static void compare(final String expectedModule, final String machineString) throws BCompoundException, TLA2BException {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
 		ToolIO.setMode(ToolIO.TOOL);
 
 		Translator b2tlaTranslator = new Translator(machineString);
 		b2tlaTranslator.translate();
+		System.out.println("Input B machine:");
+		System.out.println(machineString);
+		System.out.println("Expected TLA+ module:");
+		System.out.println(expectedModule);
+		System.out.println("Translated TLA+ module:");
 		System.out.println(b2tlaTranslator.getModuleString());
 
 		// TODO create standard modules BBuildins
 
 		String moduleName = b2tlaTranslator.getMachineName();
-		String str1 = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), null);
-
-		String str2 = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, null);
-		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
-		// .translateString(name, b2tlaTranslator.getModuleString(), null);
-		// StringBuilder sb2 = de.tla2b.translation.Tla2BTranslator
-		// .translateString(name, expectedModule, null);
-		if (!str1.equals(str2)) {
-			// assertEquals(expected, actual);
-
-			fail("expected:\n" + expectedModule + "\nbut was:\n" + b2tlaTranslator.getModuleString());
+		String actualB = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
+		String expectedB = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, b2tlaTranslator.getConfigString());
+		if (!expectedB.equals(actualB)) {
+			System.out.println("Expected TLA+ module translated to B machine:");
+			System.out.println(expectedB);
+			System.out.println("Actual translated TLA+ module translated back to B machine:");
+			System.out.println(actualB);
 		}
-		// assertEquals(sb2.toString(), sb1.toString());
+		assertEquals(expectedB, actualB);
 	}
 
 	public static void tryTranslating(final String machineString) throws BException {
@@ -63,50 +64,32 @@ public class TestUtil {
 
 	}
 
-	public static String translateTLA2B(String moduleName, String tlaString) throws TLA2BException {
-		return de.tla2bAst.Translator.translateModuleString(moduleName, tlaString, null);
-	}
-
 	public static String translateTLA2B(String moduleName, String tlaString, String configString)
 			throws TLA2BException {
 		return de.tla2bAst.Translator.translateModuleString(moduleName, tlaString, configString);
 	}
 
-	public static void compareLTLFormula(String expected, String machine, String ltlFormula) throws Exception {
+	public static void compareLTLFormula(String expected, String machine, String ltlFormula) throws BCompoundException {
 		Translator b2tlaTranslator = new Translator(machine, ltlFormula);
 		b2tlaTranslator.translate();
 		String translatedLTLFormula = b2tlaTranslator.getTranslatedLTLFormula();
 		translatedLTLFormula = translatedLTLFormula.replaceAll("\\s", "");
 		expected = expected.replaceAll("\\s", "");
-		System.out.println(translatedLTLFormula);
-		System.out.println(b2tlaTranslator.getModuleString());
 		assertEquals(expected, translatedLTLFormula);
 	}
 
 	public static void checkMachine(String machine) throws Exception {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
-		System.out.println(b2tlaTranslator.getModuleString());
 
 		String name = b2tlaTranslator.getMachineName();
-		translateTLA2B(name, b2tlaTranslator.getModuleString());
-		// de.tla2b.translation.Tla2BTranslator.translateString(name,
-		// b2tlaTranslator.getModuleString(), null);
-	}
-
-	public static void print(Start start) {
-		final Ast2String ast2String2 = new Ast2String();
-		start.apply(ast2String2);
-		System.out.println(ast2String2.toString());
+		translateTLA2B(name, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
 	}
 
 	public static void compareEqualsConfig(String expectedModule, String expectedConfig, String machine)
 			throws Exception {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
-		// print(b2tlaTranslator.getStart());
-		System.out.println(b2tlaTranslator.getModuleString());
-		System.out.println(b2tlaTranslator.getConfigString());
 
 		String name = b2tlaTranslator.getMachineName();
 
@@ -118,12 +101,9 @@ public class TestUtil {
 	}
 
 	public static void compareModuleAndConfig(String expectedModule, String expectedConfig, String machine)
-			throws Exception {
+		throws BCompoundException, TLA2BException {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
-		// print(b2tlaTranslator.getStart());
-		System.out.println(b2tlaTranslator.getModuleString());
-		System.out.println(b2tlaTranslator.getConfigString());
 
 		// TODO include config file in back translation from TLA+ to B
 
@@ -145,7 +125,6 @@ public class TestUtil {
 		try {
 			Translator b2tlaTranslator = new Translator(machine);
 			b2tlaTranslator.translate();
-			System.out.println(b2tlaTranslator.getModuleString());
 			assertEquals(expected, b2tlaTranslator.getModuleString());
 		} catch (BCompoundException e) {
 			throw e.getFirstException();
@@ -157,7 +136,6 @@ public class TestUtil {
 		try {
 			Translator translator = new Translator(machine);
 			translator.translate();
-			System.out.println(translator.getModuleString());
 			return translator.getModuleString();
 		} catch (BCompoundException e) {
 			throw e.getFirstException();
@@ -176,12 +154,9 @@ public class TestUtil {
 	}
 
 	private static TLCResult runTLC(String runnerClassName, String[] args) throws IOException {
-		System.out.println("Starting JVM...");
-		final Process p = startJVM("", runnerClassName, args);
+		final Process p = startJVM(runnerClassName, args);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
-		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
-		errOut.start();
 		try {
 			p.waitFor();
 		} catch (InterruptedException e) {
@@ -190,20 +165,17 @@ public class TestUtil {
 
 		for (int i = stdOut.getLog().size() - 1; i > 1; i--) {
 			String s = stdOut.getLog().get(i);
-			// System.out.println(s);
 			if (s.startsWith("Result:")) {
 				String resultString = s.substring(s.indexOf(':') + 2);
 				resultString = resultString.replaceAll("\\s+", "");
-				System.out.println(resultString);
 				return TLCResult.valueOf(resultString);
 			}
 		}
-		System.out.println("No result found.");
 		return null;
 
 	}
 
-	private static Process startJVM(final String optionsAsString, final String mainClass, final String[] arguments)
+	private static Process startJVM(final String mainClass, final String[] arguments)
 			throws IOException {
 
 		String separator = System.getProperty("file.separator");
@@ -219,24 +191,19 @@ public class TestUtil {
 		command.addAll(Arrays.asList(arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		processBuilder.redirectErrorStream(true);
 		Process process = processBuilder.start();
 		return process;
 	}
 
-	public static void testParse(String[] args, boolean deleteFiles) throws Exception {
+	public static void testParse(String[] args, boolean deleteFiles) throws IOException, BCompoundException, FrontEndException {
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4BGlobals.setCreateTraceFile(false);
 		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
-		try {
-			tlc4b.process(args);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-			throw e;
-		}
+		tlc4b.process(args);
 		File module = new File(tlc4b.getBuildDir(), tlc4b.getMachineFileNameWithoutFileExtension() + ".tla");
 
 		// parse result

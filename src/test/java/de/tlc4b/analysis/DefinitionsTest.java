@@ -66,7 +66,7 @@ public class DefinitionsTest {
 				+ "END";
 		String expected = "---- MODULE test----\n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x = 1\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "======";

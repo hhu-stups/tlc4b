@@ -127,8 +127,13 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAEnabledLtl(AEnabledLtl node) {
+		LinkedHashMap<String, Node> operations = ltlFormulaVisitor
+				.getMachineContext().getOperations();
 		tlaPrinter.moduleStringAppend("ENABLED(");
-		tlaPrinter.moduleStringAppend(node.getOperation().getText());
+		//tlaPrinter.moduleStringAppend(node.getOperation().getText()); 
+		String action1Name = node.getOperation().getText();
+		Node op1 = operations.get(action1Name);
+		tlaPrinter.printOperationCall(op1);
 		tlaPrinter.moduleStringAppend(")");
 	}
 

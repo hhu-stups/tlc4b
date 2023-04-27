@@ -201,7 +201,6 @@ public class SetTest {
 				+ "EXTENDS BBuiltIns\n"
 				+ "ASSUME Inter({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {}\n"
 				+ "====";
-		System.out.println(expected);
 		compareEquals(expected, machine);
 	}
 	

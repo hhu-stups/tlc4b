@@ -15,7 +15,6 @@ public class ModelValuesTest {
 				+ "CONSTANTS k \n"
 				+ "PROPERTIES k = a \n" + "END";
 		TestTypechecker t = new TestTypechecker(machine);
-		System.out.println(t.constants.get("k").toString());
 		assertEquals("S", t.constants.get("k").toString());
 	}
 	

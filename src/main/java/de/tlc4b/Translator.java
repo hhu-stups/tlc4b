@@ -15,11 +15,11 @@ import de.tlc4b.analysis.ConstantsEliminator;
 import de.tlc4b.analysis.ConstantsEvaluator;
 import de.tlc4b.analysis.DefinitionsAnalyser;
 import de.tlc4b.analysis.MachineContext;
-import de.tlc4b.analysis.UnsupportedConstructsFinder;
 import de.tlc4b.analysis.PrecedenceCollector;
 import de.tlc4b.analysis.PrimedNodesMarker;
 import de.tlc4b.analysis.Renamer;
 import de.tlc4b.analysis.Typechecker;
+import de.tlc4b.analysis.UnsupportedConstructsFinder;
 import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.analysis.transformation.DefinitionsEliminator;
@@ -32,7 +32,6 @@ import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.prettyprint.TLAPrinter;
 import de.tlc4b.tla.Generator;
 import de.tlc4b.tlc.TLCOutputInfo;
-import de.tlc4b.util.Ast2String;
 
 public class Translator {
 
@@ -52,9 +51,6 @@ public class Translator {
 		this.machineString = machineString;
 		BParser parser = new BParser("Testing");
 		start = parser.parse(machineString, false);
-		final Ast2String ast2String2 = new Ast2String();
-		start.apply(ast2String2);
-		// System.out.println(ast2String2.toString());
 	}
 
 	public Translator(String machineString, String ltlFormula) throws BCompoundException {
@@ -62,9 +58,6 @@ public class Translator {
 		this.ltlFormula = ltlFormula;
 		BParser parser = new BParser("Testing");
 		start = parser.parse(machineString, false);
-		final Ast2String ast2String2 = new Ast2String();
-		start.apply(ast2String2);
-		// System.out.println(ast2String2.toString());
 	}
 
 	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
@@ -99,15 +92,7 @@ public class Translator {
 
 			APredicateParseUnit parseUnit = (APredicateParseUnit) start2.getPParseUnit();
 			this.constantsSetup = parseUnit.getPredicate();
-
-			final Ast2String ast2String2 = new Ast2String();
-			start2.apply(ast2String2);
-			// System.out.println(ast2String2.toString());
 		}
-
-		final Ast2String ast2String2 = new Ast2String();
-		start.apply(ast2String2);
-		// System.out.println(ast2String2.toString());
 	}
 
 	public void translate() {
