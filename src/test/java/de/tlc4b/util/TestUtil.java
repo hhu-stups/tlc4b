@@ -11,6 +11,7 @@ import java.util.List;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.exceptions.BException;
+import de.tla2b.exceptions.FrontEndException;
 import de.tla2b.exceptions.TLA2BException;
 import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
@@ -24,7 +25,7 @@ import static org.junit.Assert.fail;
 
 public class TestUtil {
 
-	public static void compare(final String expectedModule, final String machineString) throws Exception {
+	public static void compare(final String expectedModule, final String machineString) throws BCompoundException, TLA2BException {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
 		ToolIO.setMode(ToolIO.TOOL);
 
@@ -66,7 +67,7 @@ public class TestUtil {
 		return de.tla2bAst.Translator.translateModuleString(moduleName, tlaString, configString);
 	}
 
-	public static void compareLTLFormula(String expected, String machine, String ltlFormula) throws Exception {
+	public static void compareLTLFormula(String expected, String machine, String ltlFormula) throws BCompoundException {
 		Translator b2tlaTranslator = new Translator(machine, ltlFormula);
 		b2tlaTranslator.translate();
 		String translatedLTLFormula = b2tlaTranslator.getTranslatedLTLFormula();
@@ -98,7 +99,7 @@ public class TestUtil {
 	}
 
 	public static void compareModuleAndConfig(String expectedModule, String expectedConfig, String machine)
-			throws Exception {
+		throws BCompoundException, TLA2BException {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
 
@@ -193,19 +194,14 @@ public class TestUtil {
 		return process;
 	}
 
-	public static void testParse(String[] args, boolean deleteFiles) throws Exception {
+	public static void testParse(String[] args, boolean deleteFiles) throws IOException, BCompoundException, FrontEndException {
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4BGlobals.setCreateTraceFile(false);
 		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
-		try {
-			tlc4b.process(args);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
+		tlc4b.process(args);
 		File module = new File(tlc4b.getBuildDir(), tlc4b.getMachineFileNameWithoutFileExtension() + ".tla");
 
 		// parse result
