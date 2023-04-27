@@ -30,12 +30,24 @@ public class TestUtil {
 
 		Translator b2tlaTranslator = new Translator(machineString);
 		b2tlaTranslator.translate();
+		System.out.println("Input B machine:");
+		System.out.println(machineString);
+		System.out.println("Expected TLA+ module:");
+		System.out.println(expectedModule);
+		System.out.println("Translated TLA+ module:");
+		System.out.println(b2tlaTranslator.getModuleString());
 
 		// TODO create standard modules BBuildins
 
 		String moduleName = b2tlaTranslator.getMachineName();
-		String actualB = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), null);
-		String expectedB = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, null);
+		String actualB = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
+		String expectedB = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, b2tlaTranslator.getConfigString());
+		if (!expectedB.equals(actualB)) {
+			System.out.println("Expected TLA+ module translated to B machine:");
+			System.out.println(expectedB);
+			System.out.println("Actual translated TLA+ module translated back to B machine:");
+			System.out.println(actualB);
+		}
 		assertEquals(expectedB, actualB);
 	}
 
@@ -50,10 +62,6 @@ public class TestUtil {
 			throw e.getFirstException();
 		}
 
-	}
-
-	public static String translateTLA2B(String moduleName, String tlaString) throws TLA2BException {
-		return de.tla2bAst.Translator.translateModuleString(moduleName, tlaString, null);
 	}
 
 	public static String translateTLA2B(String moduleName, String tlaString, String configString)
@@ -75,7 +83,7 @@ public class TestUtil {
 		b2tlaTranslator.translate();
 
 		String name = b2tlaTranslator.getMachineName();
-		translateTLA2B(name, b2tlaTranslator.getModuleString());
+		translateTLA2B(name, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
 	}
 
 	public static void compareEqualsConfig(String expectedModule, String expectedConfig, String machine)

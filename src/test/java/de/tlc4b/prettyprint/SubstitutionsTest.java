@@ -54,7 +54,7 @@ public class SubstitutionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == \\E a \\in {1}, b \\in {2} : x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
@@ -107,7 +107,7 @@ public class SubstitutionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x \\in {1}\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
@@ -125,7 +125,7 @@ public class SubstitutionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "EXTENDS Naturals \n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == (CASE 1 = 1 -> x = 1 [] 1 = 2 -> x = 2 [] OTHER -> x = 4)\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";

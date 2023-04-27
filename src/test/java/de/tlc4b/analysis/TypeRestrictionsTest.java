@@ -176,7 +176,7 @@ public class TypeRestrictionsTest {
 				+ "EXTENDS Naturals\n"
 				+ "VARIABLES x \n"
 				+ "k == 1 .. 4\n"
-				+ "Invariant == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x = 1 \n"
 				+ "foo(a) == x' = a\n"
 				+ "Next == \\E a \\in k: foo(a) \n"
@@ -234,7 +234,7 @@ public class TypeRestrictionsTest {
 
 		String expected = "---- MODULE test ----\n"
 				+ "VARIABLES x \n"
-				+ "Invariant == x = 1\n"
+				+ "Invariant1 == x = 1\n"
 				+ "Init == x = 1 \n"
 				+ "foo(a) == (a = a)	/\\ x' = 3\n"
 				+ "Next == \\E a \\in {1} : foo(a) \n"
