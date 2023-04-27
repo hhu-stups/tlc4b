@@ -13,12 +13,13 @@ import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
 import de.be4.classicalb.core.parser.node.AConjunctPredicate;
 import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
 import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
-import de.be4.classicalb.core.parser.node.AIdentifierExpression;
+import de.be4.classicalb.core.parser.node.AMachineReferenceNoParams;
 import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
+import de.be4.classicalb.core.parser.node.PMachineReferenceNoParams;
 import de.be4.classicalb.core.parser.node.PParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
@@ -52,11 +53,10 @@ public class SeesEliminator extends DepthFirstAdapter {
 	}
 
 	public void inASeesMachineClause(ASeesMachineClause node) {
-		LinkedList<PExpression> machineNames = node.getMachineNames();
-		for (PExpression pExpression : machineNames) {
-			AIdentifierExpression id = (AIdentifierExpression) pExpression;
+		for (PMachineReferenceNoParams pExpression : node.getMachineNames()) {
+			AMachineReferenceNoParams id = (AMachineReferenceNoParams) pExpression;
 			String machineName = Utils
-					.getTIdentifierListAsString(id.getIdentifier());
+					.getTIdentifierListAsString(id.getMachineName());
 			if (!resolvedMachines.contains(machineName)) {
 				resolvedMachines.add(machineName);
 				Start start = parsedMachines.get(machineName);

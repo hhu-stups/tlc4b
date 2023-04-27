@@ -38,6 +38,7 @@ import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
 import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AMachineHeader;
+import de.be4.classicalb.core.parser.node.AMachineReferenceNoParams;
 import de.be4.classicalb.core.parser.node.AOpSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
@@ -58,6 +59,7 @@ import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.PMachineHeader;
+import de.be4.classicalb.core.parser.node.PMachineReferenceNoParams;
 import de.be4.classicalb.core.parser.node.POperation;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.PSet;
@@ -90,7 +92,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private final LinkedHashMap<String, Node> constants;
 	private final LinkedHashMap<String, Node> definitions;
 	private final LinkedHashMap<String, Node> operations;
-	private final LinkedHashMap<String, AIdentifierExpression> seenMachines;
+	private final LinkedHashMap<String, AMachineReferenceNoParams> seenMachines;
 
 	private PMachineHeader header;
 	private AAbstractMachineParseUnit abstractMachineParseUnit;
@@ -124,7 +126,7 @@ public class MachineContext extends DepthFirstAdapter {
 		this.variables = new LinkedHashMap<String, Node>();
 		this.definitions = new LinkedHashMap<String, Node>();
 		this.operations = new LinkedHashMap<String, Node>();
-		this.seenMachines = new LinkedHashMap<String, AIdentifierExpression>();
+		this.seenMachines = new LinkedHashMap<>();
 	}
 
 	public void analyseMachine() {
@@ -383,13 +385,12 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseASeesMachineClause(ASeesMachineClause node) {
 		this.seesMachineClause = node;
-		List<PExpression> copy = new ArrayList<PExpression>(node.getMachineNames());
-		for (PExpression e : copy) {
-			AIdentifierExpression p = (AIdentifierExpression) e;
-			String name = Utils.getTIdentifierListAsString(p.getIdentifier());
+		for (PMachineReferenceNoParams e : new ArrayList<>(node.getMachineNames())) {
+			AMachineReferenceNoParams p = (AMachineReferenceNoParams) e;
+			String name = Utils.getTIdentifierListAsString(p.getMachineName());
 
 			try {
-				exist(p.getIdentifier());
+				identifierAlreadyExists(name);
 			} catch (ScopeException e2) {
 				throw new ScopeException("Machine '" + name + "' is seen twice.");
 			}
@@ -966,7 +967,7 @@ public class MachineContext extends DepthFirstAdapter {
 		return new LinkedHashMap<>(enumValues);
 	}
 
-	public LinkedHashMap<String, AIdentifierExpression> getSeenMachines() {
+	public LinkedHashMap<String, AMachineReferenceNoParams> getSeenMachines() {
 		return new LinkedHashMap<>(seenMachines);
 	}
 
