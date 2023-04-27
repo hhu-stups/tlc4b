@@ -15,10 +15,6 @@ final isSnapshot = project.version.endsWith("-SNAPSHOT")
 project.sourceCompatibility = '1.7'
 project.targetCompatibility = '1.7'
 
-wrapper {
-	gradleVersion = "7.4.1"
-}
-
 repositories {
 	mavenCentral()
 	maven {
