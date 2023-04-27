@@ -21,7 +21,6 @@ import de.tlc4b.tlc.TLCResults.TLCResult;
 import util.ToolIO;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class TestUtil {
 
@@ -35,14 +34,9 @@ public class TestUtil {
 		// TODO create standard modules BBuildins
 
 		String moduleName = b2tlaTranslator.getMachineName();
-		String str1 = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), null);
-
-		String str2 = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, null);
-		if (!str1.equals(str2)) {
-			// assertEquals(expected, actual);
-
-			fail("expected:\n" + expectedModule + "\nbut was:\n" + b2tlaTranslator.getModuleString());
-		}
+		String actualB = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), null);
+		String expectedB = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, null);
+		assertEquals(expectedB, actualB);
 	}
 
 	public static void tryTranslating(final String machineString) throws BException {
