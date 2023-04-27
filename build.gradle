@@ -42,8 +42,8 @@ dependencies {
 }
 
 java {
-	project.sourceCompatibility = JavaVersion.VERSION_1_7
-	project.targetCompatibility = JavaVersion.VERSION_1_7
+	project.sourceCompatibility = JavaVersion.VERSION_1_8
+	project.targetCompatibility = JavaVersion.VERSION_1_8
 	
 	withSourcesJar()
 	withJavadocJar()
