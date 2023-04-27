@@ -158,7 +158,7 @@ public class TestUtil {
 	}
 
 	private static TLCResult runTLC(String runnerClassName, String[] args) throws IOException {
-		final Process p = startJVM("", runnerClassName, args);
+		final Process p = startJVM(runnerClassName, args);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
 		try {
@@ -179,7 +179,7 @@ public class TestUtil {
 
 	}
 
-	private static Process startJVM(final String optionsAsString, final String mainClass, final String[] arguments)
+	private static Process startJVM(final String mainClass, final String[] arguments)
 			throws IOException {
 
 		String separator = System.getProperty("file.separator");
