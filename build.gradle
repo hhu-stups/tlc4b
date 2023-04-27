@@ -12,9 +12,6 @@ project.group = 'de.hhu.stups'
 
 final isSnapshot = project.version.endsWith("-SNAPSHOT")
 
-project.sourceCompatibility = '1.7'
-project.targetCompatibility = '1.7'
-
 repositories {
 	mavenCentral()
 	if (isSnapshot) {
@@ -49,6 +46,9 @@ dependencies {
 }
 
 java {
+	project.sourceCompatibility = JavaVersion.VERSION_1_7
+	project.targetCompatibility = JavaVersion.VERSION_1_7
+	
 	withSourcesJar()
 	withJavadocJar()
 }
