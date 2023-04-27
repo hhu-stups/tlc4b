@@ -37,16 +37,11 @@ public class TestUtil {
 		String str1 = de.tla2bAst.Translator.translateModuleString(moduleName, b2tlaTranslator.getModuleString(), null);
 
 		String str2 = de.tla2bAst.Translator.translateModuleString(moduleName, expectedModule, null);
-		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
-		// .translateString(name, b2tlaTranslator.getModuleString(), null);
-		// StringBuilder sb2 = de.tla2b.translation.Tla2BTranslator
-		// .translateString(name, expectedModule, null);
 		if (!str1.equals(str2)) {
 			// assertEquals(expected, actual);
 
 			fail("expected:\n" + expectedModule + "\nbut was:\n" + b2tlaTranslator.getModuleString());
 		}
-		// assertEquals(sb2.toString(), sb1.toString());
 	}
 
 	public static void tryTranslating(final String machineString) throws BException {
@@ -86,8 +81,6 @@ public class TestUtil {
 
 		String name = b2tlaTranslator.getMachineName();
 		translateTLA2B(name, b2tlaTranslator.getModuleString());
-		// de.tla2b.translation.Tla2BTranslator.translateString(name,
-		// b2tlaTranslator.getModuleString(), null);
 	}
 
 	public static void compareEqualsConfig(String expectedModule, String expectedConfig, String machine)
