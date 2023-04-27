@@ -100,8 +100,7 @@ clean {
 	delete "${projectDir}/temp"
 }
 
-task regressionTests(dependsOn: extractPublicExamples, type: Test){
-	doFirst{ println("Running integration tests") }
+task regressionTests(dependsOn: extractPublicExamples, type: Test) {
 	include('de/tlc4b/tlc/integration/probprivate/**')
 }
 check.dependsOn(regressionTests)
