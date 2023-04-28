@@ -81,12 +81,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			if (e instanceof AExpressionDefinitionDefinition) {
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
-				if (name.startsWith("ASSERT_LTL")
-						|| name.startsWith("scope_")
-						|| name.startsWith("SET_PREF_")
-						|| name.equals("VISB_JSON_FILE")
-						|| name.startsWith("ANIMATION_FUNCTION")
-						|| name.startsWith("ANIMATION_IMG"))
+				if (Utils.isProBSpecialDefinitionName(name))
 					continue;
 			}
 			e.apply(this);
@@ -100,12 +95,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 
 				String name = ((AExpressionDefinitionDefinition) e).getName()
 						.getText().toString();
-				if (name.startsWith("ASSERT_LTL")
-						|| name.startsWith("scope_")
-						|| name.startsWith("SET_PREF_")
-						|| name.equals("VISB_JSON_FILE")
-						|| name.startsWith("ANIMATION_FUNCTION")
-						|| name.startsWith("ANIMATION_IMG")
+				if (Utils.isProBSpecialDefinitionName(name)
 						|| StandardMadules
 								.isKeywordInModuleExternalFunctions(name)) {
 
@@ -114,7 +104,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			} else if (e instanceof APredicateDefinitionDefinition) {
 				String name = ((APredicateDefinitionDefinition) e).getName()
 						.getText().toString();
-				if (name.equals("GOAL")
+				if (Utils.isProBSpecialDefinitionName(name)
 						|| StandardMadules
 								.isKeywordInModuleExternalFunctions(name)) {
 					newDefinitionsList.add(e);
