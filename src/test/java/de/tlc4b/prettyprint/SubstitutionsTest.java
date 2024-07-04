@@ -17,11 +17,37 @@ public class SubstitutionsTest {
 		compare(null, machine);
 	}
 	
-	@Test  (expected = SubstitutionException.class)
+	@Test (expected = SubstitutionException.class)
 	public void testMissingVariableAssignment() throws Exception {
 		String machine = "MACHINE test\n" + "VARIABLES x,y \n"
 				+ "INVARIANT x = 1 & y = 1 \n" + "INITIALISATION x := 1 \n"
 				+ "END";
+		compare(null, machine);
+	}
+
+	@Test
+	public void testSimpleSequentialSubstitution() throws Exception {
+		String machine = "MACHINE test\n" + "VARIABLES x,y\n"
+			+ "INVARIANT x = 1 & y = 3 \n" + "INITIALISATION x :: 1..3 ; y := x \n"
+			+ "END";
+
+		String expected = "---- MODULE test ----\n"
+			+ "EXTENDS Naturals\n"
+			+ "VARIABLES x, y\n"
+			+ "Invariant1 == x = 1\n"
+			+ "Invariant2 == y = 3\n"
+			+ "Init == x \\in (1 .. 3) /\\ y = x\n"
+			+ "\n"
+			+ "Next == 1 = 2 /\\ UNCHANGED <<x, y>>\n"
+			+ "====";
+		compare(expected, machine);
+	}
+
+	@Test (expected = SubstitutionException.class)
+	public void testSimpleSequentialSubstitutionAssignedTwice() throws Exception {
+		String machine = "MACHINE test\n" + "VARIABLES x,y\n"
+			+ "INVARIANT x = 1 & y = 3 \n" + "INITIALISATION x := 1 ; y := x ; x := y \n"
+			+ "END";
 		compare(null, machine);
 	}
 	
