@@ -24,6 +24,7 @@ import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.analysis.transformation.DefinitionsEliminator;
 import de.tlc4b.analysis.transformation.SeesEliminator;
+import de.tlc4b.analysis.transformation.SequenceSubstitutionsEliminator;
 import de.tlc4b.analysis.transformation.SetComprehensionOptimizer;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.analysis.unchangedvariables.InvariantPreservationAnalysis;
@@ -103,6 +104,7 @@ public class Translator {
 		SeesEliminator.eliminateSeesClauses(start, parsedMachines);
 
 		DefinitionsEliminator.eliminateDefinitions(start);
+		SequenceSubstitutionsEliminator.eliminateSequenceSubstitutions(start);
 
 		// TODO move set comprehension optimizer behind the type checker
 		SetComprehensionOptimizer.optimizeSetComprehensions(start);
