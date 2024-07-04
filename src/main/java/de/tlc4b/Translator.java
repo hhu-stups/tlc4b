@@ -36,7 +36,7 @@ import de.tlc4b.tlc.TLCOutputInfo;
 public class Translator {
 
 	private String machineString;
-	private Start start;
+	private final Start start;
 	private Map<String, Start> parsedMachines;
 	private String moduleString;
 	private String configString;
@@ -50,14 +50,14 @@ public class Translator {
 	public Translator(String machineString) throws BCompoundException {
 		this.machineString = machineString;
 		BParser parser = new BParser("Testing");
-		start = parser.parse(machineString, false);
+		start = parser.parseMachine(machineString);
 	}
 
 	public Translator(String machineString, String ltlFormula) throws BCompoundException {
 		this.machineString = machineString;
 		this.ltlFormula = ltlFormula;
 		BParser parser = new BParser("Testing");
-		start = parser.parse(machineString, false);
+		start = parser.parseMachine(machineString);
 	}
 
 	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
@@ -67,7 +67,7 @@ public class Translator {
 
 		BParser parser = new BParser(machineName);
 		try {
-			start = parser.parseFile(machineFile, false);
+			start = parser.parseFile(machineFile);
 		} catch (NoClassDefFoundError e) {
 			throw new TLC4BIOException("Definitions file cannot be found.");
 		}
@@ -82,11 +82,11 @@ public class Translator {
 
 		if (constantSetup != null) {
 			BParser con = new BParser();
-			Start start2 = null;
+			Start start2;
 			try {
-				start2 = con.parse("#FORMULA " + constantSetup, false);
+				start2 = con.parseFormula(constantSetup);
 			} catch (BCompoundException e) {
-				System.err.println("An error occured while parsing the constants setup predicate.");
+				System.err.println("An error occurred while parsing the constants setup predicate.");
 				throw e;
 			}
 
