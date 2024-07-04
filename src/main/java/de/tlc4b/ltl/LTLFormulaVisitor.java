@@ -150,11 +150,10 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	}
 
 	private de.be4.classicalb.core.parser.node.Start parseBPredicate(String text) {
-		String bPredicate = "#PREDICATE " + text;
 		BParser parser = new BParser("Testing");
-		de.be4.classicalb.core.parser.node.Start start = null;
+		de.be4.classicalb.core.parser.node.Start start;
 		try {
-			start = parser.parse(bPredicate, false);
+			start = parser.parsePredicate(text);
 		} catch (BCompoundException e) {
 			throw new LTLParseException(e.getMessage());
 		}
