@@ -104,7 +104,7 @@ public class MachineContext extends DepthFirstAdapter {
 	private AInvariantMachineClause invariantMachineClause;
 	private AInitialisationMachineClause initialisationMachineClause;
 	private AOperationsMachineClause operationMachineClause;
-	private AAssertionsMachineClause assertiondMachineClause;
+	private AAssertionsMachineClause assertionsMachineClause;
 
 	private ArrayList<LinkedHashMap<String, Node>> contextTable;
 
@@ -113,19 +113,19 @@ public class MachineContext extends DepthFirstAdapter {
 	public MachineContext(final String machineName, final Start start) {
 		this.start = start;
 		this.machineName = machineName;
-		this.referencesTable = new Hashtable<Node, Node>();
-		this.ltlVisitors = new ArrayList<LTLFormulaVisitor>();
+		this.referencesTable = new Hashtable<>();
+		this.ltlVisitors = new ArrayList<>();
 
-		this.machineSetParameter = new LinkedHashMap<String, Node>();
-		this.machineScalarParameter = new LinkedHashMap<String, Node>();
+		this.machineSetParameter = new LinkedHashMap<>();
+		this.machineScalarParameter = new LinkedHashMap<>();
 
-		this.deferredSets = new LinkedHashMap<String, Node>();
-		this.enumeratedSets = new LinkedHashMap<String, Node>();
-		this.enumValues = new LinkedHashMap<String, Node>();
-		this.constants = new LinkedHashMap<String, Node>();
-		this.variables = new LinkedHashMap<String, Node>();
-		this.definitions = new LinkedHashMap<String, Node>();
-		this.operations = new LinkedHashMap<String, Node>();
+		this.deferredSets = new LinkedHashMap<>();
+		this.enumeratedSets = new LinkedHashMap<>();
+		this.enumValues = new LinkedHashMap<>();
+		this.constants = new LinkedHashMap<>();
+		this.variables = new LinkedHashMap<>();
+		this.definitions = new LinkedHashMap<>();
+		this.operations = new LinkedHashMap<>();
 		this.seenMachines = new LinkedHashMap<>();
 	}
 
@@ -135,7 +135,7 @@ public class MachineContext extends DepthFirstAdapter {
 		checkLTLFormulas();
 	}
 
-	public void addLTLFromula(final String ltlFormula) {
+	public void addLTLFormula(final String ltlFormula) {
 		LTLFormulaVisitor ltlVisitor = new LTLFormulaVisitor("ltl", this);
 		ltlVisitor.parseLTLString(ltlFormula);
 		this.ltlVisitors.add(ltlVisitor);
@@ -149,10 +149,9 @@ public class MachineContext extends DepthFirstAdapter {
 		if (constantsSetupPredicate == null) {
 			return;
 		}
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
+		for (MachineContext s : list) {
 			contextTable.add(s.getDeferredSets());
 			contextTable.add(s.getEnumeratedSets());
 			contextTable.add(s.getEnumValues());
@@ -167,9 +166,8 @@ public class MachineContext extends DepthFirstAdapter {
 			ltlVisitors.get(0).start();
 			return;
 		}
-		ArrayList<LTLFormulaVisitor> formulasNotSupportedByTLC = new ArrayList<LTLFormulaVisitor>();
-		for (int i = 0; i < ltlVisitors.size(); i++) {
-			LTLFormulaVisitor visitor = ltlVisitors.get(i);
+		ArrayList<LTLFormulaVisitor> formulasNotSupportedByTLC = new ArrayList<>();
+		for (LTLFormulaVisitor visitor : ltlVisitors) {
 			try {
 				visitor.start();
 			} catch (ScopeException e) {
@@ -181,7 +179,7 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	public void checkLTLBPredicate(LTLBPredicate ltlbPredicate) {
-		contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		contextTable = new ArrayList<>();
 		contextTable.add(getDeferredSets());
 		contextTable.add(getEnumeratedSets());
 		contextTable.add(getEnumValues());
@@ -190,9 +188,8 @@ public class MachineContext extends DepthFirstAdapter {
 		contextTable.add(getDefinitions());
 
 		LinkedHashMap<String, Node> identifierHashTable = ltlbPredicate.getIdentifierList();
-		if (identifierHashTable.size() > 0) {
-			LinkedHashMap<String, Node> currentContext = new LinkedHashMap<String, Node>();
-			currentContext.putAll(identifierHashTable);
+		if (!identifierHashTable.isEmpty()) {
+			LinkedHashMap<String, Node> currentContext = new LinkedHashMap<>(identifierHashTable);
 			contextTable.add(currentContext);
 		}
 		ltlbPredicate.getBFormula().apply(this);
@@ -236,11 +233,11 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAMachineHeader(AMachineHeader node) {
 		this.header = node;
 		if (machineName == null) {
-			List<TIdentifierLiteral> nameList = new ArrayList<TIdentifierLiteral>(node.getName());
+			List<TIdentifierLiteral> nameList = new ArrayList<>(node.getName());
 			this.machineName = Utils.getTIdentifierListAsString(nameList);
 		}
 
-		List<PExpression> copy = new ArrayList<PExpression>(node.getParameters());
+		List<PExpression> copy = new ArrayList<>(node.getParameters());
 		for (PExpression e : copy) {
 			AIdentifierExpression p = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(p.getIdentifier());
@@ -274,7 +271,7 @@ public class MachineContext extends DepthFirstAdapter {
 		 * definitions can depend on each other. First all definitions are added
 		 * to the definitions context table. Then all definitions are visited.
 		 */
-		Collection<PDefinition> definitionsToRemove = new HashSet<PDefinition>();
+		Collection<PDefinition> definitionsToRemove = new HashSet<>();
 
 		for (PDefinition e : copy) {
 			if (e instanceof AExpressionDefinitionDefinition) {
@@ -290,11 +287,11 @@ public class MachineContext extends DepthFirstAdapter {
 				} else if (name.startsWith("ANIMATION_")) {
 					definitionsToRemove.add(def);
 				}
-				evalDefinitionName(((AExpressionDefinitionDefinition) e).getName().getText().toString(), e);
+				evalDefinitionName(((AExpressionDefinitionDefinition) e).getName().getText(), e);
 			} else if (e instanceof APredicateDefinitionDefinition) {
-				evalDefinitionName(((APredicateDefinitionDefinition) e).getName().getText().toString(), e);
+				evalDefinitionName(((APredicateDefinitionDefinition) e).getName().getText(), e);
 			} else if (e instanceof ASubstitutionDefinitionDefinition) {
-				evalDefinitionName(((ASubstitutionDefinitionDefinition) e).getName().getText().toString(), e);
+				evalDefinitionName(((ASubstitutionDefinitionDefinition) e).getName().getText(), e);
 			}
 		}
 		/*
@@ -302,10 +299,9 @@ public class MachineContext extends DepthFirstAdapter {
 		 * formulas are stored in the Arraylist {@value #ltlVisitors}.
 		 */
 		copy.removeAll(definitionsToRemove);
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
+		for (MachineContext s : list) {
 			contextTable.add(s.getDeferredSets());
 			contextTable.add(s.getEnumeratedSets());
 			contextTable.add(s.getEnumValues());
@@ -326,18 +322,18 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAExpressionDefinitionDefinition(AExpressionDefinitionDefinition node) {
-		visitBDefinition(node, node.getName().getText().toString(), node.getParameters(), node.getRhs());
+		visitBDefinition(node, node.getName().getText(), node.getParameters(), node.getRhs());
 	}
 
 	@Override
 	public void caseAPredicateDefinitionDefinition(APredicateDefinitionDefinition node) {
-		visitBDefinition(node, node.getName().getText().toString(), node.getParameters(), node.getRhs());
+		visitBDefinition(node, node.getName().getText(), node.getParameters(), node.getRhs());
 	}
 
 	/* d == x := 1 */
 	@Override
 	public void caseASubstitutionDefinitionDefinition(ASubstitutionDefinitionDefinition node) {
-		visitBDefinition(node, node.getName().getText().toString(), node.getParameters(), node.getRhs());
+		visitBDefinition(node, node.getName().getText(), node.getParameters(), node.getRhs());
 
 	}
 
@@ -345,7 +341,7 @@ public class MachineContext extends DepthFirstAdapter {
 		if (!this.definitions.containsValue(node)) {
 			return;
 		}
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		for (PExpression e : copy) {
 			putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 		}
@@ -355,17 +351,17 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseADefinitionExpression(ADefinitionExpression node) {
-		visitBDefinitionCall(node, node.getDefLiteral().getText().toString(), node.getParameters());
+		visitBDefinitionCall(node, node.getDefLiteral().getText(), node.getParameters());
 	}
 
 	@Override
 	public void caseADefinitionPredicate(ADefinitionPredicate node) {
-		visitBDefinitionCall(node, node.getDefLiteral().getText().toString(), node.getParameters());
+		visitBDefinitionCall(node, node.getDefLiteral().getText(), node.getParameters());
 	}
 
 	@Override
 	public void caseADefinitionSubstitution(ADefinitionSubstitution node) {
-		visitBDefinitionCall(node, node.getDefLiteral().getText().toString(), node.getParameters());
+		visitBDefinitionCall(node, node.getDefLiteral().getText(), node.getParameters());
 	}
 
 	private void visitBDefinitionCall(Node node, String name, List<PExpression> copy) {
@@ -379,7 +375,7 @@ public class MachineContext extends DepthFirstAdapter {
 				return;
 			}
 		}
-		throw new ScopeException("Unkown definition: '" + name + "' at position: " + node.getStartPos());
+		throw new ScopeException("Unknown definition: '" + name + "' at position: " + node.getStartPos());
 	}
 
 	@Override
@@ -401,7 +397,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseASetsContextClause(ASetsContextClause node) {
 		this.setsMachineClause = node;
-		List<PSet> copy = new ArrayList<PSet>(node.getSet());
+		List<PSet> copy = new ArrayList<>(node.getSet());
 		for (PSet e : copy) {
 			e.apply(this);
 		}
@@ -409,7 +405,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseADeferredSetSet(ADeferredSetSet node) {
-		List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(node.getIdentifier());
+		List<TIdentifierLiteral> copy = new ArrayList<>(node.getIdentifier());
 		String name = Utils.getTIdentifierListAsString(copy);
 		exist(node.getIdentifier());
 		deferredSets.put(name, node);
@@ -418,12 +414,12 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAEnumeratedSetSet(AEnumeratedSetSet node) {
 		{
-			List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(node.getIdentifier());
+			List<TIdentifierLiteral> copy = new ArrayList<>(node.getIdentifier());
 			String name = Utils.getTIdentifierListAsString(copy);
 			exist(node.getIdentifier());
 			enumeratedSets.put(name, node);
 		}
-		List<PExpression> copy = new ArrayList<PExpression>(node.getElements());
+		List<PExpression> copy = new ArrayList<>(node.getElements());
 		for (PExpression e : copy) {
 			AIdentifierExpression v = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(v.getIdentifier());
@@ -435,7 +431,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
 		hasConstants = true;
-		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			AIdentifierExpression c = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(c.getIdentifier());
@@ -447,7 +443,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAAbstractConstantsMachineClause(AAbstractConstantsMachineClause node) {
 		hasConstants = true;
-		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			AIdentifierExpression c = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(c.getIdentifier());
@@ -458,7 +454,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
-		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			AIdentifierExpression v = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(v.getIdentifier());
@@ -469,7 +465,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
-		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			AIdentifierExpression v = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(v.getIdentifier());
@@ -498,7 +494,7 @@ public class MachineContext extends DepthFirstAdapter {
 				return;
 			}
 		}
-		throw new ScopeException("Unkown Identifier: '" + name + "' at position: " + node.getStartPos());
+		throw new ScopeException("Unknown Identifier: '" + name + "' at position: " + node.getStartPos());
 	}
 
 	@Override
@@ -511,11 +507,11 @@ public class MachineContext extends DepthFirstAdapter {
 				return;
 			}
 		}
-		throw new ScopeException("Unkown Identifier: '" + name + "' at position: " + node.getStartPos());
+		throw new ScopeException("Unknown Identifier: '" + name + "' at position: " + node.getStartPos());
 	}
 
 	private ArrayList<MachineContext> lookupReferencedMachines() {
-		ArrayList<MachineContext> list = new ArrayList<MachineContext>();
+		ArrayList<MachineContext> list = new ArrayList<>();
 		list.add(this);
 		return list;
 	}
@@ -524,7 +520,7 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAConstraintsMachineClause(AConstraintsMachineClause node) {
 		this.constraintMachineClause = node;
 
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 		this.contextTable.add(this.machineScalarParameter);
 		this.contextTable.add(this.machineSetParameter);
 		if (node.getPredicates() != null) {
@@ -536,14 +532,13 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
 		this.propertiesMachineClause = node;
 		hasConstants = true;
-		/**
+		/*
 		 * check identifier scope in properties clauses
 		 */
 
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
+		for (MachineContext s : list) {
 			contextTable.add(s.getDeferredSets());
 			contextTable.add(s.getEnumeratedSets());
 			contextTable.add(s.getEnumValues());
@@ -559,12 +554,11 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
 		this.invariantMachineClause = node;
 
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
-			this.contextTable.add(s.getSetParamter());
+		for (MachineContext s : list) {
+			this.contextTable.add(s.getSetParameter());
 			this.contextTable.add(s.getScalarParameter());
 			this.contextTable.add(s.getDeferredSets());
 			this.contextTable.add(s.getEnumeratedSets());
@@ -578,13 +572,12 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
-		this.assertiondMachineClause = node;
+		this.assertionsMachineClause = node;
 
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
-			this.contextTable.add(s.getSetParamter());
+		for (MachineContext s : list) {
+			this.contextTable.add(s.getSetParameter());
 			this.contextTable.add(s.getScalarParameter());
 			this.contextTable.add(s.getDeferredSets());
 			this.contextTable.add(s.getEnumeratedSets());
@@ -594,7 +587,7 @@ public class MachineContext extends DepthFirstAdapter {
 			this.contextTable.add(s.getVariables());
 		}
 
-		List<PPredicate> copy = new ArrayList<PPredicate>(node.getPredicates());
+		List<PPredicate> copy = new ArrayList<>(node.getPredicates());
 		for (PPredicate e : copy) {
 			e.apply(this);
 		}
@@ -604,13 +597,11 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAInitialisationMachineClause(AInitialisationMachineClause node) {
 		this.initialisationMachineClause = node;
 
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
-
-			this.contextTable.add(s.getSetParamter());
+		for (MachineContext s : list) {
+			this.contextTable.add(s.getSetParameter());
 			this.contextTable.add(s.getScalarParameter());
 			this.contextTable.add(s.getDeferredSets());
 			this.contextTable.add(s.getEnumeratedSets());
@@ -627,11 +618,10 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseAOperationsMachineClause(AOperationsMachineClause node) {
 		this.operationMachineClause = node;
-		this.contextTable = new ArrayList<LinkedHashMap<String, Node>>();
+		this.contextTable = new ArrayList<>();
 		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (int i = 0; i < list.size(); i++) {
-			MachineContext s = list.get(i);
-			this.contextTable.add(s.getSetParamter());
+		for (MachineContext s : list) {
+			this.contextTable.add(s.getSetParameter());
 			this.contextTable.add(s.getScalarParameter());
 			this.contextTable.add(s.getDeferredSets());
 			this.contextTable.add(s.getEnumeratedSets());
@@ -640,13 +630,13 @@ public class MachineContext extends DepthFirstAdapter {
 			this.contextTable.add(s.getDefinitions());
 			this.contextTable.add(s.getVariables());
 		}
-		List<POperation> copy = new ArrayList<POperation>(node.getOperations());
+		List<POperation> copy = new ArrayList<>(node.getOperations());
 		// first collect all operations
 		for (POperation e : copy) {
 			AOperation op = (AOperation) e;
 			String name = Utils.getTIdentifierListAsString(op.getOpName());
 			// existString(name);
-			if (operations.keySet().contains(name)) {
+			if (operations.containsKey(name)) {
 				throw new ScopeException(String.format("Duplicate operation: '%s'", name));
 			}
 			operations.put(name, op);
@@ -659,9 +649,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAOperation(AOperation node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getReturnValues());
+			List<PExpression> copy = new ArrayList<>(node.getReturnValues());
 			for (PExpression e : copy) {
 				AIdentifierExpression id = (AIdentifierExpression) e;
 				exist(id.getIdentifier());
@@ -670,7 +660,7 @@ public class MachineContext extends DepthFirstAdapter {
 		}
 
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getParameters());
+			List<PExpression> copy = new ArrayList<>(node.getParameters());
 			for (PExpression e : copy) {
 				AIdentifierExpression id = (AIdentifierExpression) e;
 				exist(id.getIdentifier());
@@ -687,8 +677,8 @@ public class MachineContext extends DepthFirstAdapter {
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
 		ArrayList<LinkedHashMap<String, Node>> temp = contextTable;
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getLhsExpression());
-			ArrayList<LinkedHashMap<String, Node>> varTable = new ArrayList<LinkedHashMap<String, Node>>();
+			List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
+			ArrayList<LinkedHashMap<String, Node>> varTable = new ArrayList<>();
 			varTable.add(variables);
 			for (PExpression e : copy) {
 				if (e instanceof AFunctionExpression) {
@@ -708,7 +698,7 @@ public class MachineContext extends DepthFirstAdapter {
 		}
 		{
 			contextTable = temp;
-			List<PExpression> copy = new ArrayList<PExpression>(node.getRhsExpressions());
+			List<PExpression> copy = new ArrayList<>(node.getRhsExpressions());
 			for (PExpression e : copy) {
 				e.apply(this);
 			}
@@ -717,8 +707,8 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseALetSubstitution(ALetSubstitution node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
-		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+		contextTable.add(new LinkedHashMap<>());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 		}
@@ -728,8 +718,8 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAnySubstitution(AAnySubstitution node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
-		List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+		contextTable.add(new LinkedHashMap<>());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 		}
@@ -750,7 +740,7 @@ public class MachineContext extends DepthFirstAdapter {
 			}
 		}
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getParameters());
+			List<PExpression> copy = new ArrayList<>(node.getParameters());
 			for (PExpression e : copy) {
 				e.apply(this);
 			}
@@ -759,9 +749,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAForallPredicate(AForallPredicate node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -774,9 +764,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAExistsPredicate(AExistsPredicate node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -789,9 +779,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseALambdaExpression(ALambdaExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -803,9 +793,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -816,9 +806,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAEventBComprehensionSetExpression(AEventBComprehensionSetExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -831,9 +821,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -849,9 +839,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAQuantifiedIntersectionExpression(AQuantifiedIntersectionExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -867,9 +857,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralProductExpression(AGeneralProductExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -885,9 +875,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAGeneralSumExpression(AGeneralSumExpression node) {
-		contextTable.add(new LinkedHashMap<String, Node>());
+		contextTable.add(new LinkedHashMap<>());
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
 			}
@@ -923,12 +913,12 @@ public class MachineContext extends DepthFirstAdapter {
 		return start;
 	}
 
-	public LinkedHashMap<String, Node> getSetParamter() {
+	public LinkedHashMap<String, Node> getSetParameter() {
 		return new LinkedHashMap<>(machineSetParameter);
 	}
 
 	public ArrayList<Node> getConstantArrayList() {
-		ArrayList<Node> list = new ArrayList<Node>();
+		ArrayList<Node> list = new ArrayList<>();
 		for (Entry<String, Node> entry : constants.entrySet()) {
 			list.add(entry.getValue());
 		}
@@ -1008,7 +998,7 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	public AAssertionsMachineClause getAssertionMachineClause() {
-		return assertiondMachineClause;
+		return assertionsMachineClause;
 	}
 
 	public void setPropertiesMachineClaus(APropertiesMachineClause propertiesMachineClause) {
@@ -1020,7 +1010,7 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	public boolean machineContainsOperations() {
-		return operations.size() > 0;
+		return !operations.isEmpty();
 	}
 
 	public AInitialisationMachineClause getInitialisationMachineClause() {

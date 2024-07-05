@@ -22,17 +22,17 @@ public class TLAModule {
 	protected ArrayList<PDefinition> allDefinitions;
 
 	public TLAModule() {
-		this.tlaDefinitions = new ArrayList<TLADefinition>();
-		this.constants = new ArrayList<Node>();
-		this.assumes = new ArrayList<Node>();
-		this.variables = new ArrayList<Node>();
-		this.initPredicates = new ArrayList<Node>();
-		this.operations = new ArrayList<POperation>();
-		this.bDefinitions = new ArrayList<PDefinition>();
-		this.assertions = new ArrayList<Node>();
-		this.invariants = new ArrayList<Node>();
+		this.tlaDefinitions = new ArrayList<>();
+		this.constants = new ArrayList<>();
+		this.assumes = new ArrayList<>();
+		this.variables = new ArrayList<>();
+		this.initPredicates = new ArrayList<>();
+		this.operations = new ArrayList<>();
+		this.bDefinitions = new ArrayList<>();
+		this.assertions = new ArrayList<>();
+		this.invariants = new ArrayList<>();
 
-		this.allDefinitions = new ArrayList<PDefinition>();
+		this.allDefinitions = new ArrayList<>();
 
 	}
 
@@ -107,10 +107,10 @@ public class TLAModule {
 	}
 
 	public boolean hasInitPredicate() {
-		return this.initPredicates.size() > 0;
+		return !this.initPredicates.isEmpty();
 	}
 
-	public void addTLADefinition(TLADefinition defintion) {
-		this.tlaDefinitions.add(defintion);
+	public void addTLADefinition(TLADefinition definition) {
+		this.tlaDefinitions.add(definition);
 	}
 }

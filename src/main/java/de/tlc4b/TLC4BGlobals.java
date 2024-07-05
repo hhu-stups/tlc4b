@@ -148,8 +148,8 @@ public class TLC4BGlobals {
 		partialInvariantEvaluation = b;
 	}
 
-	public static void setDEFERRED_SET_SIZE(int dEFERRED_SET_SIZE) {
-		DEFERRED_SET_SIZE = dEFERRED_SET_SIZE;
+	public static void setDEFERRED_SET_SIZE(int DEFERRED_SET_SIZE) {
+		TLC4BGlobals.DEFERRED_SET_SIZE = DEFERRED_SET_SIZE;
 	}
 
 	public static void setMAX_INT(int mAX_INT) {

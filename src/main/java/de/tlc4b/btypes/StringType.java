@@ -7,7 +7,7 @@ import de.tlc4b.exceptions.UnificationException;
 
 public class StringType implements BType {
 
-	private static StringType instance = new StringType();
+	private static final StringType instance = new StringType();
 
 	public static StringType getInstance() {
 		return instance;
@@ -42,10 +42,7 @@ public class StringType implements BType {
 		if (other instanceof UntypedType) {
 			return true;
 		}
-		if (other instanceof StringType) {
-			return true;
-		}
-		return false;
+		return other instanceof StringType;
 	}
 
 	public boolean containsInfiniteType() {

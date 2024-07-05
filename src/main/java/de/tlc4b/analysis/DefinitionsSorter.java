@@ -3,7 +3,6 @@ package de.tlc4b.analysis;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ADefinitionExpression;
@@ -22,11 +21,11 @@ import de.be4.classicalb.core.parser.node.PDefinition;
  */
 
 public class DefinitionsSorter extends DepthFirstAdapter {
-	private MachineContext machineContext;
-	private Hashtable<Node, HashSet<Node>> dependenciesTable;
+	private final MachineContext machineContext;
+	private final Hashtable<Node, HashSet<Node>> dependenciesTable;
 	private HashSet<Node> current;
 
-	private ArrayList<PDefinition> allDefinitions;
+	private final ArrayList<PDefinition> allDefinitions;
 
 	public ArrayList<PDefinition> getAllDefinitions() {
 		return allDefinitions;
@@ -35,28 +34,26 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	public DefinitionsSorter(MachineContext machineContext,
 			ArrayList<PDefinition> allDefinitions) {
 		this.machineContext = machineContext;
-		dependenciesTable = new Hashtable<Node, HashSet<Node>>();
+		dependenciesTable = new Hashtable<>();
 
 		for (PDefinition def : allDefinitions) {
 			def.apply(this);
 		}
 
-		this.allDefinitions = sort(new ArrayList<PDefinition>(allDefinitions));
+		this.allDefinitions = sort(new ArrayList<>(allDefinitions));
 
 	}
 
 	private ArrayList<PDefinition> sort(ArrayList<PDefinition> list) {
-		ArrayList<PDefinition> result = new ArrayList<PDefinition>();
+		ArrayList<PDefinition> result = new ArrayList<>();
 		boolean newRun = true;
 		while (newRun) {
 			newRun = false;
-			Iterator<PDefinition> itr = list.iterator();
-			while (itr.hasNext()) {
-				PDefinition def = itr.next();
+			for (PDefinition def : list) {
 				if (result.contains(def))
 					continue;
 				HashSet<Node> set = dependenciesTable.get(def);
-				if (set.size() == 0) {
+				if (set.isEmpty()) {
 					newRun = true;
 					result.add(def);
 
@@ -83,15 +80,14 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	}
 
 	private void removeDef(Node def) {
-		Iterator<HashSet<Node>> itr = dependenciesTable.values().iterator();
-		while (itr.hasNext()) {
-			itr.next().remove(def);
+		for (HashSet<Node> nodes : dependenciesTable.values()) {
+			nodes.remove(def);
 		}
 	}
 
 	public void inAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
-		current = new HashSet<Node>();
+		current = new HashSet<>();
 	}
 
 	public void outAExpressionDefinitionDefinition(
@@ -102,7 +98,7 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 
 	public void inAPredicateDefinitionDefinition(
 			APredicateDefinitionDefinition node) {
-		current = new HashSet<Node>();
+		current = new HashSet<>();
 	}
 
 	public void outAPredicateDefinitionDefinition(
@@ -113,7 +109,7 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 
 	public void inASubstitutionDefinitionDefinition(
 			ASubstitutionDefinitionDefinition node) {
-		current = new HashSet<Node>();
+		current = new HashSet<>();
 	}
 
 	public void outASubstitutionDefinitionDefinition(

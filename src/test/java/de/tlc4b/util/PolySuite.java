@@ -29,10 +29,10 @@ public class PolySuite extends Suite {
 	 */
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public static @interface Config {
+	public @interface Config {
 	}
 
-	public static interface Configuration {
+	public interface Configuration {
 		int size();
 		Object getTestValue(int index);
 		Object getExpectedValue(int index);
@@ -53,11 +53,11 @@ public class PolySuite extends Suite {
 	 * @throws Throwable if something bad happens
 	 */
 	public PolySuite(Class<?> c) throws Throwable {
-		super(c, Collections.<Runner>emptyList());
+		super(c, Collections.emptyList());
 		TestClass testClass = getTestClass();
 		Class<?> jTestClass = testClass.getJavaClass();
 		Configuration configuration = getConfiguration(testClass);
-		List<Runner> runners = new ArrayList<Runner>();
+		List<Runner> runners = new ArrayList<>();
 		for (int i = 0, size = configuration.size(); i < size; i++) {
 			SingleRunner runner = new SingleRunner(jTestClass, configuration.getTestValue(i), configuration.getTestName(i), configuration.getExpectedValue(i));
 			runners.add(runner);

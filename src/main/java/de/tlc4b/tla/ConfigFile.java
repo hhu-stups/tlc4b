@@ -17,7 +17,7 @@ public class ConfigFile {
 	
 	
 	public ConfigFile(){
-		this.assignments = new ArrayList<ConfigFileAssignment>();
+		this.assignments = new ArrayList<>();
 		this.invariantNumber = 0;
 	}
 

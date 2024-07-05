@@ -33,7 +33,7 @@ import de.tlc4b.exceptions.SubstitutionException;
 
 /**
  * This class is a tree walker which calculates all missing variables
- * assignments for each node inside a operation body. Missing variables
+ * assignments for each node inside an operation body. Missing variables
  * assignments correspond to unchanged variables in TLA+. B definitions or the
  * initialisation are not visited by this class.
  */
@@ -64,10 +64,7 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		if(set== null){
 			return false;
 		}else{
-			if(set.size() == 0){
-				return false;
-			}else
-				return true;
+			return !set.isEmpty();
 		}
 	}
 
@@ -81,11 +78,11 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		AssignedVariablesFinder aVF = new AssignedVariablesFinder(c);
 		this.assignedIdentifiersTable = aVF.getAssignedVariablesTable();
 
-		this.expectedVariablesTable = new Hashtable<Node, HashSet<Node>>();
-		this.expectedOutputParametersTable = new Hashtable<Node, HashSet<Node>>();
+		this.expectedVariablesTable = new Hashtable<>();
+		this.expectedOutputParametersTable = new Hashtable<>();
 
-		this.unchangedVariablesTable = new Hashtable<Node, HashSet<Node>>();
-		this.unchangedVariablesNull = new Hashtable<Node, HashSet<Node>>();
+		this.unchangedVariablesTable = new Hashtable<>();
+		this.unchangedVariablesNull = new Hashtable<>();
 
 		c.getStartNode().apply(this);
 	}
@@ -101,17 +98,12 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseAOperation(AOperation node) {
-		HashSet<Node> expectedOutputParameter = new HashSet<Node>();
-		List<PExpression> returnValues = new ArrayList<PExpression>(
-				node.getReturnValues());
-		for (PExpression e : returnValues) {
-			expectedOutputParameter.add(e);
-		}
+		List<PExpression> returnValues = new ArrayList<>(node.getReturnValues());
+		HashSet<Node> expectedOutputParameter = new HashSet<>(returnValues);
 
 		Node body = node.getOperationBody();
 		expectedOutputParametersTable.put(body, expectedOutputParameter);
-		expectedVariablesTable.put(body, new HashSet<Node>(machineContext
-				.getVariables().values()));
+		expectedVariablesTable.put(body, new HashSet<>(machineContext.getVariables().values()));
 
 		body.apply(this);
 
@@ -120,15 +112,13 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 
 	private void check(Node node) {
 		HashSet<Node> found = assignedIdentifiersTable.get(node);
-		HashSet<Node> missingVariables = new HashSet<Node>(
-				expectedVariablesTable.get(node));
+		HashSet<Node> missingVariables = new HashSet<>(expectedVariablesTable.get(node));
 		missingVariables.removeAll(found);
 		unchangedVariablesTable.put(node, missingVariables);
 
-		HashSet<Node> missingOutputParameter = new HashSet<Node>(
-				expectedOutputParametersTable.get(node));
+		HashSet<Node> missingOutputParameter = new HashSet<>(expectedOutputParametersTable.get(node));
 		missingOutputParameter.removeAll(found);
-		if (missingOutputParameter.size() > 0) {
+		if (!missingOutputParameter.isEmpty()) {
 			throw new SubstitutionException(
 					"To the following output parameters no values are assigned: "
 							+ missingOutputParameter);
@@ -146,8 +136,7 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseABecomesElementOfSubstitution(
-			ABecomesElementOfSubstitution node) {
+	public void caseABecomesElementOfSubstitution(ABecomesElementOfSubstitution node) {
 		check(node);
 	}
 
@@ -155,12 +144,10 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	public void caseAParallelSubstitution(AParallelSubstitution node) {
 		check(node);
 
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getSubstitutions());
+		List<PSubstitution> copy = new ArrayList<>(node.getSubstitutions());
 		for (PSubstitution e : copy) {
-
-			expectedOutputParametersTable.put(e, new HashSet<Node>());
-			expectedVariablesTable.put(e, new HashSet<Node>());
+			expectedOutputParametersTable.put(e, new HashSet<>());
+			expectedVariablesTable.put(e, new HashSet<>());
 			e.apply(this);
 		}
 	}
@@ -169,8 +156,8 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	public void caseAAnySubstitution(AAnySubstitution node) {
 		check(node);
 
-		expectedOutputParametersTable.put(node.getThen(), new HashSet<Node>());
-		expectedVariablesTable.put(node.getThen(), new HashSet<Node>());
+		expectedOutputParametersTable.put(node.getThen(), new HashSet<>());
+		expectedVariablesTable.put(node.getThen(), new HashSet<>());
 		node.getThen().apply(this);
 	}
 
@@ -178,9 +165,8 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	public void caseALetSubstitution(ALetSubstitution node) {
 		check(node);
 
-		expectedOutputParametersTable.put(node.getSubstitution(),
-				new HashSet<Node>());
-		expectedVariablesTable.put(node.getSubstitution(), new HashSet<Node>());
+		expectedOutputParametersTable.put(node.getSubstitution(), new HashSet<>());
+		expectedVariablesTable.put(node.getSubstitution(), new HashSet<>());
 		node.getSubstitution().apply(this);
 	}
 
@@ -190,18 +176,17 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 
 		// Separating variables and output parameters
 		HashSet<Node> foundIdentifiers = assignedIdentifiersTable.get(node);
-		HashSet<Node> variables = new HashSet<Node>(foundIdentifiers);
+		HashSet<Node> variables = new HashSet<>(foundIdentifiers);
 		variables.removeAll(expectedOutputParametersTable.get(node));
 
 		// System.out.println(parameters);
 
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getSubstitutions());
+		List<PSubstitution> copy = new ArrayList<>(
+			node.getSubstitutions());
 		for (PSubstitution e : copy) {
 			// each child of CHOICE must assign all variables and all output
 			// parameter
-			expectedOutputParametersTable.put(e,
-					expectedOutputParametersTable.get(node));
+			expectedOutputParametersTable.put(e, expectedOutputParametersTable.get(node));
 			expectedVariablesTable.put(e, variables);
 			e.apply(this);
 		}
@@ -210,14 +195,12 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	@Override
 	public void caseAChoiceOrSubstitution(AChoiceOrSubstitution node) {
 		Node sub = node.getSubstitution();
-		expectedOutputParametersTable.put(sub,
-				expectedOutputParametersTable.get(node));
+		expectedOutputParametersTable.put(sub, expectedOutputParametersTable.get(node));
 		expectedVariablesTable.put(sub, expectedVariablesTable.get(node));
 
 		sub.apply(this);
 
 		unchangedVariablesTable.put(node, unchangedVariablesTable.get(sub));
-
 	}
 
 	@Override
@@ -225,41 +208,34 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		check(node);
 		// Separating variables and output parameters
 		HashSet<Node> foundIdentifiers = assignedIdentifiersTable.get(node);
-		HashSet<Node> foundVariables = new HashSet<Node>(foundIdentifiers);
+		HashSet<Node> foundVariables = new HashSet<>(foundIdentifiers);
 		foundVariables.removeAll(expectedOutputParametersTable.get(node));
 
-		expectedOutputParametersTable.put(node.getThen(),
-				expectedOutputParametersTable.get(node));
+		expectedOutputParametersTable.put(node.getThen(), expectedOutputParametersTable.get(node));
 		expectedVariablesTable.put(node.getThen(), foundVariables);
 		node.getThen().apply(this);
 
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getElsifSubstitutions());
+		List<PSubstitution> copy = new ArrayList<>(node.getElsifSubstitutions());
 		for (PSubstitution e : copy) {
-			expectedOutputParametersTable.put(e,
-					expectedOutputParametersTable.get(node));
+			expectedOutputParametersTable.put(e, expectedOutputParametersTable.get(node));
 			expectedVariablesTable.put(e, foundVariables);
 			e.apply(this);
 		}
 
 		if (node.getElse() != null) {
-			expectedOutputParametersTable.put(node.getElse(),
-					expectedOutputParametersTable.get(node));
+			expectedOutputParametersTable.put(node.getElse(), expectedOutputParametersTable.get(node));
 			expectedVariablesTable.put(node.getElse(), foundVariables);
 			node.getElse().apply(this);
 		} else {
-			unchangedVariablesNull.put(node,
-					assignedIdentifiersTable.get(node.getThen()));
+			unchangedVariablesNull.put(node, assignedIdentifiersTable.get(node.getThen()));
 		}
 
 	}
 
 	@Override
 	public void caseAIfElsifSubstitution(AIfElsifSubstitution node) {
-		expectedOutputParametersTable.put(node.getThenSubstitution(),
-				expectedOutputParametersTable.get(node));
-		expectedVariablesTable.put(node.getThenSubstitution(),
-				expectedVariablesTable.get(node));
+		expectedOutputParametersTable.put(node.getThenSubstitution(), expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getThenSubstitution(), expectedVariablesTable.get(node));
 		node.getThenSubstitution().apply(this);
 	}
 
@@ -273,28 +249,22 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		// HashSet<Node> foundVariables = new HashSet<Node>(foundIdentifiers);
 		// foundVariables.removeAll(expectedOutputParametersTable.get(node));
 
-		expectedOutputParametersTable.put(node.getSubstitution(),
-				expectedOutputParametersTable.get(node));
-		expectedVariablesTable.put(node.getSubstitution(),
-				expectedVariablesTable.get(node));
+		expectedOutputParametersTable.put(node.getSubstitution(), expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getSubstitution(), expectedVariablesTable.get(node));
 		node.getSubstitution().apply(this);
 	}
 
 	@Override
 	public void caseAAssertionSubstitution(AAssertionSubstitution node) {
-		expectedOutputParametersTable.put(node.getSubstitution(),
-				expectedOutputParametersTable.get(node));
-		expectedVariablesTable.put(node.getSubstitution(),
-				expectedVariablesTable.get(node));
+		expectedOutputParametersTable.put(node.getSubstitution(), expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getSubstitution(), expectedVariablesTable.get(node));
 		node.getSubstitution().apply(this);
 	}
 
 	@Override
 	public void caseABlockSubstitution(ABlockSubstitution node) {
-		expectedOutputParametersTable.put(node.getSubstitution(),
-				expectedOutputParametersTable.get(node));
-		expectedVariablesTable.put(node.getSubstitution(),
-				expectedVariablesTable.get(node));
+		expectedOutputParametersTable.put(node.getSubstitution(), expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getSubstitution(), expectedVariablesTable.get(node));
 		node.getSubstitution().apply(this);
 	}
 
@@ -303,27 +273,24 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 		check(node);
 		// Separating variables and output parameters
 		HashSet<Node> foundIdentifiers = assignedIdentifiersTable.get(node);
-		HashSet<Node> variables = new HashSet<Node>(foundIdentifiers);
+		HashSet<Node> variables = new HashSet<>(foundIdentifiers);
 		variables.removeAll(expectedOutputParametersTable.get(node));
 
-		expectedOutputParametersTable.put(node.getThen(),
-				expectedOutputParametersTable.get(node));
+		expectedOutputParametersTable.put(node.getThen(), expectedOutputParametersTable.get(node));
 		expectedVariablesTable.put(node.getThen(), variables);
 		node.getThen().apply(this);
 		{
-			List<PSubstitution> copy = new ArrayList<PSubstitution>(
+			List<PSubstitution> copy = new ArrayList<>(
 					node.getWhenSubstitutions());
 			for (PSubstitution e : copy) {
-				expectedOutputParametersTable.put(e,
-						expectedOutputParametersTable.get(node));
+				expectedOutputParametersTable.put(e, expectedOutputParametersTable.get(node));
 				expectedVariablesTable.put(e, variables);
 				e.apply(this);
 			}
 		}
 
 		if (node.getElse() != null) {
-			expectedOutputParametersTable.put(node.getElse(),
-					expectedOutputParametersTable.get(node));
+			expectedOutputParametersTable.put(node.getElse(), expectedOutputParametersTable.get(node));
 			expectedVariablesTable.put(node.getElse(), variables);
 			node.getElse().apply(this);
 		}
@@ -332,10 +299,8 @@ public class UnchangedVariablesFinder extends DepthFirstAdapter {
 	@Override
 	public void caseASelectWhenSubstitution(ASelectWhenSubstitution node) {
 		check(node);
-		expectedOutputParametersTable.put(node.getSubstitution(),
-				expectedOutputParametersTable.get(node));
-		expectedVariablesTable.put(node.getSubstitution(),
-				expectedVariablesTable.get(node));
+		expectedOutputParametersTable.put(node.getSubstitution(), expectedOutputParametersTable.get(node));
+		expectedVariablesTable.put(node.getSubstitution(), expectedVariablesTable.get(node));
 		node.getSubstitution().apply(this);
 	}
 

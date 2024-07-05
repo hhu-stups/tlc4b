@@ -22,8 +22,8 @@ import de.tlc4b.exceptions.TranslationException;
  */
 
 public class DefinitionsAnalyser extends DepthFirstAdapter {
-	private MachineContext machineContext;
-	private HashMap<Node, Integer> deferredSetSizeTable;
+	private final MachineContext machineContext;
+	private final HashMap<Node, Integer> deferredSetSizeTable;
 
 	public Integer getSize(Node node) {
 		return deferredSetSizeTable.get(node);
@@ -31,13 +31,12 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 
 	public DefinitionsAnalyser(MachineContext machineContext) {
 		this.machineContext = machineContext;
-		deferredSetSizeTable = new HashMap<Node, Integer>();
-		HashSet<Node> deferredSets = new HashSet<Node>(machineContext
-				.getDeferredSets().values());
+		deferredSetSizeTable = new HashMap<>();
+		HashSet<Node> deferredSets = new HashSet<>(machineContext.getDeferredSets().values());
 
 		findDefaultSizesInDefinitions();
 
-		if (deferredSets.size() == 0)
+		if (deferredSets.isEmpty())
 			return;
 
 		Set<String> strings = machineContext.getDeferredSets().keySet();
@@ -109,8 +108,8 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 		if (null != node) {
 			try {
 				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-				AIntegerExpression sizeExpr = null;
-				Integer value = null;
+				AIntegerExpression sizeExpr;
+				int value;
 				if (d.getRhs() instanceof AUnaryMinusExpression) {
 					AUnaryMinusExpression minus = (AUnaryMinusExpression) d
 							.getRhs();
@@ -146,7 +145,6 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 				String intString = integer.getLiteral().getText();
 				deferredSetSizeTable.put(ref_node, Integer.parseInt(intString));
 			} catch (ClassCastException e) {
-				return;
 			}
 
 		}

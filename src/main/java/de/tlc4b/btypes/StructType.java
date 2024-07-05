@@ -12,17 +12,17 @@ import de.be4.classicalb.core.parser.node.ARecEntry;
 import de.be4.classicalb.core.parser.node.AStructExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PRecEntry;
-import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
+import de.tlc4b.util.UtilMethods;
 
 public class StructType extends AbstractHasFollowers {
 
-	private LinkedHashMap<String, BType> types;
+	private final LinkedHashMap<String, BType> types;
 	private boolean complete;
 
 	public StructType() {
-		types = new LinkedHashMap<String, BType>();
+		types = new LinkedHashMap<>();
 	}
 
 	public BType getType(String fieldName) {
@@ -42,7 +42,7 @@ public class StructType extends AbstractHasFollowers {
 
 	@Override
 	public String toString() {
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		res.append("struct(");
 
 		Iterator<Entry<String, BType>> iterator = types.entrySet().iterator();
@@ -50,7 +50,7 @@ public class StructType extends AbstractHasFollowers {
 			res.append("...");
 		while (iterator.hasNext()) {
 			Entry<String, BType> next = iterator.next();
-			String fieldName = (String) next.getKey();
+			String fieldName = next.getKey();
 			res.append(fieldName).append(":").append(next.getValue());
 			if (iterator.hasNext())
 				res.append(",");
@@ -60,10 +60,7 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType) {
-		Iterator<Entry<String, BType>> iterator = this.types.entrySet()
-				.iterator();
-		while (iterator.hasNext()) {
-			Entry<String, BType> next = iterator.next();
+		for (Entry<String, BType> next : this.types.entrySet()) {
 			String name = next.getKey();
 			BType type = next.getValue();
 			if (type == oldType) {
@@ -87,17 +84,13 @@ public class StructType extends AbstractHasFollowers {
 		if (other instanceof StructType) {
 			StructType s = (StructType) other;
 
-			Iterator<Entry<String, BType>> iterator = s.types.entrySet()
-					.iterator();
-			while (iterator.hasNext()) {
-				Entry<String, BType> next = iterator.next();
+			for (Entry<String, BType> next : s.types.entrySet()) {
 				String fieldName = next.getKey();
 				BType sType = next.getValue();
 				if (this.types.containsKey(fieldName)) {
-					BType res = this.types.get(fieldName).unify(sType,
-							typechecker);
+					BType res = this.types.get(fieldName).unify(sType, typechecker);
 					this.types.put(fieldName, res);
-					if(res instanceof AbstractHasFollowers){
+					if (res instanceof AbstractHasFollowers) {
 						((AbstractHasFollowers) res).addFollower(this);
 					}
 				} else {
@@ -118,9 +111,8 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public boolean isUntyped() {
-		Iterator<BType> iterator = types.values().iterator();
-		while (iterator.hasNext()) {
-			if (iterator.next().isUntyped()) {
+		for (BType bType : types.values()) {
+			if (bType.isUntyped()) {
 				return true;
 			}
 		}
@@ -134,15 +126,15 @@ public class StructType extends AbstractHasFollowers {
 		if (other instanceof StructType) {
 			StructType s = (StructType) other;
 			Iterator<String> itr = types.keySet().iterator();
-			Set<String> intersection = new HashSet<String>();
+			Set<String> intersection = new HashSet<>();
 			while (itr.hasNext()) {
 				String temp = itr.next();
-				if (s.types.keySet().contains(temp)) {
+				if (s.types.containsKey(temp)) {
 					intersection.add(temp);
 				}
 			}
 			if (this.complete) {
-				Set<String> temp = new HashSet<String>(s.types.keySet());
+				Set<String> temp = new HashSet<>(s.types.keySet());
 				temp.removeAll(intersection);
 				if (!temp.equals(new HashSet<String>())) {
 					return false;
@@ -150,16 +142,13 @@ public class StructType extends AbstractHasFollowers {
 			}
 
 			if (s.complete) {
-				Set<String> temp = new HashSet<String>(this.types.keySet());
+				Set<String> temp = new HashSet<>(this.types.keySet());
 				temp.removeAll(intersection);
 				if (!temp.equals(new HashSet<String>())) {
 					return false;
 				}
 			}
-			Iterator<Entry<String, BType>> iterator = types.entrySet()
-					.iterator();
-			while (iterator.hasNext()) {
-				Entry<String, BType> next = iterator.next();
+			for (Entry<String, BType> next : types.entrySet()) {
 				String name = next.getKey();
 				BType value = next.getValue();
 				if (!this.types.get(name).compare(value)) {
@@ -173,9 +162,7 @@ public class StructType extends AbstractHasFollowers {
 
 	@Override
 	public boolean contains(BType other) {
-		Iterator<BType> itr = types.values().iterator();
-		while (itr.hasNext()) {
-			BType t = itr.next();
+		for (BType t : types.values()) {
 			if (t.equals(other)) {
 				return true;
 			}
@@ -189,25 +176,21 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public boolean containsInfiniteType() {
-		Iterator<BType> iterator = this.types.values().iterator();
-		while (iterator.hasNext()) {
-			if (iterator.next().containsInfiniteType())
+		for (BType bType : this.types.values()) {
+			if (bType.containsInfiniteType())
 				return true;
 		}
 		return false;
 	}
 
 	public PExpression createASTNode(Typechecker typechecker) {
-		ArrayList<PRecEntry> list = new ArrayList<PRecEntry>();
+		ArrayList<PRecEntry> list = new ArrayList<>();
 
 		Set<Entry<String, BType>> entrySet = this.types.entrySet();
 		for (Entry<String, BType> entry : entrySet) {
 			String name = entry.getKey();
 			BType type = entry.getValue();
-			TIdentifierLiteral literal = new TIdentifierLiteral(name);
-			ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
-			idList.add(literal);
-			AIdentifierExpression id = new AIdentifierExpression(idList);
+			AIdentifierExpression id = UtilMethods.createAIdentifierExpression(name);
 			ARecEntry recEntry = new ARecEntry(id,
 					type.createASTNode(typechecker));
 			list.add(recEntry);

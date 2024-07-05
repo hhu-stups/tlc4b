@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -183,7 +184,7 @@ public class TestUtil {
 		String jvm = System.getProperty("java.home") + separator + "bin" + separator + "java";
 		String classpath = System.getProperty("java.class.path");
 
-		List<String> command = new ArrayList<String>();
+		List<String> command = new ArrayList<>();
 		command.add(jvm);
 		command.add("-cp");
 		command.add(classpath);
@@ -213,8 +214,8 @@ public class TestUtil {
 }
 
 class StreamGobbler extends Thread {
-	private InputStream is;
-	private ArrayList<String> log;
+	private final InputStream is;
+	private final ArrayList<String> log;
 
 	public ArrayList<String> getLog() {
 		return log;
@@ -222,12 +223,12 @@ class StreamGobbler extends Thread {
 
 	StreamGobbler(InputStream is) {
 		this.is = is;
-		this.log = new ArrayList<String>();
+		this.log = new ArrayList<>();
 	}
 
 	public void run() {
 		try {
-			InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+			InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
 			while ((line = br.readLine()) != null) {

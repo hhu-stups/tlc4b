@@ -18,7 +18,7 @@ import de.tlc4b.btypes.IntegerType;
 
 public class PrecedenceCollector extends DepthFirstAdapter {
 
-	private final static Hashtable<String, Precedence> PRECEDENCES = new Hashtable<String, Precedence>();
+	private final static Hashtable<String, Precedence> PRECEDENCES = new Hashtable<>();
 
 	private static void put(String s, int from, int to, boolean leftAssociative) {
 		PRECEDENCES.put(s, new Precedence(s, from, to, leftAssociative));
@@ -32,7 +32,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("AEquivalencePredicate", 2, 2, false);
 		put("ADisjunctPredicate", 3, 3, true); // or
 
-		/** and **/
+		/* and **/
 		put("AConjunctPredicate", 3, 3, true);
 		put("APreconditionSubstitution", 3, 3, true);
 		put("AAssertionSubstitution", 3, 3, true);
@@ -86,8 +86,8 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 
 	public PrecedenceCollector(Start start, Typechecker typeChecker,
 			MachineContext machineContext, TypeRestrictor typeRestrictor) {
-		precedenceTable = new Hashtable<Node, Precedence>();
-		brackets = new HashSet<Node>();
+		precedenceTable = new Hashtable<>();
+		brackets = new HashSet<>();
 		this.typechecker = typeChecker;
 		start.apply(this);
 
@@ -226,10 +226,7 @@ class Precedence {
 				|| node.to >= parent.from && node.to <= parent.to) {
 			return true;
 		}
-		if (parent.from > node.from)
-			return true;
-
-		return false;
+		return parent.from > node.from;
 	}
 
 	@Override

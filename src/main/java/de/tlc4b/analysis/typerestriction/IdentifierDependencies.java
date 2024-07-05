@@ -16,7 +16,7 @@ public class IdentifierDependencies extends DepthFirstAdapter {
 	public IdentifierDependencies(MachineContext machineContext) {
 		this.machineContext = machineContext;
 
-		this.usedIdentifier = new HashMap<Node, HashSet<Node>>();
+		this.usedIdentifier = new HashMap<>();
 
 	}
 
@@ -42,7 +42,7 @@ public class IdentifierDependencies extends DepthFirstAdapter {
 		Node refNode = machineContext.getReferenceNode(node);
 		if(refNode == null)
 			refNode = node;
-		HashSet<Node> set = new HashSet<Node>();
+		HashSet<Node> set = new HashSet<>();
 		set.add(refNode);
 		setSetToNode(node, set);
 
@@ -52,7 +52,7 @@ public class IdentifierDependencies extends DepthFirstAdapter {
 	private void setSetToNode(Node node, HashSet<Node> set) {
 		HashSet<Node> oldSet = usedIdentifier.get(node);
 		if (oldSet == null) {
-			oldSet = new HashSet<Node>();
+			oldSet = new HashSet<>();
 		} 
 		if (set != null) {
 			oldSet.addAll(set);

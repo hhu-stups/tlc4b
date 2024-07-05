@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,14 +31,10 @@ public class TLCRunner {
 		String path = args[0];
 		ToolIO.setUserDir(path);
 		String[] parameters = new String[args.length - 1];
-		for (int i = 0; i < parameters.length; i++) {
-			parameters[i] = args[i + 1];
-		}
+		System.arraycopy(args, 1, parameters, 0, parameters.length);
 		try {
 			TLC.main(parameters);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
+		} catch (UnknownHostException | FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
@@ -45,13 +43,13 @@ public class TLCRunner {
 			final String mainClass, final String[] arguments)
 			throws IOException {
 
-		String separator = System.getProperty("file.separator");
+		String separator = FileSystems.getDefault().getSeparator();
 
 		String jvm = System.getProperty("java.home") + separator + "bin"
 				+ separator + "java";
 		String classpath = System.getProperty("java.class.path");
 
-		List<String> command = new ArrayList<String>();
+		List<String> command = new ArrayList<>();
 		command.add(jvm);
 		command.add("-cp");
 		command.add(classpath);
@@ -59,13 +57,12 @@ public class TLCRunner {
 		command.addAll(Arrays.asList(arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		Process process = processBuilder.start();
-		return process;
+		return processBuilder.start();
 	}
 
 	public static ArrayList<String> runTLCInANewJVM(String machineName,
 			String path) throws IOException {
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		list.add(path);
 		list.add(machineName);
 		if (!TLC4BGlobals.isDeadlockCheck()) {
@@ -98,7 +95,7 @@ public class TLCRunner {
 		MP.TLCOutputStream.changeOutputStream();
 		ToolIO.setMode(ToolIO.SYSTEM);
 
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		if (!TLC4BGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
@@ -121,7 +118,7 @@ public class TLCRunner {
 		// list.add(machineName + ".cfg");
 		list.add(machineName);
 		ToolIO.setUserDir(path.getPath());
-		String[] args = list.toArray(new String[list.size()]);
+		String[] args = list.toArray(new String[0]);
 		TLC tlc = new TLC();
 		// handle parameters
 		if (tlc.handleParameters(args)) {
@@ -142,11 +139,9 @@ public class TLCRunner {
 	}
 
 	private static void closeThreads() {
-		Set<Thread> threadSet = new HashSet<Thread>(Thread.getAllStackTraces()
-				.keySet());
-		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
-		for (int i = 0; i < threadArray.length; i++) {
-			Thread t = threadArray[i];
+		Set<Thread> threadSet = new HashSet<>(Thread.getAllStackTraces().keySet());
+		Thread[] threadArray = threadSet.toArray(new Thread[0]);
+		for (Thread t : threadArray) {
 			// System.out.println(t.getId()+ " "+t.getThreadGroup());
 			if (t.getName().equals("RMI Reaper")) {
 				t.interrupt();
@@ -157,8 +152,8 @@ public class TLCRunner {
 }
 
 class StreamGobbler extends Thread {
-	private InputStream is;
-	private ArrayList<String> log;
+	private final InputStream is;
+	private final ArrayList<String> log;
 
 	public ArrayList<String> getLog() {
 		return log;
@@ -166,14 +161,14 @@ class StreamGobbler extends Thread {
 
 	StreamGobbler(InputStream is) {
 		this.is = is;
-		this.log = new ArrayList<String>();
+		this.log = new ArrayList<>();
 	}
 
 	public void run() {
 		try {
-			InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+			InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 			BufferedReader br = new BufferedReader(isr);
-			String line = null;
+			String line;
 			while ((line = br.readLine()) != null) {
 				System.out.println("> " + line);
 				log.add(line);

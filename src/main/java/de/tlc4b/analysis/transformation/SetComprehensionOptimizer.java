@@ -44,18 +44,17 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 	public void caseAComprehensionSetExpression(AComprehensionSetExpression node) {
 
 		final LinkedList<PExpression> identifiers = node.getIdentifiers();
-		final ArrayList<String> list = new ArrayList<String>();
-		final Hashtable<String, AIdentifierExpression> identifierTable = new Hashtable<String, AIdentifierExpression>();
-		for (int i = 0; i < identifiers.size(); i++) {
-			AIdentifierExpression id = (AIdentifierExpression) identifiers
-					.get(i);
+		final ArrayList<String> list = new ArrayList<>();
+		final Hashtable<String, AIdentifierExpression> identifierTable = new Hashtable<>();
+		for (PExpression identifier : identifiers) {
+			AIdentifierExpression id = (AIdentifierExpression) identifier;
 			String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 			list.add(name);
 			identifierTable.put(name, id);
 		}
 
-		Hashtable<String, PExpression> values = new Hashtable<String, PExpression>();
-		ArrayList<AEqualPredicate> equalList = new ArrayList<AEqualPredicate>();
+		Hashtable<String, PExpression> values = new Hashtable<>();
+		ArrayList<AEqualPredicate> equalList = new ArrayList<>();
 		analysePredicate(node.getPredicates(), list, values, equalList);
 
 		ArrayList<ADomainExpression> parentDomainExprsList = collectParentDomainExpression(node
@@ -73,7 +72,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 		// If these conditions are not fulfilled, the AST transformation will
 		// not be applied.
 		// However, other optimization techniques may be applicable.
-		if ((values.size() > 0 || parentDomainExprsList.size() > 0)
+		if ((!values.isEmpty() || !parentDomainExprsList.isEmpty())
 				&& values.size() < list.size()
 				&& list.size() - values.size() <= 2) {
 
@@ -84,10 +83,10 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			int exprCount = list.size() - max;
 
 			// {ids. ids2 \in {ids3 \in S: P } | exprs}
-			ArrayList<PExpression> ids = new ArrayList<PExpression>();
-			ArrayList<PExpression> ids2 = new ArrayList<PExpression>();
-			ArrayList<PExpression> ids3 = new ArrayList<PExpression>();
-			ArrayList<PExpression> exprs = new ArrayList<PExpression>();
+			ArrayList<PExpression> ids = new ArrayList<>();
+			ArrayList<PExpression> ids2 = new ArrayList<>();
+			ArrayList<PExpression> ids3 = new ArrayList<>();
+			ArrayList<PExpression> exprs = new ArrayList<>();
 			for (int i = 0; i < list.size(); i++) {
 				String name = list.get(i);
 
@@ -96,7 +95,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 					if (values.containsKey(name)) {
 						exprs.add(values.get(name));
 					} else {
-						PExpression clone = (PExpression) identifierTable.get(
+						PExpression clone = identifierTable.get(
 								name).clone();
 						exprs.add(clone);
 					}
@@ -104,13 +103,13 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 				// remaining quantified variables
 				if (!values.containsKey(name)) {
-					PExpression clone = (PExpression) identifierTable.get(name)
+					PExpression clone = identifierTable.get(name)
 							.clone();
 					ids.add(clone);
-					PExpression clone2 = (PExpression) identifierTable
+					PExpression clone2 = identifierTable
 							.get(name).clone();
 					ids2.add(clone2);
-					PExpression clone3 = (PExpression) identifierTable
+					PExpression clone3 = identifierTable
 							.get(name).clone();
 					ids3.add(clone3);
 				}
@@ -135,7 +134,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 			eventBcomprehension.setPredicates(member);
 			setSourcePosition(node, eventBcomprehension);
-			if (parentDomainExprsList.size() > 0) {
+			if (!parentDomainExprsList.isEmpty()) {
 				ADomainExpression aDomainExpression = parentDomainExprsList
 						.get(max - 1);
 				aDomainExpression.replaceBy(eventBcomprehension);
@@ -166,7 +165,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			domExprList.add(0, (ADomainExpression) node);
 			return domExprList;
 		} else {
-			return new ArrayList<ADomainExpression>();
+			return new ArrayList<>();
 		}
 
 	}
@@ -190,7 +189,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getLeft();
 				String name = Utils.getTIdentifierListAsString(id.getIdentifier());
-				Set<String> names = new HashSet<String>(values.keySet());
+				Set<String> names = new HashSet<>(values.keySet());
 				names.add(name);
 				if (list.contains(name)
 						&& !DependenciesDetector.expressionContainsIdentifier(
@@ -203,7 +202,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 				AIdentifierExpression id = (AIdentifierExpression) equal
 						.getRight();
 				String name = Utils.getTIdentifierListAsString(id.getIdentifier());
-				Set<String> names = new HashSet<String>(values.keySet());
+				Set<String> names = new HashSet<>(values.keySet());
 				names.add(name);
 				if (list.contains(name)
 						&& !DependenciesDetector.expressionContainsIdentifier(
@@ -243,7 +242,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 
 	}
 
-	class NodesRemover extends DepthFirstAdapter {
+	static class NodesRemover extends DepthFirstAdapter {
 		final ArrayList<AEqualPredicate> removeList;
 		final Hashtable<String, PExpression> values;
 
@@ -292,7 +291,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			// todo the name is not a unique of the node
 			PExpression value = values.get(name);
 			if (value != null) {
-				node.replaceBy((PExpression) value.clone());
+				node.replaceBy(value.clone());
 			}
 
 		}

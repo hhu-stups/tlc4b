@@ -15,8 +15,8 @@ public abstract class AbstractParseMachineTest {
 		private static final String[] MACHINE_SUFFIX = { ".mch" };
 
 		public boolean accept(final File dir, final String name) {
-			for (int i = 0; i < MACHINE_SUFFIX.length; i++) {
-				if (name.endsWith(MACHINE_SUFFIX[i])) {
+			for (String machineSuffix : MACHINE_SUFFIX) {
+				if (name.endsWith(machineSuffix)) {
 					return true;
 				}
 			}
@@ -38,7 +38,7 @@ public abstract class AbstractParseMachineTest {
 		File root = new File(path);
 		File[] list = root.listFiles();
 		
-		ArrayList<File> files = new ArrayList<File>();
+		ArrayList<File> files = new ArrayList<>();
 		if (list == null)
 			return files;
 
@@ -70,9 +70,9 @@ public abstract class AbstractParseMachineTest {
 	}
 
 	protected static Configuration getConfiguration2(ArrayList<String> list, ArrayList<String> ignoreList) {
-		final ArrayList<File> allMachines = new ArrayList<File>();
+		final ArrayList<File> allMachines = new ArrayList<>();
 
-		final ArrayList<TLCResult> expectedValues = new ArrayList<TLCResult>();
+		final ArrayList<TLCResult> expectedValues = new ArrayList<>();
 		for (String path : list) {
 			File[] machines = getMachinesRecursively(path, ignoreList);
 			allMachines.addAll(Arrays.asList(machines));
@@ -101,9 +101,9 @@ public abstract class AbstractParseMachineTest {
 	}
 
 	protected static Configuration getConfiguration(ArrayList<TestPair> list) {
-		final ArrayList<File> allMachines = new ArrayList<File>();
+		final ArrayList<File> allMachines = new ArrayList<>();
 
-		final ArrayList<TLCResult> expectedValues = new ArrayList<TLCResult>();
+		final ArrayList<TLCResult> expectedValues = new ArrayList<>();
 		for (TestPair testPair : list) {
 			File[] machines = getMachines(testPair.getPath());
 			allMachines.addAll(Arrays.asList(machines));

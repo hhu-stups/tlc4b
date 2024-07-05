@@ -19,7 +19,7 @@ public class TLCOutputInfo {
 	Hashtable<String, BType> typesTable;
 	Set<String> constants;
 	boolean constantSetup = false;
-	private boolean hasInit = false;
+	private final boolean hasInit;
 
 	public boolean hasInitialisation() {
 		return hasInit;
@@ -42,22 +42,22 @@ public class TLCOutputInfo {
 	}
 
 	public boolean hasConstants() {
-		return constants.size() > 0 || constantSetup;
+		return !constants.isEmpty() || constantSetup;
 	}
 
 	public TLCOutputInfo(MachineContext machineContext, Renamer renamer,
 			Typechecker typechecker, TLAModule tlaModule, ConfigFile configFile) {
 
-		this.namesMapping = new Hashtable<String, String>();
-		this.typesTable = new Hashtable<String, BType>();
+		this.namesMapping = new Hashtable<>();
+		this.typesTable = new Hashtable<>();
 		this.constants = machineContext.getConstants().keySet();
-		this.hasInit = tlaModule.getInitPredicates().size() > 0;
+		this.hasInit = !tlaModule.getInitPredicates().isEmpty();
 
 		if (machineContext.hasConstants()) {
 			this.constantSetup = true;
 		}
 
-		LinkedHashMap<String, Node> identifiers = new LinkedHashMap<String, Node>();
+		LinkedHashMap<String, Node> identifiers = new LinkedHashMap<>();
 		identifiers.putAll(machineContext.getConstants());
 		identifiers.putAll(machineContext.getVariables());
 		identifiers.putAll(machineContext.getEnumValues());
