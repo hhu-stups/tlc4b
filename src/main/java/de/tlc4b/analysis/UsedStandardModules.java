@@ -1,11 +1,9 @@
 package de.tlc4b.analysis;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Collections;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAddExpression;
@@ -106,11 +104,11 @@ import de.tlc4b.tla.TLAModule;
 
 public class UsedStandardModules extends DepthFirstAdapter {
 
-	public static enum STANDARD_MODULES {
+	public enum STANDARD_MODULES {
 		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations, ExternalFunctions, Foo
 	}
 
-	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<UsedStandardModules.STANDARD_MODULES>();
+	private final static ArrayList<STANDARD_MODULES> modules = new ArrayList<>();
 	static {
 		modules.add(STANDARD_MODULES.Naturals);
 		modules.add(STANDARD_MODULES.Integers);
@@ -131,7 +129,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public UsedStandardModules(Start start, Typechecker typechecker,
 			TypeRestrictor typeRestrictor, TLAModule tlaModule) {
-		this.extendedStandardModules = new HashSet<STANDARD_MODULES>();
+		this.extendedStandardModules = new HashSet<>();
 		this.typechecker = typechecker;
 
 		if (TLC4BGlobals.useSymmetry()) {
@@ -152,24 +150,21 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public ArrayList<STANDARD_MODULES> getExtendedModules() {
-		ArrayList<STANDARD_MODULES> list = new ArrayList<STANDARD_MODULES>(
-				extendedStandardModules);
+		ArrayList<STANDARD_MODULES> list = new ArrayList<>(extendedStandardModules);
 		if (list.contains(STANDARD_MODULES.Integers)) {
 			list.remove(STANDARD_MODULES.Naturals);
 		}
-		Collections.sort(list, new Comparator<STANDARD_MODULES>() {
-			public int compare(STANDARD_MODULES s1, STANDARD_MODULES s2) {
-				Integer i1 = Integer.valueOf(modules.indexOf(s1));
-				Integer i2 = Integer.valueOf(modules.indexOf(s2));
-				return i1.compareTo(i2);
-			}
+		list.sort((s1, s2) -> {
+			Integer i1 = modules.indexOf(s1);
+			Integer i2 = modules.indexOf(s2);
+			return i1.compareTo(i2);
 		});
 		return list;
 	}
 
 	public HashSet<STANDARD_MODULES> getStandardModulesToBeCreated() {
 		// dependencies of standard modules
-		HashSet<STANDARD_MODULES> res = new HashSet<STANDARD_MODULES>();
+		HashSet<STANDARD_MODULES> res = new HashSet<>();
 		for (STANDARD_MODULES module : extendedStandardModules) {
 			switch (module) {
 			case ExternalFunctions:
@@ -208,13 +203,12 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void inAExpressionDefinitionDefinition(
-			AExpressionDefinitionDefinition node) {
+	public void inAExpressionDefinitionDefinition(AExpressionDefinitionDefinition node) {
 		if (TLC4BGlobals.isForceTLCToEvalConstants()) {
 			extendedStandardModules.add(STANDARD_MODULES.TLC);
 		}
 		String name = node.getName().getText().trim();
-		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
+		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {
 			extendedStandardModules.add(STANDARD_MODULES.ExternalFunctions);
 		}
 	}
@@ -222,7 +216,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	@Override
 	public void inADefinitionPredicate(ADefinitionPredicate node) {
 		String name = node.getDefLiteral().getText().trim();
-		if (StandardMadules.isKeywordInModuleExternalFunctions(name)) {
+		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {
 			extendedStandardModules.add(STANDARD_MODULES.ExternalFunctions);
 		}
 	}
@@ -531,8 +525,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getLhsExpression());
+		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
 		for (PExpression e : copy) {
 			if (e instanceof AFunctionExpression) {
 				BType type = typechecker.getType(((AFunctionExpression) e)

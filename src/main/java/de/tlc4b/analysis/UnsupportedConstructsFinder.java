@@ -8,18 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.ACaseSubstitution;
-import de.be4.classicalb.core.parser.node.AExtendsMachineClause;
-import de.be4.classicalb.core.parser.node.AImplementationMachineParseUnit;
-import de.be4.classicalb.core.parser.node.AImportsMachineClause;
-import de.be4.classicalb.core.parser.node.AIncludesMachineClause;
-import de.be4.classicalb.core.parser.node.APromotesMachineClause;
-import de.be4.classicalb.core.parser.node.ARefinesModelClause;
-import de.be4.classicalb.core.parser.node.ASequenceSubstitution;
-import de.be4.classicalb.core.parser.node.AVarSubstitution;
-import de.be4.classicalb.core.parser.node.AWhileSubstitution;
-import de.be4.classicalb.core.parser.node.Node;
-import de.be4.classicalb.core.parser.node.Start;
+import de.be4.classicalb.core.parser.node.*;
 import de.tlc4b.exceptions.NotSupportedException;
 
 public class UnsupportedConstructsFinder extends DepthFirstAdapter {
@@ -36,6 +25,7 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		add(AWhileSubstitution.class);
 		add(AVarSubstitution.class);
 		add(ACaseSubstitution.class);
+		add(AOperationCallSubstitution.class);
 
 		add(AImplementationMachineParseUnit.class);
 	}
@@ -52,14 +42,13 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		start.apply(this);
 	}
 
-	private static final List<String> SUM_TYPE = new LinkedList<String>(
-			Arrays.asList("model_clause", "machine_clause", "substitution", "machine_parse_unit"));
+	private static final List<String> SUM_TYPE = new LinkedList<>(
+		Arrays.asList("model_clause", "machine_clause", "substitution", "machine_parse_unit"));
 
 	private String formatCamel(final String input) {
 		StringWriter out = new StringWriter();
 		char[] chars = input.toCharArray();
-		for (int i = 0; i < chars.length; i++) {
-			char current = chars[i];
+		for (char current : chars) {
 			if (Character.isUpperCase(current)) {
 				out.append('_');
 				out.append(Character.toLowerCase(current));

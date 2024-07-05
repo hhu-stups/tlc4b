@@ -34,7 +34,7 @@ public class TLCResults implements ToolGlobals {
 	private Date startTime;
 	private Date endTime;
 	private LinkedHashMap<String, Long> operationsCount;
-	private ArrayList<String> violatedAssertions = new ArrayList<String>();
+	private final ArrayList<String> violatedAssertions = new ArrayList<>();
 
 	private int lengthOfTrace;
 	private String traceString;
@@ -42,10 +42,10 @@ public class TLCResults implements ToolGlobals {
 	private int numberOfDistinctStates;
 	private int numberOfTransitions;
 
-	private TLCOutputInfo tlcOutputInfo;
+	private final TLCOutputInfo tlcOutputInfo;
 
-	public static enum TLCResult {
-		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError, InitialStateError;
+	public enum TLCResult {
+		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError, InitialStateError
 	}
 
 	public boolean hasTrace() {
@@ -105,13 +105,13 @@ public class TLCResults implements ToolGlobals {
 		}
 
 		if (TLC4BGlobals.isPrintCoverage()
-				&& OutputCollector.getLineCountTable().size() != 0) {
+				&& !OutputCollector.getLineCountTable().isEmpty()) {
 			evalCoverage();
 		}
 	}
 
 	private void evalCoverage() {
-		Hashtable<Integer, Long> lineCount = new Hashtable<Integer, Long>();
+		Hashtable<Integer, Long> lineCount = new Hashtable<>();
 		Set<Entry<Location, Long>> entrySet = OutputCollector
 				.getLineCountTable().entrySet();
 		for (Entry<Location, Long> entry : entrySet) {
@@ -125,7 +125,7 @@ public class TLCResults implements ToolGlobals {
 		}
 		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector
 				.getModuleNode());
-		operationsCount = new LinkedHashMap<String, Long>();
+		operationsCount = new LinkedHashMap<>();
 		for (OpDefNode opDefNode : defs) {
 			String operationName = opDefNode.getName().toString();
 			Long count = lineCount.get(opDefNode.getLocation().endLine());
@@ -139,7 +139,7 @@ public class TLCResults implements ToolGlobals {
 	private ArrayList<OpDefNode> getActionsFromGeneratedModule(
 			ModuleNode moduleNode) {
 		// list of actions in the module
-		ArrayList<OpDefNode> actions = new ArrayList<OpDefNode>();
+		ArrayList<OpDefNode> actions = new ArrayList<>();
 
 		// get all definitions from the module
 		OpDefNode[] opDefs = moduleNode.getOpDefs();
@@ -175,11 +175,10 @@ public class TLCResults implements ToolGlobals {
 		if (opcode == OPCODE_be) { // BoundedExists
 			return findAction(op1.getArgs()[0]);
 		} else if (opNode instanceof OpDefNode) {
-			OpDefNode def = (OpDefNode) opNode;
-			return def;
+			return (OpDefNode) opNode;
 		} else {
 			throw new NotSupportedException(
-					"Can not find action in next state relation. Unkown node: "
+					"Can not find action in next state relation. Unknown node: "
 							+ opNode.getClass());
 
 		}
@@ -293,7 +292,7 @@ public class TLCResults implements ToolGlobals {
 			// get the violated assumption expr from the OutputCollector
 			ArrayList<ExprNode> violatedAssumptions = OutputCollector
 					.getViolatedAssumptions();
-			if (violatedAssumptions.size() > 0) {
+			if (!violatedAssumptions.isEmpty()) {
 				// try to find the assume node contain the expr in order to get
 				// the name of the assumption
 				for (ExprNode exprNode : violatedAssumptions) {
@@ -358,8 +357,7 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private TLCResult evaluatingParameter(String[] params) {
-		for (int i = 0; i < params.length; i++) {
-			String s = params[i];
+		for (String s : params) {
 			if (s == null) {
 				break;
 			} else if (s.contains("not enumerable")) {
@@ -375,15 +373,15 @@ public class TLCResults implements ToolGlobals {
 			} else if (s.contains("tlc2.module.TLC.Assert")) {
 				return WellDefinednessError;
 			} else if (s
-					.contains("CHOOSE x \\in S: P, but no element of S satisfied P")
-					&& s.contains("module FunctionsAsRelations")) {
+				.contains("CHOOSE x \\in S: P, but no element of S satisfied P")
+				&& s.contains("module FunctionsAsRelations")) {
 				return tlcResult = WellDefinednessError;
 			} else if (s.contains("The property of ASSERT_LTL")) {
 				return TemporalPropertyViolation;
 			}
 
 		}
-		// unkown error
+		// unknown error
 		return null;
 	}
 

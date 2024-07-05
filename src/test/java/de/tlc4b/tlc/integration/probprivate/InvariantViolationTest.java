@@ -36,7 +36,7 @@ public class InvariantViolationTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<TestPair>();
+		final ArrayList<TestPair> list = new ArrayList<>();
 		list.add(new TestPair(InvariantViolation,
 				"build/prob_examples/public_examples/TLC/InvariantViolation"));
 		return getConfiguration(list);

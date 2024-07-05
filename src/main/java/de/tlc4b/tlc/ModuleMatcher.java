@@ -16,7 +16,7 @@ public class ModuleMatcher {
 
 	public ModuleMatcher(String fileName, String path) {
 		this.fileName = fileName;
-		this.lineToNameMap = new HashMap<Integer, String>();
+		this.lineToNameMap = new HashMap<>();
 		ModuleNode moduleNode = parse(fileName, path);
 		evalActions(moduleNode);
 	}
@@ -26,15 +26,12 @@ public class ModuleMatcher {
 		if(line == -1){
 			return "Init";
 		}
-		String res = lineToNameMap.get(line);
-		return res;
+		return lineToNameMap.get(line);
 	}
 	
 	private void evalActions(ModuleNode moduleNode) {
 		OpDefNode[] opdefs = moduleNode.getOpDefs();
-		for (int i = 0; i < opdefs.length; i++) {
-			OpDefNode opdef = opdefs[i];
-			
+		for (OpDefNode opdef : opdefs) {
 			String module = opdef.getSource()
 					.getOriginallyDefinedInModuleNode().getName().toString();
 			if (module.equalsIgnoreCase(fileName)) {
@@ -84,7 +81,7 @@ public class ModuleMatcher {
 	public static String allMessagesToString(String[] allMessages) {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < allMessages.length - 1; i++) {
-			sb.append(allMessages[i] + "\n");
+			sb.append(allMessages[i]).append("\n");
 		}
 		return sb.toString();
 	}

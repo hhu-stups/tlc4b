@@ -42,25 +42,22 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getLhsExpression());
+		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
-			if (machineContext.getVariables().values().contains(ref)) {
+			if (machineContext.getVariables().containsValue(ref)) {
 				primedNodes.add(e);
 			}
-
 		}
 	}
 
 	@Override
-	public void caseABecomesElementOfSubstitution(
-			ABecomesElementOfSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+	public void caseABecomesElementOfSubstitution(ABecomesElementOfSubstitution node) {
+		List<PExpression> copy = new ArrayList<>(
+			node.getIdentifiers());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
-			if (machineContext.getVariables().values().contains(ref)) {
+			if (machineContext.getVariables().containsValue(ref)) {
 				primedNodes.add(e);
 			}
 		}
@@ -68,9 +65,8 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
-		nodesToPrime = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+		nodesToPrime = new HashSet<>();
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
 			nodesToPrime.add(ref);
@@ -92,14 +88,14 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseAPrimedIdentifierExpression(APrimedIdentifierExpression node) {
-		if(nodesToPrime != null){
+		if (nodesToPrime != null){
 			Node ref = machineContext.getReferences().get(node);
 			if (nodesToPrime.contains(ref)) {
 				return;
 			}
 		}
 		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
-		throw new ScopeException("Unkown identifier: '"+name+"$0'");
+		throw new ScopeException("Unknown identifier: '"+name+"$0'");
 	}
 
 	public boolean isPrimed(Node node) {

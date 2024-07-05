@@ -4,8 +4,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class MP {
-	private static PrintStream out = System.out;
-	private static PrintStream err = System.err;
+	private static final PrintStream out = System.out;
+	private static final PrintStream err = System.err;
 
 	private MP() {
 	}

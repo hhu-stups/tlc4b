@@ -1,7 +1,6 @@
 package de.tlc4b.exceptions;
 
-@SuppressWarnings("serial")
-public class NotSupportedException extends TLC4BException{
+public class NotSupportedException extends TLC4BException {
 
 	
 	public NotSupportedException(String e){

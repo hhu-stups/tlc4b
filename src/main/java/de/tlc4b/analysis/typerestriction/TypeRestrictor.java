@@ -82,11 +82,11 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		this.typechecker = typechecker;
 		this.constantsEvaluator = constantsEvaluator;
 
-		this.restrictedTypeNodeTable = new Hashtable<Node, Node>();
-		this.removedNodes = new HashSet<Node>();
+		this.restrictedTypeNodeTable = new Hashtable<>();
+		this.removedNodes = new HashSet<>();
 
-		this.restrictedNodeTable = new Hashtable<Node, ArrayList<Node>>();
-		this.subtractedNodeTable = new Hashtable<Node, ArrayList<Node>>();
+		this.restrictedNodeTable = new Hashtable<>();
+		this.subtractedNodeTable = new Hashtable<>();
 
 		this.identifierDependencies = new IdentifierDependencies(machineContext);
 
@@ -103,26 +103,24 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				Node bNode = visitor.getBAst(ltlNode);
 
 				if (ltlNode instanceof AExistsLtl) {
-					Node id = visitor.getLTLIdentifier(((AExistsLtl) ltlNode)
+					PExpression id = visitor.getLTLIdentifier(((AExistsLtl) ltlNode)
 							.getExistsIdentifier().getText());
-					HashSet<Node> list = new HashSet<Node>();
+					HashSet<Node> list = new HashSet<>();
 					list.add(id);
-					analysePredicate(bNode, list, new HashSet<Node>());
+					analysePredicate(bNode, list, new HashSet<>());
 
-					PExpression e = (PExpression) id;
-					HashSet<PExpression> set = new HashSet<PExpression>();
-					set.add(e);
+					HashSet<PExpression> set = new HashSet<>();
+					set.add(id);
 					createRestrictedTypeofLocalVariables(set, true);
 				} else if (ltlNode instanceof AForallLtl) {
-					Node id = visitor.getLTLIdentifier(((AForallLtl) ltlNode)
+					PExpression id = visitor.getLTLIdentifier(((AForallLtl) ltlNode)
 							.getForallIdentifier().getText());
-					HashSet<Node> list = new HashSet<Node>();
+					HashSet<Node> list = new HashSet<>();
 					list.add(id);
-					analysePredicate(bNode, list, new HashSet<Node>());
+					analysePredicate(bNode, list, new HashSet<>());
 
-					PExpression e = (PExpression) id;
-					HashSet<PExpression> set = new HashSet<PExpression>();
-					set.add(e);
+					HashSet<PExpression> set = new HashSet<>();
+					set.add(id);
 					createRestrictedTypeofLocalVariables(set, true);
 				}
 				bNode.apply(this);
@@ -139,7 +137,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		ArrayList<Node> list = restrictedNodeTable.get(identifier);
 
 		if (list == null) {
-			list = new ArrayList<Node>();
+			list = new ArrayList<>();
 			list.add(expression);
 			restrictedNodeTable.put(identifier, list);
 		} else {
@@ -149,10 +147,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 	}
 
-	private void putSubstractedType(Node identifier, Node expression) {
+	private void putSubtractedType(Node identifier, Node expression) {
 		ArrayList<Node> list = subtractedNodeTable.get(identifier);
 		if (list == null) {
-			list = new ArrayList<Node>();
+			list = new ArrayList<>();
 			list.add(expression);
 			subtractedNodeTable.put(identifier, list);
 		} else {
@@ -162,36 +160,30 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	@Override
 	public void inAConstraintsMachineClause(AConstraintsMachineClause node) {
-		HashSet<Node> list = new HashSet<Node>();
-		// list.addAll(machineContext.getSetParamter().values());
-		list.addAll(machineContext.getScalarParameter().values());
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		HashSet<PExpression> set = new HashSet<PExpression>();
+		// list.addAll(machineContext.getSetParameter().values());
+		HashSet<Node> list = new HashSet<>(machineContext.getScalarParameter().values());
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
+		HashSet<PExpression> set = new HashSet<>();
 		for (Node param : list) {
 			set.add((PExpression) param);
 		}
-		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set),
-				false);
+		createRestrictedTypeofLocalVariables(new HashSet<>(set), false);
 	}
 
 	@Override
 	public void inAPropertiesMachineClause(APropertiesMachineClause node) {
-		HashSet<PExpression> set = new HashSet<PExpression>();
+		HashSet<PExpression> set = new HashSet<>();
 		for (Node con : machineContext.getConstants().values()) {
 			set.add((PExpression) con);
 			Node valueOfConstant = constantsEvaluator.getValueOfConstant(con);
-			if(valueOfConstant!= null){
+			if (valueOfConstant != null) {
 				removedNodes.add(valueOfConstant.parent());
 			}
-			
 		}
-		HashSet<Node> list = new HashSet<Node>();
-		list.addAll(machineContext.getConstants().values());
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		
+		HashSet<Node> list = new HashSet<>(machineContext.getConstants().values());
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
 
-		createRestrictedTypeofLocalVariables(new HashSet<PExpression>(set),
-				false);
+		createRestrictedTypeofLocalVariables(new HashSet<>(set), false);
 	}
 
 	public void analyseDisjunktionPredicate(PPredicate node, HashSet<Node> list) {
@@ -200,12 +192,11 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			analyseDisjunktionPredicate(dis.getLeft(), list);
 			analyseDisjunktionPredicate(dis.getRight(), list);
 		} else {
-			analysePredicate(node, list, new HashSet<Node>());
+			analysePredicate(node, list, new HashSet<>());
 		}
 	}
 
-	private void analysePredicate(Node n, HashSet<Node> list,
-			HashSet<Node> ignoreList) {
+	private void analysePredicate(Node n, HashSet<Node> list, HashSet<Node> ignoreList) {
 
 		if (removedNodes.contains(n))
 			return;
@@ -219,9 +210,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			if (list.contains(r_left)
 					&& isAConstantExpression(right, list, ignoreList)) {
 				right.apply(this);
-				ArrayList<PExpression> element = new ArrayList<PExpression>();
+				ArrayList<PExpression> element = new ArrayList<>();
 				element.add(right);
-				if (machineContext.getVariables().values().contains(r_left)) {
+				if (machineContext.getVariables().containsValue(r_left)) {
 					r_left = variablesHashTable.get(r_left);
 				}
 				putRestrictedType(r_left, new ASetExtensionExpression(element));
@@ -230,9 +221,9 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			if (list.contains(r_right)
 					&& isAConstantExpression(left, list, ignoreList)) {
 				left.apply(this);
-				ArrayList<PExpression> element = new ArrayList<PExpression>();
+				ArrayList<PExpression> element = new ArrayList<>();
 				element.add(left);
-				if (machineContext.getVariables().values().contains(r_right)) {
+				if (machineContext.getVariables().containsValue(r_right)) {
 					r_right = variablesHashTable.get(r_right);
 				}
 				putRestrictedType(r_right, new ASetExtensionExpression(element));
@@ -265,7 +256,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			PExpression right = ((AMemberPredicate) n).getRight();
 			if (list.contains(r_left)
 					&& isAConstantExpression(right, list, ignoreList)) {
-				if (machineContext.getVariables().values().contains(r_left)) {
+				if (machineContext.getVariables().containsValue(r_left)) {
 					r_left = variablesHashTable.get(r_left);
 				}
 				putRestrictedType(r_left, right);
@@ -280,10 +271,10 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			PExpression right = ((ANotMemberPredicate) n).getRight();
 			if (list.contains(r_left)
 					&& isAConstantExpression(right, list, ignoreList)) {
-				if (machineContext.getVariables().values().contains(r_left)) {
+				if (machineContext.getVariables().containsValue(r_left)) {
 					r_left = variablesHashTable.get(r_left);
 				}
-				putSubstractedType(r_left, right);
+				putSubtractedType(r_left, right);
 				removedNodes.add(n);
 			}
 			return;
@@ -297,7 +288,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 			if (list.contains(r_left)
 					&& isAConstantExpression(right, list, ignoreList)) {
 				right.apply(this);
-				if (machineContext.getVariables().values().contains(r_left)) {
+				if (machineContext.getVariables().containsValue(r_left)) {
 					r_left = variablesHashTable.get(r_left);
 				}
 				putRestrictedType(r_left, new APowSubsetExpression(right));
@@ -318,10 +309,8 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		}
 
 		if (n instanceof AExistsPredicate) {
-			HashSet<Node> set = new HashSet<Node>();
-			for (PExpression e : ((AExistsPredicate) n).getIdentifiers()) {
-				set.add(e);
-			}
+			HashSet<Node> set = new HashSet<>();
+			set.addAll(((AExistsPredicate) n).getIdentifiers());
 			set.addAll(ignoreList);
 			analysePredicate(((AExistsPredicate) n).getPredicate(), list, set);
 		}
@@ -333,145 +322,94 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		if (n instanceof APredicateParseUnit) {
 			analysePredicate(((APredicateParseUnit) n).getPredicate(), list,
 					ignoreList);
-			return;
 		}
 	}
 
 	public boolean isAConstantExpression(Node node, HashSet<Node> list,
 			HashSet<Node> ignoreList) {
-		HashSet<Node> newList = new HashSet<Node>();
+		HashSet<Node> newList = new HashSet<>();
 		newList.addAll(list);
 		newList.addAll(ignoreList);
-		if (identifierDependencies.containsIdentifier(node, newList)) {
-			return false;
-		}
-		return true;
+		return !identifierDependencies.containsIdentifier(node, newList);
 	}
 
 	@Override
 	public void inAForallPredicate(AForallPredicate node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		AImplicationPredicate implication = (AImplicationPredicate) node
-				.getImplication();
-		analysePredicate(implication.getLeft(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		AImplicationPredicate implication = (AImplicationPredicate) node.getImplication();
+		analysePredicate(implication.getLeft(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	@Override
 	public void inAExistsPredicate(AExistsPredicate node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicate(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	@Override
 	public void inAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	@Override
-	public void inAQuantifiedIntersectionExpression(
-			AQuantifiedIntersectionExpression node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+	public void inAQuantifiedIntersectionExpression(AQuantifiedIntersectionExpression node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	@Override
 	public void inAComprehensionSetExpression(AComprehensionSetExpression node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	@Override
 	public void inALambdaExpression(ALambdaExpression node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicate(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	public void inAGeneralSumExpression(AGeneralSumExpression node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	public void inAGeneralProductExpression(AGeneralProductExpression node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
-		analysePredicate(node.getPredicates(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>(copy);
+		analysePredicate(node.getPredicates(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
-	private Hashtable<Node, HashSet<PExpression>> expectedIdentifieListTable = new Hashtable<Node, HashSet<PExpression>>();
+	private final Hashtable<Node, HashSet<PExpression>> expectedIdentifieListTable = new Hashtable<>();
 
 	@Override
-	public void caseAInitialisationMachineClause(
-			AInitialisationMachineClause node) {
-		expectedIdentifieListTable.put(node.getSubstitutions(),
-				new HashSet<PExpression>());
+	public void caseAInitialisationMachineClause(AInitialisationMachineClause node) {
+		expectedIdentifieListTable.put(node.getSubstitutions(), new HashSet<>());
 		node.getSubstitutions().apply(this);
 	}
 
 	@Override
 	public void caseAOperation(AOperation node) {
-		HashSet<PExpression> list = new HashSet<PExpression>();
+		HashSet<PExpression> list = new HashSet<>();
 		{
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getParameters());
-			for (PExpression e : copy) {
-				list.add(e);
-			}
+			List<PExpression> copy = new ArrayList<>(node.getParameters());
+			list.addAll(copy);
 		}
 		expectedIdentifieListTable.put(node.getOperationBody(), list);
 		if (node.getOperationBody() != null) {
@@ -482,74 +420,63 @@ public class TypeRestrictor extends DepthFirstAdapter {
 
 	@Override
 	public void inAPreconditionSubstitution(APreconditionSubstitution node) {
-		HashSet<Node> set = new HashSet<Node>(getExpectedIdentifier(node));
-		analysePredicate(node.getPredicate(), set, new HashSet<Node>());
+		HashSet<Node> set = new HashSet<>(getExpectedIdentifier(node));
+		analysePredicate(node.getPredicate(), set, new HashSet<>());
 	}
 
 	private HashSet<PExpression> getExpectedIdentifier(Node node) {
 		HashSet<PExpression> list = expectedIdentifieListTable.get(node);
 		if (list == null)
-			list = new HashSet<PExpression>();
+			list = new HashSet<>();
 		return list;
 	}
 
 	@Override
 	public void inASelectSubstitution(ASelectSubstitution node) {
-		HashSet<Node> list = new HashSet<Node>(getExpectedIdentifier(node));
-		analysePredicate(node.getCondition(), list, new HashSet<Node>());
+		HashSet<Node> list = new HashSet<>(getExpectedIdentifier(node));
+		analysePredicate(node.getCondition(), list, new HashSet<>());
 	}
 
 	@Override
 	public void inAAnySubstitution(AAnySubstitution node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
+		HashSet<Node> list = new HashSet<>();
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		list.addAll(copy);
 		list.addAll(getExpectedIdentifier(node));
-		analysePredicate(node.getWhere(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		analysePredicate(node.getWhere(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	@Override
 	public void inALetSubstitution(ALetSubstitution node) {
-		HashSet<Node> list = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			list.add(e);
-		}
+		HashSet<Node> list = new HashSet<>();
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		list.addAll(copy);
 		list.addAll(getExpectedIdentifier(node));
-		analysePredicate(node.getPredicate(), list, new HashSet<Node>());
-		createRestrictedTypeofLocalVariables(
-				new HashSet<PExpression>(node.getIdentifiers()), false);
+		analysePredicate(node.getPredicate(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 
 	private Hashtable<Node, Node> variablesHashTable;
 
 	public void inABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
 		if (!(node.getPredicate() instanceof AExistsPredicate)) {
-			variablesHashTable = new Hashtable<Node, Node>();
+			variablesHashTable = new Hashtable<>();
 
-			HashSet<Node> list = new HashSet<Node>();
-			List<PExpression> copy = new ArrayList<PExpression>(
-					node.getIdentifiers());
+			HashSet<Node> list = new HashSet<>();
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			for (PExpression e : copy) {
 				Node ref = machineContext.getReferenceNode(e);
 
 				list.add(ref);
 				variablesHashTable.put(ref, e);
 			}
-			analysePredicate(node.getPredicate(), list, new HashSet<Node>());
-			createRestrictedTypeofLocalVariables(
-					new HashSet<PExpression>(copy), false);
+			analysePredicate(node.getPredicate(), list, new HashSet<>());
+			createRestrictedTypeofLocalVariables(new HashSet<>(copy), false);
 		}
 	}
 
-	private void createRestrictedTypeofLocalVariables(Set<PExpression> copy,
-			boolean constant) {
+	private void createRestrictedTypeofLocalVariables(Set<PExpression> copy, boolean constant) {
 		// TODO if constant is true, only constant expressions should be used to
 		// restrict the type.
 		// This is required by the TLC model checker when checking an LTL
@@ -560,20 +487,18 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				continue;
 			}
 
-			PExpression tree = null;
+			PExpression tree;
 			ArrayList<Node> restrictedList = restrictedNodeTable.get(e);
 			if (restrictedList == null) {
 				BType conType = typechecker.getType(e);
 				if (conType == null) {
-					conType = typechecker.getType(machineContext
-							.getReferenceNode(e));
+					conType = typechecker.getType(machineContext.getReferenceNode(e));
 				}
 				if (conType.containsInfiniteType()
 						&& !(e.parent() instanceof ALambdaExpression)
 						&& !(e.parent() instanceof AComprehensionSetExpression)) {
 					AIdentifierExpression id = (AIdentifierExpression) e;
-					String localVariableName = Utils.getTIdentifierListAsString(id
-							.getIdentifier());
+					String localVariableName = Utils.getTIdentifierListAsString(id.getIdentifier());
 					throw new NotSupportedException(
 							"Unable to restrict the type '"
 									+ conType
@@ -592,12 +517,11 @@ public class TypeRestrictor extends DepthFirstAdapter {
 				}
 
 			}
-			ArrayList<Node> substractedList = subtractedNodeTable.get(e);
-			if (substractedList != null) {
-				for (int i = 0; i < substractedList.size(); i++) {
-					PExpression n = (PExpression) substractedList.get(i);
+			ArrayList<Node> subtractedList = subtractedNodeTable.get(e);
+			if (subtractedList != null) {
+				for (Node node : subtractedList) {
+					PExpression n = (PExpression) node;
 					tree = new ASetSubtractionExpression(tree, n);
-
 				}
 			}
 			this.restrictedTypeNodeTable.put(e, tree);
@@ -607,8 +531,7 @@ public class TypeRestrictor extends DepthFirstAdapter {
 	@Override
 	public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
 		if (TLC4BGlobals.isAssertion()) {
-			List<PPredicate> copy = new ArrayList<PPredicate>(
-					node.getPredicates());
+			List<PPredicate> copy = new ArrayList<>(node.getPredicates());
 			for (PPredicate e : copy) {
 				e.apply(this);
 			}

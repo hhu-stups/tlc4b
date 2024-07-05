@@ -35,7 +35,7 @@ public class Renamer extends DepthFirstAdapter {
 	private final MachineContext machineContext;
 	private final Hashtable<Node, String> namesTable;
 	private final HashSet<String> globalNames;
-	private final static Set<String> KEYWORDS = new HashSet<String>();
+	private final static Set<String> KEYWORDS = new HashSet<>();
 	static {
 		KEYWORDS.add("ASSUME");
 		KEYWORDS.add("ASSUMPTION");
@@ -77,28 +77,27 @@ public class Renamer extends DepthFirstAdapter {
 		KEYWORDS.add("Int");
 		KEYWORDS.add("Seq");
 	}
-	private final static Set<String> RelationsKeywords = new HashSet<String>();
+
+	private final static Set<String> RelationsKeywords = new HashSet<>();
 	static {
 		RelationsKeywords.add("domain");
 		RelationsKeywords.add("range");
 		RelationsKeywords.add("id");
 		RelationsKeywords.add("set_of_relations");
 		RelationsKeywords.add("domain_restriction");
-		RelationsKeywords.add("domain_substraction");
+		RelationsKeywords.add("domain_subtraction");
 		RelationsKeywords.add("rel_inverse");
 		RelationsKeywords.add("relational_image");
 		RelationsKeywords.add("relational_overriding");
 		RelationsKeywords.add("direct");
 		RelationsKeywords.add("Seq");
-
 	}
 
 	public Renamer(MachineContext machineContext) {
 		this.machineContext = machineContext;
-		this.namesTable = new Hashtable<Node, String>();
-		this.globalNames = new HashSet<String>();
+		this.namesTable = new Hashtable<>();
+		this.globalNames = new HashSet<>();
 		start();
-
 	}
 
 	public void start() {
@@ -115,9 +114,7 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private void evalEnumValues() {
-
-		for (Entry<String, Node> entry : machineContext.getEnumValues()
-				.entrySet()) {
+		for (Entry<String, Node> entry : machineContext.getEnumValues().entrySet()) {
 			String name = entry.getKey();
 			Node node = entry.getValue();
 
@@ -141,14 +138,12 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private void evalDefinitions() {
-		ADefinitionsMachineClause node = machineContext
-				.getDefinitionMachineClause();
+		ADefinitionsMachineClause node = machineContext.getDefinitionMachineClause();
 		if (null == node) {
 			return;
 		}
 
-		List<PDefinition> copy = new ArrayList<PDefinition>(
-				node.getDefinitions());
+		List<PDefinition> copy = new ArrayList<>(node.getDefinitions());
 		for (PDefinition e : copy) {
 			String name = null;
 			if (e instanceof AExpressionDefinitionDefinition) {
@@ -190,7 +185,7 @@ public class Renamer extends DepthFirstAdapter {
 		return res;
 	}
 
-	private ArrayList<HashSet<String>> localContexts = new ArrayList<HashSet<String>>();
+	private final ArrayList<HashSet<String>> localContexts = new ArrayList<>();
 
 	private boolean exist(String name) {
 		if (KEYWORDS.contains(name))
@@ -199,15 +194,15 @@ public class Renamer extends DepthFirstAdapter {
 			return true;
 		// TODO check only if the standard module is extended
 
-		if (StandardMadules.isKeywordInModuleFunctions(name))
+		if (StandardModules.isKeywordInModuleFunctions(name))
 			return true;
-		if (StandardMadules.isKeywordInModuleSequences(name))
+		if (StandardModules.isKeywordInModuleSequences(name))
 			return true;
-		if (StandardMadules.isKeywordInModuleSequencesExtended(name))
+		if (StandardModules.isKeywordInModuleSequencesExtended(name))
 			return true;
 
-		for (int i = 0; i < localContexts.size(); i++) {
-			if (localContexts.get(i).contains(name))
+		for (HashSet<String> localContext : localContexts) {
+			if (localContext.contains(name))
 				return true;
 		}
 
@@ -229,20 +224,17 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void inAExpressionDefinitionDefinition(
-			AExpressionDefinitionDefinition node) {
+	public void inAExpressionDefinitionDefinition(AExpressionDefinitionDefinition node) {
 		evalDefinition(node.getParameters());
 	}
 
 	@Override
-	public void inAPredicateDefinitionDefinition(
-			APredicateDefinitionDefinition node) {
+	public void inAPredicateDefinitionDefinition(APredicateDefinitionDefinition node) {
 		evalDefinition(node.getParameters());
 	}
 
 	@Override
-	public void inASubstitutionDefinitionDefinition(
-			ASubstitutionDefinitionDefinition node) {
+	public void inASubstitutionDefinitionDefinition(ASubstitutionDefinitionDefinition node) {
 		evalDefinition(node.getParameters());
 	}
 
@@ -280,8 +272,7 @@ public class Renamer extends DepthFirstAdapter {
 	@Override
 	public void caseAQuantifiedUnionExpression(AQuantifiedUnionExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			e.apply(this);
 		}
@@ -291,8 +282,7 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAQuantifiedIntersectionExpression(
-			AQuantifiedIntersectionExpression node) {
+	public void caseAQuantifiedIntersectionExpression(AQuantifiedIntersectionExpression node) {
 		evalBoundedVariables(node, node.getIdentifiers());
 		node.getPredicates().apply(this);
 		node.getExpression().apply(this);
@@ -317,7 +307,7 @@ public class Renamer extends DepthFirstAdapter {
 
 	@Override
 	public void caseAOperation(AOperation node) {
-		List<PExpression> list = new ArrayList<PExpression>();
+		List<PExpression> list = new ArrayList<>();
 		list.addAll(node.getParameters());
 		list.addAll(node.getReturnValues());
 		evalBoundedVariables(node, list);
@@ -326,7 +316,7 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private void evalBoundedVariables(Node node, List<PExpression> params) {
-		HashSet<String> context = new HashSet<String>();
+		HashSet<String> context = new HashSet<>();
 		for (PExpression e : params) {
 			String newName = renameIdentifier(e);
 			context.add(newName);
@@ -336,12 +326,10 @@ public class Renamer extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAnySubstitution(AAnySubstitution node) {
-		List<PExpression> list = new ArrayList<PExpression>();
-		list.addAll(node.getIdentifiers());
+		List<PExpression> list = new ArrayList<>(node.getIdentifiers());
 		evalBoundedVariables(node, list);
 
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			e.apply(this);
 		}
@@ -352,12 +340,10 @@ public class Renamer extends DepthFirstAdapter {
 
 	@Override
 	public void caseALetSubstitution(ALetSubstitution node) {
-		List<PExpression> list = new ArrayList<PExpression>();
-		list.addAll(node.getIdentifiers());
+		List<PExpression> list = new ArrayList<>(node.getIdentifiers());
 		evalBoundedVariables(node, list);
 
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			e.apply(this);
 		}
@@ -368,11 +354,9 @@ public class Renamer extends DepthFirstAdapter {
 
 	@Override
 	public void caseAVarSubstitution(AVarSubstitution node) {
-		List<PExpression> list = new ArrayList<PExpression>();
-		list.addAll(node.getIdentifiers());
+		List<PExpression> list = new ArrayList<>(node.getIdentifiers());
 		evalBoundedVariables(node, list);
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			e.apply(this);
 		}

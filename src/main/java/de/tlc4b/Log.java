@@ -10,8 +10,8 @@ import de.tlc4b.util.StopWatch.Watches;
 
 public class Log {
 
-	private ArrayList<String> fieldNames = new ArrayList<>();
-	private ArrayList<String> fieldValues = new ArrayList<>();
+	private final ArrayList<String> fieldNames = new ArrayList<>();
+	private final ArrayList<String> fieldValues = new ArrayList<>();
 
 	public Log(TLC4B tlc4b, TLCResults tlcResults) {
 

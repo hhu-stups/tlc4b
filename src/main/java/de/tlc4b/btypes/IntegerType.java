@@ -7,7 +7,7 @@ import de.tlc4b.exceptions.UnificationException;
 
 public class IntegerType implements BType {
 
-	private static IntegerType instance = new IntegerType();
+	private static final IntegerType instance = new IntegerType();
 
 	public static IntegerType getInstance() {
 		return instance;
@@ -47,10 +47,8 @@ public class IntegerType implements BType {
 	public boolean compare(BType other) {
 		if (other instanceof UntypedType || other instanceof IntegerType)
 			return true;
-		if (other instanceof IntegerOrSetType
-				|| other instanceof IntegerOrSetOfPairType)
-			return true;
-		return false;
+		return other instanceof IntegerOrSetType
+			|| other instanceof IntegerOrSetOfPairType;
 	}
 
 	public boolean containsInfiniteType() {

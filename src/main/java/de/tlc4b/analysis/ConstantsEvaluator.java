@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -31,14 +30,14 @@ import de.be4.classicalb.core.parser.node.PPredicate;
  * 
  */
 public class ConstantsEvaluator extends DepthFirstAdapter {
-	private LinkedHashMap<Node, HashSet<Node>> dependsOnIdentifierTable;
-	private MachineContext machineContext;
-	private ValuesOfIdentifierFinder valuesOfConstantsFinder;
-	private HashMap<Node, Integer> integerValueTable;
+	private final LinkedHashMap<Node, HashSet<Node>> dependsOnIdentifierTable;
+	private final MachineContext machineContext;
+	private final ValuesOfIdentifierFinder valuesOfConstantsFinder;
+	private final HashMap<Node, Integer> integerValueTable;
 	private final ArrayList<Node> propertiesList;
 	private final ArrayList<Node> invariantList;
 
-	private LinkedHashMap<Node, Node> valueOfIdentifier;
+	private final LinkedHashMap<Node, Node> valueOfIdentifier;
 
 	public Node getValueOfConstant(Node con) {
 		return valueOfIdentifier.get(con);
@@ -65,11 +64,11 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	}
 
 	public ConstantsEvaluator(MachineContext machineContext) {
-		this.dependsOnIdentifierTable = new LinkedHashMap<Node, HashSet<Node>>();
-		this.integerValueTable = new HashMap<Node, Integer>();
+		this.dependsOnIdentifierTable = new LinkedHashMap<>();
+		this.integerValueTable = new HashMap<>();
 		this.machineContext = machineContext;
-		this.propertiesList = new ArrayList<Node>();
-		this.invariantList = new ArrayList<Node>();
+		this.propertiesList = new ArrayList<>();
+		this.invariantList = new ArrayList<>();
 
 		ConstantsInTreeFinder constantInTreeFinder = new ConstantsInTreeFinder();
 
@@ -77,21 +76,19 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			machineContext.getConstantsSetup().apply(constantInTreeFinder);
 		}
 
-		APropertiesMachineClause properties = machineContext
-				.getPropertiesMachineClause();
+		APropertiesMachineClause properties = machineContext.getPropertiesMachineClause();
 		if (null != properties) {
 			properties.apply(constantInTreeFinder);
 		}
 
-		AConstraintsMachineClause constraints = machineContext
-				.getConstraintMachineClause();
+		AConstraintsMachineClause constraints = machineContext.getConstraintMachineClause();
 		if (null != constraints) {
 			constraints.apply(constantInTreeFinder);
 		}
 
 		this.valuesOfConstantsFinder = new ValuesOfIdentifierFinder();
 
-		this.valueOfIdentifier = new LinkedHashMap<Node, Node>();
+		this.valueOfIdentifier = new LinkedHashMap<>();
 
 		evalIdentifier(machineContext.getConstants().values());
 		evalIdentifier(machineContext.getScalarParameter().values());
@@ -101,18 +98,15 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		boolean newRun = true;
 		while (newRun) {
 			newRun = false;
-			Iterator<Node> itr = ids.iterator();
-			while (itr.hasNext()) {
-				Node id = itr.next();
+			for (Node id : ids) {
 				if (valueOfIdentifier.containsKey(id))
 					continue;
-				HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable
-						.get(id);
+				HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable.get(id);
 
 				for (Node val : idValues) {
 					HashSet<Node> idsInVal = dependsOnIdentifierTable.get(val);
 					idsInVal.remove(id);
-					if (idsInVal.size() == 0) {
+					if (idsInVal.isEmpty()) {
 						valueOfIdentifier.put(id, val);
 						removeIdentifier(ids, id);
 						newRun = true;
@@ -123,13 +117,9 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 		}
 	}
 
-	private void removeIdentifier(Collection<Node> collection,
-			Node identifierToRemove) {
-		Iterator<Node> itr = collection.iterator();
-		while (itr.hasNext()) {
-			Node id = itr.next();
-			HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable
-					.get(id);
+	private void removeIdentifier(Collection<Node> collection, Node identifierToRemove) {
+		for (Node id : collection) {
+			HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable.get(id);
 			for (Node val : idValues) {
 				HashSet<Node> idsInVal = dependsOnIdentifierTable.get(val);
 				idsInVal.remove(identifierToRemove);
@@ -140,7 +130,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	class ConstantsInTreeFinder extends DepthFirstAdapter {
 		@Override
 		public void defaultIn(Node node) {
-			dependsOnIdentifierTable.put(node, new HashSet<Node>());
+			dependsOnIdentifierTable.put(node, new HashSet<>());
 		}
 
 		@Override
@@ -151,7 +141,6 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			if (parentSet != null) {
 				parentSet.addAll(set);
 			}
-
 		}
 
 		@Override
@@ -186,41 +175,33 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 	}
 
 	class ValuesOfIdentifierFinder extends DepthFirstAdapter {
-		private Hashtable<Node, HashSet<Node>> valuesOfIdentifierTable;
-		private Hashtable<Node, ArrayList<PExpression>> rangeOfIdentifierTable;
-		private HashSet<Node> identifiers;
+		private final Hashtable<Node, HashSet<Node>> valuesOfIdentifierTable;
+		private final Hashtable<Node, ArrayList<PExpression>> rangeOfIdentifierTable;
+		private final HashSet<Node> identifiers;
 
 		public ValuesOfIdentifierFinder() {
-			this.valuesOfIdentifierTable = new Hashtable<Node, HashSet<Node>>();
-			this.rangeOfIdentifierTable = new Hashtable<Node, ArrayList<PExpression>>();
+			this.valuesOfIdentifierTable = new Hashtable<>();
+			this.rangeOfIdentifierTable = new Hashtable<>();
 
-			this.identifiers = new HashSet<Node>();
+			this.identifiers = new HashSet<>();
 			this.identifiers.addAll(machineContext.getConstants().values());
-			this.identifiers.addAll(machineContext.getScalarParameter()
-					.values());
+			this.identifiers.addAll(machineContext.getScalarParameter().values());
 
-			Iterator<Node> itr = identifiers.iterator();
-			while (itr.hasNext()) {
-				Node id = itr.next();
-				valuesOfIdentifierTable.put(id, new HashSet<Node>());
-				rangeOfIdentifierTable.put(id, new ArrayList<PExpression>());
+			for (Node id : identifiers) {
+				valuesOfIdentifierTable.put(id, new HashSet<>());
+				rangeOfIdentifierTable.put(id, new ArrayList<>());
 			}
 
-			Node constraints = machineContext.getConstraintMachineClause();
+			AConstraintsMachineClause constraints = machineContext.getConstraintMachineClause();
 			if (constraints != null) {
-				analysePredicate(
-						((AConstraintsMachineClause) constraints)
-								.getPredicates(),
-						false);
+				analysePredicate(constraints.getPredicates(), false);
 			}
 
 			if (machineContext.getConstantsSetup() != null) {
 				if (machineContext.getConstantsSetup() instanceof ADisjunctPredicate) {
-					analyseConstantSetupPredicate(machineContext
-							.getConstantsSetup());
+					analyseConstantSetupPredicate(machineContext.getConstantsSetup());
 					for (Node con : this.identifiers) {
-						ArrayList<PExpression> list = rangeOfIdentifierTable
-								.get(con);
+						ArrayList<PExpression> list = rangeOfIdentifierTable.get(con);
 						if (list.size() == 1) {
 							// there only one value for the constant con, hence
 							// con remains a constant
@@ -230,21 +211,17 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 				} else {
 					analysePredicate(machineContext.getConstantsSetup(), true);
 				}
-
 			}
 
-			Node properties = machineContext.getPropertiesMachineClause();
+			APropertiesMachineClause properties = machineContext.getPropertiesMachineClause();
 			if (properties != null) {
-				PPredicate predicate = (PPredicate) ((APropertiesMachineClause) properties)
-						.getPredicates();
+				PPredicate predicate = properties.getPredicates();
 				analysePredicate(predicate, true);
-
 			}
 
-			Node invariantClause = machineContext.getInvariantMachineClause();
+			AInvariantMachineClause invariantClause = machineContext.getInvariantMachineClause();
 			if (invariantClause != null) {
-				analyseInvariantPredicate(((AInvariantMachineClause) invariantClause)
-						.getPredicates());
+				analyseInvariantPredicate(invariantClause.getPredicates());
 			}
 		}
 
@@ -273,12 +250,10 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 						found = true;
 					}
 				}
-				if (found == false) {
-					currentRange.add((PExpression) equals.getRight());
+				if (!found) {
+					currentRange.add(equals.getRight());
 				}
-
 			}
-
 		}
 
 		private void analyseInvariantPredicate(Node node) {
@@ -303,7 +278,7 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			}
 
 			if (isProperties) {
-				propertiesList.add((PPredicate) node);
+				propertiesList.add(node);
 			}
 		}
 
@@ -314,13 +289,11 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			Node right_ref = machineContext.getReferences().get(right);
 
 			if (left instanceof ACardExpression) {
-				Node ref = machineContext.getReferences().get(
-						((ACardExpression) left).getExpression());
+				Node ref = machineContext.getReferences().get(((ACardExpression) left).getExpression());
 				if (!machineContext.getConstants().containsValue(ref)) {
 					try {
 						AIntegerExpression intExpr = (AIntegerExpression) right;
-						int size = Integer.parseInt(intExpr.getLiteral()
-								.getText());
+						int size = Integer.parseInt(intExpr.getLiteral().getText());
 						integerValueTable.put(ref, size);
 					} catch (ClassCastException e) {
 					}
@@ -328,15 +301,13 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			}
 
 			if (right instanceof ACardExpression) {
-				Node ref = machineContext.getReferences().get(
-						((ACardExpression) right).getExpression());
+				Node ref = machineContext.getReferences().get(((ACardExpression) right).getExpression());
 				if (!machineContext.getConstants().containsValue(ref)) {
 					try {
 						AIntegerExpression intExpr = (AIntegerExpression) left;
-						int size = Integer.parseInt(intExpr.getLiteral()
-								.getText());
+						int size = Integer.parseInt(intExpr.getLiteral().getText());
 						integerValueTable.put(ref, size);
-					} catch (ClassCastException e) {
+					} catch (ClassCastException ignored) {
 					}
 				}
 			}
@@ -348,8 +319,6 @@ public class ConstantsEvaluator extends DepthFirstAdapter {
 			if (identifiers.contains(right_ref)) {
 				valuesOfIdentifierTable.get(right_ref).add(left);
 			}
-			return;
-
 		}
 
 	}

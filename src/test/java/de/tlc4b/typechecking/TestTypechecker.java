@@ -17,14 +17,14 @@ public class TestTypechecker {
 	Hashtable<String, BType> variables;
 
 	public TestTypechecker(String machine) throws BException {
-		parameters = new Hashtable<String, BType>();
-		constants = new Hashtable<String, BType>();
-		variables = new Hashtable<String, BType>();
+		parameters = new Hashtable<>();
+		constants = new Hashtable<>();
+		variables = new Hashtable<>();
 
 		BParser parser = new BParser("Test");
 		Start start;
 		try {
-			start = parser.parse(machine, false);
+			start = parser.parseMachine(machine);
 		} catch (BCompoundException e) {
 			throw e.getFirstException();
 		}
@@ -33,8 +33,8 @@ public class TestTypechecker {
 		c.analyseMachine();
 		Typechecker t = new Typechecker(c);
 
-		for (String name : c.getSetParamter().keySet()) {
-			parameters.put(name, t.getType(c.getSetParamter().get(name)));
+		for (String name : c.getSetParameter().keySet()) {
+			parameters.put(name, t.getType(c.getSetParameter().get(name)));
 		}
 
 		for (String name : c.getScalarParameter().keySet()) {

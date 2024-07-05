@@ -1,15 +1,13 @@
 package de.tlc4b.btypes;
 
-import java.util.ArrayList;
-
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
+import de.tlc4b.util.UtilMethods;
 
 public class EnumeratedSetElement implements BType {
-	private String name;
+	private final String name;
 
 	public EnumeratedSetElement(String name) {
 		this.name = name;
@@ -50,9 +48,7 @@ public class EnumeratedSetElement implements BType {
 		if (other instanceof UntypedType)
 			return true;
 		if (other instanceof EnumeratedSetElement) {
-			if (((EnumeratedSetElement) other).getName().equals(this.name)) {
-				return true;
-			}
+			return ((EnumeratedSetElement) other).getName().equals(this.name);
 		}
 		return false;
 	}
@@ -62,10 +58,7 @@ public class EnumeratedSetElement implements BType {
 	}
 
 	public PExpression createASTNode(Typechecker typechecker) {
-		TIdentifierLiteral literal = new TIdentifierLiteral(name);
-		ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
-		idList.add(literal);
-		AIdentifierExpression id = new AIdentifierExpression(idList);
+		AIdentifierExpression id = UtilMethods.createAIdentifierExpression(name);
 		typechecker.setType(id, new SetType(this));
 		return id;
 	}

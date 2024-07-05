@@ -40,13 +40,13 @@ import de.tlc4b.tla.config.SetOfModelValuesAssignment;
 
 public class Generator extends DepthFirstAdapter {
 
-	private MachineContext machineContext;
-	private TypeRestrictor typeRestrictor;
-	private ConstantsEvaluator constantsEvaluator;
-	private DefinitionsAnalyser deferredSetSizeCalculator;
+	private final MachineContext machineContext;
+	private final TypeRestrictor typeRestrictor;
+	private final ConstantsEvaluator constantsEvaluator;
+	private final DefinitionsAnalyser deferredSetSizeCalculator;
 
-	private TLAModule tlaModule;
-	private ConfigFile configFile;
+	private final TLAModule tlaModule;
+	private final ConfigFile configFile;
 
 	public Generator(MachineContext machineContext,
 			TypeRestrictor typeRestrictor,
@@ -92,37 +92,33 @@ public class Generator extends DepthFirstAdapter {
 	private void evalSpec() {
 		if (this.configFile.isInit() && this.configFile.isNext()
 				&& TLC4BGlobals.isCheckLTL()
-				&& machineContext.getLTLFormulas().size() > 0) {
+				&& !machineContext.getLTLFormulas().isEmpty()) {
 			this.configFile.setSpec();
 		}
 	}
 
 	private void evalGoal() {
 		if (TLC4BGlobals.isGOAL()) {
-			if (machineContext.getDefinitions().keySet().contains("GOAL")) {
+			if (machineContext.getDefinitions().containsKey("GOAL")) {
 				this.configFile.setGoal();
 			}
 		}
 	}
 
 	private void evalSetValuedParameter() {
-		/**
+		/*
 		 * For each set-valued parameter (first letter in upper case) we create
 		 * a TLA definition e.g. MACHINE Test(P) -> P == {P_1, P_2}
 		 */
-		Iterator<String> itr = machineContext.getSetParamter().keySet()
-				.iterator();
-		while (itr.hasNext()) {
-			String parameter = itr.next();
-			Node node = machineContext.getSetParamter().get(parameter);
+		for (String parameter : machineContext.getSetParameter().keySet()) {
+			Node node = machineContext.getSetParameter().get(parameter);
 			tlaModule.constants.add(node);
 			configFile.addAssignment(new SetOfModelValuesAssignment(node, 3));
 		}
-
 	}
 
 	private void evalScalarParameter() {
-		/**
+		/*
 		 * For each scalar-valued parameter we have to find out if it has a
 		 * determined value in the CONSTRAINT clause (e.g. p = 1). In this case
 		 * we create a TLA constant, in the other case we create a TLA variable
@@ -130,7 +126,7 @@ public class Generator extends DepthFirstAdapter {
 		 */
 
 		Collection<Node> params = machineContext.getScalarParameter().values();
-		if (params.size() == 0)
+		if (params.isEmpty())
 			return;
 
 		LinkedHashMap<Node, Node> idValueTable = constantsEvaluator
@@ -177,12 +173,10 @@ public class Generator extends DepthFirstAdapter {
 
 	private void evalMachineSets() {
 		/*
-		 * Deffered Sets
+		 * Deferred Sets
 		 */
 		LinkedHashMap<String, Node> map = machineContext.getDeferredSets();
-		Iterator<Node> itr = map.values().iterator();
-		while (itr.hasNext()) {
-			Node d = itr.next();
+		for (Node d : map.values()) {
 			tlaModule.constants.add(d);
 			Integer size;
 			size = deferredSetSizeCalculator.getSize(d);
@@ -190,8 +184,7 @@ public class Generator extends DepthFirstAdapter {
 				size = constantsEvaluator.getIntValue(d);
 			}
 
-			this.configFile.addAssignment(new SetOfModelValuesAssignment(d,
-					size));
+			this.configFile.addAssignment(new SetOfModelValuesAssignment(d, size));
 		}
 
 		/*
@@ -199,100 +192,81 @@ public class Generator extends DepthFirstAdapter {
 		 */
 
 		LinkedHashMap<String, Node> map2 = machineContext.getEnumeratedSets();
-		Iterator<Node> itr2 = map2.values().iterator();
-		while (itr2.hasNext()) {
-			Node n = itr2.next();
+		for (Node n : map2.values()) {
 			AEnumeratedSetSet e = (AEnumeratedSetSet) n;
 			TLADefinition def = new TLADefinition(e, e);
 			this.tlaModule.addTLADefinition(def);
-			List<PExpression> copy = new ArrayList<PExpression>(e.getElements());
+			List<PExpression> copy = new ArrayList<>(e.getElements());
 			for (PExpression element : copy) {
 				this.tlaModule.constants.add(element);
-				this.configFile
-						.addAssignment(new ModelValueAssignment(element));
+				this.configFile.addAssignment(new ModelValueAssignment(element));
 			}
 		}
 	}
 
 	private void evalDefinitions() {
-		ADefinitionsMachineClause node = machineContext
-				.getDefinitionMachineClause();
+		ADefinitionsMachineClause node = machineContext.getDefinitionMachineClause();
 		if (node != null) {
-			ArrayList<PDefinition> bDefinitions = new ArrayList<PDefinition>(
-					node.getDefinitions());
-			DefinitionsSorter defOrder = new DefinitionsSorter(machineContext,
-					bDefinitions);
+			ArrayList<PDefinition> bDefinitions = new ArrayList<>(node.getDefinitions());
+			DefinitionsSorter defOrder = new DefinitionsSorter(machineContext, bDefinitions);
 			this.tlaModule.allDefinitions.addAll(defOrder.getAllDefinitions());
 		}
 	}
 
 	private void evalOperations() {
-		AOperationsMachineClause node = machineContext
-				.getOperationMachineClause();
+		AOperationsMachineClause node = machineContext.getOperationMachineClause();
 		if (null != node) {
 			configFile.setNext();
-			List<POperation> copy = new ArrayList<POperation>(
-					node.getOperations());
-			for (POperation e : copy) {
-				this.tlaModule.operations.add(e);
-			}
+			List<POperation> copy = new ArrayList<>(node.getOperations());
+			this.tlaModule.operations.addAll(copy);
 		}
 	}
 
 	private void evalConstants() {
 		if (machineContext.getPropertiesMachineClause() == null)
 			return;
-		LinkedHashMap<Node, Node> conValueTable = constantsEvaluator
-				.getValueOfIdentifierMap();
-		Iterator<Entry<Node, Node>> iterator = conValueTable.entrySet()
-				.iterator();
-		while (iterator.hasNext()) {
-			Entry<Node, Node> entry = iterator.next();
+		LinkedHashMap<Node, Node> conValueTable = constantsEvaluator.getValueOfIdentifierMap();
+		for (Entry<Node, Node> entry : conValueTable.entrySet()) {
 			AIdentifierExpression con = (AIdentifierExpression) entry.getKey();
 			Node value = entry.getValue();
 
 			AExpressionDefinitionDefinition exprDef = new AExpressionDefinitionDefinition(
-					con.getIdentifier().get(0), new LinkedList<PExpression>(),
-					(PExpression) value);// .clone());
+				con.getIdentifier().get(0), new LinkedList<>(),
+				(PExpression) value
+			);// .clone());
 			machineContext.addReference(exprDef, con);
 
 			this.tlaModule.addToAllDefinitions(exprDef);
 		}
 
-		ArrayList<Node> remainingConstants = new ArrayList<Node>();
-		remainingConstants.addAll(machineContext.getConstants().values());
+		ArrayList<Node> remainingConstants = new ArrayList<>(machineContext.getConstants().values());
 		remainingConstants.removeAll(conValueTable.keySet());
 
-		Node propertiesPerdicate = machineContext.getPropertiesMachineClause()
-				.getPredicates();
-		if (remainingConstants.size() > 0) {
+		Node propertiesPredicate = machineContext.getPropertiesMachineClause().getPredicates();
+		if (!remainingConstants.isEmpty()) {
 			boolean init = false;
 			int numberOfIteratedConstants = 0;
 
-			for (int i = 0; i < remainingConstants.size(); i++) {
+			for (Node remainingConstant : remainingConstants) {
 				init = true;
-				Node con = remainingConstants.get(i);
-				this.tlaModule.variables.add(con);
+				this.tlaModule.variables.add(remainingConstant);
 
-				ArrayList<PExpression> rangeList = constantsEvaluator
-						.getRangeOfIdentifier(con);
-				if (rangeList.size() > 0) {
+				ArrayList<PExpression> rangeList = constantsEvaluator.getRangeOfIdentifier(remainingConstant);
+				if (!rangeList.isEmpty()) {
 					numberOfIteratedConstants++;
-					ArrayList<PExpression> clone = new ArrayList<PExpression>();
+					ArrayList<PExpression> clone = new ArrayList<>();
 					for (PExpression pExpression : rangeList) {
-						clone.add((PExpression) pExpression.clone());
+						clone.add(pExpression.clone());
 					}
-					ASetExtensionExpression set = new ASetExtensionExpression(
-							clone);
-					AMemberPredicate member = new AMemberPredicate(
-							(AIdentifierExpression) con, set);
+					ASetExtensionExpression set = new ASetExtensionExpression(clone);
+					AMemberPredicate member = new AMemberPredicate((AIdentifierExpression) remainingConstant, set);
 					tlaModule.addInit(member);
 					continue;
 				}
 
-				Node restrictedNode = typeRestrictor.getRestrictedNode(con);
+				Node restrictedNode = typeRestrictor.getRestrictedNode(remainingConstant);
 				AMemberPredicate memberPredicate = new AMemberPredicate(
-						(PExpression) con, (PExpression) restrictedNode);
+						(PExpression) remainingConstant, (PExpression) restrictedNode);
 				tlaModule.addInit(memberPredicate);
 
 			}
@@ -303,8 +277,8 @@ public class Generator extends DepthFirstAdapter {
 
 			if (init) {
 				configFile.setInit();
-				if (!typeRestrictor.isARemovedNode(propertiesPerdicate))
-					tlaModule.addInit(propertiesPerdicate);
+				if (!typeRestrictor.isARemovedNode(propertiesPredicate))
+					tlaModule.addInit(propertiesPredicate);
 			}
 
 		} else {
@@ -312,7 +286,7 @@ public class Generator extends DepthFirstAdapter {
 				tlaModule.assumes
 						.addAll(constantsEvaluator.getPropertiesList());
 			}
-			tlaModule.addAssume(propertiesPerdicate);
+			tlaModule.addAssume(propertiesPredicate);
 		}
 
 	}
@@ -326,26 +300,19 @@ public class Generator extends DepthFirstAdapter {
 
 	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			this.tlaModule.variables.add(e);
-		}
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		this.tlaModule.variables.addAll(copy);
 	}
 
 	@Override
-	public void caseAConcreteVariablesMachineClause(
-			AConcreteVariablesMachineClause node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		for (PExpression e : copy) {
-			this.tlaModule.variables.add(e);
-		}
+	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		this.tlaModule.variables.addAll(copy);
 	}
 
 	@Override
 	public void inAAssertionsMachineClause(AAssertionsMachineClause node) {
-		List<PPredicate> copy = new ArrayList<PPredicate>(node.getPredicates());
+		List<PPredicate> copy = new ArrayList<>(node.getPredicates());
 		for (PPredicate e : copy) {
 			this.tlaModule.addAssertion(e);
 		}

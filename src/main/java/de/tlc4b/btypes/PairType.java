@@ -64,10 +64,9 @@ public class PairType extends AbstractHasFollowers {
 	@Override
 	public String toString() {
 		String res = "";
-		if(this.equals(first)|| this.equals(second)){
+		if (this.equals(first)|| this.equals(second)) {
 			res += "(Recursive Type)";
-			return res;
-		}else{
+		} else {
 			if (first instanceof PairType) {
 				res += "(" + first + ")";
 			} else
@@ -77,18 +76,12 @@ public class PairType extends AbstractHasFollowers {
 				res += "(" + second + ")";
 			} else
 				res += second;
-			return res;
 		}
-		
-		
-
+		return res;
 	}
 
 	public boolean isUntyped() {
-		if (first.isUntyped() || second.isUntyped())
-			return true;
-		else
-			return false;
+		return first.isUntyped() || second.isUntyped();
 	}
 
 	public boolean compare(BType other) {
@@ -114,8 +107,7 @@ public class PairType extends AbstractHasFollowers {
 				return true;
 		}
 		if (second instanceof AbstractHasFollowers) {
-			if (((AbstractHasFollowers) second).contains(other))
-				return true;
+			return ((AbstractHasFollowers) second).contains(other);
 		}
 		return false;
 	}

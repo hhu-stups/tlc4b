@@ -70,8 +70,7 @@ public class FunctionType extends AbstractHasFollowers {
 
 	@Override
 	public String toString() {
-		String res = "FUNC(" + domain + "," + range + ")";
-		return res;
+		return "FUNC(" + domain + "," + range + ")";
 	}
 
 	public void update(BType oldType, BType newType) {
@@ -96,10 +95,7 @@ public class FunctionType extends AbstractHasFollowers {
 			if (t instanceof PairType) {
 				return ((PairType) t).getFirst().compare(domain)
 						&& ((PairType) t).getSecond().compare(range);
-			} else if (t instanceof UntypedType) {
-				return true;
-			} else
-				return false;
+			} else return t instanceof UntypedType;
 		}
 		return false;
 	}
@@ -114,8 +110,7 @@ public class FunctionType extends AbstractHasFollowers {
 				return true;
 		}
 		if (range instanceof AbstractHasFollowers) {
-			if (((AbstractHasFollowers) range).contains(other))
-				return true;
+			return ((AbstractHasFollowers) range).contains(other);
 		}
 		return false;
 	}

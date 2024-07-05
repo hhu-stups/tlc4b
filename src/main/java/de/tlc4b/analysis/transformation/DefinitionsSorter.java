@@ -2,7 +2,6 @@ package de.tlc4b.analysis.transformation;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -23,10 +22,10 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	String current = null;
 
 	public DefinitionsSorter(ADefinitionsMachineClause clause) {
-		dependencies = new LinkedHashMap<String, HashSet<String>>();
-		allDependencies = new LinkedHashMap<String, HashSet<String>>();
-		definitionsTable = new LinkedHashMap<String, PDefinition>();
-		res = new ArrayList<PDefinition>();
+		dependencies = new LinkedHashMap<>();
+		allDependencies = new LinkedHashMap<>();
+		definitionsTable = new LinkedHashMap<>();
+		res = new ArrayList<>();
 
 		clause.apply(this);
 
@@ -34,19 +33,16 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 			resolveDependencies(defName);
 		}
 
-		ArrayList<String> defs = new ArrayList<String>(allDependencies.keySet());
+		ArrayList<String> defs = new ArrayList<>(allDependencies.keySet());
 		
 		
 		while (!res.containsAll(definitionsTable.values())) {
-			Iterator<String> iterator = new ArrayList<String>(defs).iterator();
-			while (iterator.hasNext()) {
-				String next = iterator.next();
-				
+			for (String next : new ArrayList<>(defs)) {
 				HashSet<String> deps = allDependencies.get(next);
-				
+
 				deps.retainAll(defs);
-				
-				if (deps.size() == 0) {
+
+				if (deps.isEmpty()) {
 					PDefinition pDefinition = definitionsTable.get(next);
 					pDefinition.replaceBy(null);
 					res.add(pDefinition);
@@ -62,7 +58,7 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 		if (allDependencies.containsKey(defName)) {
 			return;
 		}
-		HashSet<String> allDeps = new HashSet<String>();
+		HashSet<String> allDeps = new HashSet<>();
 		HashSet<String> deps = dependencies.get(defName);
 		for (String def : deps) {
 			resolveDependencies(def);
@@ -81,7 +77,7 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	@Override
 	public void inAPredicateDefinitionDefinition(
 			APredicateDefinitionDefinition node) {
-		String name = node.getName().getText().toString();
+		String name = node.getName().getText();
 		addDefinition(name);
 		definitionsTable.put(name, node);
 		current = name;
@@ -90,7 +86,7 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	@Override
 	public void inASubstitutionDefinitionDefinition(
 			ASubstitutionDefinitionDefinition node) {
-		String name = node.getName().getText().toString();
+		String name = node.getName().getText();
 		addDefinition(name);
 		definitionsTable.put(name, node);
 		current = name;
@@ -99,7 +95,7 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	@Override
 	public void inAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
-		String name = node.getName().getText().toString();
+		String name = node.getName().getText();
 		addDefinition(name);
 		definitionsTable.put(name, node);
 		current = name;
@@ -107,25 +103,25 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 
 	@Override
 	public void inADefinitionExpression(ADefinitionExpression node) {
-		String name = node.getDefLiteral().getText().toString();
+		String name = node.getDefLiteral().getText();
 		addDefinitionCall(name);
 	}
 
 	@Override
 	public void inADefinitionPredicate(ADefinitionPredicate node) {
-		String name = node.getDefLiteral().getText().toString();
+		String name = node.getDefLiteral().getText();
 		addDefinitionCall(name);
 	}
 
 	@Override
 	public void inADefinitionSubstitution(ADefinitionSubstitution node) {
-		String name = node.getDefLiteral().getText().toString();
+		String name = node.getDefLiteral().getText();
 		addDefinitionCall(name);
 	}
 
 	private void addDefinition(String name) {
-		if (!dependencies.keySet().contains(name)) {
-			dependencies.put(name, new HashSet<String>());
+		if (!dependencies.containsKey(name)) {
+			dependencies.put(name, new HashSet<>());
 		}
 	}
 

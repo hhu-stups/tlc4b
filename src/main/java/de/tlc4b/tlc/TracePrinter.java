@@ -55,8 +55,8 @@ public class TracePrinter {
 	}
 
 	private void setup() {
-		constants = new ArrayList<OpDeclNode>();
-		variables = new ArrayList<OpDeclNode>();
+		constants = new ArrayList<>();
+		variables = new ArrayList<>();
 		for (int i = 0; i < TLCState.vars.length; i++) {
 			String tlaName = TLCState.vars[i].getName().toString();
 			String bName = tlcOutputInfo.getBName(tlaName);
@@ -101,7 +101,7 @@ public class TracePrinter {
 	private StringBuilder setupConstants(TLCState state) {
 		StringBuilder expression = new StringBuilder();
 		if (tlcOutputInfo.constantSetup) {
-			if (constants.size() == 0) {
+			if (constants.isEmpty()) {
 				expression.append("1 = 1");
 			} else {
 				for (int i = 0; i < constants.size(); i++) {
@@ -175,18 +175,17 @@ public class TracePrinter {
 			} else if (type instanceof FunctionType) {
 				if (((TupleValue) val).elems.length == 0) {
 					res.append("{}");
-					return res;
 				} else {
 					BType subtype = ((FunctionType) type).getRange();
 					res.append("[");
 					res.append(parseEnumerationValue(((TupleValue) val).elems,
 							subtype));
 					res.append("]");
-					return res;
 				}
+				return res;
 
 			}
-			throw new NotSupportedException("Unkown type of tuple.");
+			throw new NotSupportedException("Unknown type of tuple.");
 
 		case RECORDVALUE: {
 			RecordValue rec = (RecordValue) val;

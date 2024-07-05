@@ -11,10 +11,9 @@ public class UtilMethods {
 
 	public static AIdentifierExpression createAIdentifierExpression(String name) {
 		TIdentifierLiteral literal = new TIdentifierLiteral(name);
-		ArrayList<TIdentifierLiteral> idList = new ArrayList<TIdentifierLiteral>();
+		ArrayList<TIdentifierLiteral> idList = new ArrayList<>();
 		idList.add(literal);
-		AIdentifierExpression id = new AIdentifierExpression(idList);
-		return id;
+		return new AIdentifierExpression(idList);
 	}
 
 	public static String getPositionAsString(Node node) {

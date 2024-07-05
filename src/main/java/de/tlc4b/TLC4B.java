@@ -9,12 +9,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
-import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
 import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.exceptions.TLC4BException;
@@ -114,7 +114,7 @@ public class TLC4B {
 				+ " sec");
 		// MP.printMessage("Number of workers: " +
 		// TLCGlobals.getNumWorkers());
-		if (results.getViolatedAssertions().size() > 0) {
+		if (!results.getViolatedAssertions().isEmpty()) {
 			println("Violated assertions: " + results.getViolatedAssertions());
 		}
 		println("States analysed: " + results.getNumberOfDistinctStates());
@@ -229,93 +229,92 @@ public class TLC4B {
 	private void handleParameter(String[] args) {
 		int index = 0;
 		while (index < args.length) {
-			if (args[index].toLowerCase().equals("-nodead")) {
+			if (args[index].equalsIgnoreCase("-nodead")) {
 				TLC4BGlobals.setDeadlockCheck(false);
-			} else if (args[index].toLowerCase().equals("-notlc")) {
+			} else if (args[index].equalsIgnoreCase("-notlc")) {
 				TLC4BGlobals.setRunTLC(false);
-			} else if (args[index].toLowerCase().equals("-notranslation")) {
+			} else if (args[index].equalsIgnoreCase("-notranslation")) {
 				TLC4BGlobals.setTranslate(false);
-			} else if (args[index].toLowerCase().equals("-nogoal")) {
+			} else if (args[index].equalsIgnoreCase("-nogoal")) {
 				TLC4BGlobals.setGOAL(false);
-			} else if (args[index].toLowerCase().equals("-noinv")) {
+			} else if (args[index].equalsIgnoreCase("-noinv")) {
 				TLC4BGlobals.setInvariant(false);
-			} else if (args[index].toLowerCase().equals("-noass")) {
+			} else if (args[index].equalsIgnoreCase("-noass")) {
 				TLC4BGlobals.setAssertionCheck(false);
-			} else if (args[index].toLowerCase().equals("-wdcheck")) {
+			} else if (args[index].equalsIgnoreCase("-wdcheck")) {
 				TLC4BGlobals.setWelldefinednessCheck(true);
-			} else if (args[index].toLowerCase().equals("-symmetry")) {
+			} else if (args[index].equalsIgnoreCase("-symmetry")) {
 				TLC4BGlobals.setSymmetryUse(true);
-			} else if (args[index].toLowerCase().equals("-tool")) {
+			} else if (args[index].equalsIgnoreCase("-tool")) {
 				TLC4BGlobals.setTool(false);
-			} else if (args[index].toLowerCase().equals("-tmp")) {
+			} else if (args[index].equalsIgnoreCase("-tmp")) {
 				buildDir = new File(System.getProperty("java.io.tmpdir"));
-			} else if (args[index].toLowerCase().equals("-noltl")) {
+			} else if (args[index].equalsIgnoreCase("-noltl")) {
 				TLC4BGlobals.setCheckltl(false);
-			} else if (args[index].toLowerCase().equals("-lazyconstants")) {
+			} else if (args[index].equalsIgnoreCase("-lazyconstants")) {
 				TLC4BGlobals.setForceTLCToEvalConstants(false);
-			} else if (args[index].toLowerCase().equals("-testscript")) {
+			} else if (args[index].equalsIgnoreCase("-testscript")) {
 				TLC4BGlobals.setRunTestscript(true);
-			} else if (args[index].toLowerCase().equals("-notrace")) {
+			} else if (args[index].equalsIgnoreCase("-notrace")) {
 				TLC4BGlobals.setCreateTraceFile(false);
-			} else if (args[index].toLowerCase().equals("-del")) {
+			} else if (args[index].equalsIgnoreCase("-del")) {
 				TLC4BGlobals.setDeleteOnExit(true);
-			} else if (args[index].toLowerCase().equals("-parinveval")) {
+			} else if (args[index].equalsIgnoreCase("-parinveval")) {
 				TLC4BGlobals.setPartialInvariantEvaluation(true);
-			} else if (args[index].toLowerCase().equals("-log")) {
+			} else if (args[index].equalsIgnoreCase("-log")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: File requiered after option '-log'.");
+							"Error: File required after option '-log'.");
 				}
 				logFileString = args[index];
 
-			} else if (args[index].toLowerCase().equals("-maxint")) {
+			} else if (args[index].equalsIgnoreCase("-maxint")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: Number requiered after option '-maxint'.");
+							"Error: Number required after option '-maxint'.");
 				}
 				int maxint = Integer.parseInt(args[index]);
 				TLC4BGlobals.setMAX_INT(maxint);
-			} else if (args[index].toLowerCase().equals("-default_setsize")) {
+			} else if (args[index].equalsIgnoreCase("-default_setsize")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: Number requiered after option '-default_setsize'.");
+							"Error: Number required after option '-default_setsize'.");
 				}
 				int deferredSetSize = Integer.parseInt(args[index]);
 				TLC4BGlobals.setDEFERRED_SET_SIZE(deferredSetSize);
 			} 
-			else if (args[index].toLowerCase().equals("-minint")) {
+			else if (args[index].equalsIgnoreCase("-minint")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: Number requiered after option '-minint'.");
+							"Error: Number required after option '-minint'.");
 				}
 				int minint = Integer.parseInt(args[index]);
 				TLC4BGlobals.setMIN_INT(minint);
-				;
-			} else if (args[index].toLowerCase().equals("-workers")) {
+			} else if (args[index].equalsIgnoreCase("-workers")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: Number requiered after option '-workers'.");
+							"Error: Number required after option '-workers'.");
 				}
 				int workers = Integer.parseInt(args[index]);
 				TLC4BGlobals.setWorkers(workers);
-			} else if (args[index].toLowerCase().equals("-constantssetup")) {
+			} else if (args[index].equalsIgnoreCase("-constantssetup")) {
 				TLC4BGlobals.setProBconstantsSetup(true);
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: String requiered after option '-constantssetup'.");
+							"Error: String required after option '-constantssetup'.");
 				}
 				constantsSetup = args[index];
-			} else if (args[index].toLowerCase().equals("-ltlformula")) {
+			} else if (args[index].equalsIgnoreCase("-ltlformula")) {
 				index = index + 1;
 				if (index == args.length) {
 					throw new TLC4BIOException(
-							"Error: LTL formula requiered after option '-ltlformula'.");
+							"Error: LTL formula required after option '-ltlformula'.");
 				}
 				ltlFormula = args[index];
 			} else if (args[index].charAt(0) == '-') {
@@ -340,8 +339,7 @@ public class TLC4B {
 	public void process(String[] args) throws IOException, BCompoundException {
 
 		MP.print("Arguments: ");
-		for (int i = 0; i < args.length; i++) {
-			String string = args[i];
+		for (String string : args) {
 			MP.print(string);
 			MP.print(" ");
 		}
@@ -417,7 +415,7 @@ public class TLC4B {
 				fw.close();
 				println("Log file: " + logFile.getAbsolutePath());
 			} catch (IOException e) {
-				new TLC4BIOException(e.getLocalizedMessage());
+				throw new TLC4BIOException(e.getLocalizedMessage());
 			}
 		}
 	}
@@ -482,7 +480,7 @@ public class TLC4B {
 
 			fos = new FileOutputStream(file);
 
-			int read = 0;
+			int read;
 			byte[] bytes = new byte[1024];
 
 			while ((read = is.read(bytes)) != -1) {
@@ -517,14 +515,10 @@ public class TLC4B {
 		try {
 			exists = file.createNewFile();
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(file), "UTF-8"));
+				Files.newOutputStream(file.toPath()), StandardCharsets.UTF_8));
 			out.write(text);
 			out.close();
 			return file;
-		} catch (UnsupportedEncodingException e1) {
-			throw new TLC4BIOException(e1.getMessage());
-		} catch (FileNotFoundException e1) {
-			throw new TLC4BIOException(e1.getMessage());
 		} catch (IOException e) {
 			throw new TLC4BIOException(e.getMessage());
 		} finally {

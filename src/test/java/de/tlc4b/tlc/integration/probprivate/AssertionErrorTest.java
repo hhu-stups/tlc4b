@@ -36,7 +36,7 @@ public class AssertionErrorTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<TestPair>();
+		final ArrayList<TestPair> list = new ArrayList<>();
 		list.add(new TestPair(AssertionError, "build/prob_examples/public_examples/TLC/AssertionError"));
 		return getConfiguration(list);
 	}

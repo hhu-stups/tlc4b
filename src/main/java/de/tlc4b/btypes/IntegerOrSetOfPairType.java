@@ -22,12 +22,10 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 	public IntegerOrSetOfPairType(SourcePosition sourcePosition,
 			SourcePosition sourcePosition2) {
 
-		IntegerOrSetType i1 = new IntegerOrSetType();
-		this.first = i1;
+		this.first = new IntegerOrSetType();
 		first.addFollower(this);
 
-		IntegerOrSetType i2 = new IntegerOrSetType();
-		this.second = i2;
+		this.second = new IntegerOrSetType();
 		second.addFollower(this);
 	}
 
@@ -55,7 +53,6 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 			}
 			this.setFollowersTo(IntegerType.getInstance(), typechecker);
 
-			return;
 		} else if (newType instanceof SetType) {
 			SetType newFirst;
 			SetType newSecond;
@@ -96,7 +93,6 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 						newFirst.getSubtype(), newSecond.getSubtype()));
 				setOfPairSetType.unify(this, typechecker);
 			}
-			return;
 		} else if (newType instanceof IntegerOrSetOfPairType) {
 			if (this.first == oldType) {
 				first.deleteFollower(this);
@@ -199,10 +195,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 			return true;
 		else if (other instanceof SetType) {
 			BType subType = ((SetType) other).getSubtype();
-			if (subType instanceof UntypedType || subType instanceof PairType)
-				return true;
-			else
-				return false;
+			return subType instanceof UntypedType || subType instanceof PairType;
 		} else
 			return false;
 	}
@@ -212,11 +205,8 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		if (this.first.equals(other) || this.second.equals(other)) {
 			return true;
 		}
-		
-		if(first.contains(other) || second.contains(other)){
-			return true;
-		}else
-			return false;
+
+		return first.contains(other) || second.contains(other);
 	}
 
 	public boolean containsInfiniteType() {

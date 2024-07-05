@@ -17,8 +17,8 @@ import de.tlc4b.analysis.Renamer;
  */
 
 public class SetOfModelValuesAssignment extends ConfigFileAssignment {
-	private Node node;
-	private int size;
+	private final Node node;
+	private final int size;
 
 	public SetOfModelValuesAssignment(Node node, Integer size) {
 		this.node = node;
@@ -31,25 +31,25 @@ public class SetOfModelValuesAssignment extends ConfigFileAssignment {
 	}
 
 	public String getString(Renamer renamer) {
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 
-		String conString;
+		StringBuilder conString;
 		if (node instanceof ADeferredSetSet) {
-			conString = "";
+			conString = new StringBuilder();
 			List<TIdentifierLiteral> copy = ((ADeferredSetSet) node)
 					.getIdentifier();
 			for (TIdentifierLiteral e : copy) {
-				conString += e.getText();
+				conString.append(e.getText());
 			}
-			conString = renamer.getName(node);
+			conString = new StringBuilder(renamer.getName(node));
 		} else {
 			AIdentifierExpression id = (AIdentifierExpression) node;
-			conString = getIdentifier(id);
+			conString = new StringBuilder(getIdentifier(id));
 		}
 
 		res.append(conString).append(" = {");
 		for (int j = 1; j < size + 1; j++) {
-			res.append(conString + j);
+			res.append(conString).append(j);
 			if (j < size) {
 				res.append(",");
 			}

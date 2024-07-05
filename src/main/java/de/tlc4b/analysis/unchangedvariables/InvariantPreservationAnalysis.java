@@ -20,31 +20,31 @@ public class InvariantPreservationAnalysis extends DepthFirstAdapter {
 	private HashSet<Node> foundVariables;
 
 	public ArrayList<Node> getPreservingOperations(Node invariant) {
-		return new ArrayList<Node>(preservingOperationsTable.get(invariant));
+		return new ArrayList<>(preservingOperationsTable.get(invariant));
 	}
 
 	public InvariantPreservationAnalysis(MachineContext machineContext,
 			ArrayList<Node> invariants, UnchangedVariablesFinder unchangedFinder) {
-		this.foundVariablesTable = new Hashtable<Node, HashSet<Node>>();
+		this.foundVariablesTable = new Hashtable<>();
 		this.machineContext = machineContext;
 
-		this.preservingOperationsTable = new Hashtable<Node, HashSet<Node>>();
+		this.preservingOperationsTable = new Hashtable<>();
 
 		for (Node inv : invariants) {
-			foundVariables = new HashSet<Node>();
+			foundVariables = new HashSet<>();
 			inv.apply(this);
 			foundVariablesTable.put(inv, foundVariables);
 		}
 
 		for (Node inv : invariants) {
-			HashSet<Node> preservingOperations = new HashSet<Node>();
+			HashSet<Node> preservingOperations = new HashSet<>();
 			HashSet<Node> usedVariables = foundVariablesTable.get(inv);
 			for (Node op : machineContext.getOperations().values()) {
 				HashSet<Node> assignedVariables = unchangedFinder
 						.getAssignedVariables(op);
-				HashSet<Node> temp = new HashSet<Node>(usedVariables);
+				HashSet<Node> temp = new HashSet<>(usedVariables);
 				temp.retainAll(assignedVariables);
-				if (temp.size() == 0) {
+				if (temp.isEmpty()) {
 					preservingOperations.add(op);
 				}
 			}

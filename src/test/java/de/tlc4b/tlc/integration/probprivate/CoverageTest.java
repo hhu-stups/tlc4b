@@ -38,8 +38,8 @@ public class CoverageTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<String> list = new ArrayList<String>();
-		final ArrayList<String> ignoreList = new ArrayList<String>();
+		final ArrayList<String> list = new ArrayList<>();
+		final ArrayList<String> ignoreList = new ArrayList<>();
 		list.add("build/prob_examples/public_examples/TLC/");
 
 		list.add("./src/test/resources/");

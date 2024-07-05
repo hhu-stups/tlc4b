@@ -112,7 +112,7 @@ public class Translator {
 
 		MachineContext machineContext = new MachineContext(machineName, start);
 		if (ltlFormula != null) {
-			machineContext.addLTLFromula(this.ltlFormula);
+			machineContext.addLTLFormula(this.ltlFormula);
 		}
 		if (this.constantsSetup != null) {
 			machineContext.setConstantSetupPredicate(constantsSetup);

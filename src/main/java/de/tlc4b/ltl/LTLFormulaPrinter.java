@@ -186,7 +186,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseADetLtl(ADetLtl node) {
-		List<PActions> copy = new ArrayList<PActions>(node.getArgs());
+		List<PActions> copy = new ArrayList<>(node.getArgs());
 		LinkedHashMap<String, Node> operations = ltlFormulaVisitor
 				.getMachineContext().getOperations();
 		if (copy.size() > 1) {
@@ -222,7 +222,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 				tlaPrinter.moduleStringAppend("(ENABLED(");
 				tlaPrinter.printOperationCall(op1);
 				tlaPrinter.moduleStringAppend(") => \\neg(");
-				ArrayList<Node> remainingOperations = new ArrayList<Node>(operations.values());
+				ArrayList<Node> remainingOperations = new ArrayList<>(operations.values());
 				remainingOperations.remove(op1);
 				for (int i = 0; i < remainingOperations.size(); i++) {
 					if (i != 0) {
