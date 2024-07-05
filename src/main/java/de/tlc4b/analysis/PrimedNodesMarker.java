@@ -3,6 +3,7 @@ package de.tlc4b.analysis;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
@@ -17,15 +18,15 @@ import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.exceptions.ScopeException;
 
 public class PrimedNodesMarker extends DepthFirstAdapter {
-	private ArrayList<POperation> operations;
-	private MachineContext machineContext;
-	private HashSet<Node> primedNodes;
+	private final ArrayList<POperation> operations;
+	private final MachineContext machineContext;
+	private final HashSet<Node> primedNodes;
 
 	private HashSet<Node> nodesToPrime;
 
-	public PrimedNodesMarker(ArrayList<POperation> operations,
-			MachineContext machineContext) {
-		this.primedNodes = new HashSet<Node>();
+	public PrimedNodesMarker(ArrayList<POperation> operations, MachineContext machineContext,
+	                         Set<Node> primedNodes) {
+		this.primedNodes = new HashSet<>(primedNodes);
 		this.operations = operations;
 		this.machineContext = machineContext;
 	}

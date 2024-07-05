@@ -104,7 +104,8 @@ public class Translator {
 		SeesEliminator.eliminateSeesClauses(start, parsedMachines);
 
 		DefinitionsEliminator.eliminateDefinitions(start);
-		SequenceSubstitutionsEliminator.eliminateSequenceSubstitutions(start);
+
+		SequenceSubstitutionsEliminator sequenceSubstitutionsEliminator = new SequenceSubstitutionsEliminator(start);
 
 		// TODO move set comprehension optimizer behind the type checker
 		SetComprehensionOptimizer.optimizeSetComprehensions(start);
@@ -151,7 +152,7 @@ public class Translator {
 		standardModulesToBeCreated = usedModules.getStandardModulesToBeCreated();
 
 		PrimedNodesMarker primedNodesMarker = new PrimedNodesMarker(generator.getTlaModule().getOperations(),
-				machineContext);
+				machineContext, sequenceSubstitutionsEliminator.getPrimeNodes());
 		primedNodesMarker.start();
 
 		Renamer renamer = new Renamer(machineContext);

@@ -26,9 +26,17 @@ public class SubstitutionsTest {
 	}
 
 	@Test
-	public void testSimpleSequentialSubstitution() throws Exception {
-		String machine = "MACHINE test\n" + "VARIABLES x,y\n"
-			+ "INVARIANT x = 1 & y = 3 \n" + "INITIALISATION x :: 1..3 ; y := x \n"
+	public void testAssignSequentialSubstitution() throws Exception {
+		String machine = "MACHINE test\n"
+			+ "VARIABLES x,y\n"
+			+ "INVARIANT x = 1 & y = 3 \n"
+			+ "INITIALISATION x := 1 ; y := x \n"
+			+ "OPERATIONS\n"
+			+ " op1 = BEGIN x := 1 ; y := x + 1 END; \n"
+			+ " op2 = BEGIN x := 1 || y := x + 1 END; \n"
+			+ " op3 = BEGIN x := y ; y := 1 END; \n"
+			+ " op4 = BEGIN x := y || y := 1 END; \n"
+			+ " op5 = BEGIN x, y := x + 1, x + 1 END \n"
 			+ "END";
 
 		String expected = "---- MODULE test ----\n"
@@ -36,17 +44,109 @@ public class SubstitutionsTest {
 			+ "VARIABLES x, y\n"
 			+ "Invariant1 == x = 1\n"
 			+ "Invariant2 == y = 3\n"
-			+ "Init == x \\in (1 .. 3) /\\ y = x\n"
+			+ "Init == x = 1 /\\ y = x\n"
 			+ "\n"
-			+ "Next == 1 = 2 /\\ UNCHANGED <<x, y>>\n"
+			+ "op1 == x' = 1 /\\ y' = x' + 1\n"
+			+ "\n"
+			+ "op2 == x' = 1 /\\ y' = x + 1\n"
+			+ "\n"
+			+ "op3 == x' = y /\\ y' = 1\n"
+			+ "\n"
+			+ "op4 == x' = y /\\ y' = 1\n"
+			+ "\n"
+			+ "op5 == x' = x + 1 /\\ y' = x + 1\n"
+			+ "\n"
+			+ "Next == \\/ op1\n"
+			+ "\t\\/ op2\n"
+			+ "\t\\/ op3\n"
+			+ "\t\\/ op4\n"
+			+ "\t\\/ op5\n"
+			+ "====";
+		compare(expected, machine);
+	}
+
+	@Test
+	public void testBecomesElementOfSequentialSubstitution() throws Exception {
+		String machine = "MACHINE test\n"
+			+ "VARIABLES x,y\n"
+			+ "INVARIANT x = 1 & y = 3 \n"
+			+ "INITIALISATION x := 1 ; y := x \n"
+			+ "OPERATIONS\n"
+			+ " op1 = PRE x < 6 THEN x :: 4..6 ; y := x + 1 END; \n"
+			+ " op2 = PRE x < 6 THEN x :: 4..6 || y := x + 1 END; \n"
+			+ " op3 = PRE x < 6 THEN x := 1 ; y :: {x} END; \n"
+			+ " op4 = PRE x < 6 THEN x := 1 || y :: {x} END \n"
+			+ "END";
+
+		String expected = "---- MODULE test ----\n"
+			+ "EXTENDS Naturals\n"
+			+ "VARIABLES x, y\n"
+			+ "Invariant1 == x = 1\n"
+			+ "Invariant2 == y = 3\n"
+			+ "Init == x = 1 /\\ y = x\n"
+			+ "\n"
+			+ "op1 == x < 6\n"
+			+ "\t/\\ (x' \\in (4 .. 6) /\\ y' = x' + 1)\n"
+			+ "\n"
+			+ "op2 == x < 6\n"
+			+ "\t/\\ (x' \\in (4 .. 6) /\\ y' = x + 1)\n"
+			+ "\n"
+			+ "op3 == x < 6\n"
+			+ "\t/\\ (x' = 1 /\\ y' \\in {x'})\n"
+			+ "\n"
+			+ "op4 == x < 6\n"
+			+ "\t/\\ (x' = 1 /\\ y' \\in {x})\n"
+			+ "\n"
+			+ "Next == \\/ op1\n"
+			+ "\t\\/ op2\n"
+			+ "\t\\/ op3\n"
+			+ "\t\\/ op4\n"
+			+ "====";
+		compare(expected, machine);
+	}
+
+	@Test
+	public void testBecomesSuchSequentialSubstitution() throws Exception {
+		String machine = "MACHINE test\n"
+			+ "VARIABLES x,y\n"
+			+ "INVARIANT x = 1 & y = 3 \n"
+			+ "INITIALISATION x := 1 ; y := x \n"
+			+ "OPERATIONS\n"
+			+ " op1 = BEGIN x : (x : 4..6) ; y := x END; \n"
+			+ " op2 = BEGIN x : (x : 4..6) || y := x END; \n"
+			+ " op3 = BEGIN x := 1 ; y : (x = y) END; \n"
+			+ " op4 = BEGIN x := 1 || y : (x = y) END \n"
+			+ "END";
+
+		String expected = "---- MODULE test ----\n"
+			+ "EXTENDS Naturals\n"
+			+ "VARIABLES x, y\n"
+			+ "Invariant1 == x = 1\n"
+			+ "Invariant2 == y = 3\n"
+			+ "Init == x = 1 /\\ y = x\n"
+			+ "\n"
+			+ "op1 == x' \\in (4 .. 6) /\\ y' = x'\n"
+			+ "\n"
+			+ "op2 == x' \\in (4 .. 6) /\\ y' = x\n"
+			+ "\n"
+			+ "op3 == x' = 1 /\\ y' \\in {x'}\n"
+			+ "\n"
+			+ "op4 == x' = 1 /\\ y' \\in {x}\n"
+			+ "\n"
+			+ "Next == \\/ op1\n"
+			+ "\t\\/ op2\n"
+			+ "\t\\/ op3\n"
+			+ "\t\\/ op4\n"
 			+ "====";
 		compare(expected, machine);
 	}
 
 	@Test (expected = SubstitutionException.class)
 	public void testSimpleSequentialSubstitutionAssignedTwice() throws Exception {
-		String machine = "MACHINE test\n" + "VARIABLES x,y\n"
-			+ "INVARIANT x = 1 & y = 3 \n" + "INITIALISATION x := 1 ; y := x ; x := y \n"
+		String machine = "MACHINE test\n"
+			+ "VARIABLES x,y\n"
+			+ "INVARIANT x = 1 & y = 3 \n"
+			+ "INITIALISATION x := 1 ; y := x ; x := y \n"
 			+ "END";
 		compare(null, machine);
 	}
