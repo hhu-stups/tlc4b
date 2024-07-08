@@ -233,15 +233,12 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 
 			AConstraintsMachineClause constraints = machineContext.getConstraintMachineClause();
 			if (constraints != null) {
-				analysePredicate(constraints
-						.getPredicates());
+				analysePredicate(constraints.getPredicates());
 			}
 			APropertiesMachineClause properties = machineContext.getPropertiesMachineClause();
 			if (properties != null) {
-				analysePredicate(properties
-						.getPredicates());
+				analysePredicate(properties.getPredicates());
 			}
-
 		}
 
 		private void analysePredicate(Node n) {
@@ -265,8 +262,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			Node right_ref = machineContext.getReferences().get(right);
 
 			if (left instanceof ACardExpression) {
-				Node ref = machineContext.getReferences().get(
-						((ACardExpression) left).getExpression());
+				Node ref = machineContext.getReferences().get(((ACardExpression) left).getExpression());
 				try {
 					AIntegerExpression intExpr = (AIntegerExpression) right;
 					int size = Integer.parseInt(intExpr.getLiteral().getText());
