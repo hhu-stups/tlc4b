@@ -28,6 +28,10 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		add(AOperationCallSubstitution.class);
 
 		add(AImplementationMachineParseUnit.class);
+
+		add(ARealSetExpression.class);
+		add(AFloatSetExpression.class);
+		add(ARealExpression.class);
 	}
 
 	private static void add(Class<? extends Node> clazz) {
