@@ -66,22 +66,17 @@ public class TLC4B {
 
 		if (TLC4BGlobals.isRunTLC()) {
 			try {
-
-				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
-						tlc4b.buildDir);
+				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
 				TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
 				tlc4b.printResults(results, TLC4BGlobals.isCreateTraceFile());
 				Log log = new Log(tlc4b, results);
 				tlc4b.createLogFile(log);
 				System.exit(0);
-
 			} catch (NoClassDefFoundError e) {
 				printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
 			}
-
 		}
-
 	}
 
 	private void printResults(TLCResults results, boolean createTraceFile) {
@@ -104,7 +99,7 @@ public class TLC4B {
 		println("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
 		println("| MIN Int: " + TLC4BGlobals.getMIN_INT());
 		println("| MAX Int: " + TLC4BGlobals.getMAX_INT());
-		println("| Standard deferret set size: "
+		println("| Standard deferred set size: "
 				+ TLC4BGlobals.getDEFERRED_SET_SIZE());
 		println("--------------------------------");
 		println("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
@@ -127,21 +122,17 @@ public class TLC4B {
 
 		if (results.hasTrace() && createTraceFile) {
 			String trace = results.getTrace();
-			String tracefileName = machineFileNameWithoutFileExtension
-					+ ".tla.trace";
-			File traceFile = createFile(mainfile.getParentFile(),
-					tracefileName, trace, false);
+			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
+			File traceFile = createFile(mainfile.getParentFile(), tracefileName, trace, false);
 			if (traceFile != null) {
-				println("Trace file '" + traceFile.getAbsolutePath()
-						+ "' created.");
+				println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
 			}
 		}
 
 	}
 
 	private void printOperationsCount(TLCResults results) {
-		LinkedHashMap<String, Long> operationCount = results
-				.getOperationCount();
+		LinkedHashMap<String, Long> operationCount = results.getOperationCount();
 		if (TLC4BGlobals.isPrintCoverage() && operationCount != null) {
 			println("---------- Coverage statistics ----------");
 
@@ -154,10 +145,8 @@ public class TLC4B {
 		}
 	}
 
-	public static void test(String[] args, boolean deleteFiles)
-			throws Exception {
-		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
-															// windows
+	public static void test(String[] args, boolean deleteFiles) throws Exception {
+		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4BGlobals.setCreateTraceFile(false);
@@ -184,8 +173,7 @@ public class TLC4B {
 		}
 	}
 
-	public static void testString(String machineString, boolean deleteFiles)
-			throws Exception {
+	public static void testString(String machineString, boolean deleteFiles) throws Exception {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
 															// windows
 		TLC4BGlobals.resetGlobals();
@@ -363,8 +351,7 @@ public class TLC4B {
 			this.config = translator.getConfigString();
 			this.tlcOutputInfo = translator.getTLCOutputInfo();
 			StopWatch.stop(TRANSLATION_TIME);
-			println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME)
-					+ "ms)");
+			println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
 			createFiles();
 		}
 
@@ -374,29 +361,25 @@ public class TLC4B {
 		// the following lines fix incorrect file names
 		filename = filename.replace("\\", File.separator);
 		filename = filename.replace("/", File.separator);
-		if (!filename.toLowerCase().endsWith(".mch") &&
-				!filename.toLowerCase().endsWith(".sys")) {
+		if (!filename.toLowerCase().endsWith(".mch") && !filename.toLowerCase().endsWith(".sys")) {
 			filename = filename + ".mch";
 		}
 
 		mainfile = new File(filename);
 		if (!mainfile.exists()) {
-			throw new TLC4BIOException("The file " + mainfile.getPath()
-					+ " does not exist.");
+			throw new TLC4BIOException("The file " + mainfile.getPath() + " does not exist.");
 		}
 		try {
 			mainfile = mainfile.getCanonicalFile();
 		} catch (IOException e) {
-			throw new TLC4BIOException("The file '" + mainfile.getPath()
-					+ "' can not be accessed.");
+			throw new TLC4BIOException("The file '" + mainfile.getPath() + "' can not be accessed.");
 		}
 
 		machineFileNameWithoutFileExtension = mainfile.getName().substring(0,
 				mainfile.getName().length() - 4); // deleting .mch
 
 		if (buildDir == null) {
-			buildDir = new File(mainfile.getParentFile(),
-					machineFileNameWithoutFileExtension);
+			buildDir = new File(mainfile.getParentFile(), machineFileNameWithoutFileExtension);
 		}
 	}
 
@@ -406,8 +389,7 @@ public class TLC4B {
 			FileWriter fw;
 			boolean fileExists = logFile.exists();
 			try {
-				fw = new FileWriter(logFile, true); // the true will append the
-													// new data
+				fw = new FileWriter(logFile, true); // the true will append the new data
 				if (!fileExists) {
 					fw.write(log.getCSVFieldNamesLine());
 				}
@@ -430,31 +412,27 @@ public class TLC4B {
 				machineFileNameWithoutFileExtension + ".tla", tlaModule,
 				TLC4BGlobals.isDeleteOnExit());
 		if (moduleFile != null) {
-			println("TLA+ module '" + moduleFile.getAbsolutePath()
-					+ "' created.");
+			println("TLA+ module '" + moduleFile.getAbsolutePath() + "' created.");
 		}
 
 		File configFile = createFile(buildDir,
 				machineFileNameWithoutFileExtension + ".cfg", config,
 				TLC4BGlobals.isDeleteOnExit());
 		if (configFile != null) {
-			println("Configuration file '" + configFile.getAbsolutePath()
-					+ "' created.");
+			println("Configuration file '" + configFile.getAbsolutePath() + "' created.");
 		}
 
 		createStandardModules();
 	}
 
 	private void createStandardModules() {
-		for (STANDARD_MODULES module : translator
-				.getStandardModuleToBeCreated()) {
+		for (STANDARD_MODULES module : translator.getStandardModuleToBeCreated()) {
 			createStandardModule(buildDir, module.toString());
 		}
 	}
 
 	private void createStandardModule(File path, String name) {
-		// standard modules are copied from the standardModules folder to the
-		// current directory
+		// standard modules are copied from the standardModules folder to the current directory
 
 		File file = new File(path, name + ".tla");
 		InputStream is = null;
@@ -462,8 +440,7 @@ public class TLC4B {
 		try {
 
 			try {
-				is = new FileInputStream("src/main/resources/standardModules/"
-						+ name + ".tla");
+				is = new FileInputStream("src/main/resources/standardModules/" + name + ".tla");
 			} catch (FileNotFoundException e) {
 				is = this
 						.getClass()
@@ -474,8 +451,7 @@ public class TLC4B {
 			if (is == null) {
 				// should never happen
 				throw new TranslationException(
-						"Unable to determine the source of the standard module: "
-								+ name);
+						"Unable to determine the source of the standard module: " + name);
 			}
 
 			fos = new FileOutputStream(file);
@@ -507,8 +483,7 @@ public class TLC4B {
 		}
 	}
 
-	public static File createFile(File dir, String fileName, String text,
-			boolean deleteOnExit) {
+	public static File createFile(File dir, String fileName, String text, boolean deleteOnExit) {
 
 		File file = new File(dir, fileName);
 		boolean exists = false;
