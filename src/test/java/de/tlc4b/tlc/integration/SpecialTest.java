@@ -13,7 +13,7 @@ public class SpecialTest {
 	public void testConstantSetup() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantSetup.mch",
-				"-constantsSetup", "(a = 1 &  b = 1) or (a = 1 &  b = 2)" };
+				"-constantssetup", "(a = 1 &  b = 1) or (a = 1 &  b = 2)" };
 		assertEquals(NoError, test(a));
 	}
 	
@@ -21,7 +21,7 @@ public class SpecialTest {
 	public void testConstantSetup2() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantSetup.mch",
-				"-constantsSetup", "a = 1 &  b = 1" };
+				"-constantssetup", "a = 1 &  b = 1" };
 		assertEquals(NoError, test(a));
 	}
 	
@@ -29,7 +29,7 @@ public class SpecialTest {
 	public void testConstantSetup3() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantSetup.mch",
-				"-constantsSetup", "(a = 1 &  b = 1) or (a = 2 &  b = 2)" };
+				"-constantssetup", "(a = 1 &  b = 1) or (a = 2 &  b = 2)" };
 		assertEquals(NoError, test(a));
 	}
 	
@@ -37,7 +37,7 @@ public class SpecialTest {
 	public void testConstantSetupFile2() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantsSetup2.mch",
-				"-constantsSetup", "a = {(1,TRUE)}" };
+				"-constantssetup", "a = {(1,TRUE)}" };
 		assertEquals(NoError, test(a));
 	}
 	
