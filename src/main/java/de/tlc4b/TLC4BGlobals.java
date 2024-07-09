@@ -15,6 +15,7 @@ public class TLC4BGlobals {
 	private static boolean partialInvariantEvaluation;
 	private static boolean useSymmetry;
 	private static boolean printCoverage;
+	private static boolean verbose;
 	
 	private static boolean checkOnlyMainAssertions;
 
@@ -259,6 +260,14 @@ public class TLC4BGlobals {
 
 	public static boolean isPrintCoverage() {
 		return printCoverage;
+	}
+
+	public static void setVerbose(boolean b) {
+		verbose = b;
+	}
+
+	public static boolean isVerbose() {
+		return verbose;
 	}
 	
 	public static boolean isCheckOnlyMainAssertions(){

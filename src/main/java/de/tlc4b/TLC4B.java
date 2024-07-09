@@ -52,6 +52,7 @@ public class TLC4B {
 	public static final String WORKERS = "workers";
 	public static final String CONSTANTSSETUP = "constantssetup";
 	public static final String LTLFORMULA = "ltlformula";
+	public static final String VERBOSE = "verbose";
 
 	private String filename;
 	private File mainfile;
@@ -249,6 +250,7 @@ public class TLC4B {
 				filename = remainingArgs[0];
 			}
 
+			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE));
 			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD));
 			TLC4BGlobals.setRunTLC(!line.hasOption(NOTLC));
 			TLC4BGlobals.setTranslate(!line.hasOption(NOTRANSLATION));
@@ -531,6 +533,7 @@ public class TLC4B {
 		options.addOption(WORKERS, true, "");
 		options.addOption(CONSTANTSSETUP, true, "use constants found by ProB for TLC model checking");
 		options.addOption(LTLFORMULA, true, "");
+		options.addOption(VERBOSE, "put TLC4B in verbose mode");
 
 		return options;
 	}
