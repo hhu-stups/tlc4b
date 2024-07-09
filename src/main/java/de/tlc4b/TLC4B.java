@@ -22,10 +22,36 @@ import de.tlc4b.exceptions.TranslationException;
 import de.tlc4b.tlc.TLCOutputInfo;
 import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.util.StopWatch;
+import org.apache.commons.cli.*;
+
 import static de.tlc4b.util.StopWatch.Watches.*;
 import static de.tlc4b.MP.*;
 
 public class TLC4B {
+
+	public static final String NODEAD = "nodead";
+	public static final String NOTLC = "notlc";
+	public static final String NOTRANSLATION = "notranslation";
+	public static final String NOGOAL = "nogoal";
+	public static final String NOINV = "noinv";
+	public static final String NOASS = "noass";
+	public static final String WDCHECK = "wdcheck";
+	public static final String SYMMETRY = "symmetry";
+	public static final String TOOL = "tool";
+	public static final String TMP = "tmp";
+	public static final String NOLTL = "noltl";
+	public static final String LAZYCONSTANTS = "lazyconstants";
+	public static final String TESTSCRIPT = "testscript";
+	public static final String NOTRACE = "notrace";
+	public static final String DEL = "del";
+	public static final String PARINVEVAL = "parinveval";
+	public static final String LOG = "log";
+	public static final String MAXINT = "maxint";
+	public static final String DEFAULT_SETSIZE = "default_setsize";
+	public static final String MININT = "minint";
+	public static final String WORKERS = "workers";
+	public static final String CONSTANTSSETUP = "constantssetup";
+	public static final String LTLFORMULA = "ltlformula";
 
 	private String filename;
 	private File mainfile;
@@ -93,9 +119,9 @@ public class TLC4B {
 				+ TLC4BGlobals.isPartialInvariantEvaluation());
 		println("| Lazy constants setup: "
 				+ !TLC4BGlobals.isForceTLCToEvalConstants());
-		println("| Agressive well-definedness check: "
+		println("| Aggressive well-definedness check: "
 				+ TLC4BGlobals.checkWelldefinedness());
-		println("| Prob constant setup: " + TLC4BGlobals.isProBconstantsSetup());
+		println("| ProB constant setup: " + TLC4BGlobals.isProBconstantsSetup());
 		println("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
 		println("| MIN Int: " + TLC4BGlobals.getMIN_INT());
 		println("| MAX Int: " + TLC4BGlobals.getMAX_INT());
@@ -124,9 +150,7 @@ public class TLC4B {
 			String trace = results.getTrace();
 			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
 			File traceFile = createFile(mainfile.getParentFile(), tracefileName, trace, false);
-			if (traceFile != null) {
-				println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
-			}
+			println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
 		}
 
 	}
@@ -162,8 +186,7 @@ public class TLC4B {
 		}
 		if (TLC4BGlobals.isRunTLC()) {
 			MP.TLCOutputStream.changeOutputStream();
-			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension,
-					tlc4b.buildDir);
+			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
 			MP.TLCOutputStream.resetOutputStream();
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
@@ -174,8 +197,7 @@ public class TLC4B {
 	}
 
 	public static void testString(String machineString, boolean deleteFiles) throws Exception {
-		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up
-															// windows
+		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4BGlobals.setCreateTraceFile(false);
@@ -215,112 +237,88 @@ public class TLC4B {
 	}
 
 	private void handleParameter(String[] args) {
-		int index = 0;
-		while (index < args.length) {
-			if (args[index].equalsIgnoreCase("-nodead")) {
-				TLC4BGlobals.setDeadlockCheck(false);
-			} else if (args[index].equalsIgnoreCase("-notlc")) {
-				TLC4BGlobals.setRunTLC(false);
-			} else if (args[index].equalsIgnoreCase("-notranslation")) {
-				TLC4BGlobals.setTranslate(false);
-			} else if (args[index].equalsIgnoreCase("-nogoal")) {
-				TLC4BGlobals.setGOAL(false);
-			} else if (args[index].equalsIgnoreCase("-noinv")) {
-				TLC4BGlobals.setInvariant(false);
-			} else if (args[index].equalsIgnoreCase("-noass")) {
-				TLC4BGlobals.setAssertionCheck(false);
-			} else if (args[index].equalsIgnoreCase("-wdcheck")) {
-				TLC4BGlobals.setWelldefinednessCheck(true);
-			} else if (args[index].equalsIgnoreCase("-symmetry")) {
-				TLC4BGlobals.setSymmetryUse(true);
-			} else if (args[index].equalsIgnoreCase("-tool")) {
-				TLC4BGlobals.setTool(false);
-			} else if (args[index].equalsIgnoreCase("-tmp")) {
-				buildDir = new File(System.getProperty("java.io.tmpdir"));
-			} else if (args[index].equalsIgnoreCase("-noltl")) {
-				TLC4BGlobals.setCheckltl(false);
-			} else if (args[index].equalsIgnoreCase("-lazyconstants")) {
-				TLC4BGlobals.setForceTLCToEvalConstants(false);
-			} else if (args[index].equalsIgnoreCase("-testscript")) {
-				TLC4BGlobals.setRunTestscript(true);
-			} else if (args[index].equalsIgnoreCase("-notrace")) {
-				TLC4BGlobals.setCreateTraceFile(false);
-			} else if (args[index].equalsIgnoreCase("-del")) {
-				TLC4BGlobals.setDeleteOnExit(true);
-			} else if (args[index].equalsIgnoreCase("-parinveval")) {
-				TLC4BGlobals.setPartialInvariantEvaluation(true);
-			} else if (args[index].equalsIgnoreCase("-log")) {
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: File required after option '-log'.");
-				}
-				logFileString = args[index];
+		DefaultParser parser = new DefaultParser();
+		Options options = getCommandlineOptions();
+		try {
+			CommandLine line = parser.parse(options, args);
 
-			} else if (args[index].equalsIgnoreCase("-maxint")) {
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: Number required after option '-maxint'.");
-				}
-				int maxint = Integer.parseInt(args[index]);
-				TLC4BGlobals.setMAX_INT(maxint);
-			} else if (args[index].equalsIgnoreCase("-default_setsize")) {
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: Number required after option '-default_setsize'.");
-				}
-				int deferredSetSize = Integer.parseInt(args[index]);
-				TLC4BGlobals.setDEFERRED_SET_SIZE(deferredSetSize);
-			} 
-			else if (args[index].equalsIgnoreCase("-minint")) {
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: Number required after option '-minint'.");
-				}
-				int minint = Integer.parseInt(args[index]);
-				TLC4BGlobals.setMIN_INT(minint);
-			} else if (args[index].equalsIgnoreCase("-workers")) {
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: Number required after option '-workers'.");
-				}
-				int workers = Integer.parseInt(args[index]);
-				TLC4BGlobals.setWorkers(workers);
-			} else if (args[index].equalsIgnoreCase("-constantssetup")) {
-				TLC4BGlobals.setProBconstantsSetup(true);
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: String required after option '-constantssetup'.");
-				}
-				constantsSetup = args[index];
-			} else if (args[index].equalsIgnoreCase("-ltlformula")) {
-				index = index + 1;
-				if (index == args.length) {
-					throw new TLC4BIOException(
-							"Error: LTL formula required after option '-ltlformula'.");
-				}
-				ltlFormula = args[index];
-			} else if (args[index].charAt(0) == '-') {
-				throw new TLC4BIOException("Error: unrecognized option: "
-						+ args[index]);
+			String[] remainingArgs = line.getArgs();
+			if (remainingArgs.length != 1) {
+				throw new TLC4BIOException("Main machine required!");
 			} else {
-				if (filename != null) {
-					throw new TLC4BIOException(
-							"Error: more than one input files: " + filename
-									+ " and " + args[index]);
-				}
-				filename = args[index];
-
+				filename = remainingArgs[0];
 			}
-			index++;
-		}
-		if (filename == null) {
-			throw new TLC4BIOException("Main machine required!");
+
+			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD));
+			TLC4BGlobals.setRunTLC(!line.hasOption(NOTLC));
+			TLC4BGlobals.setTranslate(!line.hasOption(NOTRANSLATION));
+			TLC4BGlobals.setGOAL(!line.hasOption(NOGOAL));
+			TLC4BGlobals.setInvariant(!line.hasOption(NOINV));
+			TLC4BGlobals.setAssertionCheck(!line.hasOption(NOASS));
+			TLC4BGlobals.setWelldefinednessCheck(line.hasOption(WDCHECK));
+			TLC4BGlobals.setSymmetryUse(line.hasOption(SYMMETRY));
+			TLC4BGlobals.setTool(!line.hasOption(TOOL));
+			TLC4BGlobals.setCheckltl(!line.hasOption(NOLTL));
+			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(LAZYCONSTANTS));
+			TLC4BGlobals.setRunTestscript(line.hasOption(TESTSCRIPT));
+			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE));
+			TLC4BGlobals.setDeleteOnExit(line.hasOption(DEL));
+			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(PARINVEVAL));
+
+			if (line.hasOption(TMP)) {
+				buildDir = new File(System.getProperty("java.io.tmpdir"));
+			}
+			if (line.hasOption(LOG)) {
+				logFileString = line.getOptionValue(LOG);
+				if (logFileString == null) {
+					throw new TLC4BIOException("Error: File required after option '-log'.");
+				}
+			}
+			if (line.hasOption(MAXINT)) {
+				String maxint = line.getOptionValue(MAXINT);
+				if (maxint == null) {
+					throw new TLC4BIOException("Error: Number required after option '-maxint'.");
+				}
+				TLC4BGlobals.setMAX_INT(Integer.parseInt(maxint));
+			}
+			if (line.hasOption(DEFAULT_SETSIZE)) {
+				String deferredSetSize = line.getOptionValue(DEFAULT_SETSIZE);
+				if (deferredSetSize == null) {
+					throw new TLC4BIOException("Error: Number required after option '-default_setsize'.");
+				}
+				TLC4BGlobals.setDEFERRED_SET_SIZE(Integer.parseInt(deferredSetSize));
+			} 
+			if (line.hasOption(MININT)) {
+				String minint = line.getOptionValue(MININT);
+				if (minint == null) {
+					throw new TLC4BIOException("Error: Number required after option '-minint'.");
+				}
+				TLC4BGlobals.setMIN_INT(Integer.parseInt(minint));
+			}
+			if (line.hasOption(WORKERS)) {
+				String workers = line.getOptionValue(WORKERS);
+				if (workers == null) {
+					throw new TLC4BIOException("Error: Number required after option '-workers'.");
+				}
+				TLC4BGlobals.setWorkers(Integer.parseInt(workers));
+			}
+			if (line.hasOption(CONSTANTSSETUP)) {
+				TLC4BGlobals.setProBconstantsSetup(true);
+				constantsSetup = line.getOptionValue(CONSTANTSSETUP);
+				if (constantsSetup == null) {
+					throw new TLC4BIOException("Error: String required after option '-constantssetup'.");
+				}
+			}
+			if (line.hasOption(LTLFORMULA)) {
+				ltlFormula = line.getOptionValue(LTLFORMULA);
+				if (ltlFormula == null) {
+					throw new TLC4BIOException("Error: LTL formula required after option '-ltlformula'.");
+				}
+			}
+		} catch (ParseException e) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp("[file]", options);
+			throw new TLC4BIOException(e.getMessage());
 		}
 	}
 
@@ -386,11 +384,8 @@ public class TLC4B {
 	private void createLogFile(Log log) {
 		if (logFileString != null) {
 			File logFile = new File(logFileString);
-			FileWriter fw;
-			boolean fileExists = logFile.exists();
-			try {
-				fw = new FileWriter(logFile, true); // the true will append the new data
-				if (!fileExists) {
+			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
+				if (!logFile.exists()) {
 					fw.write(log.getCSVFieldNamesLine());
 				}
 				fw.write(log.getCSVValueLine());
@@ -411,16 +406,12 @@ public class TLC4B {
 		File moduleFile = createFile(buildDir,
 				machineFileNameWithoutFileExtension + ".tla", tlaModule,
 				TLC4BGlobals.isDeleteOnExit());
-		if (moduleFile != null) {
-			println("TLA+ module '" + moduleFile.getAbsolutePath() + "' created.");
-		}
+		println("TLA+ module '" + moduleFile.getAbsolutePath() + "' created.");
 
 		File configFile = createFile(buildDir,
 				machineFileNameWithoutFileExtension + ".cfg", config,
 				TLC4BGlobals.isDeleteOnExit());
-		if (configFile != null) {
-			println("Configuration file '" + configFile.getAbsolutePath() + "' created.");
-		}
+		println("Configuration file '" + configFile.getAbsolutePath() + "' created.");
 
 		createStandardModules();
 	}
@@ -450,8 +441,7 @@ public class TLC4B {
 
 			if (is == null) {
 				// should never happen
-				throw new TranslationException(
-						"Unable to determine the source of the standard module: " + name);
+				throw new TranslationException("Unable to determine the source of the standard module: " + name);
 			}
 
 			fos = new FileOutputStream(file);
@@ -513,6 +503,36 @@ public class TLC4B {
 
 	public File getMainFile(){
 		return this.mainfile;
+	}
+
+	private static Options getCommandlineOptions() {
+		Options options = new Options();
+
+		options.addOption(NODEAD, "do not look for deadlocks (for model check, animate, execute)");
+		options.addOption(NOTLC, "");
+		options.addOption(NOTRANSLATION, "");
+		options.addOption(NOGOAL, "");
+		options.addOption(NOINV, "");
+		options.addOption(NOASS, "");
+		options.addOption(WDCHECK, "");
+		options.addOption(SYMMETRY, "");
+		options.addOption(TOOL, "");
+		options.addOption(TMP, "");
+		options.addOption(NOLTL, "");
+		options.addOption(LAZYCONSTANTS, "");
+		options.addOption(TESTSCRIPT, "");
+		options.addOption(NOTRACE, "");
+		options.addOption(DEL, "");
+		options.addOption(PARINVEVAL, "");
+		options.addOption(LOG, true, "");
+		options.addOption(MAXINT, true, "");
+		options.addOption(DEFAULT_SETSIZE, true, "");
+		options.addOption(MININT, true, "");
+		options.addOption(WORKERS, true, "");
+		options.addOption(CONSTANTSSETUP, true, "use constants found by ProB for TLC model checking");
+		options.addOption(LTLFORMULA, true, "");
+
+		return options;
 	}
 	
 }
