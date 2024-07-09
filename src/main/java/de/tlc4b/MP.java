@@ -15,6 +15,16 @@ public class MP {
 		err.println(errorMessage);
 	}
 
+	public static void printlnVerbose(String message) {
+		if (TLC4BGlobals.isVerbose())
+			out.println(message);
+	}
+
+	public static void printVerbose(String message) {
+		if (TLC4BGlobals.isVerbose())
+			out.print(message);
+	}
+
 	public static void println(String message) {
 		out.println(message);
 	}

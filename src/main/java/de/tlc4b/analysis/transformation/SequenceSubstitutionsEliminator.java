@@ -6,7 +6,7 @@ import de.be4.classicalb.core.parser.node.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static de.tlc4b.MP.println;
+import static de.tlc4b.MP.printlnVerbose;
 
 /**
  * Replace all SequenceSubstitutions by ParallelSubstitutions.
@@ -229,7 +229,7 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void outASequenceSubstitution(ASequenceSubstitution node) {
 		node.replaceBy(new AParallelSubstitution(new ArrayList<>(node.getSubstitutions())));
-		println(node.getStartPos() + "-" + node.getEndPos() + ": replaced sequential substitution by parallel substitution");
+		printlnVerbose(node.getStartPos() + "-" + node.getEndPos() + ": replaced sequential substitution by parallel substitution");
 
 		if (modeStack.removeFirst() != SubstitutionMode.SEQUENTIAL) {
 			throw new IllegalStateException("expected SEQUENTIAL mode");
