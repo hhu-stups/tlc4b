@@ -173,7 +173,9 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 			throw new IllegalStateException("expected PARALLEL mode");
 		}
 
-		parallelAssignedVariables.addAll(currentAssignedVariables.removeFirst());
+		if (!currentAssignedVariables.isEmpty()) {
+			parallelAssignedVariables.addAll(currentAssignedVariables.removeFirst());
+		}
 		if (!modeStack.isEmpty() && modeStack.getFirst() == SubstitutionMode.SEQUENTIAL) {
 			currentAssignedVariables.getFirst().addAll(parallelAssignedVariables);
 			parallelAssignedVariables.clear();

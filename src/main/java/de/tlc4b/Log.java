@@ -14,7 +14,6 @@ public class Log {
 	private final ArrayList<String> fieldValues = new ArrayList<>();
 
 	public Log(TLC4B tlc4b, TLCResults tlcResults) {
-
 		fieldNames.add("Machine File");
 		String machineFile = tlc4b.getMainFile().getAbsolutePath();
 		fieldValues.add(machineFile);
@@ -32,8 +31,7 @@ public class Log {
 		fieldValues.add(String.valueOf(translationTime));
 
 		fieldNames.add("Model Checking Time (ms)");
-		long modelCheckingTime = StopWatch
-				.getRunTime(Watches.MODEL_CHECKING_TIME);
+		long modelCheckingTime = StopWatch.getRunTime(Watches.MODEL_CHECKING_TIME);
 		fieldValues.add(String.valueOf(modelCheckingTime));
 		
 		fieldNames.add("TLC Result");

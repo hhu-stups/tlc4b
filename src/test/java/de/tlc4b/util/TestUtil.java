@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -179,7 +180,7 @@ public class TestUtil {
 	private static Process startJVM(final String mainClass, final String[] arguments)
 			throws IOException {
 
-		String separator = System.getProperty("file.separator");
+		String separator = FileSystems.getDefault().getSeparator();
 
 		String jvm = System.getProperty("java.home") + separator + "bin" + separator + "java";
 		String classpath = System.getProperty("java.class.path");
@@ -193,8 +194,7 @@ public class TestUtil {
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.redirectErrorStream(true);
-		Process process = processBuilder.start();
-		return process;
+		return processBuilder.start();
 	}
 
 	public static void testParse(String[] args, boolean deleteFiles) throws IOException, BCompoundException, FrontEndException {
@@ -230,7 +230,7 @@ class StreamGobbler extends Thread {
 		try {
 			InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 			BufferedReader br = new BufferedReader(isr);
-			String line = null;
+			String line;
 			while ((line = br.readLine()) != null) {
 				System.out.println("> " + line);
 				log.add(line);
