@@ -56,7 +56,7 @@ public class TLC4BCliOptions {
 		options.addOption(CONSTANTSSETUP, true, "use constants found by ProB for TLC model checking");
 		options.addOption(LTLFORMULA, true, "");
 		options.addOption(VERBOSE, "put TLC4B in verbose mode");
-		
+
 		return options;
 	}
 	

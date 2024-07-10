@@ -2,6 +2,7 @@ package de.tlc4b.analysis.transformation;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
+import de.tlc4b.exceptions.NotSupportedException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,11 +25,11 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 
 	private ASequenceSubstitution topLevel = null;
 	private boolean initialisationMode = false, replacementMode = false;
-	private final Set<List<String>> assignedVariables = new HashSet<>();
+
 	private final Set<List<String>> parallelAssignedVariables = new HashSet<>();
-	private final Deque<Set<List<String>>> currentAssignedVariables = new ArrayDeque<>();
-	private final Set<Node> primeNodes = new HashSet<>();
+	private final Set<List<String>> currentAssignedVariables = new HashSet<>();
 	private final Deque<SubstitutionMode> modeStack = new ArrayDeque<>();
+	private final Set<Node> primeNodes = new HashSet<>();
 
 	public SequenceSubstitutionsEliminator(Start start) {
 		start.apply(this);
@@ -68,8 +69,10 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 		for (PExpression lhs : node.getLhsExpression()) {
 			if (lhs instanceof AIdentifierExpression) {
 				assignVariables((AIdentifierExpression) lhs);
+			} else if (lhs instanceof AFunctionExpression) {
+				// TODO: what to do with AFunctionExpression?
+				throw new NotSupportedException("function assignments in sequential substitutions are not yet supported");
 			}
-			// TODO: what to do with AFunctionExpression?
 		}
 	}
 
@@ -110,8 +113,8 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 		if (topLevel == null)
 			return;
 
-		if (!initialisationMode && replacementMode && !currentAssignedVariables.isEmpty()
-				&& currentAssignedVariables.getFirst().contains(identifierToStringList(node))) {
+		// mark identifiers that have already been assigned in the current block as primed
+		if (!initialisationMode && replacementMode && currentAssignedVariables.contains(identifierToStringList(node))) {
 			primeNodes.add(node);
 		}
 	}
@@ -159,12 +162,6 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void inAParallelSubstitution(AParallelSubstitution node) {
 		modeStack.push(SubstitutionMode.PARALLEL);
-
-		Set<List<String>> variables = new HashSet<>();
-		if (!currentAssignedVariables.isEmpty()) {
-			variables.addAll(currentAssignedVariables.getFirst());
-		}
-		currentAssignedVariables.push(variables);
 	}
 
 	@Override
@@ -173,11 +170,8 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 			throw new IllegalStateException("expected PARALLEL mode");
 		}
 
-		if (!currentAssignedVariables.isEmpty()) {
-			parallelAssignedVariables.addAll(currentAssignedVariables.removeFirst());
-		}
-		if (!modeStack.isEmpty() && modeStack.getFirst() == SubstitutionMode.SEQUENTIAL) {
-			currentAssignedVariables.getFirst().addAll(parallelAssignedVariables);
+		if (modeStack.peekFirst() == SubstitutionMode.SEQUENTIAL) {
+			currentAssignedVariables.addAll(parallelAssignedVariables);
 			parallelAssignedVariables.clear();
 		}
 	}
@@ -218,12 +212,6 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 			topLevel = node;
 		}
 		modeStack.push(SubstitutionMode.SEQUENTIAL);
-
-		Set<List<String>> variables = new HashSet<>();
-		if (!currentAssignedVariables.isEmpty()) {
-			variables.addAll(currentAssignedVariables.getFirst());
-		}
-		currentAssignedVariables.push(variables);
 	}
 
 	@Override
@@ -231,15 +219,11 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 		node.replaceBy(new AParallelSubstitution(new ArrayList<>(node.getSubstitutions())));
 		printlnVerbose(node.getStartPos() + "-" + node.getEndPos() + ": replaced sequential substitution by parallel substitution");
 
-		if (modeStack.removeFirst() != SubstitutionMode.SEQUENTIAL) {
+		if (modeStack.pollFirst() != SubstitutionMode.SEQUENTIAL) {
 			throw new IllegalStateException("expected SEQUENTIAL mode");
 		}
-
-		Set<List<String>> currVariables = currentAssignedVariables.removeFirst();
-		if (!modeStack.isEmpty() && modeStack.getFirst() == SubstitutionMode.PARALLEL) {
-			parallelAssignedVariables.addAll(currVariables);
-		} else if (!currentAssignedVariables.isEmpty()) {
-			currentAssignedVariables.getFirst().addAll(currVariables);
+		if (modeStack.peekFirst() == SubstitutionMode.PARALLEL) {
+			parallelAssignedVariables.addAll(currentAssignedVariables);
 		}
 
 		if (topLevel.equals(node)) {
@@ -250,9 +234,9 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 	}
 
 	private void assignVariables(AIdentifierExpression lhs) {
-		if (modeStack.getFirst().equals(SubstitutionMode.SEQUENTIAL) && !currentAssignedVariables.isEmpty()) {
-			currentAssignedVariables.getFirst().add(identifierToStringList(lhs));
-		} else if (modeStack.getFirst().equals(SubstitutionMode.PARALLEL)) {
+		if (modeStack.peekFirst() == SubstitutionMode.SEQUENTIAL) {
+			currentAssignedVariables.add(identifierToStringList(lhs));
+		} else if (modeStack.peekFirst() == SubstitutionMode.PARALLEL) {
 			parallelAssignedVariables.add(identifierToStringList(lhs));
 		}
 	}
