@@ -55,16 +55,15 @@ public class TLC4B {
 		} catch (BCompoundException e) {
 			printlnErr("***** Parsing Error *****");
 			printlnErr(e.getMessage());
-			return;
+			System.exit(-1);
 		} catch (TLC4BException e) {
 			printlnErr(e.getMessage());
-			println("Model checking time: 0 sec");
 			println("Result: " + e.getError());
-			return;
+			System.exit(-1);
 		} catch (IOException e) {
 			printlnErr(e.getMessage());
-			println("Model checking time: 0 sec");
 			println("Result: " + "I/O Error");
+			System.exit(-1);
 		}
 
 		if (TLC4BGlobals.isRunTLC()) {
@@ -92,24 +91,18 @@ public class TLC4B {
 		println("| Assertion check: " + TLC4BGlobals.isAssertion());
 		println("| Find Goal check: " + TLC4BGlobals.isGOAL());
 		println("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
-		println("| Partial invariant evaluation: "
-				+ TLC4BGlobals.isPartialInvariantEvaluation());
-		println("| Lazy constants setup: "
-				+ !TLC4BGlobals.isForceTLCToEvalConstants());
-		println("| Aggressive well-definedness check: "
-				+ TLC4BGlobals.checkWelldefinedness());
+		println("| Partial invariant evaluation: " + TLC4BGlobals.isPartialInvariantEvaluation());
+		println("| Lazy constants setup: " + !TLC4BGlobals.isForceTLCToEvalConstants());
+		println("| Aggressive well-definedness check: " + TLC4BGlobals.checkWelldefinedness());
 		println("| ProB constant setup: " + TLC4BGlobals.isProBconstantsSetup());
 		println("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
 		println("| MIN Int: " + TLC4BGlobals.getMIN_INT());
 		println("| MAX Int: " + TLC4BGlobals.getMAX_INT());
-		println("| Standard deferred set size: "
-				+ TLC4BGlobals.getDEFERRED_SET_SIZE());
+		println("| Standard deferred set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
 		println("--------------------------------");
 		println("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
-		println("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME)
-				+ " ms");
-		println("Model checking time: " + results.getModelCheckingTime()
-				+ " sec");
+		println("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME) + " ms");
+		println("Model checking time: " + results.getModelCheckingTime() + " sec");
 		// MP.printMessage("Number of workers: " +
 		// TLCGlobals.getNumWorkers());
 		if (!results.getViolatedAssertions().isEmpty()) {
