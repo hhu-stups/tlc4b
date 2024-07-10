@@ -222,9 +222,6 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 		if (modeStack.pollFirst() != SubstitutionMode.SEQUENTIAL) {
 			throw new IllegalStateException("expected SEQUENTIAL mode");
 		}
-		if (modeStack.peekFirst() == SubstitutionMode.PARALLEL) {
-			parallelAssignedVariables.addAll(currentAssignedVariables);
-		}
 
 		if (topLevel.equals(node)) {
 			topLevel = null;
