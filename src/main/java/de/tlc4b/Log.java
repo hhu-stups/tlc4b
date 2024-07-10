@@ -36,6 +36,16 @@ public class Log {
 		
 		fieldNames.add("TLC Result");
 		fieldValues.add(tlcResults.getResultString());
+
+		fieldNames.add("States analysed");
+		fieldValues.add(Integer.toString(tlcResults.getNumberOfDistinctStates()));
+
+		fieldNames.add("Transitions fired");
+		fieldValues.add(Integer.toString(tlcResults.getNumberOfTransitions()));
+
+		fieldNames.add("Violated Definition");
+		String violatedDefinition = tlcResults.getViolatedDefinition();
+		fieldValues.add(violatedDefinition != null ? violatedDefinition : "");
 	}
 
 	public String getCSVValueLine() {

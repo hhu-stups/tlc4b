@@ -386,8 +386,9 @@ public class TLC4B {
 	private void createLogFile(Log log) {
 		if (logFileString != null) {
 			File logFile = new File(logFileString);
+			boolean exists = logFile.exists();
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
-				if (!logFile.exists()) {
+				if (!exists) {
 					fw.write(log.getCSVFieldNamesLine());
 				}
 				fw.write(log.getCSVValueLine());
@@ -526,7 +527,7 @@ public class TLC4B {
 		options.addOption(NOTRACE, "");
 		options.addOption(DEL, "");
 		options.addOption(PARINVEVAL, "");
-		options.addOption(LOG, true, "");
+		options.addOption(LOG, true, "write statistics to CSV file");
 		options.addOption(MAXINT, true, "");
 		options.addOption(DEFAULT_SETSIZE, true, "");
 		options.addOption(MININT, true, "");
