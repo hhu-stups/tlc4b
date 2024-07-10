@@ -326,12 +326,12 @@ public class TLC4B {
 
 	public void process(String[] args) throws IOException, BCompoundException {
 
-		MP.print("Arguments: ");
+		MP.printVerbose("Arguments: ");
 		for (String string : args) {
-			MP.print(string);
-			MP.print(" ");
+			MP.printVerbose(string);
+			MP.printVerbose(" ");
 		}
-		println("");
+		printlnVerbose("");
 
 		handleParameter(args);
 
