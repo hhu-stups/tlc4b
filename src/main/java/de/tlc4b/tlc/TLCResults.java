@@ -1,31 +1,21 @@
 package de.tlc4b.tlc;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.exceptions.NotSupportedException;
-import static de.tlc4b.tlc.TLCResults.TLCResult.*;
-import tla2sany.semantic.AssumeNode;
-import tla2sany.semantic.ExprNode;
-import tla2sany.semantic.ExprOrOpArgNode;
-import tla2sany.semantic.ModuleNode;
-import tla2sany.semantic.OpApplNode;
-import tla2sany.semantic.OpDefNode;
-import tla2sany.semantic.SymbolNode;
-import tla2sany.semantic.ThmOrAssumpDefNode;
+import tla2sany.semantic.*;
 import tla2sany.st.Location;
 import tlc2.output.EC;
-import static tlc2.output.MP.*;
 import tlc2.output.Message;
 import tlc2.output.OutputCollector;
 import tlc2.tool.BuiltInOPs;
 import tlc2.tool.TLCStateInfo;
 import tlc2.tool.ToolGlobals;
+
+import java.util.*;
+import java.util.Map.Entry;
+
+import static de.tlc4b.tlc.TLCResults.TLCResult.*;
+import static tlc2.output.MP.*;
 
 public class TLCResults implements ToolGlobals {
 
@@ -73,10 +63,10 @@ public class TLCResults implements ToolGlobals {
 		return violatedDefinition;
 	}
 
-	public ArrayList<String> getViolatedAssertions(){
+	public ArrayList<String> getViolatedAssertions() {
 		return this.violatedAssertions;
 	}
-	
+
 	public int getNumberOfTransitions() {
 		return numberOfTransitions;
 	}
@@ -92,39 +82,32 @@ public class TLCResults implements ToolGlobals {
 
 		evalAllMessages();
 
-		if (hasTrace()
-				|| (TLC4BGlobals.getTestingMode() && OutputCollector
-						.getInitialState() != null)) {
+		if (hasTrace() || (TLC4BGlobals.getTestingMode() && OutputCollector.getInitialState() != null)) {
 			evalTrace();
 		}
 
-		if (tlcResult == NoError && tlcOutputInfo.hasInitialisation()
-				&& numberOfDistinctStates == 0) {
+		if (tlcResult == NoError && tlcOutputInfo.hasInitialisation() && numberOfDistinctStates == 0) {
 			// Can not setup constants
 			tlcResult = InitialStateError;
 		}
 
-		if (TLC4BGlobals.isPrintCoverage()
-				&& !OutputCollector.getLineCountTable().isEmpty()) {
+		if (TLC4BGlobals.isPrintCoverage() && !OutputCollector.getLineCountTable().isEmpty()) {
 			evalCoverage();
 		}
 	}
 
 	private void evalCoverage() {
 		Hashtable<Integer, Long> lineCount = new Hashtable<>();
-		Set<Entry<Location, Long>> entrySet = OutputCollector
-				.getLineCountTable().entrySet();
+		Set<Entry<Location, Long>> entrySet = OutputCollector.getLineCountTable().entrySet();
 		for (Entry<Location, Long> entry : entrySet) {
 			int endline = entry.getKey().endLine();
 			if (lineCount.containsKey(endline)) {
-				lineCount.put(endline,
-						Math.max(lineCount.get(endline), entry.getValue()));
+				lineCount.put(endline, Math.max(lineCount.get(endline), entry.getValue()));
 			} else {
 				lineCount.put(endline, entry.getValue());
 			}
 		}
-		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector
-				.getModuleNode());
+		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.getModuleNode());
 		operationsCount = new LinkedHashMap<>();
 		for (OpDefNode opDefNode : defs) {
 			String operationName = opDefNode.getName().toString();
@@ -136,8 +119,7 @@ public class TLCResults implements ToolGlobals {
 		}
 	}
 
-	private ArrayList<OpDefNode> getActionsFromGeneratedModule(
-			ModuleNode moduleNode) {
+	private ArrayList<OpDefNode> getActionsFromGeneratedModule(ModuleNode moduleNode) {
 		// list of actions in the module
 		ArrayList<OpDefNode> actions = new ArrayList<>();
 
@@ -178,9 +160,7 @@ public class TLCResults implements ToolGlobals {
 			return (OpDefNode) opNode;
 		} else {
 			throw new NotSupportedException(
-					"Can not find action in next state relation. Unknown node: "
-							+ opNode.getClass());
-
+				"Can not find action in next state relation. Unknown node: " + opNode.getClass());
 		}
 	}
 
@@ -190,8 +170,7 @@ public class TLCResults implements ToolGlobals {
 		if (trace != null) {
 			printer = new TracePrinter(trace, tlcOutputInfo);
 		} else if (OutputCollector.getInitialState() != null) {
-			printer = new TracePrinter(OutputCollector.getInitialState(),
-					tlcOutputInfo);
+			printer = new TracePrinter(OutputCollector.getInitialState(), tlcOutputInfo);
 		}
 		if (printer != null) {
 			traceString = printer.getTrace().toString();
@@ -203,21 +182,21 @@ public class TLCResults implements ToolGlobals {
 		ArrayList<Message> messages = OutputCollector.getAllMessages();
 		for (Message m : messages) {
 			switch (m.getMessageClass()) {
-			case ERROR:
-				evalErrorMessage(m);
-				break;
-			case TLCBUG:
-				break;
-			case STATE:
-				lengthOfTrace++;
-				break;
-			case WARNING:
-				break;
-			case NONE:
-				evalStatusMessage(m);
-				break;
-			default:
-				break;
+				case ERROR:
+					evalErrorMessage(m);
+					break;
+				case TLCBUG:
+					break;
+				case STATE:
+					lengthOfTrace++;
+					break;
+				case WARNING:
+					break;
+				case NONE:
+					evalStatusMessage(m);
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -231,117 +210,116 @@ public class TLCResults implements ToolGlobals {
 
 		switch (m.getMessageCode()) {
 
-		case EC.TLC_STARTING:
-			startTime = m.getDate();
-			break;
-		case EC.TLC_FINISHED:
-			endTime = m.getDate();
-			break;
+			case EC.TLC_STARTING:
+				startTime = m.getDate();
+				break;
+			case EC.TLC_FINISHED:
+				endTime = m.getDate();
+				break;
 
-		case EC.TLC_STATS:
-			numberOfTransitions = Integer.parseInt(m.getParameters()[0]);
-			numberOfDistinctStates = Integer.parseInt(m.getParameters()[1]);
-			break;
+			case EC.TLC_STATS:
+				numberOfTransitions = Integer.parseInt(m.getParameters()[0]);
+				numberOfDistinctStates = Integer.parseInt(m.getParameters()[1]);
+				break;
 
-		case EC.TLC_STATS_DFID:
+			case EC.TLC_STATS_DFID:
+				break;
 
-			break;
+			case EC.TLC_SUCCESS:
+				tlcResult = TLCResult.NoError;
+				break;
 
-		case EC.TLC_SUCCESS:
-			tlcResult = TLCResult.NoError;
-			break;
-
-		default:
-			break;
+			default:
+				break;
 		}
 
 	}
 
 	private void evalErrorMessage(Message m) {
 		switch (m.getMessageCode()) {
-		case EC.TLC_INVARIANT_VIOLATED_INITIAL:
-		case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
-			if (m.getParameters()[0].startsWith("Assertion")) {
-				tlcResult = AssertionError;
-			} else if (m.getParameters()[0].equals("NotGoal")) {
-				tlcResult = Goal;
-			} else if (m.getParameters()[0].startsWith("ASSERT_LTL")) {
-				tlcResult = TemporalPropertyViolation;
-			} else {
-				tlcResult = InvariantViolation;
-			}
-			if (m.getParameters().length > 0) {
-				violatedDefinition = m.getParameters()[0];
-			}
-			break;
-
-		case EC.TLC_INITIAL_STATE: {
-			String arg1 = m.getParameters()[0];
-			if (arg1.contains("Attempted to compute the number of elements in the overridden")) {
-				// TODO
-			}
-			tlcResult = EnumerationError;
-			return;
-		}
-
-		case EC.TLC_DEADLOCK_REACHED:
-			tlcResult = TLCResult.Deadlock;
-			break;
-
-		case EC.TLC_ASSUMPTION_FALSE:
-			// get the violated assumption expr from the OutputCollector
-			ArrayList<ExprNode> violatedAssumptions = OutputCollector
-					.getViolatedAssumptions();
-			if (!violatedAssumptions.isEmpty()) {
-				// try to find the assume node contain the expr in order to get
-				// the name of the assumption
-				for (ExprNode exprNode : violatedAssumptions) {
-					AssumeNode assumeNode = findAssumeNode(exprNode);
-					ThmOrAssumpDefNode def = assumeNode.getDef();
-					// if the assumption is a named assumption, def is
-					// unequal null
-					// All B assertions are represented as named assumptions
-					// in the TLA module
-					if (def != null) {
-						String assertionName = def.getName().toString();
-						if(!violatedAssertions.contains(assertionName)){
-							this.violatedAssertions.add(assertionName);
-						}
-						tlcResult = TLCResult.AssertionError;
-					}
-
+			case EC.TLC_INVARIANT_VIOLATED_INITIAL:
+			case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
+				if (m.getParameters()[0].startsWith("Assertion")) {
+					tlcResult = AssertionError;
+				} else if (m.getParameters()[0].equals("NotGoal")) {
+					tlcResult = Goal;
+				} else if (m.getParameters()[0].startsWith("ASSERT_LTL")) {
+					tlcResult = TemporalPropertyViolation;
+				} else {
+					tlcResult = InvariantViolation;
 				}
+				if (m.getParameters().length > 0) {
+					violatedDefinition = m.getParameters()[0];
+				}
+				break;
+
+			case EC.TLC_INITIAL_STATE: {
+				String arg1 = m.getParameters()[0];
+				if (arg1.contains("Attempted to compute the number of elements in the overridden")) {
+					// TODO
+				}
+				tlcResult = EnumerationError;
+				return;
 			}
-			if(tlcResult == null){
-				// otherwise, it is normal properties error
-				tlcResult = TLCResult.PropertiesError;
-			}
-			break;
 
-		case EC.TLC_TEMPORAL_PROPERTY_VIOLATED:
-			tlcResult = TLCResult.TemporalPropertyViolation;
-			if (m.getParameters().length > 0) {
-				violatedDefinition = m.getParameters()[0];
-			}
-			break;
+			case EC.TLC_DEADLOCK_REACHED:
+				tlcResult = TLCResult.Deadlock;
+				break;
 
-		case EC.TLC_ASSUMPTION_EVALUATION_ERROR:
-			tlcResult = evaluatingParameter(m.getParameters());
-			break;
+			case EC.TLC_ASSUMPTION_FALSE:
+				// get the violated assumption expr from the OutputCollector
+				ArrayList<ExprNode> violatedAssumptions = OutputCollector
+					.getViolatedAssumptions();
+				if (!violatedAssumptions.isEmpty()) {
+					// try to find the assume node contain the expr in order to get
+					// the name of the assumption
+					for (ExprNode exprNode : violatedAssumptions) {
+						AssumeNode assumeNode = findAssumeNode(exprNode);
+						ThmOrAssumpDefNode def = assumeNode.getDef();
+						// if the assumption is a named assumption, def is
+						// unequal null
+						// All B assertions are represented as named assumptions
+						// in the TLA module
+						if (def != null) {
+							String assertionName = def.getName().toString();
+							if (!violatedAssertions.contains(assertionName)) {
+								this.violatedAssertions.add(assertionName);
+							}
+							tlcResult = TLCResult.AssertionError;
+						}
 
-		case EC.TLC_VALUE_ASSERT_FAILED:
-			tlcResult = WellDefinednessError;
-			break;
+					}
+				}
+				if (tlcResult == null) {
+					// otherwise, it is normal properties error
+					tlcResult = TLCResult.PropertiesError;
+				}
+				break;
 
-		case EC.TLC_MODULE_VALUE_JAVA_METHOD_OVERRIDE:
-			if (m.getParameters()[0].contains("tlc2.module.TLC.Assert")) {
+			case EC.TLC_TEMPORAL_PROPERTY_VIOLATED:
+				tlcResult = TLCResult.TemporalPropertyViolation;
+				if (m.getParameters().length > 0) {
+					violatedDefinition = m.getParameters()[0];
+				}
+				break;
+
+			case EC.TLC_ASSUMPTION_EVALUATION_ERROR:
+				tlcResult = evaluatingParameter(m.getParameters());
+				break;
+
+			case EC.TLC_VALUE_ASSERT_FAILED:
 				tlcResult = WellDefinednessError;
-			}
-			break;
+				break;
 
-		case EC.GENERAL:
-			tlcResult = evaluatingParameter(m.getParameters());
-			break;
+			case EC.TLC_MODULE_VALUE_JAVA_METHOD_OVERRIDE:
+				if (m.getParameters()[0].contains("tlc2.module.TLC.Assert")) {
+					tlcResult = WellDefinednessError;
+				}
+				break;
+
+			case EC.GENERAL:
+				tlcResult = evaluatingParameter(m.getParameters());
+				break;
 		}
 	}
 
@@ -379,7 +357,6 @@ public class TLCResults implements ToolGlobals {
 			} else if (s.contains("The property of ASSERT_LTL")) {
 				return TemporalPropertyViolation;
 			}
-
 		}
 		// unknown error
 		return null;
