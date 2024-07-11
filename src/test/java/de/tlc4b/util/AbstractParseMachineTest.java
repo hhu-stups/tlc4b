@@ -30,8 +30,7 @@ public abstract class AbstractParseMachineTest {
 	}
 
 	protected static File[] getMachinesRecursively(String path, ArrayList<String> ignoreList) {
-		File[] files = walk(path, ignoreList).toArray(new File[0]);
-		return files;
+		return walk(path, ignoreList).toArray(new File[0]);
 	}
 
 	private static ArrayList<File> walk(String path, ArrayList<String> ignoreList) {

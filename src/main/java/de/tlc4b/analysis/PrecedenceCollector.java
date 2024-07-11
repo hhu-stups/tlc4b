@@ -200,10 +200,10 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 }
 
 class Precedence {
-	int from;
-	int to;
-	String name;
-	boolean leftAssociative;
+	final int from;
+	final int to;
+	final String name;
+	final boolean leftAssociative;
 
 	public Precedence(String s, int from, int to, boolean leftAssociative) {
 		this.from = from;

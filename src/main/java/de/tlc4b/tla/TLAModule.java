@@ -19,7 +19,7 @@ public class TLAModule {
 	private ArrayList<PDefinition> bDefinitions;
 	private final ArrayList<Node> assertions;
 
-	protected ArrayList<PDefinition> allDefinitions;
+	protected final ArrayList<PDefinition> allDefinitions;
 
 	public TLAModule() {
 		this.tlaDefinitions = new ArrayList<>();

@@ -12,9 +12,9 @@ import de.tlc4b.btypes.BType;
 
 public class TestTypechecker {
 
-	Hashtable<String, BType> parameters;
-	Hashtable<String, BType> constants;
-	Hashtable<String, BType> variables;
+	final Hashtable<String, BType> parameters;
+	final Hashtable<String, BType> constants;
+	final Hashtable<String, BType> variables;
 
 	public TestTypechecker(String machine) throws BException {
 		parameters = new Hashtable<>();

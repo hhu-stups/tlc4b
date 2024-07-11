@@ -15,9 +15,9 @@ import de.tlc4b.tla.TLAModule;
 
 public class TLCOutputInfo {
 
-	public Hashtable<String, String> namesMapping;
-	Hashtable<String, BType> typesTable;
-	Set<String> constants;
+	public final Hashtable<String, String> namesMapping;
+	final Hashtable<String, BType> typesTable;
+	final Set<String> constants;
 	boolean constantSetup = false;
 	private final boolean hasInit;
 
