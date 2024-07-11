@@ -232,8 +232,7 @@ public class SetComprehensionOptimizer extends DepthFirstAdapter {
 			}
 		}
 
-		static boolean expressionContainsIdentifier(PExpression node,
-				Set<String> names) {
+		static boolean expressionContainsIdentifier(PExpression node, Set<String> names) {
 			DependenciesDetector dependenciesDetector = new DependenciesDetector(
 					names);
 			node.apply(dependenciesDetector);

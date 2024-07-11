@@ -17,8 +17,7 @@ public class StopWatch {
 	}
 	
 	public static long stop(Watches id) {
-		long stopTime = System.currentTimeMillis()
-				-  startTime.remove(id);
+		long stopTime = System.currentTimeMillis() - startTime.remove(id);
 		runTime.put(id, stopTime);
 		return stopTime;
 	}

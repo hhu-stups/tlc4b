@@ -1,21 +1,20 @@
 package de.tlc4b.tlc.integration;
 
-import static org.junit.Assert.assertEquals;
+import de.tlc4b.tlc.TLCResults.TLCResult;
+import de.tlc4b.util.AbstractParseMachineTest;
+import de.tlc4b.util.PolySuite;
+import de.tlc4b.util.PolySuite.Config;
+import de.tlc4b.util.PolySuite.Configuration;
+import de.tlc4b.util.TestPair;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import de.tlc4b.tlc.TLCResults.TLCResult;
-import de.tlc4b.util.AbstractParseMachineTest;
-import de.tlc4b.util.PolySuite;
-import de.tlc4b.util.TestPair;
-import de.tlc4b.util.PolySuite.Config;
-import de.tlc4b.util.PolySuite.Configuration;
 import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
 import static de.tlc4b.util.TestUtil.test;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(PolySuite.class)
 public class BasicTest extends AbstractParseMachineTest {

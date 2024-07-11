@@ -39,7 +39,7 @@ public class TracePrinter {
 
 	ArrayList<TLCStateInfo> trace;
 	TLCState initialState;
-	TLCOutputInfo tlcOutputInfo;
+	final TLCOutputInfo tlcOutputInfo;
 
 	ArrayList<OpDeclNode> constants;
 	ArrayList<OpDeclNode> variables;

@@ -75,7 +75,7 @@ public class TLCRunner {
 		// list.add("-coverage");
 		// list.add("1");
 
-		String[] args = list.toArray(new String[list.size()]);
+		String[] args = list.toArray(new String[0]);
 		final Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();

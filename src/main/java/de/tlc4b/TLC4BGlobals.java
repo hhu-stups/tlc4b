@@ -16,7 +16,7 @@ public class TLC4BGlobals {
 	private static boolean useSymmetry;
 	private static boolean printCoverage;
 	private static boolean verbose;
-	
+
 	private static boolean checkOnlyMainAssertions;
 
 	private static boolean deleteFilesOnExit;
@@ -67,11 +67,8 @@ public class TLC4BGlobals {
 		runTLC = true;
 		translate = true;
 		hideTLCConsoleOutput = false; // is mapped to TOOLIO.tool
-		deleteFilesOnExit = false; // if enabled: deletes all created '.tla',
-									// '.cfg' files on exit of the JVM. This
-									// includes
-									// the created B2TLA standard modules (e.g.
-									// Relation, but not Naturals etc.).
+		deleteFilesOnExit = false; // if enabled: deletes all created '.tla', '.cfg' files on exit of the JVM.
+			// This includes the created B2TLA standard modules (e.g. Relation, but not Naturals etc.).
 		runTestscript = false;
 		testingMode = false;
 		createTraceFile = true;
@@ -241,8 +238,7 @@ public class TLC4BGlobals {
 		return forceTLCToEvalConstants;
 	}
 
-	public static void setForceTLCToEvalConstants(
-			boolean forceTLCToEvalConstants) {
+	public static void setForceTLCToEvalConstants(boolean forceTLCToEvalConstants) {
 		TLC4BGlobals.forceTLCToEvalConstants = forceTLCToEvalConstants;
 	}
 
@@ -269,8 +265,8 @@ public class TLC4BGlobals {
 	public static boolean isVerbose() {
 		return verbose;
 	}
-	
-	public static boolean isCheckOnlyMainAssertions(){
+
+	public static boolean isCheckOnlyMainAssertions() {
 		return checkOnlyMainAssertions;
 	}
 
