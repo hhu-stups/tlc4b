@@ -19,7 +19,7 @@ public class Log {
 		fieldValues.add(machineFile);
 
 		fieldNames.add("TLC Model Checking Time (s)");
-		int tlcModelCheckingTime = tlcResults.getModelCheckingTime();
+		double tlcModelCheckingTime = tlcResults.getModelCheckingTime();
 		fieldValues.add(String.valueOf(tlcModelCheckingTime));
 
 		fieldNames.add("Parsing Time Of B machine (ms)");

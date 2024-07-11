@@ -81,11 +81,11 @@ public class TLCResults implements ToolGlobals {
 		return numberOfTransitions;
 	}
 
-	public int getModelCheckingTime() {
+	public double getModelCheckingTime() {
 		if (endTime == null || startTime == null) {
 			return -1;
 		}
-		return (int) (endTime.getTime() - startTime.getTime()) / 1000;
+		return (endTime.getTime() - startTime.getTime()) / 1000.0;
 	}
 
 	public void evalResults() {
