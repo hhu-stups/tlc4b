@@ -91,7 +91,7 @@ public class TLCRunner {
 
 	public static void runTLC(String machineName, File path) {
 		StopWatch.start(MODEL_CHECKING_TIME);
-		MP.println("--------------------------------");
+		MP.printlnSilent("--------------------------------");
 		MP.TLCOutputStream.changeOutputStream();
 		ToolIO.setMode(ToolIO.SYSTEM);
 

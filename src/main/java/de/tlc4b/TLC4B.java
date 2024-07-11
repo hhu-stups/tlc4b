@@ -84,24 +84,24 @@ public class TLC4B {
 	private void printResults(TLCResults results, boolean createTraceFile) {
 		printOperationsCount(results);
 		// options
-		println("Used Options");
-		println("| Number of workers: " + TLC4BGlobals.getWorkers());
-		println("| Invariants check: " + TLC4BGlobals.isInvariant());
-		println("| Deadlock check: " + TLC4BGlobals.isDeadlockCheck());
-		println("| Assertion check: " + TLC4BGlobals.isAssertion());
-		println("| Find Goal check: " + TLC4BGlobals.isGOAL());
-		println("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
-		println("| Partial invariant evaluation: " + TLC4BGlobals.isPartialInvariantEvaluation());
-		println("| Lazy constants setup: " + !TLC4BGlobals.isForceTLCToEvalConstants());
-		println("| Aggressive well-definedness check: " + TLC4BGlobals.checkWelldefinedness());
-		println("| ProB constant setup: " + TLC4BGlobals.isProBconstantsSetup());
-		println("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
-		println("| MIN Int: " + TLC4BGlobals.getMIN_INT());
-		println("| MAX Int: " + TLC4BGlobals.getMAX_INT());
-		println("| Standard deferred set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
-		println("--------------------------------");
-		println("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
-		println("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME) + " ms");
+		printlnSilent("Used Options");
+		printlnSilent("| Number of workers: " + TLC4BGlobals.getWorkers());
+		printlnSilent("| Invariants check: " + TLC4BGlobals.isInvariant());
+		printlnSilent("| Deadlock check: " + TLC4BGlobals.isDeadlockCheck());
+		printlnSilent("| Assertion check: " + TLC4BGlobals.isAssertion());
+		printlnSilent("| Find Goal check: " + TLC4BGlobals.isGOAL());
+		printlnSilent("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
+		printlnSilent("| Partial invariant evaluation: " + TLC4BGlobals.isPartialInvariantEvaluation());
+		printlnSilent("| Lazy constants setup: " + !TLC4BGlobals.isForceTLCToEvalConstants());
+		printlnSilent("| Aggressive well-definedness check: " + TLC4BGlobals.checkWelldefinedness());
+		printlnSilent("| ProB constant setup: " + TLC4BGlobals.isProBconstantsSetup());
+		printlnSilent("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
+		printlnSilent("| MIN Int: " + TLC4BGlobals.getMIN_INT());
+		printlnSilent("| MAX Int: " + TLC4BGlobals.getMAX_INT());
+		printlnSilent("| Standard deferred set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
+		printlnSilent("--------------------------------");
+		printlnSilent("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
+		printlnSilent("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME) + " ms");
 		println("Model checking time: " + results.getModelCheckingTime() + " sec");
 		// MP.printMessage("Number of workers: " +
 		// TLCGlobals.getNumWorkers());
@@ -128,14 +128,11 @@ public class TLC4B {
 	private void printOperationsCount(TLCResults results) {
 		LinkedHashMap<String, Long> operationCount = results.getOperationCount();
 		if (TLC4BGlobals.isPrintCoverage() && operationCount != null) {
-			println("---------- Coverage statistics ----------");
-
+			printlnSilent("---------- Coverage statistics ----------");
 			for (Entry<String, Long> entry : operationCount.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue().toString();
-				println(key + ": " + value);
+				printlnSilent(entry.getKey() + ": " + entry.getValue().toString());
 			}
-			println("---------- End of coverage statistics ----------");
+			printlnSilent("---------- End of coverage statistics ----------");
 		}
 	}
 
@@ -179,13 +176,13 @@ public class TLC4B {
 		tlc4b.machineFileNameWithoutFileExtension = "Test";
 
 		StopWatch.start(PARSING_TIME);
-		MP.print("Parsing... ");
+		print("Parsing... ");
 		tlc4b.translator = new Translator(machineString);
 		StopWatch.stop(PARSING_TIME);
 		println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
 
 		StopWatch.start(TRANSLATION_TIME);
-		MP.print("Translating... ");
+		print("Translating... ");
 		tlc4b.translator.translate();
 		tlc4b.tlaModule = tlc4b.translator.getModuleString();
 		tlc4b.config = tlc4b.translator.getConfigString();
@@ -219,6 +216,7 @@ public class TLC4B {
 			}
 
 			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE));
+			TLC4BGlobals.setSilent(line.hasOption(SILENT));
 			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD));
 			TLC4BGlobals.setRunTLC(!line.hasOption(NOTLC));
 			TLC4BGlobals.setTranslate(!line.hasOption(NOTRANSLATION));

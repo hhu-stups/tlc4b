@@ -28,21 +28,22 @@ public class TLC4BCliOptions {
 	static final String CONSTANTSSETUP = "constantssetup";
 	static final String LTLFORMULA = "ltlformula";
 	static final String VERBOSE = "verbose";
+	static final String SILENT = "silent";
 
 	static Options getCommandlineOptions() {
 		Options options = new Options();
 
-		options.addOption(NODEAD, "do not look for deadlocks (for model check, animate, execute)");
+		options.addOption(NODEAD, "do not look for deadlocks");
 		options.addOption(NOTLC, "");
 		options.addOption(NOTRANSLATION, "");
-		options.addOption(NOGOAL, "");
-		options.addOption(NOINV, "");
-		options.addOption(NOASS, "");
+		options.addOption(NOGOAL, "do not look for GOAL predicate");
+		options.addOption(NOINV, "do not look for invariant violations");
+		options.addOption(NOASS, "do not look for ASSERTION violations");
 		options.addOption(WDCHECK, "");
 		options.addOption(SYMMETRY, "");
 		options.addOption(TOOL, "");
 		options.addOption(TMP, "");
-		options.addOption(NOLTL, "");
+		options.addOption(NOLTL, "no checking of LTL assertions");
 		options.addOption(LAZYCONSTANTS, "");
 		options.addOption(TESTSCRIPT, "");
 		options.addOption(NOTRACE, "");
@@ -56,6 +57,7 @@ public class TLC4BCliOptions {
 		options.addOption(CONSTANTSSETUP, true, "use constants found by ProB for TLC model checking");
 		options.addOption(LTLFORMULA, true, "");
 		options.addOption(VERBOSE, "put TLC4B in verbose mode");
+		options.addOption(SILENT, "put TLC4B in silent mode");
 
 		return options;
 	}

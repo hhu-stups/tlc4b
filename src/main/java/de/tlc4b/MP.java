@@ -15,6 +15,11 @@ public class MP {
 		err.println(errorMessage);
 	}
 
+	public static void printlnSilent(String message) {
+		if (!TLC4BGlobals.isSilent() || TLC4BGlobals.isVerbose())
+			out.println(message);
+	}
+
 	public static void printlnVerbose(String message) {
 		if (TLC4BGlobals.isVerbose())
 			out.println(message);
@@ -37,8 +42,17 @@ public class MP {
 		static final PrintStream origOut = System.out;
 
 		public static void changeOutputStream() {
-			MP.TLCOutputStream tlcOutputStream = new TLCOutputStream(origOut);
-			System.setOut(tlcOutputStream);
+			if (TLC4BGlobals.isSilent()) {
+				origOut.println("Run TLC...");
+				System.setOut(new PrintStream(new OutputStream() {
+					@Override
+					public void write(int b) {
+						// ignore
+					}
+				}));
+				return;
+			}
+			System.setOut(new TLCOutputStream(origOut));
 		}
 
 		public static void resetOutputStream() {

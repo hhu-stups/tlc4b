@@ -16,6 +16,7 @@ public class TLC4BGlobals {
 	private static boolean useSymmetry;
 	private static boolean printCoverage;
 	private static boolean verbose;
+	private static boolean silent;
 
 	private static boolean checkOnlyMainAssertions;
 
@@ -264,6 +265,14 @@ public class TLC4BGlobals {
 
 	public static boolean isVerbose() {
 		return verbose;
+	}
+
+	public static void setSilent(boolean b) {
+		silent = b;
+	}
+
+	public static boolean isSilent() {
+		return silent;
 	}
 
 	public static boolean isCheckOnlyMainAssertions() {
