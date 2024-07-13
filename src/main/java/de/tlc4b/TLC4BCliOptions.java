@@ -4,31 +4,31 @@ import org.apache.commons.cli.Options;
 
 public class TLC4BCliOptions {
 
-	static final String NODEAD = "nodead";
-	static final String NOTLC = "notlc";
-	static final String NOTRANSLATION = "notranslation";
-	static final String NOGOAL = "nogoal";
-	static final String NOINV = "noinv";
-	static final String NOASS = "noass";
-	static final String WDCHECK = "wdcheck";
-	static final String SYMMETRY = "symmetry";
-	static final String TOOL = "tool";
-	static final String TMP = "tmp";
-	static final String NOLTL = "noltl";
-	static final String LAZYCONSTANTS = "lazyconstants";
-	static final String TESTSCRIPT = "testscript";
-	static final String NOTRACE = "notrace";
-	static final String DEL = "del";
-	static final String PARINVEVAL = "parinveval";
-	static final String LOG = "log";
-	static final String MAXINT = "maxint";
-	static final String DEFAULT_SETSIZE = "default_setsize";
-	static final String MININT = "minint";
-	static final String WORKERS = "workers";
-	static final String CONSTANTSSETUP = "constantssetup";
-	static final String LTLFORMULA = "ltlformula";
-	static final String VERBOSE = "verbose";
-	static final String SILENT = "silent";
+	public static final String NODEAD = "nodead";
+	public static final String NOTLC = "notlc";
+	public static final String NOTRANSLATION = "notranslation";
+	public static final String NOGOAL = "nogoal";
+	public static final String NOINV = "noinv";
+	public static final String NOASS = "noass";
+	public static final String WDCHECK = "wdcheck";
+	public static final String SYMMETRY = "symmetry";
+	public static final String TOOL = "tool";
+	public static final String TMP = "tmp";
+	public static final String NOLTL = "noltl";
+	public static final String LAZYCONSTANTS = "lazyconstants";
+	public static final String TESTSCRIPT = "testscript";
+	public static final String NOTRACE = "notrace";
+	public static final String DEL = "del";
+	public static final String PARINVEVAL = "parinveval";
+	public static final String LOG = "log";
+	public static final String MAXINT = "maxint";
+	public static final String DEFAULT_SETSIZE = "default_setsize";
+	public static final String MININT = "minint";
+	public static final String WORKERS = "workers";
+	public static final String CONSTANTSSETUP = "constantssetup";
+	public static final String LTLFORMULA = "ltlformula";
+	public static final String VERBOSE = "verbose";
+	public static final String SILENT = "silent";
 
 	static Options getCommandlineOptions() {
 		Options options = new Options();
