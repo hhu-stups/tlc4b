@@ -46,6 +46,15 @@ public class TLC4B {
 	private String constantsSetup;
 
 	public static void main(String[] args) {
+		System.exit(run(args) != null ? 0 : -1);
+	}
+
+	/**
+	 * API method to call TLC4B directly in Java
+	 * @param args same arguments as for the CLI version
+	 * @return results of TLC model check
+	 */
+	public static TLCResults run(String[] args) {
 		System.setProperty("apple.awt.UIElement", "true");
 		// avoiding pop up window
 
@@ -55,30 +64,33 @@ public class TLC4B {
 		} catch (BCompoundException e) {
 			printlnErr("***** Parsing Error *****");
 			printlnErr(e.getMessage());
-			System.exit(-1);
+			return null;
 		} catch (TLC4BException e) {
 			printlnErr(e.getMessage());
 			println("Result: " + e.getError());
-			System.exit(-1);
+			return null;
 		} catch (IOException e) {
 			printlnErr(e.getMessage());
 			println("Result: " + "I/O Error");
-			System.exit(-1);
+			return null;
 		}
 
+		TLCResults results = null;
 		if (TLC4BGlobals.isRunTLC()) {
 			try {
 				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
-				TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
+				results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
 				tlc4b.printResults(results, TLC4BGlobals.isCreateTraceFile());
 				Log log = new Log(tlc4b, results);
 				tlc4b.createLogFile(log);
-				System.exit(0);
 			} catch (NoClassDefFoundError e) {
 				printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
 			}
+		} else {
+			results = new TLCResults(null);
 		}
+		return results;
 	}
 
 	private void printResults(TLCResults results, boolean createTraceFile) {
