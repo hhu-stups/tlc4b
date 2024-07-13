@@ -17,12 +17,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.tlc4b.tlc.TLCMessageListener;
 import de.tlc4b.util.StopWatch;
 import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
 
 public class TLCRunner {
+
+	public static TLCMessageListener listener = null;
+
+	public static void addTLCMessageListener(final TLCMessageListener listener) {
+		TLCRunner.listener = listener;
+	}
 
 	public static void main(String[] args) {
 		// this method will be executed in a separate JVM
@@ -49,11 +56,7 @@ public class TLCRunner {
 				+ separator + "java";
 		String classpath = System.getProperty("java.class.path");
 
-		List<String> command = new ArrayList<>();
-		command.add(jvm);
-		command.add("-cp");
-		command.add(classpath);
-		command.add(mainClass);
+		List<String> command = Arrays.asList(jvm, "-cp", classpath, mainClass);
 		command.addAll(Arrays.asList(arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -125,7 +128,9 @@ public class TLCRunner {
 			tlc.setResolver(new SimpleFilenameToStream());
 			// call the actual processing method
 			try {
+				if (listener != null) listener.start();
 				tlc.process();
+				if (listener != null) listener.finish();
 			} catch (Exception e) {
 			}
 		}
