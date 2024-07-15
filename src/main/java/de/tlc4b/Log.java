@@ -3,6 +3,8 @@ package de.tlc4b;
 import static de.tlc4b.util.StopWatch.Watches.PARSING_TIME;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.util.StopWatch;
@@ -10,6 +12,8 @@ import de.tlc4b.util.StopWatch.Watches;
 
 public class Log {
 
+	public static final String DELIMITER = ";";
+	
 	private final ArrayList<String> fieldNames = new ArrayList<>();
 	private final ArrayList<String> fieldValues = new ArrayList<>();
 
@@ -46,25 +50,28 @@ public class Log {
 		fieldNames.add("Violated Definition");
 		String violatedDefinition = tlcResults.getViolatedDefinition();
 		fieldValues.add(violatedDefinition != null ? violatedDefinition : "");
-	}
 
-	public String getCSVValueLine() {
-		return getCSVLine(fieldValues);
-	}
+		fieldNames.add("Violated Assertions");
+		List<String> violatedAssertions = tlcResults.getViolatedAssertions();
+		fieldValues.add(!violatedAssertions.isEmpty() ? String.join(DELIMITER, violatedAssertions) : "");
 
-	public String getCSVFieldNamesLine() {
-		return getCSVLine(fieldNames);
-	}
-
-	private String getCSVLine(ArrayList<String> list) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < list.size(); i++) {
-			sb.append(list.get(i));
-			if (i < list.size() - 1) {
-				sb.append(";");
-			}
+		fieldNames.add("Operation Coverage");
+		Map<String, Long> operationCount = tlcResults.getOperationCount();
+		List<String> opCountString = new ArrayList<>();
+		for (String operation : operationCount.keySet()) {
+			opCountString.add(operation + DELIMITER + operationCount.get(operation));
 		}
-		sb.append("\n");
+		fieldValues.add(!opCountString.isEmpty() ? String.join(DELIMITER, opCountString) : "");
+
+		fieldNames.add("Trace File");
+		fieldValues.add(tlc4b.getTraceFile() != null ? tlc4b.getTraceFile().getAbsolutePath() : "");
+	}
+
+	public String getCSVString() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < fieldNames.size(); i++) {
+			sb.append(fieldNames.get(i)).append(DELIMITER).append(fieldValues.get(i)).append("\n");
+		}
 		return sb.toString();
 	}
 

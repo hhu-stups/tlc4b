@@ -33,7 +33,7 @@ import static de.tlc4b.MP.*;
 public class TLC4B {
 
 	private String filename;
-	private File mainfile;
+	private File mainfile, traceFile;
 	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
 	private String logFileString;
@@ -161,10 +161,14 @@ public class TLC4B {
 		if (results.hasTrace() && createTraceFile) {
 			String trace = results.getTrace();
 			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
-			File traceFile = createFile(mainfile.getParentFile(), tracefileName, trace, false);
+			traceFile = createFile(mainfile.getParentFile(), tracefileName, trace, false);
 			println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
 		}
 
+	}
+
+	public File getTraceFile() {
+		return traceFile;
 	}
 
 	private void printOperationsCount(TLCResults results) {
@@ -400,12 +404,8 @@ public class TLC4B {
 	private void createLogFile(Log log) {
 		if (logFileString != null) {
 			File logFile = new File(logFileString);
-			boolean exists = logFile.exists();
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
-				if (!exists) {
-					fw.write(log.getCSVFieldNamesLine());
-				}
-				fw.write(log.getCSVValueLine());
+				fw.write(log.getCSVString());
 				fw.close();
 				println("Log file: " + logFile.getAbsolutePath());
 			} catch (IOException e) {
