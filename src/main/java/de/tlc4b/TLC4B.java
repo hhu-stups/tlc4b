@@ -25,6 +25,7 @@ import de.tlc4b.util.StopWatch;
 import org.apache.commons.cli.*;
 
 import static de.tlc4b.TLC4BCliOptions.*;
+import static de.tlc4b.TLC4BCliOptions.TLCOption.*;
 import static de.tlc4b.util.StopWatch.Watches.*;
 import static de.tlc4b.MP.*;
 
@@ -227,70 +228,70 @@ public class TLC4B {
 				filename = remainingArgs[0];
 			}
 
-			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE));
-			TLC4BGlobals.setSilent(line.hasOption(SILENT));
-			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD));
-			TLC4BGlobals.setRunTLC(!line.hasOption(NOTLC));
-			TLC4BGlobals.setTranslate(!line.hasOption(NOTRANSLATION));
-			TLC4BGlobals.setGOAL(!line.hasOption(NOGOAL));
-			TLC4BGlobals.setInvariant(!line.hasOption(NOINV));
-			TLC4BGlobals.setAssertionCheck(!line.hasOption(NOASS));
-			TLC4BGlobals.setWelldefinednessCheck(line.hasOption(WDCHECK));
-			TLC4BGlobals.setSymmetryUse(line.hasOption(SYMMETRY));
-			TLC4BGlobals.setTool(!line.hasOption(TOOL));
-			TLC4BGlobals.setCheckltl(!line.hasOption(NOLTL));
-			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(LAZYCONSTANTS));
-			TLC4BGlobals.setRunTestscript(line.hasOption(TESTSCRIPT));
-			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE));
-			TLC4BGlobals.setDeleteOnExit(line.hasOption(DEL));
-			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(PARINVEVAL));
+			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE.arg()));
+			TLC4BGlobals.setSilent(line.hasOption(SILENT.arg()));
+			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD.arg()));
+			TLC4BGlobals.setRunTLC(!line.hasOption(NOTLC.arg()));
+			TLC4BGlobals.setTranslate(!line.hasOption(NOTRANSLATION.arg()));
+			TLC4BGlobals.setGOAL(!line.hasOption(NOGOAL.arg()));
+			TLC4BGlobals.setInvariant(!line.hasOption(NOINV.arg()));
+			TLC4BGlobals.setAssertionCheck(!line.hasOption(NOASS.arg()));
+			TLC4BGlobals.setWelldefinednessCheck(line.hasOption(WDCHECK.arg()));
+			TLC4BGlobals.setSymmetryUse(line.hasOption(SYMMETRY.arg()));
+			TLC4BGlobals.setTool(!line.hasOption(TOOL.arg()));
+			TLC4BGlobals.setCheckltl(!line.hasOption(NOLTL.arg()));
+			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(LAZYCONSTANTS.arg()));
+			TLC4BGlobals.setRunTestscript(line.hasOption(TESTSCRIPT.arg()));
+			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE.arg()));
+			TLC4BGlobals.setDeleteOnExit(line.hasOption(DEL.arg()));
+			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(PARINVEVAL.arg()));
 
-			if (line.hasOption(TMP)) {
+			if (line.hasOption(TMP.arg())) {
 				buildDir = new File(System.getProperty("java.io.tmpdir"));
 			}
-			if (line.hasOption(LOG)) {
-				logFileString = line.getOptionValue(LOG);
+			if (line.hasOption(LOG.arg())) {
+				logFileString = line.getOptionValue(LOG.arg());
 				if (logFileString == null) {
 					throw new TLC4BIOException("Error: File required after option '-log'.");
 				}
 			}
-			if (line.hasOption(MAXINT)) {
-				String maxint = line.getOptionValue(MAXINT);
+			if (line.hasOption(MAXINT.arg())) {
+				String maxint = line.getOptionValue(MAXINT.arg());
 				if (maxint == null) {
 					throw new TLC4BIOException("Error: Number required after option '-maxint'.");
 				}
 				TLC4BGlobals.setMAX_INT(Integer.parseInt(maxint));
 			}
-			if (line.hasOption(DEFAULT_SETSIZE)) {
-				String deferredSetSize = line.getOptionValue(DEFAULT_SETSIZE);
+			if (line.hasOption(DEFAULT_SETSIZE.arg())) {
+				String deferredSetSize = line.getOptionValue(DEFAULT_SETSIZE.arg());
 				if (deferredSetSize == null) {
 					throw new TLC4BIOException("Error: Number required after option '-default_setsize'.");
 				}
 				TLC4BGlobals.setDEFERRED_SET_SIZE(Integer.parseInt(deferredSetSize));
 			} 
-			if (line.hasOption(MININT)) {
-				String minint = line.getOptionValue(MININT);
+			if (line.hasOption(MININT.arg())) {
+				String minint = line.getOptionValue(MININT.arg());
 				if (minint == null) {
 					throw new TLC4BIOException("Error: Number required after option '-minint'.");
 				}
 				TLC4BGlobals.setMIN_INT(Integer.parseInt(minint));
 			}
-			if (line.hasOption(WORKERS)) {
-				String workers = line.getOptionValue(WORKERS);
+			if (line.hasOption(WORKERS.arg())) {
+				String workers = line.getOptionValue(WORKERS.arg());
 				if (workers == null) {
 					throw new TLC4BIOException("Error: Number required after option '-workers'.");
 				}
 				TLC4BGlobals.setWorkers(Integer.parseInt(workers));
 			}
-			if (line.hasOption(CONSTANTSSETUP)) {
+			if (line.hasOption(CONSTANTSSETUP.arg())) {
 				TLC4BGlobals.setProBconstantsSetup(true);
-				constantsSetup = line.getOptionValue(CONSTANTSSETUP);
+				constantsSetup = line.getOptionValue(CONSTANTSSETUP.arg());
 				if (constantsSetup == null) {
 					throw new TLC4BIOException("Error: String required after option '-constantssetup'.");
 				}
 			}
-			if (line.hasOption(LTLFORMULA)) {
-				ltlFormula = line.getOptionValue(LTLFORMULA);
+			if (line.hasOption(LTLFORMULA.arg())) {
+				ltlFormula = line.getOptionValue(LTLFORMULA.arg());
 				if (ltlFormula == null) {
 					throw new TLC4BIOException("Error: LTL formula required after option '-ltlformula'.");
 				}
