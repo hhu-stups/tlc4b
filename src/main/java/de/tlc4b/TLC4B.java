@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
@@ -93,6 +94,35 @@ public class TLC4B {
 			results = new TLCResults(null);
 		}
 		return results;
+	}
+
+	/**
+	 * Quickly check whether TLC4B is applicable to the provided machine.
+	 *
+	 * @param path path to B machine file
+	 * @param timeOut time out in seconds
+	 * @return Exception if TLC4B is not applicable, else null (also if unknown)
+	 */
+	public static Exception checkTLC4BIsApplicable(final String path, int timeOut) {
+		try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+			Future<Exception> future = executor.submit(() -> {
+				try {
+					TLC4B tlc4B = new TLC4B();
+					tlc4B.processArgs(new String[]{path});
+					tlc4B.translate(false);
+					return null;
+				} catch (BCompoundException | IOException | TLC4BException e) {
+					return e;
+				}
+			});
+
+			try {
+				return future.get(timeOut, TimeUnit.SECONDS);
+			} catch (TimeoutException | InterruptedException | ExecutionException e) {
+				future.cancel(true);
+				return null; // unknown if TLC4B is applicable, exceptions can be ignored
+			}
+		}
 	}
 
 	private void printResults(TLCResults results, boolean createTraceFile) {
@@ -304,8 +334,7 @@ public class TLC4B {
 		}
 	}
 
-	public void process(String[] args) throws IOException, BCompoundException {
-
+	private void processArgs(String[] args) {
 		MP.printVerbose("Arguments: ");
 		for (String string : args) {
 			MP.printVerbose(string);
@@ -314,13 +343,15 @@ public class TLC4B {
 		printlnVerbose("");
 
 		handleParameter(args);
-
 		handleMainFileName();
+	}
+
+	private void translate(boolean createFiles) throws IOException, BCompoundException {
 		if (TLC4BGlobals.isTranslate()) {
 			StopWatch.start(PARSING_TIME);
 			MP.print("Parsing... ");
 			translator = new Translator(machineFileNameWithoutFileExtension,
-					mainfile, this.ltlFormula, this.constantsSetup);
+				mainfile, this.ltlFormula, this.constantsSetup);
 			StopWatch.stop(PARSING_TIME);
 			println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
 
@@ -332,9 +363,14 @@ public class TLC4B {
 			this.tlcOutputInfo = translator.getTLCOutputInfo();
 			StopWatch.stop(TRANSLATION_TIME);
 			println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
-			createFiles();
+			if (createFiles)
+				createFiles();
 		}
+	}
 
+	public void process(String[] args) throws IOException, BCompoundException {
+		processArgs(args);
+		translate(true);
 	}
 
 	private void handleMainFileName() {
