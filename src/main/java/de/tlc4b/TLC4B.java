@@ -104,24 +104,22 @@ public class TLC4B {
 	 * @return Exception if TLC4B is not applicable, else null (also if unknown)
 	 */
 	public static Exception checkTLC4BIsApplicable(final String path, int timeOut) {
-		try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
-			Future<Exception> future = executor.submit(() -> {
-				try {
-					TLC4B tlc4B = new TLC4B();
-					tlc4B.processArgs(new String[]{path});
-					tlc4B.translate(false);
-					return null;
-				} catch (BCompoundException | IOException | TLC4BException e) {
-					return e;
-				}
-			});
-
+		Future<Exception> future = Executors.newSingleThreadExecutor().submit(() -> {
 			try {
-				return future.get(timeOut, TimeUnit.SECONDS);
-			} catch (TimeoutException | InterruptedException | ExecutionException e) {
-				future.cancel(true);
-				return null; // unknown if TLC4B is applicable, exceptions can be ignored
+				TLC4B tlc4B = new TLC4B();
+				tlc4B.processArgs(new String[]{path});
+				tlc4B.translate(false);
+				return null;
+			} catch (BCompoundException | IOException | TLC4BException e) {
+				return e;
 			}
+		});
+
+		try {
+			return future.get(timeOut, TimeUnit.SECONDS);
+		} catch (TimeoutException | InterruptedException | ExecutionException e) {
+			future.cancel(true);
+			return null; // unknown if TLC4B is applicable, exceptions can be ignored
 		}
 	}
 
