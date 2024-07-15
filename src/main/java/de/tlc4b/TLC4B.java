@@ -47,7 +47,22 @@ public class TLC4B {
 	private String constantsSetup;
 
 	public static void main(String[] args) {
-		System.exit(run(args) != null ? 0 : -1);
+		try {
+			run(args);
+		} catch (BCompoundException e) {
+			printlnErr("***** Parsing Error *****");
+			printlnErr(e.getMessage());
+			System.exit(-1);
+		} catch (TLC4BException e) {
+			printlnErr(e.getMessage());
+			println("Result: " + e.getError());
+			System.exit(-1);
+		} catch (IOException e) {
+			printlnErr(e.getMessage());
+			println("Result: " + "I/O Error");
+			System.exit(-1);
+		}
+		System.exit(0);
 	}
 
 	/**
@@ -55,26 +70,12 @@ public class TLC4B {
 	 * @param args same arguments as for the CLI version
 	 * @return results of TLC model check
 	 */
-	public static TLCResults run(String[] args) {
+	public static TLCResults run(String[] args) throws TLC4BException, IOException, BCompoundException {
 		System.setProperty("apple.awt.UIElement", "true");
 		// avoiding pop up window
 
 		TLC4B tlc4b = new TLC4B();
-		try {
-			tlc4b.process(args);
-		} catch (BCompoundException e) {
-			printlnErr("***** Parsing Error *****");
-			printlnErr(e.getMessage());
-			return null;
-		} catch (TLC4BException e) {
-			printlnErr(e.getMessage());
-			println("Result: " + e.getError());
-			return null;
-		} catch (IOException e) {
-			printlnErr(e.getMessage());
-			println("Result: " + "I/O Error");
-			return null;
-		}
+		tlc4b.process(args);
 
 		TLCResults results = null;
 		if (TLC4BGlobals.isRunTLC()) {
