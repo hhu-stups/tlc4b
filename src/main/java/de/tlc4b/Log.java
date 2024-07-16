@@ -13,7 +13,7 @@ import de.tlc4b.util.StopWatch.Watches;
 public class Log {
 
 	public static final String DELIMITER = ";";
-	
+
 	private final ArrayList<String> fieldNames = new ArrayList<>();
 	private final ArrayList<String> fieldValues = new ArrayList<>();
 
@@ -58,8 +58,10 @@ public class Log {
 		fieldNames.add("Operation Coverage");
 		Map<String, Long> operationCount = tlcResults.getOperationCount();
 		List<String> opCountString = new ArrayList<>();
-		for (String operation : operationCount.keySet()) {
-			opCountString.add(operation + DELIMITER + operationCount.get(operation));
+		if (operationCount != null) {
+			for (String operation : operationCount.keySet()) {
+				opCountString.add(operation + DELIMITER + operationCount.get(operation));
+			}
 		}
 		fieldValues.add(!opCountString.isEmpty() ? String.join(DELIMITER, opCountString) : "");
 
