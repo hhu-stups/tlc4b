@@ -27,7 +27,7 @@ public class TLCResults implements ToolGlobals {
 	private final ArrayList<String> violatedAssertions = new ArrayList<>();
 
 	private int lengthOfTrace;
-	private String traceString;
+	private String traceString, traceFile;
 
 	private int numberOfDistinctStates;
 	private int numberOfTransitions;
@@ -40,6 +40,18 @@ public class TLCResults implements ToolGlobals {
 
 	public boolean hasTrace() {
 		return lengthOfTrace > 0;
+	}
+
+	public void addTraceFilePath(final String traceFile) {
+		this.traceFile = traceFile;
+	}
+
+	public String getTraceFilePath() {
+		if (this.hasTrace() && this.traceFile != null) {
+			return this.traceFile;
+		} else {
+			return null;
+		}
 	}
 
 	public LinkedHashMap<String, Long> getOperationCount() {
