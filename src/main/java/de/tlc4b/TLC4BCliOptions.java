@@ -2,39 +2,44 @@ package de.tlc4b;
 
 import org.apache.commons.cli.Options;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class TLC4BCliOptions {
 
 	public enum TLCOption {
-		NODEAD("nodead", "do not look for deadlocks", false),
-		NOTLC("notlc", "", false),
-		NOTRANSLATION("notranslation", "", false),
-		NOGOAL("nogoal", "do not look for GOAL predicate", false),
-		NOINV("noinv", "do not look for invariant violations", false),
-		NOASS("noass", "do not look for ASSERTION violations", false),
-		WDCHECK("wdcheck", "", false),
-		SYMMETRY("symmetry", "", false),
-		TOOL("tool", "", false),
-		TMP("tmp", "", false),
-		NOLTL("noltl", "no checking of LTL assertions", false),
-		LAZYCONSTANTS("lazyconstants", "", false),
-		TESTSCRIPT("testscript", "", false),
-		NOTRACE("notrace", "", false),
-		DEL("del", "", false),
-		PARINVEVAL("parinveval", "", false),
-		LOG("log", "write statistics to CSV file", true),
-		MAXINT("maxint", "", true),
-		DEFAULT_SETSIZE("default_setsize", "", true),
-		MININT("minint", "", true),
-		WORKERS("workers", "", true),
-		CONSTANTSSETUP("constantssetup", "use constants found by ProB for TLC model checking", true),
-		LTLFORMULA("ltlformula", "", true),
-		VERBOSE("verbose", "put TLC4B in verbose mode", false),
-		SILENT("silent", "put TLC4B in silent mode", false);
+		NODEAD("nodead", "do not look for deadlocks", null),
+		NOTLC("notlc", "", null),
+		NOTRANSLATION("notranslation", "", null),
+		NOGOAL("nogoal", "do not look for GOAL predicate", null),
+		NOINV("noinv", "do not look for invariant violations", null),
+		NOASS("noass", "do not look for ASSERTION violations", null),
+		WDCHECK("wdcheck", "", null),
+		SYMMETRY("symmetry", "", null),
+		TOOL("tool", "", null),
+		TMP("tmp", "", null),
+		NOLTL("noltl", "no checking of LTL assertions", null),
+		LAZYCONSTANTS("lazyconstants", "", null),
+		TESTSCRIPT("testscript", "", null),
+		NOTRACE("notrace", "", null),
+		DEL("del", "", null),
+		PARINVEVAL("parinveval", "", null),
+		LOG("log", "write statistics to CSV file", String.class),
+		MAXINT("maxint", "", Integer.class),
+		DEFAULT_SETSIZE("default_setsize", "", Integer.class),
+		MININT("minint", "", Integer.class),
+		WORKERS("workers", "", Integer.class),
+		CONSTANTSSETUP("constantssetup", "use constants found by ProB for TLC model checking", String.class),
+		LTLFORMULA("ltlformula", "", String.class),
+		VERBOSE("verbose", "put TLC4B in verbose mode", null),
+		SILENT("silent", "put TLC4B in silent mode", null);
 
 		private final String arg, desc;
-		private final boolean expectsArg;
+		private final Class<?> expectsArg;
 
-		TLCOption(String arg, String desc, boolean expectsArg) {
+		TLCOption(String arg, String desc, Class<?> expectsArg) {
 			this.arg = arg;
 			this.desc = desc;
 			this.expectsArg = expectsArg;
@@ -48,15 +53,23 @@ public class TLC4BCliOptions {
 			return desc;
 		}
 
-		public boolean expectsArg() {
+		public Class<?> expectsArg() {
 			return expectsArg;
 		}
+	}
+
+	public static Map<String, Class<?>> getOptions() {
+		Map<String, Class<?>> options = new HashMap<>();
+		for (TLCOption option : TLCOption.values()) {
+			options.put(option.arg(), option.expectsArg());
+		}
+		return options;
 	}
 
 	static Options getCommandlineOptions() {
 		Options options = new Options();
 		for (TLCOption option : TLCOption.values()) {
-			options.addOption(option.arg(), option.expectsArg(), option.desc());
+			options.addOption(option.arg(), option.expectsArg() != null, option.desc());
 		}
 		return options;
 	}
