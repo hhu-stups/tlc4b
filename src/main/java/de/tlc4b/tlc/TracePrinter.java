@@ -11,27 +11,7 @@ import de.tlc4b.exceptions.NotSupportedException;
 import tla2sany.semantic.OpDeclNode;
 import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
-import tlc2.value.FcnLambdaValue;
-import tlc2.value.FcnRcdValue;
-import tlc2.value.IntervalValue;
-import tlc2.value.LazyValue;
-import tlc2.value.ModelValue;
-import tlc2.value.RecordValue;
-import tlc2.value.SetCapValue;
-import tlc2.value.SetCupValue;
-import tlc2.value.SetDiffValue;
-import tlc2.value.SetEnumValue;
-import tlc2.value.SetOfFcnsValue;
-import tlc2.value.SetOfRcdsValue;
-import tlc2.value.SetOfTuplesValue;
-import tlc2.value.SetPredValue;
-import tlc2.value.StringValue;
-import tlc2.value.SubsetValue;
-import tlc2.value.TupleValue;
-import tlc2.value.UnionValue;
-import tlc2.value.Value;
-import tlc2.value.ValueEnumeration;
-import tlc2.value.ValueVec;
+import tlc2.value.impl.*;
 import util.UniqueString;
 import static tlc2.value.ValueConstants.*;
 
@@ -111,8 +91,7 @@ public class TracePrinter {
 					UniqueString var = constants.get(i).getName();
 					String bName = tlcOutputInfo.getBName(var.toString());
 					BType type = tlcOutputInfo.getBType(var.toString());
-					String value = parseValue(state.lookup(var), type)
-							.toString();
+					String value = parseValue((Value) state.lookup(var), type).toString();
 					expression.append(bName).append(" = ").append(value);
 				}
 			}
@@ -131,7 +110,7 @@ public class TracePrinter {
 			UniqueString var = variables.get(i).getName();
 			String bName = tlcOutputInfo.getBName(var.toString());
 			BType type = tlcOutputInfo.getBType(var.toString());
-			String value = parseValue(state.lookup(var), type).toString();
+			String value = parseValue((Value) state.lookup(var), type).toString();
 			expression.append(bName).append(" = ").append(value);
 		}
 		return expression;
