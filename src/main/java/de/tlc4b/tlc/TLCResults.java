@@ -315,10 +315,6 @@ public class TLCResults implements ToolGlobals {
 				}
 				break;
 
-			case EC.TLC_ASSUMPTION_EVALUATION_ERROR:
-				tlcResult = evaluatingParameter(m.getParameters());
-				break;
-
 			case EC.TLC_VALUE_ASSERT_FAILED:
 				tlcResult = WellDefinednessError;
 				break;
@@ -329,6 +325,21 @@ public class TLCResults implements ToolGlobals {
 				}
 				break;
 
+			case EC.TLC_CONFIG_ID_HAS_VALUE: // LTL errors, Assertion violations
+				String kind = m.getParameters()[0];
+				String id = m.getParameters()[1];
+				// third param should be "FALSE" (we are already in error case here)
+				if (kind.contains("property") && id.startsWith("ASSERT_LTL")) {
+					tlcResult = TemporalPropertyViolation;
+				} else if (kind.contains("invariant") && id.startsWith("Assertion")) {
+					tlcResult = AssertionError;
+				} else {
+					// just as fall-back
+					tlcResult = evaluatingParameter(m.getParameters());
+				}
+				break;
+
+			case EC.TLC_ASSUMPTION_EVALUATION_ERROR:
 			case EC.GENERAL:
 				tlcResult = evaluatingParameter(m.getParameters());
 				break;
@@ -356,17 +367,18 @@ public class TLCResults implements ToolGlobals {
 				return AssertionError;
 			} else if (s.contains("The invariant of Invariant")) {
 				return InvariantViolation;
-			} else if (s.contains("In applying the function")) {
+			} else if (s.contains("In applying the function")
+				|| s.contains("which is not in the domain of the function")
+				|| s.contains("tlc2.module.TLC.Assert")
+				|| (s.contains("CHOOSE x \\in S: P, but no element of S satisfied P") && s.contains("module FunctionsAsRelations"))
+				// messages from BBuiltIns:
+				|| s.contains("Both operands of the modulo operator must be natural numbers")
+				|| s.contains("Division by zero")
+				|| s.contains("Applied the inter operator to an empty set")
+				|| s.replace("\n","").matches(".*The.*argument.*operator should be.*sequence.*")
+				|| s.replace("\n","").matches(".*The.*argument.*operator is an invalid number.*")) {
 				return WellDefinednessError;
-			} else if (s.contains("which is not in the domain of the function")) {
-				return WellDefinednessError;
-			} else if (s.contains("tlc2.module.TLC.Assert")) {
-				return WellDefinednessError;
-			} else if (s
-				.contains("CHOOSE x \\in S: P, but no element of S satisfied P")
-				&& s.contains("module FunctionsAsRelations")) {
-				return tlcResult = WellDefinednessError;
-			} else if (s.contains("The property of ASSERT_LTL")) {
+			} else if (s.contains("ASSERT_LTL")) {
 				return TemporalPropertyViolation;
 			}
 		}

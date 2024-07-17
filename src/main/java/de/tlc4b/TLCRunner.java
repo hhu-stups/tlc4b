@@ -41,8 +41,8 @@ public class TLCRunner {
 		System.arraycopy(args, 1, parameters, 0, parameters.length);
 		try {
 			TLC.main(parameters);
-		} catch (UnknownHostException | FileNotFoundException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
