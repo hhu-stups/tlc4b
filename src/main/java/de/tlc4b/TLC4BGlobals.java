@@ -34,6 +34,7 @@ public class TLC4BGlobals {
 	private static boolean forceTLCToEvalConstants;
 
 	private static int workers;
+	private static int dfid_initial_depth;
 
 	private static boolean runTestscript;
 
@@ -57,12 +58,15 @@ public class TLC4BGlobals {
 		printCoverage = false;
 		forceTLCToEvalConstants = false;
 		checkOnlyMainAssertions = false;
+		verbose = false;
+		silent = false;
 
 		proBconstantsSetup = false;
 
 		cleanup = true;
 
 		workers = 1;
+		dfid_initial_depth = -1; // option not selected
 
 		// for debugging purposes
 		runTLC = true;
@@ -147,20 +151,20 @@ public class TLC4BGlobals {
 		partialInvariantEvaluation = b;
 	}
 
-	public static void setDEFERRED_SET_SIZE(int DEFERRED_SET_SIZE) {
-		TLC4BGlobals.DEFERRED_SET_SIZE = DEFERRED_SET_SIZE;
+	public static void setDEFERRED_SET_SIZE(int deferredSetSize) {
+		TLC4BGlobals.DEFERRED_SET_SIZE = deferredSetSize;
 	}
 
-	public static void setMAX_INT(int mAX_INT) {
-		MAX_INT = mAX_INT;
+	public static void setMAX_INT(int maxInt) {
+		TLC4BGlobals.MAX_INT = maxInt;
 	}
 
-	public static void setMIN_INT(int mIN_INT) {
-		MIN_INT = mIN_INT;
+	public static void setMIN_INT(int minInt) {
+		TLC4BGlobals.MIN_INT = minInt;
 	}
 
-	public static void setGOAL(boolean gOAL) {
-		checkGOAL = gOAL;
+	public static void setGOAL(boolean goal) {
+		TLC4BGlobals.checkGOAL = goal;
 	}
 
 	public static void setDeadlockCheck(boolean deadlockCheck) {
@@ -201,6 +205,14 @@ public class TLC4BGlobals {
 
 	public static int getWorkers() {
 		return TLC4BGlobals.workers;
+	}
+
+	public static void setDfidInitialDepth(int depth) {
+		TLC4BGlobals.dfid_initial_depth = depth;
+	}
+
+	public static int getDfidInitialDepth() {
+		return TLC4BGlobals.dfid_initial_depth;
 	}
 
 	public static boolean isCleanup() {

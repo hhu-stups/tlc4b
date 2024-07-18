@@ -106,6 +106,10 @@ public class TLCRunner {
 			list.add("-workers");
 			list.add("" + TLC4BGlobals.getWorkers());
 		}
+		if (TLC4BGlobals.getDfidInitialDepth() >= 0) {
+			list.add("-dfid");
+			list.add("" + TLC4BGlobals.getDfidInitialDepth());
+		}
 
 		if (TLC4BGlobals.isPrintCoverage()) {
 			list.add("-nowarning");

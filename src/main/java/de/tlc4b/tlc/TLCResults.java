@@ -230,11 +230,9 @@ public class TLCResults implements ToolGlobals {
 				break;
 
 			case EC.TLC_STATS:
+			case EC.TLC_STATS_DFID:
 				numberOfTransitions = Integer.parseInt(m.getParameters()[0]);
 				numberOfDistinctStates = Integer.parseInt(m.getParameters()[1]);
-				break;
-
-			case EC.TLC_STATS_DFID:
 				break;
 
 			case EC.TLC_SUCCESS:

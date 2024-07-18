@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.util.ArrayList;
 
+import static de.tlc4b.TLC4BCliOptions.TLCOption.DFID;
 import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
 import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
@@ -30,6 +31,12 @@ public class BasicTest extends AbstractParseMachineTest {
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
+		assertEquals(error, test(a));
+	}
+
+	@Test
+	public void testRunTLCDFS() throws Exception {
+		String[] a = new String[] { machine.getPath(), "-" + DFID.arg(), "20" };
 		assertEquals(error, test(a));
 	}
 

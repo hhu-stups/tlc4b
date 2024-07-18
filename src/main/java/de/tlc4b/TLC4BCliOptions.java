@@ -29,6 +29,7 @@ public class TLC4BCliOptions {
 		DEFAULT_SETSIZE("default_setsize", "", Integer.class),
 		MININT("minint", "", Integer.class),
 		WORKERS("workers", "", Integer.class),
+		DFID("dfid", "depth-first model checking with iterative deepening, specify initial depth", Integer.class),
 		CONSTANTSSETUP("constantssetup", "use constants found by ProB for TLC model checking", String.class),
 		LTLFORMULA("ltlformula", "", String.class),
 		VERBOSE("verbose", "put TLC4B in verbose mode", null),

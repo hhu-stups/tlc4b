@@ -317,6 +317,13 @@ public class TLC4B {
 				}
 				TLC4BGlobals.setWorkers(Integer.parseInt(workers));
 			}
+			if (line.hasOption(DFID.arg())) {
+				String dfid_initial_depth = line.getOptionValue(DFID.arg());
+				if (dfid_initial_depth == null) {
+					throw new TLC4BIOException("Error: Number required after option '-dfid'.");
+				}
+				TLC4BGlobals.setDfidInitialDepth(Integer.parseInt(dfid_initial_depth));
+			}
 			if (line.hasOption(CONSTANTSSETUP.arg())) {
 				TLC4BGlobals.setProBconstantsSetup(true);
 				constantsSetup = line.getOptionValue(CONSTANTSSETUP.arg());
