@@ -4,8 +4,6 @@ import org.apache.commons.cli.Options;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TLC4BCliOptions {
 
@@ -56,14 +54,6 @@ public class TLC4BCliOptions {
 		public Class<?> expectsArg() {
 			return expectsArg;
 		}
-	}
-
-	public static Map<String, Class<?>> getOptions() {
-		Map<String, Class<?>> options = new HashMap<>();
-		for (TLCOption option : TLCOption.values()) {
-			options.put(option.arg(), option.expectsArg());
-		}
-		return options;
 	}
 
 	static Options getCommandlineOptions() {
