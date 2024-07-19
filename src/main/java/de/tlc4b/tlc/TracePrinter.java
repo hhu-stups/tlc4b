@@ -297,7 +297,7 @@ public class TracePrinter {
 
 		case LAZYVALUE: {
 			LazyValue s = (LazyValue) val;
-			res.append(parseValue(s.val, type));
+			res.append(parseValue(s.getValue(), type));
 			return res;
 		}
 
