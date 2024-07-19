@@ -46,7 +46,6 @@ public class ErrorTest {
 		assertEquals(NoError, test(a));
 	}
 
-	@Ignore
 	@Test
 	public void testEnumerationError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/EnumerationError.mch" };
