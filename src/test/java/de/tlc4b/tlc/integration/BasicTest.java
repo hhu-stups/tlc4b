@@ -36,7 +36,7 @@ public class BasicTest extends AbstractParseMachineTest {
 
 	@Test
 	public void testRunTLCDFS() throws Exception {
-		String[] a = new String[] { machine.getPath(), "-" + DFID.arg(), "20" };
+		String[] a = new String[] { machine.getPath(), DFID.arg(), "20" };
 		assertEquals(error, test(a));
 	}
 
