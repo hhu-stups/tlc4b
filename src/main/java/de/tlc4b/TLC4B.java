@@ -90,8 +90,6 @@ public class TLC4B {
 			} catch (NoClassDefFoundError e) {
 				printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
 			}
-		} else {
-			results = new TLCResults(null);
 		}
 		return results;
 	}
@@ -345,15 +343,15 @@ public class TLC4B {
 	}
 
 	private void processArgs(String[] args) {
+		handleParameter(args);
+		handleMainFileName();
+
 		MP.printVerbose("Arguments: ");
 		for (String string : args) {
 			MP.printVerbose(string);
 			MP.printVerbose(" ");
 		}
 		printlnVerbose("");
-
-		handleParameter(args);
-		handleMainFileName();
 	}
 
 	private void translate(boolean createFiles) throws IOException, BCompoundException {
