@@ -335,6 +335,9 @@ public class TLC4B {
 					throw new TLC4BIOException("Error: LTL formula required after option '-ltlformula'.");
 				}
 			}
+			if (line.hasOption(OUTPUT.arg())) {
+				buildDir = new File(line.getOptionValue(OUTPUT.arg()));
+			}
 		} catch (ParseException e) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("[file]", options);

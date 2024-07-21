@@ -1,10 +1,15 @@
 package de.tlc4b.tlc.integration;
 
-import static org.junit.Assert.assertEquals;
+import static de.tlc4b.TLC4BCliOptions.TLCOption.OUTPUT;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import static de.tlc4b.util.TestUtil.test;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class SpecialTest {
@@ -54,6 +59,16 @@ public class SpecialTest {
 				"./src/test/resources/special/LoadDefinitions.mch"};
 		assertEquals(NoError, test(a));
 	}
-	
+
+	@Test
+	public void testCustomOutputDir() throws Exception {
+		Path specialDir = Paths.get("./src/test/resources/special/veryspecialoutput");
+		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch", OUTPUT.cliArg(), specialDir.toString()};
+		assertEquals(InvariantViolation, test(a));
+
+		assertTrue(Files.deleteIfExists(specialDir.resolve("InvariantError.tla")));
+		assertTrue(Files.deleteIfExists(specialDir.resolve("InvariantError.cfg")));
+		assertTrue(Files.deleteIfExists(specialDir));
+	}
 	
 }

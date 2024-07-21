@@ -30,7 +30,8 @@ public class TLC4BCliOptions {
 		CONSTANTSSETUP("constantssetup", "use constants found by ProB for TLC model checking", String.class),
 		LTLFORMULA("ltlformula", "provide an additional LTL formula", String.class),
 		VERBOSE("verbose", "put TLC4B in verbose mode", null),
-		SILENT("silent", "put TLC4B in silent mode", null);
+		SILENT("silent", "put TLC4B in silent mode", null),
+		OUTPUT("output", "provide path for output directory", String.class);
 
 		private final String arg, desc;
 		private final Class<?> expectsArg;
@@ -41,11 +42,11 @@ public class TLC4BCliOptions {
 			this.expectsArg = expectsArg;
 		}
 
-		public String argString() {
+		public String arg() {
 			return arg;
 		}
 
-		public String arg() {
+		public String cliArg() {
 			return "-" + arg;
 		}
 
@@ -61,7 +62,7 @@ public class TLC4BCliOptions {
 	static Options getCommandlineOptions() {
 		Options options = new Options();
 		for (TLCOption option : TLCOption.values()) {
-			options.addOption(option.argString(), option.expectsArg() != null, option.desc());
+			options.addOption(option.arg(), option.expectsArg() != null, option.desc());
 		}
 		return options;
 	}
