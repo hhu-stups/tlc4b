@@ -355,30 +355,30 @@ public class TLC4B {
 	}
 
 	private void translate(boolean createFiles) throws IOException, BCompoundException {
-		if (TLC4BGlobals.isTranslate()) {
-			StopWatch.start(PARSING_TIME);
-			MP.print("Parsing... ");
-			translator = new Translator(machineFileNameWithoutFileExtension,
-				mainfile, this.ltlFormula, this.constantsSetup);
-			StopWatch.stop(PARSING_TIME);
-			println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
+		StopWatch.start(PARSING_TIME);
+		MP.print("Parsing... ");
+		translator = new Translator(machineFileNameWithoutFileExtension,
+			mainfile, this.ltlFormula, this.constantsSetup);
+		StopWatch.stop(PARSING_TIME);
+		println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
 
-			StopWatch.start(TRANSLATION_TIME);
-			MP.print("Translating... ");
-			translator.translate();
-			this.tlaModule = translator.getModuleString();
-			this.config = translator.getConfigString();
-			this.tlcOutputInfo = translator.getTLCOutputInfo();
-			StopWatch.stop(TRANSLATION_TIME);
-			println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
-			if (createFiles)
-				createFiles();
-		}
+		StopWatch.start(TRANSLATION_TIME);
+		MP.print("Translating... ");
+		translator.translate();
+		this.tlaModule = translator.getModuleString();
+		this.config = translator.getConfigString();
+		this.tlcOutputInfo = translator.getTLCOutputInfo();
+		StopWatch.stop(TRANSLATION_TIME);
+		println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
+		if (createFiles)
+			createFiles();
 	}
 
 	public void process(String[] args) throws IOException, BCompoundException {
 		processArgs(args);
-		translate(true);
+		if (TLC4BGlobals.isTranslate()) {
+			translate(true);
+		}
 	}
 
 	private void handleMainFileName() {
