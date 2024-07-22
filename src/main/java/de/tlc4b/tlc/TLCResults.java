@@ -253,7 +253,7 @@ public class TLCResults implements ToolGlobals {
 					tlcResult = AssertionError;
 				} else if (m.getParameters()[0].equals("NotGoal")) {
 					tlcResult = Goal;
-				} else if (m.getParameters()[0].startsWith("ASSERT_LTL")) {
+				} else if (m.getParameters()[0].startsWith("ASSERT_LTL") || m.getParameters()[0].equals("ltl")) {
 					tlcResult = TemporalPropertyViolation;
 				} else {
 					tlcResult = InvariantViolation;
