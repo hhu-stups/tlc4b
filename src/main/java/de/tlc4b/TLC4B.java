@@ -140,28 +140,32 @@ public class TLC4B {
 		printlnSilent("| MAX Int: " + TLC4BGlobals.getMAX_INT());
 		printlnSilent("| Standard deferred set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
 		printlnSilent("--------------------------------");
-		printlnSilent("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
-		printlnSilent("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME) + " ms");
-		println("Model checking time: " + results.getModelCheckingTime() + " sec");
-		// MP.printMessage("Number of workers: " +
-		// TLCGlobals.getNumWorkers());
-		if (!results.getViolatedAssertions().isEmpty()) {
-			println("Violated assertions: " + results.getViolatedAssertions());
+		if (TLC4BGlobals.isTranslate()) {
+			printlnSilent("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
+			printlnSilent("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME) + " ms");
 		}
-		println("States analysed: " + results.getNumberOfDistinctStates());
-		println("Transitions fired: " + results.getNumberOfTransitions());
-		println("Result: " + results.getResultString());
-		String violatedDefinition = results.getViolatedDefinition();
-		if (violatedDefinition != null) {
-			println("Violated Definition: " + violatedDefinition);
-		}
+		if (TLC4BGlobals.isRunTLC()) {
+			println("Model checking time: " + results.getModelCheckingTime() + " sec");
+			// MP.printMessage("Number of workers: " +
+			// TLCGlobals.getNumWorkers());
+			if (!results.getViolatedAssertions().isEmpty()) {
+				println("Violated assertions: " + results.getViolatedAssertions());
+			}
+			println("States analysed: " + results.getNumberOfDistinctStates());
+			println("Transitions fired: " + results.getNumberOfTransitions());
+			println("Result: " + results.getResultString());
+			String violatedDefinition = results.getViolatedDefinition();
+			if (violatedDefinition != null) {
+				println("Violated Definition: " + violatedDefinition);
+			}
 
-		if (results.hasTrace() && createTraceFile) {
-			String trace = results.getTrace();
-			String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
-			traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
-			results.addTraceFilePath(traceFile.getAbsolutePath());
-			println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
+			if (results.hasTrace() && createTraceFile) {
+				String trace = results.getTrace();
+				String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
+				traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
+				results.addTraceFilePath(traceFile.getAbsolutePath());
+				println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
+			}
 		}
 
 	}
@@ -221,19 +225,19 @@ public class TLC4B {
 		tlc4b.machineFileNameWithoutFileExtension = "Test";
 
 		StopWatch.start(PARSING_TIME);
-		print("Parsing... ");
+		printSilent("Parsing... ");
 		tlc4b.translator = new Translator(machineString);
 		StopWatch.stop(PARSING_TIME);
-		println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
+		printlnSilent("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
 
 		StopWatch.start(TRANSLATION_TIME);
-		print("Translating... ");
+		printSilent("Translating... ");
 		tlc4b.translator.translate();
 		tlc4b.tlaModule = tlc4b.translator.getModuleString();
 		tlc4b.config = tlc4b.translator.getConfigString();
 		tlc4b.tlcOutputInfo = tlc4b.translator.getTLCOutputInfo();
 		StopWatch.stop(TRANSLATION_TIME);
-		println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
+		printlnSilent("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
 		tlc4b.createFiles();
 
 		if (TLC4BGlobals.isRunTLC()) {
@@ -359,20 +363,20 @@ public class TLC4B {
 
 	private void translate(boolean createFiles) throws IOException, BCompoundException {
 		StopWatch.start(PARSING_TIME);
-		MP.print("Parsing... ");
+		MP.printSilent("Parsing... ");
 		translator = new Translator(machineFileNameWithoutFileExtension,
 			mainfile, this.ltlFormula, this.constantsSetup);
 		StopWatch.stop(PARSING_TIME);
-		println("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
+		printlnSilent("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
 
 		StopWatch.start(TRANSLATION_TIME);
-		MP.print("Translating... ");
+		MP.printSilent("Translating... ");
 		translator.translate();
 		this.tlaModule = translator.getModuleString();
 		this.config = translator.getConfigString();
 		this.tlcOutputInfo = translator.getTLCOutputInfo();
 		StopWatch.stop(TRANSLATION_TIME);
-		println("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
+		printlnSilent("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
 		if (createFiles)
 			createFiles();
 	}

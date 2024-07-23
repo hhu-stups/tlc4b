@@ -26,8 +26,7 @@ public class TracePrinter {
 
 	StringBuilder traceBuilder;
 
-	public TracePrinter(ArrayList<TLCStateInfo> trace,
-			TLCOutputInfo tlcOutputInfo) {
+	public TracePrinter(ArrayList<TLCStateInfo> trace, TLCOutputInfo tlcOutputInfo) {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
 

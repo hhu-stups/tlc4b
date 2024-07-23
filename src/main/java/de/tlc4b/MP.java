@@ -20,6 +20,11 @@ public class MP {
 			out.println(message);
 	}
 
+	public static void printSilent(String message) {
+		if (!TLC4BGlobals.isSilent() || TLC4BGlobals.isVerbose())
+			out.print(message);
+	}
+
 	public static void printlnVerbose(String message) {
 		if (TLC4BGlobals.isVerbose())
 			out.println(message);
