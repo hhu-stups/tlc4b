@@ -10,8 +10,10 @@ variables:
 
 cache:
   paths:
-    - .gradle/wrapper
     - .gradle/caches
+    - .gradle/native
+    - .gradle/notifications
+    - .gradle/wrapper
 
 tests:
   stage: test
