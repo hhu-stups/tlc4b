@@ -5,6 +5,7 @@ import de.tlc4b.exceptions.NotSupportedException;
 import tla2sany.semantic.*;
 import tla2sany.st.Location;
 import tlc2.output.EC;
+import tlc2.output.MP;
 import tlc2.output.Message;
 import tlc2.output.OutputCollector;
 import tlc2.tool.BuiltInOPs;
@@ -20,7 +21,7 @@ import static tlc2.output.MP.*;
 public class TLCResults implements ToolGlobals {
 
 	private TLCResult tlcResult;
-	private String violatedDefinition;
+	private String violatedDefinition, tlcErrorMessage;
 	private Date startTime;
 	private Date endTime;
 	private LinkedHashMap<String, Long> operationsCount;
@@ -191,11 +192,14 @@ public class TLCResults implements ToolGlobals {
 
 	private void evalAllMessages() {
 
-		ArrayList<Message> messages = OutputCollector.getAllMessages();
+		ArrayList<Message> messages = new ArrayList<>(OutputCollector.getAllMessages());
 		for (Message m : messages) {
 			switch (m.getMessageClass()) {
 				case ERROR:
 					evalErrorMessage(m);
+					if (tlcResult == null) {
+						tlcErrorMessage = MP.getError(m.getMessageCode(), m.getParameters());
+					}
 					break;
 				case TLCBUG:
 					break;
@@ -212,10 +216,9 @@ public class TLCResults implements ToolGlobals {
 			}
 		}
 
-		if (this.tlcResult == null) {
-			// this.tlcResult = TLCError;
+		if (this.tlcErrorMessage != null) {
+			this.tlcResult = TLCError;
 		}
-
 	}
 
 	private void evalStatusMessage(Message m) {
@@ -386,6 +389,10 @@ public class TLCResults implements ToolGlobals {
 
 	public TLCResult getTLCResult() {
 		return tlcResult;
+	}
+
+	public String getTLCErrorMessage() {
+		return tlcErrorMessage;
 	}
 
 	public String getResultString() {
