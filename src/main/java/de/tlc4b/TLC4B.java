@@ -105,7 +105,7 @@ public class TLC4B {
 		Future<Exception> future = Executors.newSingleThreadExecutor().submit(() -> {
 			try {
 				TLC4B tlc4B = new TLC4B();
-				tlc4B.processArgs(new String[]{path});
+				tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
 				tlc4B.translate(false);
 				return null;
 			} catch (BCompoundException | IOException | TLC4BException e) {
