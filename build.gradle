@@ -41,8 +41,8 @@ dependencies {
 }
 
 java {
-	project.sourceCompatibility = JavaVersion.VERSION_1_8
-	project.targetCompatibility = JavaVersion.VERSION_1_8
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 	
 	withSourcesJar()
 	withJavadocJar()
@@ -58,7 +58,7 @@ jacocoTestReport {
 	reports {
 		xml.required = false
 		csv.required = false
-		html.destination file("${buildDir}/jacocoHtml")
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
 }
 
