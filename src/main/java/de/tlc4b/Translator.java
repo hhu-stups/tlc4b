@@ -120,8 +120,9 @@ public class Translator {
 		machineContext.analyseMachine();
 
 		this.machineName = machineContext.getMachineName();
-		if (machineContext.machineContainsOperations()) {
-			TLC4BGlobals.setPrintCoverage(true);
+		// ignore coverage option if machine contains no operations
+		if (!machineContext.machineContainsOperations()) {
+			TLC4BGlobals.setPrintCoverage(false);
 		}
 
 		Typechecker typechecker = new Typechecker(machineContext);

@@ -31,7 +31,8 @@ public class TLC4BCliOptions {
 		LTLFORMULA("ltlformula", "provide an additional LTL formula", String.class),
 		VERBOSE("verbose", "put TLC4B in verbose mode", null),
 		SILENT("silent", "put TLC4B in silent mode", null),
-		OUTPUT("output", "provide path for output directory", String.class);
+		OUTPUT("output", "provide path for output directory", String.class),
+		COVERAGE("coverage", "print operation coverage", null);
 
 		private final String arg, desc;
 		private final Class<?> expectsArg;

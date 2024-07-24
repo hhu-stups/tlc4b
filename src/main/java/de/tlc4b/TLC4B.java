@@ -281,6 +281,7 @@ public class TLC4B {
 			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE.arg()));
 			TLC4BGlobals.setDeleteOnExit(line.hasOption(DEL.arg()));
 			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(PARINVEVAL.arg()));
+			TLC4BGlobals.setPrintCoverage(line.hasOption(COVERAGE.arg()));
 
 			if (line.hasOption(TMP.arg())) {
 				buildDir = new File(System.getProperty("java.io.tmpdir"));
