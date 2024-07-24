@@ -1,6 +1,7 @@
 package de.tlc4b.tlc;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.FunctionType;
@@ -17,16 +18,16 @@ import static tlc2.value.ValueConstants.*;
 
 public class TracePrinter {
 
-	ArrayList<TLCStateInfo> trace;
+	List<TLCStateInfo> trace;
 	TLCState initialState;
 	final TLCOutputInfo tlcOutputInfo;
 
-	ArrayList<OpDeclNode> constants;
-	ArrayList<OpDeclNode> variables;
+	List<OpDeclNode> constants;
+	List<OpDeclNode> variables;
 
 	StringBuilder traceBuilder;
 
-	public TracePrinter(ArrayList<TLCStateInfo> trace, TLCOutputInfo tlcOutputInfo) {
+	public TracePrinter(List<TLCStateInfo> trace, TLCOutputInfo tlcOutputInfo) {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
 

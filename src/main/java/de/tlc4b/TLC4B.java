@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 
@@ -175,7 +175,7 @@ public class TLC4B {
 	}
 
 	private void printOperationsCount(TLCResults results) {
-		LinkedHashMap<String, Long> operationCount = results.getOperationCount();
+		Map<String, Long> operationCount = results.getOperationCount();
 		if (TLC4BGlobals.isPrintCoverage() && operationCount != null) {
 			printlnSilent("---------- Coverage statistics ----------");
 			for (Entry<String, Long> entry : operationCount.entrySet()) {

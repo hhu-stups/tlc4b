@@ -14,8 +14,8 @@ public class Log {
 
 	public static final String DELIMITER = ";";
 
-	private final ArrayList<String> fieldNames = new ArrayList<>();
-	private final ArrayList<String> fieldValues = new ArrayList<>();
+	private final List<String> fieldNames = new ArrayList<>();
+	private final List<String> fieldValues = new ArrayList<>();
 
 	public Log(TLC4B tlc4b, TLCResults tlcResults) {
 		fieldNames.add("Machine File");

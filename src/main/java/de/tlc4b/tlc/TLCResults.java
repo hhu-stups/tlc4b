@@ -24,8 +24,8 @@ public class TLCResults implements ToolGlobals {
 	private String violatedDefinition, tlcErrorMessage;
 	private Date startTime;
 	private Date endTime;
-	private LinkedHashMap<String, Long> operationsCount;
-	private final ArrayList<String> violatedAssertions = new ArrayList<>();
+	private Map<String, Long> operationsCount;
+	private final List<String> violatedAssertions = new ArrayList<>();
 
 	private int lengthOfTrace;
 	private String traceString, traceFile;
@@ -55,7 +55,7 @@ public class TLCResults implements ToolGlobals {
 		}
 	}
 
-	public LinkedHashMap<String, Long> getOperationCount() {
+	public Map<String, Long> getOperationCount() {
 		return operationsCount;
 	}
 
@@ -76,7 +76,7 @@ public class TLCResults implements ToolGlobals {
 		return violatedDefinition;
 	}
 
-	public ArrayList<String> getViolatedAssertions() {
+	public List<String> getViolatedAssertions() {
 		return this.violatedAssertions;
 	}
 
@@ -120,7 +120,7 @@ public class TLCResults implements ToolGlobals {
 				lineCount.put(endline, entry.getValue());
 			}
 		}
-		ArrayList<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.getModuleNode());
+		List<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.getModuleNode());
 		operationsCount = new LinkedHashMap<>();
 		for (OpDefNode opDefNode : defs) {
 			String operationName = opDefNode.getName().toString();
@@ -132,9 +132,9 @@ public class TLCResults implements ToolGlobals {
 		}
 	}
 
-	private ArrayList<OpDefNode> getActionsFromGeneratedModule(ModuleNode moduleNode) {
+	private List<OpDefNode> getActionsFromGeneratedModule(ModuleNode moduleNode) {
 		// list of actions in the module
-		ArrayList<OpDefNode> actions = new ArrayList<>();
+		List<OpDefNode> actions = new ArrayList<>();
 
 		// get all definitions from the module
 		OpDefNode[] opDefs = moduleNode.getOpDefs();
@@ -178,7 +178,7 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private void evalTrace() {
-		ArrayList<TLCStateInfo> trace = OutputCollector.getTrace();
+		List<TLCStateInfo> trace = OutputCollector.getTrace();
 		TracePrinter printer = null;
 		if (trace != null) {
 			printer = new TracePrinter(trace, tlcOutputInfo);
@@ -192,7 +192,7 @@ public class TLCResults implements ToolGlobals {
 
 	private void evalAllMessages() {
 
-		ArrayList<Message> messages = new ArrayList<>(OutputCollector.getAllMessages());
+		List<Message> messages = new ArrayList<>(OutputCollector.getAllMessages());
 		for (Message m : messages) {
 			switch (m.getMessageClass()) {
 				case ERROR:
@@ -281,8 +281,7 @@ public class TLCResults implements ToolGlobals {
 
 			case EC.TLC_ASSUMPTION_FALSE:
 				// get the violated assumption expr from the OutputCollector
-				ArrayList<ExprNode> violatedAssumptions = OutputCollector
-					.getViolatedAssumptions();
+				List<ExprNode> violatedAssumptions = OutputCollector.getViolatedAssumptions();
 				if (!violatedAssumptions.isEmpty()) {
 					// try to find the assume node contain the expr in order to get
 					// the name of the assumption
