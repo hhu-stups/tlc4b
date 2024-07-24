@@ -36,7 +36,7 @@ public class TLCResults implements ToolGlobals {
 	private final TLCOutputInfo tlcOutputInfo;
 
 	public enum TLCResult {
-		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError, InitialStateError
+		Deadlock, Goal, InvariantViolation, ParseError, NoError, AssertionError, PropertiesError, EnumerationError, TLCError, TemporalPropertyViolation, WellDefinednessError, InitialStateError, Interrupted
 	}
 
 	public boolean hasTrace() {
@@ -380,6 +380,8 @@ public class TLCResults implements ToolGlobals {
 				return WellDefinednessError;
 			} else if (s.contains("ASSERT_LTL")) {
 				return TemporalPropertyViolation;
+			} else if (s.contains("java.lang.InterruptedException")) {
+				return Interrupted;
 			}
 		}
 		// unknown error
