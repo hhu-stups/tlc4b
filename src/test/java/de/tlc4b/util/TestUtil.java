@@ -22,6 +22,7 @@ import de.tlc4b.tlc.TLCResults.TLCResult;
 
 import util.ToolIO;
 
+import static de.tlc4b.TLC4BCliOptions.TLCOption.NOTRACE;
 import static org.junit.Assert.assertEquals;
 
 public class TestUtil {
@@ -151,8 +152,19 @@ public class TestUtil {
 	}
 
 	public static TLCResult test(String[] args) throws IOException {
+		return test(args, false);
+	}
+
+	public static TLCResult test(String[] args, boolean createTrace) throws IOException {
 		String runnerClassName = TLC4BTester.class.getCanonicalName();
-		return runTLC(runnerClassName, args);
+		String[] newArgs;
+		if (createTrace) {
+			newArgs = args;
+		} else {
+			newArgs = Arrays.copyOf(args, args.length + 1);
+			newArgs[args.length] = NOTRACE.cliArg();
+		}
+		return runTLC(runnerClassName, newArgs);
 	}
 
 	private static TLCResult runTLC(String runnerClassName, String[] args) throws IOException {

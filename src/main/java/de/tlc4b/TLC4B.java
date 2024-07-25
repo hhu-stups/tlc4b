@@ -84,7 +84,7 @@ public class TLC4B {
 				TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
 				results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
-				tlc4b.printResults(results, TLC4BGlobals.isCreateTraceFile());
+				tlc4b.printResults(results);
 				Log log = new Log(tlc4b, results);
 				tlc4b.createLogFile(log);
 			} catch (NoClassDefFoundError e) {
@@ -121,7 +121,7 @@ public class TLC4B {
 		}
 	}
 
-	private void printResults(TLCResults results, boolean createTraceFile) {
+	private void printResults(TLCResults results) {
 		printOperationsCount(results);
 		// options
 		printlnSilent("Used Options");
@@ -159,7 +159,8 @@ public class TLC4B {
 				println("Violated Definition: " + violatedDefinition);
 			}
 
-			if (results.hasTrace() && createTraceFile) {
+			System.out.println(TLC4BGlobals.isCreateTraceFile());
+			if (results.hasTrace() && TLC4BGlobals.isCreateTraceFile()) {
 				String trace = results.getTrace();
 				String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
 				traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
@@ -189,7 +190,6 @@ public class TLC4B {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
-		TLC4BGlobals.setCreateTraceFile(false);
 		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
@@ -206,7 +206,9 @@ public class TLC4B {
 			MP.TLCOutputStream.resetOutputStream();
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
-			tlc4b.printResults(results, false);
+			tlc4b.printResults(results);
+			Log log = new Log(tlc4b, results);
+			tlc4b.createLogFile(log);
 
 			System.exit(0);
 		}
@@ -216,7 +218,6 @@ public class TLC4B {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
-		TLC4BGlobals.setCreateTraceFile(false);
 		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
@@ -246,7 +247,7 @@ public class TLC4B {
 			MP.TLCOutputStream.resetOutputStream();
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
-			tlc4b.printResults(results, false);
+			tlc4b.printResults(results);
 			System.exit(0);
 		}
 	}
