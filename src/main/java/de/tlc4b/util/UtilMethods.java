@@ -2,9 +2,7 @@ package de.tlc4b.util;
 
 import java.util.ArrayList;
 
-import de.be4.classicalb.core.parser.node.AIdentifierExpression;
-import de.be4.classicalb.core.parser.node.Node;
-import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
+import de.be4.classicalb.core.parser.node.*;
 import de.hhu.stups.sablecc.patch.SourcePosition;
 
 public class UtilMethods {
@@ -14,6 +12,23 @@ public class UtilMethods {
 		ArrayList<TIdentifierLiteral> idList = new ArrayList<>();
 		idList.add(literal);
 		return new AIdentifierExpression(idList);
+	}
+
+	public static AIdentifierExpression getIdentifierExpression(PExpression e) {
+		AIdentifierExpression identifier;
+		if (e instanceof ADescriptionExpression) {
+			PExpression desc = ((ADescriptionExpression) e).getExpression();
+			if (desc instanceof AIdentifierExpression) {
+				identifier = (AIdentifierExpression) desc;
+			} else {
+				throw new IllegalStateException("Unexpected expression type: " + e);
+			}
+		} else if (e instanceof AIdentifierExpression) {
+			identifier = (AIdentifierExpression) e;
+		} else {
+			throw new IllegalStateException("Unexpected expression type: " + e);
+		}
+		return identifier;
 	}
 
 	public static String getPositionAsString(Node node) {

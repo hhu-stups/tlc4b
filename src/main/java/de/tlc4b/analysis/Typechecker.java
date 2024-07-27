@@ -30,6 +30,8 @@ import de.tlc4b.exceptions.UnificationException;
 import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 
+import static de.tlc4b.util.UtilMethods.getIdentifierExpression;
+
 /**
  * TODO we need a second run over the AST to check if all local variables have a
  * type. This run should be performed after the normal model checking task.
@@ -179,41 +181,25 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression id = (AIdentifierExpression) e;
-			UntypedType u = new UntypedType();
-			setType(id, u);
-		}
+		copy.forEach(e -> setType(getIdentifierExpression(e), new UntypedType()));
 	}
 
 	@Override
 	public void caseAAbstractConstantsMachineClause(AAbstractConstantsMachineClause node) {
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression id = (AIdentifierExpression) e;
-			UntypedType u = new UntypedType();
-			setType(id, u);
-		}
+		copy.forEach(e -> setType(getIdentifierExpression(e), new UntypedType()));
 	}
 
 	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression v = (AIdentifierExpression) e;
-			UntypedType u = new UntypedType();
-			setType(v, u);
-		}
+		copy.forEach(e -> setType(getIdentifierExpression(e), new UntypedType()));
 	}
 
 	@Override
 	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression v = (AIdentifierExpression) e;
-			UntypedType u = new UntypedType();
-			setType(v, u);
-		}
+		copy.forEach(e -> setType(getIdentifierExpression(e), new UntypedType()));
 	}
 
 	/**

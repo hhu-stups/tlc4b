@@ -38,7 +38,7 @@ public class ConstantsTest {
 	}
 	
 	@Test
-	public void testConstantMultiplePossipleValues() throws Exception {
+	public void testConstantMultiplePossibleValues() throws Exception {
 		String machine = "MACHINE test\n"
 				+ "CONSTANTS k \n"
 				+ "PROPERTIES k  : {1} \n" + "END";
@@ -131,6 +131,19 @@ public class ConstantsTest {
 				+ "VARIABLES n\n"
 				+ "Init == n \\in SUBSET({1, 2, 3})\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<n>>\n"
+				+ "======";
+		compare(expected, machine);
+	}
+
+	@Test
+	public void testConstantsDescPragma() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS n /*@desc description*/\n"
+				+ "PROPERTIES n = 1\n"
+				+ "END";
+
+		String expected = "---- MODULE test----\n"
+				+ "n == 1\n"
 				+ "======";
 		compare(expected, machine);
 	}

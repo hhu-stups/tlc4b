@@ -1,70 +1,10 @@
 package de.tlc4b.analysis;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.AAbstractConstantsMachineClause;
-import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
-import de.be4.classicalb.core.parser.node.AAnySubstitution;
-import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
-import de.be4.classicalb.core.parser.node.AAssignSubstitution;
-import de.be4.classicalb.core.parser.node.AComprehensionSetExpression;
-import de.be4.classicalb.core.parser.node.AConcreteVariablesMachineClause;
-import de.be4.classicalb.core.parser.node.AConstantsMachineClause;
-import de.be4.classicalb.core.parser.node.AConstraintsMachineClause;
-import de.be4.classicalb.core.parser.node.ADeferredSetSet;
-import de.be4.classicalb.core.parser.node.ADefinitionExpression;
-import de.be4.classicalb.core.parser.node.ADefinitionPredicate;
-import de.be4.classicalb.core.parser.node.ADefinitionSubstitution;
-import de.be4.classicalb.core.parser.node.ADefinitionsMachineClause;
-import de.be4.classicalb.core.parser.node.AEnumeratedSetSet;
-import de.be4.classicalb.core.parser.node.AEventBComprehensionSetExpression;
-import de.be4.classicalb.core.parser.node.AExistsPredicate;
-import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
-import de.be4.classicalb.core.parser.node.AForallPredicate;
-import de.be4.classicalb.core.parser.node.AFunctionExpression;
-import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
-import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
-import de.be4.classicalb.core.parser.node.AIdentifierExpression;
-import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
-import de.be4.classicalb.core.parser.node.AInvariantMachineClause;
-import de.be4.classicalb.core.parser.node.ALambdaExpression;
-import de.be4.classicalb.core.parser.node.ALetSubstitution;
-import de.be4.classicalb.core.parser.node.AMachineHeader;
-import de.be4.classicalb.core.parser.node.AMachineReferenceNoParams;
-import de.be4.classicalb.core.parser.node.AOpSubstitution;
-import de.be4.classicalb.core.parser.node.AOperation;
-import de.be4.classicalb.core.parser.node.AOperationsMachineClause;
-import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
-import de.be4.classicalb.core.parser.node.APredicateParseUnit;
-import de.be4.classicalb.core.parser.node.APrimedIdentifierExpression;
-import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
-import de.be4.classicalb.core.parser.node.AQuantifiedIntersectionExpression;
-import de.be4.classicalb.core.parser.node.AQuantifiedUnionExpression;
-import de.be4.classicalb.core.parser.node.ARecEntry;
-import de.be4.classicalb.core.parser.node.ARecordFieldExpression;
-import de.be4.classicalb.core.parser.node.ASeesMachineClause;
-import de.be4.classicalb.core.parser.node.ASetsContextClause;
-import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
-import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
-import de.be4.classicalb.core.parser.node.Node;
-import de.be4.classicalb.core.parser.node.PDefinition;
-import de.be4.classicalb.core.parser.node.PExpression;
-import de.be4.classicalb.core.parser.node.PMachineClause;
-import de.be4.classicalb.core.parser.node.PMachineHeader;
-import de.be4.classicalb.core.parser.node.PMachineReferenceNoParams;
-import de.be4.classicalb.core.parser.node.POperation;
-import de.be4.classicalb.core.parser.node.PPredicate;
-import de.be4.classicalb.core.parser.node.PSet;
-import de.be4.classicalb.core.parser.node.Start;
-import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
+import de.be4.classicalb.core.parser.node.*;
 import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.MP;
 import de.tlc4b.TLC4BGlobals;
@@ -73,6 +13,8 @@ import de.tlc4b.analysis.transformation.MachineClauseSorter;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
+
+import static de.tlc4b.util.UtilMethods.getIdentifierExpression;
 
 public class MachineContext extends DepthFirstAdapter {
 
@@ -419,58 +361,37 @@ public class MachineContext extends DepthFirstAdapter {
 			exist(node.getIdentifier());
 			enumeratedSets.put(name, node);
 		}
-		List<PExpression> copy = new ArrayList<>(node.getElements());
-		for (PExpression e : copy) {
-			AIdentifierExpression v = (AIdentifierExpression) e;
-			String name = Utils.getTIdentifierListAsString(v.getIdentifier());
-			exist(v.getIdentifier());
-			enumValues.put(name, v);
-		}
+		extractIdentifierExpressions(new ArrayList<>(node.getElements()), enumValues);
 	}
 
 	@Override
 	public void caseAConstantsMachineClause(AConstantsMachineClause node) {
 		hasConstants = true;
-		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression c = (AIdentifierExpression) e;
-			String name = Utils.getTIdentifierListAsString(c.getIdentifier());
-			exist(c.getIdentifier());
-			constants.put(name, c);
-		}
+		extractIdentifierExpressions(new ArrayList<>(node.getIdentifiers()), constants);
 	}
 
 	@Override
 	public void caseAAbstractConstantsMachineClause(AAbstractConstantsMachineClause node) {
 		hasConstants = true;
-		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression c = (AIdentifierExpression) e;
-			String name = Utils.getTIdentifierListAsString(c.getIdentifier());
-			exist(c.getIdentifier());
-			constants.put(name, c);
-		}
+		extractIdentifierExpressions(new ArrayList<>(node.getIdentifiers()), constants);
 	}
 
 	@Override
 	public void caseAVariablesMachineClause(AVariablesMachineClause node) {
-		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		for (PExpression e : copy) {
-			AIdentifierExpression v = (AIdentifierExpression) e;
-			String name = Utils.getTIdentifierListAsString(v.getIdentifier());
-			exist(v.getIdentifier());
-			variables.put(name, v);
-		}
+		extractIdentifierExpressions(new ArrayList<>(node.getIdentifiers()), variables);
 	}
 
 	@Override
 	public void caseAConcreteVariablesMachineClause(AConcreteVariablesMachineClause node) {
-		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		extractIdentifierExpressions(new ArrayList<>(node.getIdentifiers()), variables);
+	}
+
+	private void extractIdentifierExpressions(List<PExpression> copy, Map<String, Node> addToMap) {
 		for (PExpression e : copy) {
-			AIdentifierExpression v = (AIdentifierExpression) e;
-			String name = Utils.getTIdentifierListAsString(v.getIdentifier());
-			exist(v.getIdentifier());
-			variables.put(name, v);
+			AIdentifierExpression identifier = getIdentifierExpression(e);
+			String name = Utils.getTIdentifierListAsString(identifier.getIdentifier());
+			exist(identifier.getIdentifier());
+			addToMap.put(name, identifier);
 		}
 	}
 
