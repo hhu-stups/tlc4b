@@ -405,5 +405,26 @@ public class OperationsTest {
 				+ "====";
 		compare(expected, machine);
 	}
+
+	@Test
+	public void testOperationWithDescPragma() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "VARIABLES x\n"
+				+ "INVARIANT x = 1\n"
+				+ "INITIALISATION x := 1\n"
+				+ "OPERATIONS\n"
+				+ "inc = x := x + 1 /*@desc increment x*/\n"
+				+ "END";
+
+		String expected = "---- MODULE test ----\n"
+				+ "EXTENDS Naturals\n"
+				+ "VARIABLES x \n"
+				+ "Invariant1 == x = 1\n"
+				+ "Init == x = 1 \n"
+				+ "inc == x' = x + 1\n"
+				+ "Next == \\/ inc \n"
+				+ "====";
+		compare(expected, machine);
+	}
 	
 }

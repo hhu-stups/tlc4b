@@ -15,6 +15,7 @@ import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 
 import static de.tlc4b.util.UtilMethods.getIdentifierExpression;
+import static de.tlc4b.util.UtilMethods.getOperation;
 
 public class MachineContext extends DepthFirstAdapter {
 
@@ -554,7 +555,7 @@ public class MachineContext extends DepthFirstAdapter {
 		List<POperation> copy = new ArrayList<>(node.getOperations());
 		// first collect all operations
 		for (POperation e : copy) {
-			AOperation op = (AOperation) e;
+			AOperation op = getOperation(e);
 			String name = Utils.getTIdentifierListAsString(op.getOpName());
 			// existString(name);
 			if (operations.containsKey(name)) {

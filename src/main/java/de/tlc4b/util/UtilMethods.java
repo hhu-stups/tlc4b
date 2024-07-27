@@ -17,18 +17,25 @@ public class UtilMethods {
 	public static AIdentifierExpression getIdentifierExpression(PExpression e) {
 		AIdentifierExpression identifier;
 		if (e instanceof ADescriptionExpression) {
-			PExpression desc = ((ADescriptionExpression) e).getExpression();
-			if (desc instanceof AIdentifierExpression) {
-				identifier = (AIdentifierExpression) desc;
-			} else {
-				throw new IllegalStateException("Unexpected expression type: " + e);
-			}
+			identifier = getIdentifierExpression(((ADescriptionExpression) e).getExpression());
 		} else if (e instanceof AIdentifierExpression) {
 			identifier = (AIdentifierExpression) e;
 		} else {
 			throw new IllegalStateException("Unexpected expression type: " + e);
 		}
 		return identifier;
+	}
+
+	public static AOperation getOperation(POperation e) {
+		AOperation op;
+		if (e instanceof ADescriptionOperation) {
+			op = getOperation(((ADescriptionOperation) e).getOperation());
+		} else if (e instanceof AOperation) {
+			op = (AOperation) e;
+		} else {
+			throw new IllegalStateException("Unexpected operation type: " + e);
+		}
+		return op;
 	}
 
 	public static String getPositionAsString(Node node) {
