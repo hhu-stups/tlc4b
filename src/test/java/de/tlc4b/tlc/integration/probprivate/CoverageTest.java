@@ -45,10 +45,7 @@ public class CoverageTest extends AbstractParseMachineTest {
 		list.add("./src/test/resources/");
 		ignoreList.add("./src/test/resources/bugs/");
 		ignoreList.add("./src/test/resources/compound/");
-		ignoreList.add("./src/test/resources/other/");
 		ignoreList.add("./src/test/resources/test/");
-		ignoreList.add("./src/test/resources/testing/");
-		ignoreList.add("./src/test/resources/todo/");
 		return getConfiguration2(list, ignoreList);
 	}
 
