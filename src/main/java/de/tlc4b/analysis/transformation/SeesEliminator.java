@@ -24,7 +24,6 @@ import de.be4.classicalb.core.parser.node.PParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.util.Utils;
-import de.tlc4b.TLC4BGlobals;
 
 public class SeesEliminator extends DepthFirstAdapter {
 
@@ -182,8 +181,6 @@ public class SeesEliminator extends DepthFirstAdapter {
 		}
 
 		public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
-			if (TLC4BGlobals.isCheckOnlyMainAssertions())
-				return;
 			AAssertionsMachineClause main = (AAssertionsMachineClause) machineClauseHashMap.get(node.getClass());
 			if (main == null) {
 				additionalMachineClauseList.add(node);

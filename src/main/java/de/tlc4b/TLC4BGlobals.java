@@ -18,8 +18,6 @@ public class TLC4BGlobals {
 	private static boolean verbose;
 	private static boolean silent;
 
-	private static boolean checkOnlyMainAssertions;
-
 	private static boolean deleteFilesOnExit;
 
 	private static boolean runTLC;
@@ -53,7 +51,6 @@ public class TLC4BGlobals {
 		useSymmetry = false;
 		printCoverage = false;
 		forceTLCToEvalConstants = false;
-		checkOnlyMainAssertions = false;
 		verbose = false;
 		silent = false;
 
@@ -263,9 +260,4 @@ public class TLC4BGlobals {
 	public static boolean isSilent() {
 		return silent;
 	}
-
-	public static boolean isCheckOnlyMainAssertions() {
-		return checkOnlyMainAssertions;
-	}
-
 }
