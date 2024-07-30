@@ -10,6 +10,8 @@ import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.tla2b.exceptions.TLA2BException;
@@ -21,9 +23,11 @@ import util.ToolIO;
 
 import static de.tlc4b.TLC4BOption.NOTRACE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestUtil {
 	private static final String MCH_SUFFIX = ".mch";
+	private static final Pattern TRANSLATED_LTL_FORMULA_PATTERN = Pattern.compile("^ltl == (.*)$", Pattern.MULTILINE);
 
 	public static File[] getMachines(String path) {
 		return new File(path).listFiles((dir, name) -> name.endsWith(MCH_SUFFIX));
@@ -87,7 +91,21 @@ public class TestUtil {
 	public static void compareLTLFormula(String expected, String machine, String ltlFormula) throws BCompoundException {
 		Translator b2tlaTranslator = new Translator(machine, ltlFormula);
 		b2tlaTranslator.translate();
-		assertEquals(expected, b2tlaTranslator.getTranslatedLTLFormula());
+
+		// Extract the translated LTL formula from the complete TLA module.
+		Matcher matcher = TRANSLATED_LTL_FORMULA_PATTERN.matcher(b2tlaTranslator.getModuleString());
+		boolean matches = matcher.find();
+		String message = "Could not find LTL formula in translated TLA module";
+		if (!matches) {
+			// Debugging help: if the LTL formula couldn't be found,
+			// do an assertEquals with the module string (which will always fail)
+			// so that the entire module string appears in the JUnit output and in IDEs, test reports, etc.
+			assertEquals(message, expected, b2tlaTranslator.getModuleString());
+		}
+		assertTrue(message, matches);
+
+		String translatedLTLFormula = matcher.group(1);
+		assertEquals(expected, translatedLTLFormula);
 	}
 
 	public static void checkMachine(String machine) throws Exception {

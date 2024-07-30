@@ -58,8 +58,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 	private final ConfigFile configFile;
 	private final PrimedNodesMarker primedNodesMarker;
 	private final Renamer renamer;
-	private boolean recordLTLFormula = false;
-	private final StringBuilder translatedLTLFormula = new StringBuilder();
 	private final InvariantPreservationAnalysis invariantPreservationAnalysis;
 
 	public TLAPrinter(MachineContext machineContext, Typechecker typechecker,
@@ -207,13 +205,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (TLC4BGlobals.isCheckLTL()) {
 			for (LTLFormulaVisitor visitor : visitors) {
 				moduleStringAppend(visitor.getName() + " == ");
-				if (TLC4BGlobals.getTestingMode()) {
-					recordLTLFormula = true;
-					visitor.printLTLFormula(this, typeRestrictor);
-					recordLTLFormula = false;
-				} else {
-					visitor.printLTLFormula(this, typeRestrictor);
-				}
+				visitor.printLTLFormula(this, typeRestrictor);
 				moduleStringAppend("\n");
 			}
 		}
@@ -287,9 +279,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	public void moduleStringAppend(String str) {
 		tlaModuleString.append(str);
-		if (recordLTLFormula) {
-			translatedLTLFormula.append(str);
-		}
 	}
 
 	private void printHeader() {
@@ -2968,10 +2957,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 		}
 		moduleStringAppend("]");
-	}
-
-	public String geTranslatedLTLFormula() {
-		return this.translatedLTLFormula.toString();
 	}
 
 	public TLAModule getTLAModule() {

@@ -44,7 +44,6 @@ public class Translator {
 	private PPredicate constantsSetup;
 	private Set<String> standardModulesToBeCreated;
 	private TLCOutputInfo tlcOutputInfo;
-	private String translatedLTLFormula;
 
 	public Translator(String machineString) throws BCompoundException {
 		this.machineString = machineString;
@@ -157,7 +156,6 @@ public class Translator {
 		printer.start();
 		moduleString = printer.getStringbuilder().toString();
 		configString = printer.getConfigString().toString();
-		translatedLTLFormula = printer.geTranslatedLTLFormula();
 
 		tlcOutputInfo = new TLCOutputInfo(machineContext, renamer, typechecker, generator.getTlaModule(),
 				generator.getConfigFile());
@@ -190,9 +188,4 @@ public class Translator {
 	public Set<String> getStandardModuleToBeCreated() {
 		return standardModulesToBeCreated;
 	}
-
-	public String getTranslatedLTLFormula() {
-		return translatedLTLFormula;
-	}
-
 }
