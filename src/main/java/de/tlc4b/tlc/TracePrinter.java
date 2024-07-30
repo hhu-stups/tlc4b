@@ -31,10 +31,6 @@ public class TracePrinter {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
 
-		setup();
-	}
-
-	private void setup() {
 		constants = new ArrayList<>();
 		variables = new ArrayList<>();
 		for (int i = 0; i < TLCState.vars.length; i++) {
@@ -47,12 +43,6 @@ public class TracePrinter {
 			}
 		}
 		evalTrace();
-	}
-
-	public TracePrinter(TLCState initialState, TLCOutputInfo tlcOutputInfo) {
-		this.initialState = initialState;
-		this.tlcOutputInfo = tlcOutputInfo;
-		setup();
 	}
 
 	public StringBuilder getTrace() {

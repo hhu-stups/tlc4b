@@ -9,6 +9,7 @@ import tlc2.output.MP;
 import tlc2.output.Message;
 import tlc2.output.OutputCollector;
 import tlc2.tool.BuiltInOPs;
+import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
 import tlc2.tool.ToolGlobals;
 
@@ -179,13 +180,13 @@ public class TLCResults implements ToolGlobals {
 
 	private void evalTrace() {
 		List<TLCStateInfo> trace = OutputCollector.getTrace();
-		TracePrinter printer = null;
-		if (!trace.isEmpty()) {
-			printer = new TracePrinter(trace, tlcOutputInfo);
-		} else if (OutputCollector.getInitialState() != null) {
-			printer = new TracePrinter(OutputCollector.getInitialState(), tlcOutputInfo);
+		TLCState initialState = OutputCollector.getInitialState();
+		if (trace.isEmpty() && initialState != null) {
+			trace = Collections.singletonList(new TLCStateInfo(initialState));
 		}
-		if (printer != null) {
+
+		if (!trace.isEmpty()) {
+			TracePrinter printer = new TracePrinter(trace, tlcOutputInfo);
 			traceString = printer.getTrace().toString();
 		}
 	}
