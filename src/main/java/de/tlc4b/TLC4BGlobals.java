@@ -22,7 +22,6 @@ public class TLC4BGlobals {
 
 	private static boolean runTLC;
 	private static boolean translate;
-	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
 
 	private static boolean forceTLCToEvalConstants;
@@ -60,7 +59,6 @@ public class TLC4BGlobals {
 		// for debugging purposes
 		runTLC = true;
 		translate = true;
-		hideTLCConsoleOutput = false; // is mapped to TOOLIO.tool
 		deleteFilesOnExit = false; // if enabled: deletes all created '.tla', '.cfg' files on exit of the JVM.
 			// This includes the created B2TLA standard modules (e.g. Relation, but not Naturals etc.).
 		createTraceFile = true;
@@ -114,10 +112,6 @@ public class TLC4BGlobals {
 		return checkLTL;
 	}
 
-	public static boolean isTool() {
-		return hideTLCConsoleOutput;
-	}
-
 	public static boolean isDeleteOnExit() {
 		return deleteFilesOnExit;
 	}
@@ -168,10 +162,6 @@ public class TLC4BGlobals {
 
 	public static void setCheckltl(boolean checkltl) {
 		TLC4BGlobals.checkLTL = checkltl;
-	}
-
-	public static void setTool(boolean tool) {
-		TLC4BGlobals.hideTLCConsoleOutput = tool;
 	}
 
 	public static void setDeleteOnExit(boolean deleteOnExit) {

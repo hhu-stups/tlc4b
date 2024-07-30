@@ -9,7 +9,6 @@ public enum TLC4BOption {
 	NOASS("noass", "do not look for ASSERTION violations", null),
 	WDCHECK("wdcheck", "", null),
 	SYMMETRY("symmetry", "", null),
-	TOOL("tool", "", null),
 	TMP("tmp", "", null),
 	NOLTL("noltl", "no checking of LTL assertions", null),
 	LAZYCONSTANTS("lazyconstants", "", null),

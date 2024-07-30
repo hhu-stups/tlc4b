@@ -282,7 +282,6 @@ public class TLC4B {
 			TLC4BGlobals.setAssertionCheck(!line.hasOption(NOASS.arg()));
 			TLC4BGlobals.setWelldefinednessCheck(line.hasOption(WDCHECK.arg()));
 			TLC4BGlobals.setSymmetryUse(line.hasOption(SYMMETRY.arg()));
-			TLC4BGlobals.setTool(!line.hasOption(TOOL.arg()));
 			TLC4BGlobals.setCheckltl(!line.hasOption(NOLTL.arg()));
 			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(LAZYCONSTANTS.arg()));
 			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE.arg()));
