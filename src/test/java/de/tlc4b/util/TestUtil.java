@@ -87,10 +87,7 @@ public class TestUtil {
 	public static void compareLTLFormula(String expected, String machine, String ltlFormula) throws BCompoundException {
 		Translator b2tlaTranslator = new Translator(machine, ltlFormula);
 		b2tlaTranslator.translate();
-		String translatedLTLFormula = b2tlaTranslator.getTranslatedLTLFormula();
-		translatedLTLFormula = translatedLTLFormula.replaceAll("\\s", "");
-		expected = expected.replaceAll("\\s", "");
-		assertEquals(expected, translatedLTLFormula);
+		assertEquals(expected, b2tlaTranslator.getTranslatedLTLFormula());
 	}
 
 	public static void checkMachine(String machine) throws Exception {

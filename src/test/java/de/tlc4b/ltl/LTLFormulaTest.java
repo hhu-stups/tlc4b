@@ -59,7 +59,7 @@ public class LTLFormulaTest {
 	@Test 
 	public void testFinally() throws Exception {
 		String machine = "MACHINE test END";
-		compareLTLFormula("<>(1=1)", machine, "F{1 = 1}");
+		compareLTLFormula("<>(1 = 1)", machine, "F{1 = 1}");
 	}
 	
 	@Test 
@@ -222,7 +222,7 @@ public class LTLFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = skip\n"
 				+ "END";
-		String expected = "([]<><<foo>>_vars\\/[]<>~ENABLED(foo)\\/[]<>ENABLED(foo/\\x'=x))=>TRUE";
+		String expected = "([]<><<foo>>_vars \\/ []<>~ENABLED(foo) \\/ []<>ENABLED(foo /\\ x' = x)) => TRUE";
 		compareLTLFormula(expected, machine, "WF(foo) => true");
 	}
 	
@@ -234,14 +234,14 @@ public class LTLFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = x := 1"
 				+ "END";
-		String expected = "([]<><<foo>>_vars\\/<>[]~ENABLED(foo)\\/[]<>ENABLED(foo/\\x'=x))=>TRUE";
+		String expected = "([]<><<foo>>_vars \\/ <>[]~ENABLED(foo) \\/ []<>ENABLED(foo /\\ x' = x)) => TRUE";
 		compareLTLFormula(expected, machine, "SF(foo) => true");
 	}
 	
 	@Test 
 	public void testExistentialQuantification() throws Exception {
 		String machine = "MACHINE test END";
-		compareLTLFormula(" \\E p \\in {1}: p = 1", machine, "#p.({p=1} & {p = 1})");
+		compareLTLFormula("\\E p \\in {1}: p = 1", machine, "#p.({p=1} & {p = 1})");
 	}
 	
 	@Test 

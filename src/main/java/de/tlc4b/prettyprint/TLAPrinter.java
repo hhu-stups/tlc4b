@@ -147,7 +147,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	public void printStrongFairness(String s) {
 
 		moduleStringAppend(String
-				.format("([]<><<%s>>_vars \\/  <>[]~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
+				.format("([]<><<%s>>_vars \\/ <>[]~ENABLED(%s) \\/ []<>ENABLED(%s /\\ ",
 						s, s, s));
 		printVarsStuttering();
 		moduleStringAppend("))");
@@ -156,7 +156,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	public void printWeakFairness(String s) {
 		moduleStringAppend(String
-				.format("([]<><<%s>>_vars \\/  []<>~ENABLED(%s) \\/ []<> ENABLED(%s /\\ ",
+				.format("([]<><<%s>>_vars \\/ []<>~ENABLED(%s) \\/ []<>ENABLED(%s /\\ ",
 						s, s, s));
 		printVarsStuttering();
 		moduleStringAppend("))");
@@ -168,9 +168,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		moduleStringAppend("([]<><<");
 		printOperationCall(operation);
-		moduleStringAppend(">>_vars \\/  []<>~ENABLED(");
+		moduleStringAppend(">>_vars \\/ []<>~ENABLED(");
 		printOperationCall(operation);
-		moduleStringAppend(") \\/ []<> ENABLED(");
+		moduleStringAppend(") \\/ []<>ENABLED(");
 		printOperationCall(operation);
 		moduleStringAppend(" /\\ ");
 		printVarsStuttering();
