@@ -9,7 +9,6 @@ import de.tlc4b.util.AbstractParseMachineTest;
 import de.tlc4b.util.PolySuite;
 import de.tlc4b.util.PolySuite.Config;
 import de.tlc4b.util.PolySuite.Configuration;
-import de.tlc4b.util.TestPair;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +36,8 @@ public class WellDefinednessTest extends AbstractParseMachineTest  {
 
 		@Config
 		public static Configuration getConfig() {
-			List<TestPair> list = new ArrayList<>();
-			list.add(new TestPair(WellDefinednessError, "build/prob_examples/public_examples/TLC/WellDefinednessError"));
-			return getConfiguration(list);
+			List<String> list = new ArrayList<>();
+			list.add("build/prob_examples/public_examples/TLC/WellDefinednessError");
+			return getConfiguration(list, WellDefinednessError);
 		}
 }

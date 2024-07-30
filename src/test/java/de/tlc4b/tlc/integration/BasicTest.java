@@ -1,17 +1,17 @@
 package de.tlc4b.tlc.integration;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.tlc4b.tlc.TLCResults.TLCResult;
 import de.tlc4b.util.AbstractParseMachineTest;
 import de.tlc4b.util.PolySuite;
 import de.tlc4b.util.PolySuite.Config;
 import de.tlc4b.util.PolySuite.Configuration;
-import de.tlc4b.util.TestPair;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import static de.tlc4b.TLC4BOption.DFID;
 import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
@@ -43,11 +43,11 @@ public class BasicTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		List<TestPair> list = new ArrayList<>();
-		list.add(new TestPair(NoError, "./src/test/resources/composition/sees"));
-		list.add(new TestPair(NoError, "./src/test/resources/composition/sees2"));
-		list.add(new TestPair(NoError, "./src/test/resources/basics"));
-		list.add(new TestPair(NoError, "./src/test/resources/laws"));
-		return getConfiguration(list);
+		List<String> list = new ArrayList<>();
+		list.add("./src/test/resources/composition/sees");
+		list.add("./src/test/resources/composition/sees2");
+		list.add("./src/test/resources/basics");
+		list.add("./src/test/resources/laws");
+		return getConfiguration(list, NoError);
 	}
 }

@@ -67,15 +67,15 @@ public abstract class AbstractParseMachineTest {
 		};
 	}
 
-	protected static Configuration getConfiguration(List<TestPair> list) {
+	protected static Configuration getConfiguration(List<String> list, TLCResult expectedResult) {
 		List<File> allMachines = new ArrayList<>();
 
 		List<TLCResult> expectedValues = new ArrayList<>();
-		for (TestPair testPair : list) {
-			File[] machines = getMachines(testPair.getPath());
+		for (String path : list) {
+			File[] machines = getMachines(path);
 			allMachines.addAll(Arrays.asList(machines));
 			for (int i = 0; i < machines.length; i++) {
-				expectedValues.add(testPair.getResult());
+				expectedValues.add(expectedResult);
 			}
 		}
 
