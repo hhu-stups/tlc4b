@@ -558,8 +558,7 @@ public class TLC4B {
 		}
 	}
 
-	public static File createFile(File dir, String fileName, String text, boolean deleteOnExit) {
-
+	private static File createFile(File dir, String fileName, String text, boolean deleteOnExit) {
 		File file = new File(dir, fileName);
 		boolean exists = false;
 		try {
