@@ -124,12 +124,6 @@ public class TestUtil {
 		// TODO Check that re-translated B machine matches original input?
 	}
 
-	public static void compareEquals(String expected, String machine) throws BCompoundException {
-		Translator b2tlaTranslator = new Translator(machine);
-		b2tlaTranslator.translate();
-		assertEquals(expected, b2tlaTranslator.getModuleString());
-	}
-
 	public static String translate(String machine) throws BCompoundException {
 		Translator translator = new Translator(machine);
 		translator.translate();
