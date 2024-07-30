@@ -1,43 +1,33 @@
 package de.tlc4b.tlc.integration.probprivate;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.tlc4b.tlc.TLCResults.TLCResult;
-import de.tlc4b.util.AbstractParseMachineTest;
-import de.tlc4b.util.PolySuite;
-import de.tlc4b.util.PolySuite.Config;
-import de.tlc4b.util.PolySuite.Configuration;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import static de.tlc4b.tlc.TLCResults.TLCResult.InvariantViolation;
 import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(PolySuite.class)
-public class InvariantViolationTest extends AbstractParseMachineTest {
-
+@RunWith(Parameterized.class)
+public class InvariantViolationTest {
 	private final File machine;
-	private final TLCResult error;
 
-	public InvariantViolationTest(File machine, TLCResult result) {
+	public InvariantViolationTest(File machine) {
 		this.machine = machine;
-		this.error = result;
 	}
 
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(error, test(a));
+		assertEquals(TLCResult.InvariantViolation, test(a));
 	}
 
-	@Config
-	public static Configuration getConfig() {
-		List<String> list = new ArrayList<>();
-		list.add("build/prob_examples/public_examples/TLC/InvariantViolation");
-		return getConfiguration(list, InvariantViolation);
+	@Parameterized.Parameters(name = "{0}")
+	public static File[] data() {
+		return TestUtil.getMachines("build/prob_examples/public_examples/TLC/InvariantViolation");
 	}
 }

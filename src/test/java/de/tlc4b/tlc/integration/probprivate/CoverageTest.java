@@ -5,23 +5,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.tlc4b.TLC4B;
-import de.tlc4b.tlc.TLCResults.TLCResult;
-import de.tlc4b.util.AbstractParseMachineTest;
-import de.tlc4b.util.PolySuite;
-import de.tlc4b.util.PolySuite.Config;
-import de.tlc4b.util.PolySuite.Configuration;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import tlc2.TLCGlobals;
 
-@RunWith(PolySuite.class)
-public class CoverageTest extends AbstractParseMachineTest {
-
+@RunWith(Parameterized.class)
+public class CoverageTest {
 	private final File machine;
 
-	public CoverageTest(File machine, TLCResult result) {
+	public CoverageTest(File machine) {
 		this.machine = machine;
 	}
 
@@ -37,18 +33,17 @@ public class CoverageTest extends AbstractParseMachineTest {
 		TLC4B.test(a, true);
 	}
 
-	@Config
-	public static Configuration getConfig() {
-		List<String> list = new ArrayList<>();
-		list.add("build/prob_examples/public_examples/TLC/");
+	@Parameterized.Parameters(name = "{0}")
+	public static List<File> data() {
+		List<File> machines = new ArrayList<>();
+		machines.addAll(TestUtil.getMachinesRecursively("build/prob_examples/public_examples/TLC/"));
 		// The subdirectories bugs, compound, and test are intentionally not included here.
-		list.add("src/test/resources/basics/");
-		list.add("src/test/resources/composition/");
-		list.add("src/test/resources/errors/");
-		list.add("src/test/resources/laws/");
-		list.add("src/test/resources/ltl/");
-		list.add("src/test/resources/special/");
-		return getConfiguration2(list);
+		machines.addAll(TestUtil.getMachinesRecursively("src/test/resources/basics/"));
+		machines.addAll(TestUtil.getMachinesRecursively("src/test/resources/composition/"));
+		machines.addAll(TestUtil.getMachinesRecursively("src/test/resources/errors/"));
+		machines.addAll(TestUtil.getMachinesRecursively("src/test/resources/laws/"));
+		machines.addAll(TestUtil.getMachinesRecursively("src/test/resources/ltl/"));
+		machines.addAll(TestUtil.getMachinesRecursively("src/test/resources/special/"));
+		return machines;
 	}
-
 }

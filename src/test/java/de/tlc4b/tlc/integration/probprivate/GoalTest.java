@@ -1,43 +1,33 @@
 package de.tlc4b.tlc.integration.probprivate;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.tlc4b.tlc.TLCResults.TLCResult;
-import de.tlc4b.util.AbstractParseMachineTest;
-import de.tlc4b.util.PolySuite;
-import de.tlc4b.util.PolySuite.Config;
-import de.tlc4b.util.PolySuite.Configuration;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import static de.tlc4b.tlc.TLCResults.TLCResult.Goal;
 import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(PolySuite.class)
-public class GoalTest extends AbstractParseMachineTest {
-
+@RunWith(Parameterized.class)
+public class GoalTest {
 	private final File machine;
-	private final TLCResult error;
 
-	public GoalTest(File machine, TLCResult result) {
+	public GoalTest(File machine) {
 		this.machine = machine;
-		this.error = result;
 	}
 
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(error, test(a));
+		assertEquals(TLCResult.Goal, test(a));
 	}
 
-	@Config
-	public static Configuration getConfig() {
-		List<String> list = new ArrayList<>();
-		list.add("build/prob_examples/public_examples/TLC/GOAL");
-		return getConfiguration(list, Goal);
+	@Parameterized.Parameters(name = "{0}")
+	public static File[] data() {
+		return TestUtil.getMachines("build/prob_examples/public_examples/TLC/GOAL");
 	}
 }
