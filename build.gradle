@@ -7,7 +7,7 @@ plugins {
 	id "de.undercouch.download" version "5.6.0"
 }
 
-project.version = '1.1.1-SNAPSHOT'
+project.version = '1.2.0-SNAPSHOT'
 project.group = 'de.hhu.stups'
 
 final isSnapshot = project.version.endsWith("-SNAPSHOT")
