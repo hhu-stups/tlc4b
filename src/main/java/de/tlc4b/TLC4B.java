@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
@@ -37,6 +39,7 @@ import static de.tlc4b.util.StopWatch.Watches.*;
 import static de.tlc4b.MP.*;
 
 public class TLC4B {
+	private static final String CSV_DELIMITER = ";";
 
 	private String filename;
 	private File mainfile, traceFile;
@@ -419,9 +422,68 @@ public class TLC4B {
 		}
 	}
 
+	private String getLogCsvString(TLCResults tlcResults) {
+		List<String> fieldNames = new ArrayList<>();
+		List<String> fieldValues = new ArrayList<>();
+
+		fieldNames.add("Machine File");
+		String machineFile = this.getMainFile().getAbsolutePath();
+		fieldValues.add(machineFile);
+
+		fieldNames.add("TLC Model Checking Time (s)");
+		double tlcModelCheckingTime = tlcResults.getModelCheckingTime();
+		fieldValues.add(String.valueOf(tlcModelCheckingTime));
+
+		fieldNames.add("Parsing Time Of B machine (ms)");
+		long parseTime = StopWatch.getRunTime(PARSING_TIME);
+		fieldValues.add(String.valueOf(parseTime));
+
+		fieldNames.add("Translation Time (ms)");
+		long translationTime = StopWatch.getRunTime(TRANSLATION_TIME);
+		fieldValues.add(String.valueOf(translationTime));
+
+		fieldNames.add("Model Checking Time (ms)");
+		long modelCheckingTime = StopWatch.getRunTime(MODEL_CHECKING_TIME);
+		fieldValues.add(String.valueOf(modelCheckingTime));
+		
+		fieldNames.add("TLC Result");
+		fieldValues.add(tlcResults.getResultString());
+
+		fieldNames.add("States analysed");
+		fieldValues.add(Integer.toString(tlcResults.getNumberOfDistinctStates()));
+
+		fieldNames.add("Transitions fired");
+		fieldValues.add(Integer.toString(tlcResults.getNumberOfTransitions()));
+
+		fieldNames.add("Violated Definition");
+		String violatedDefinition = tlcResults.getViolatedDefinition();
+		fieldValues.add(violatedDefinition != null ? violatedDefinition : "");
+
+		fieldNames.add("Violated Assertions");
+		List<String> violatedAssertions = tlcResults.getViolatedAssertions();
+		fieldValues.add(!violatedAssertions.isEmpty() ? String.join(CSV_DELIMITER, violatedAssertions) : "");
+
+		fieldNames.add("Operation Coverage");
+		Map<String, Long> operationCount = tlcResults.getOperationCount();
+		List<String> opCountString = new ArrayList<>();
+		if (operationCount != null) {
+			operationCount.forEach((operation, count) -> opCountString.add(operation + CSV_DELIMITER + count));
+		}
+		fieldValues.add(!opCountString.isEmpty() ? String.join(CSV_DELIMITER, opCountString) : "");
+
+		fieldNames.add("Trace File");
+		fieldValues.add(this.getTraceFile() != null ? this.getTraceFile().getAbsolutePath() : "");
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < fieldNames.size(); i++) {
+			sb.append(fieldNames.get(i)).append(CSV_DELIMITER).append(fieldValues.get(i)).append("\n");
+		}
+		return sb.toString();
+	}
+
 	private void createLogFile(TLCResults results) {
 		if (logFileString != null) {
-			String logCsvString = Log.getCSVString(this, results);
+			String logCsvString = getLogCsvString(results);
 			File logFile = new File(logFileString);
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
 				fw.write(logCsvString);
