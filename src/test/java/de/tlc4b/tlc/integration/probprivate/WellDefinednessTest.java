@@ -18,26 +18,25 @@ import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(PolySuite.class)
-public class WellDefinednessTest extends AbstractParseMachineTest  {
+public class WellDefinednessTest extends AbstractParseMachineTest {
+	private final File machine;
+	private final TLCResult error;
 
-		private final File machine;
-		private final TLCResult error;
-		
-		public WellDefinednessTest(File machine, TLCResult result) {
-			this.machine = machine;
-			this.error = result;
-		}
-		
-		@Test
-		public void testRunTLC() throws Exception {
-			String[] a = new String[] { machine.getPath(), "-wdcheck" };
-			assertEquals(error, test(a));
-		}
+	public WellDefinednessTest(File machine, TLCResult result) {
+		this.machine = machine;
+		this.error = result;
+	}
 
-		@Config
-		public static Configuration getConfig() {
-			List<String> list = new ArrayList<>();
-			list.add("build/prob_examples/public_examples/TLC/WellDefinednessError");
-			return getConfiguration(list, WellDefinednessError);
-		}
+	@Test
+	public void testRunTLC() throws Exception {
+		String[] a = new String[] { machine.getPath(), "-wdcheck" };
+		assertEquals(error, test(a));
+	}
+
+	@Config
+	public static Configuration getConfig() {
+		List<String> list = new ArrayList<>();
+		list.add("build/prob_examples/public_examples/TLC/WellDefinednessError");
+		return getConfiguration(list, WellDefinednessError);
+	}
 }
