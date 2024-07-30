@@ -194,7 +194,6 @@ public class TLC4B {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
-		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
 		try {
@@ -221,7 +220,6 @@ public class TLC4B {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
 		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
-		TLC4BGlobals.setTestingMode(true);
 		// B2TLAGlobals.setCleanup(true);
 		TLC4B tlc4b = new TLC4B();
 		tlc4b.buildDir = new File("temp/");

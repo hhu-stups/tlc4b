@@ -96,7 +96,7 @@ public class TLCResults implements ToolGlobals {
 
 		evalAllMessages();
 
-		if (hasTrace() || (TLC4BGlobals.getTestingMode() && OutputCollector.getInitialState() != null)) {
+		if (hasTrace()) {
 			evalTrace();
 		}
 

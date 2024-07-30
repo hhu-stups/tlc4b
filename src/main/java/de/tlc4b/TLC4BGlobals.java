@@ -27,8 +27,6 @@ public class TLC4BGlobals {
 	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
 
-	private static boolean testingMode;
-
 	private static boolean cleanup;
 
 	private static boolean forceTLCToEvalConstants;
@@ -75,7 +73,6 @@ public class TLC4BGlobals {
 		deleteFilesOnExit = false; // if enabled: deletes all created '.tla', '.cfg' files on exit of the JVM.
 			// This includes the created B2TLA standard modules (e.g. Relation, but not Naturals etc.).
 		runTestscript = false;
-		testingMode = false;
 		createTraceFile = true;
 	}
 
@@ -229,14 +226,6 @@ public class TLC4BGlobals {
 
 	public static void setProBconstantsSetup(boolean proBconstantsSetup) {
 		TLC4BGlobals.proBconstantsSetup = proBconstantsSetup;
-	}
-
-	public static void setTestingMode(boolean b) {
-		TLC4BGlobals.testingMode = b;
-	}
-
-	public static boolean getTestingMode() {
-		return TLC4BGlobals.testingMode;
 	}
 
 	public static void setWelldefinednessCheck(boolean b) {

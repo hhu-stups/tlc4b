@@ -1,26 +1,16 @@
 package de.tlc4b.ltl;
 
-
-import static de.tlc4b.util.TestUtil.compareModuleAndConfig;
-import static de.tlc4b.util.TestUtil.compareLTLFormula;
-
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.exceptions.LTLParseException;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.exceptions.TypeErrorException;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static de.tlc4b.util.TestUtil.compareLTLFormula;
+import static de.tlc4b.util.TestUtil.compareModuleAndConfig;
 
 public class LTLFormulaTest {
-
-	@BeforeClass
-	public static void setUp(){
-		TLC4BGlobals.setTestingMode(true);
-	}
-	
 	@Test (expected = ScopeException.class)
 	public void testScopeException() throws Exception {
 		String machine = "MACHINE test\n"
