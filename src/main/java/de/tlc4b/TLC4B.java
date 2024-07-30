@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -481,9 +483,8 @@ public class TLC4B {
 			String logCsvString = getLogCsvString(results);
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
 				fw.write(logCsvString);
-				fw.close();
-				println("Log file: " + logFile.getAbsolutePath());
 			}
+			println("Log file: " + logFile.getAbsolutePath());
 		}
 	}
 
@@ -516,17 +517,13 @@ public class TLC4B {
 		// standard modules are copied from the standardModules folder to the current directory
 
 		File file = new File(path, name + ".tla");
-		InputStream is = null;
-		FileOutputStream fos = null;
-		try {
-			is = TLC4B.class.getResourceAsStream("standardModules/" + name + ".tla");
-			if (is == null) {
-				// should never happen
-				throw new TranslationException("Unable to determine the source of the standard module: " + name);
-			}
+		InputStream resourceStream = TLC4B.class.getResourceAsStream("standardModules/" + name + ".tla");
+		if (resourceStream == null) {
+			// should never happen
+			throw new TranslationException("Unable to determine the source of the standard module: " + name);
+		}
 
-			fos = new FileOutputStream(file);
-
+		try (InputStream is = resourceStream; OutputStream fos = new FileOutputStream(file)) {
 			int read;
 			byte[] bytes = new byte[1024];
 
@@ -538,13 +535,6 @@ public class TLC4B {
 			if (TLC4BGlobals.isDeleteOnExit() && file.exists()) {
 				file.deleteOnExit();
 			}
-			if (is != null) {
-				is.close();
-			}
-			if (fos != null) {
-				fos.flush();
-				fos.close();
-			}
 		}
 	}
 
@@ -553,10 +543,9 @@ public class TLC4B {
 		boolean exists = false;
 		try {
 			exists = file.createNewFile();
-			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-				Files.newOutputStream(file.toPath()), StandardCharsets.UTF_8));
-			out.write(text);
-			out.close();
+			try (Writer out = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(file.toPath()), StandardCharsets.UTF_8))) {
+				out.write(text);
+			}
 			return file;
 		} finally {
 			if (deleteOnExit && exists) {
