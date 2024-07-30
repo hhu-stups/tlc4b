@@ -30,8 +30,6 @@ public class TLC4BGlobals {
 	private static int workers;
 	private static int dfid_initial_depth;
 
-	private static boolean runTestscript;
-
 	static {
 		resetGlobals();
 	}
@@ -65,7 +63,6 @@ public class TLC4BGlobals {
 		hideTLCConsoleOutput = false; // is mapped to TOOLIO.tool
 		deleteFilesOnExit = false; // if enabled: deletes all created '.tla', '.cfg' files on exit of the JVM.
 			// This includes the created B2TLA standard modules (e.g. Relation, but not Naturals etc.).
-		runTestscript = false;
 		createTraceFile = true;
 	}
 
@@ -75,14 +72,6 @@ public class TLC4BGlobals {
 
 	public static void setCreateTraceFile(boolean createTraceFile) {
 		TLC4BGlobals.createTraceFile = createTraceFile;
-	}
-
-	public static boolean isRunTestscript() {
-		return runTestscript;
-	}
-
-	public static void setRunTestscript(boolean runTestscript) {
-		TLC4BGlobals.runTestscript = runTestscript;
 	}
 
 	public static int getDEFERRED_SET_SIZE() {

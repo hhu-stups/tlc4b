@@ -285,7 +285,6 @@ public class TLC4B {
 			TLC4BGlobals.setTool(!line.hasOption(TOOL.arg()));
 			TLC4BGlobals.setCheckltl(!line.hasOption(NOLTL.arg()));
 			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(LAZYCONSTANTS.arg()));
-			TLC4BGlobals.setRunTestscript(line.hasOption(TESTSCRIPT.arg()));
 			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE.arg()));
 			TLC4BGlobals.setDeleteOnExit(line.hasOption(DEL.arg()));
 			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(PARINVEVAL.arg()));

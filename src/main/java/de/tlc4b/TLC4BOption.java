@@ -13,7 +13,6 @@ public enum TLC4BOption {
 	TMP("tmp", "", null),
 	NOLTL("noltl", "no checking of LTL assertions", null),
 	LAZYCONSTANTS("lazyconstants", "", null),
-	TESTSCRIPT("testscript", "", null),
 	NOTRACE("notrace", "do not generate counter example trace", null),
 	DEL("del", "", null),
 	PARINVEVAL("parinveval", "", null),
