@@ -2,8 +2,6 @@ package de.tlc4b;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -468,16 +466,7 @@ public class TLC4B {
 		InputStream is = null;
 		FileOutputStream fos = null;
 		try {
-
-			try {
-				is = new FileInputStream("src/main/resources/standardModules/" + name + ".tla");
-			} catch (FileNotFoundException e) {
-				is = this
-						.getClass()
-						.getClassLoader()
-						.getResourceAsStream("standardModules/" + name + ".tla");
-			}
-
+			is = this.getClass().getClassLoader().getResourceAsStream("standardModules/" + name + ".tla");
 			if (is == null) {
 				// should never happen
 				throw new TranslationException("Unable to determine the source of the standard module: " + name);
