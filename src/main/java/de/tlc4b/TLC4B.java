@@ -179,10 +179,6 @@ public class TLC4B {
 
 	}
 
-	public File getTraceFile() {
-		return traceFile;
-	}
-
 	private void printOperationsCount(TLCResults results) {
 		Map<String, Long> operationCount = results.getOperationCount();
 		if (TLC4BGlobals.isPrintCoverage() && operationCount != null) {
@@ -427,7 +423,7 @@ public class TLC4B {
 		List<String> fieldValues = new ArrayList<>();
 
 		fieldNames.add("Machine File");
-		String machineFile = this.getMainFile().getAbsolutePath();
+		String machineFile = mainfile.getAbsolutePath();
 		fieldValues.add(machineFile);
 
 		fieldNames.add("TLC Model Checking Time (s)");
@@ -472,7 +468,7 @@ public class TLC4B {
 		fieldValues.add(!opCountString.isEmpty() ? String.join(CSV_DELIMITER, opCountString) : "");
 
 		fieldNames.add("Trace File");
-		fieldValues.add(this.getTraceFile() != null ? this.getTraceFile().getAbsolutePath() : "");
+		fieldValues.add(traceFile != null ? traceFile.getAbsolutePath() : "");
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < fieldNames.size(); i++) {
@@ -581,13 +577,4 @@ public class TLC4B {
 			}
 		}
 	}
-
-	public String getMachineFileNameWithoutFileExtension() {
-		return machineFileNameWithoutFileExtension;
-	}
-
-	public File getMainFile(){
-		return this.mainfile;
-	}
-	
 }
