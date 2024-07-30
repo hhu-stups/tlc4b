@@ -39,13 +39,8 @@ public abstract class AbstractParseMachineTest {
 	protected static Configuration getConfiguration2(List<String> list) {
 		List<File> allMachines = new ArrayList<>();
 
-		List<TLCResult> expectedValues = new ArrayList<>();
 		for (String path : list) {
-			List<File> machines = getMachinesRecursively(path);
-			allMachines.addAll(machines);
-			for (int i = 0; i < machines.size(); i++) {
-				expectedValues.add(TLCResult.NoError);
-			}
+			allMachines.addAll(getMachinesRecursively(path));
 		}
 
 		return new Configuration() {
@@ -62,7 +57,7 @@ public abstract class AbstractParseMachineTest {
 			}
 
 			public TLCResult getExpectedValue(int index) {
-				return expectedValues.get(index);
+				return TLCResult.NoError;
 			}
 		};
 	}
@@ -70,13 +65,8 @@ public abstract class AbstractParseMachineTest {
 	protected static Configuration getConfiguration(List<String> list, TLCResult expectedResult) {
 		List<File> allMachines = new ArrayList<>();
 
-		List<TLCResult> expectedValues = new ArrayList<>();
 		for (String path : list) {
-			File[] machines = getMachines(path);
-			allMachines.addAll(Arrays.asList(machines));
-			for (int i = 0; i < machines.length; i++) {
-				expectedValues.add(expectedResult);
-			}
+			allMachines.addAll(Arrays.asList(getMachines(path)));
 		}
 
 		return new Configuration() {
@@ -93,7 +83,7 @@ public abstract class AbstractParseMachineTest {
 			}
 
 			public TLCResult getExpectedValue(int index) {
-				return expectedValues.get(index);
+				return expectedResult;
 			}
 		};
 	}
