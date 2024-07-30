@@ -114,14 +114,14 @@ public class TestUtil {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
 
+		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
+		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
+
 		String name = b2tlaTranslator.getMachineName();
 
 		// parse check
 		translateTLA2B(name, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
 		// TODO Check that re-translated B machine matches original input?
-
-		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
-		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
 	}
 
 	public static void compareEquals(String expected, String machine) throws BCompoundException {
