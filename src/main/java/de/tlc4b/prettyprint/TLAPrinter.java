@@ -299,15 +299,10 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	private void printExtendedModules() {
-		if (!usedStandardModules.getExtendedModules().isEmpty()) {
+		List<String> extendedModules = usedStandardModules.getExtendedModules();
+		if (!extendedModules.isEmpty()) {
 			moduleStringAppend("EXTENDS ");
-			for (int i = 0; i < usedStandardModules.getExtendedModules().size(); i++) {
-				if (i > 0) {
-					moduleStringAppend(", ");
-				}
-				moduleStringAppend(usedStandardModules.getExtendedModules()
-						.get(i).toString());
-			}
+			moduleStringAppend(String.join(", ", extendedModules));
 			moduleStringAppend("\n");
 		}
 	}

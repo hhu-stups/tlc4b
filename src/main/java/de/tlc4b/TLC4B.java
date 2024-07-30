@@ -13,17 +13,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
-import de.tlc4b.analysis.UsedStandardModules.STANDARD_MODULES;
-import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.exceptions.TLC4BException;
+import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.exceptions.TranslationException;
 import de.tlc4b.tlc.TLCOutputInfo;
 import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.util.StopWatch;
-import org.apache.commons.cli.*;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import static de.tlc4b.TLC4BCliOptions.*;
 import static de.tlc4b.TLC4BCliOptions.TLCOption.*;
@@ -448,8 +456,8 @@ public class TLC4B {
 	}
 
 	private void createStandardModules() {
-		for (STANDARD_MODULES module : translator.getStandardModuleToBeCreated()) {
-			createStandardModule(buildDir, module.toString());
+		for (String module : translator.getStandardModuleToBeCreated()) {
+			createStandardModule(buildDir, module);
 		}
 	}
 

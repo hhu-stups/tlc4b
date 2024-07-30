@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAddExpression;
@@ -103,8 +104,7 @@ import de.tlc4b.btypes.SetType;
 import de.tlc4b.tla.TLAModule;
 
 public class UsedStandardModules extends DepthFirstAdapter {
-
-	public enum STANDARD_MODULES {
+	private enum STANDARD_MODULES {
 		Naturals, Integers, FiniteSets, Sequences, TLC, BBuiltIns, Relations, FunctionsAsRelations, Functions, SequencesExtended, SequencesAsRelations, ExternalFunctions, Foo
 	}
 
@@ -149,7 +149,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		start.apply(this);
 	}
 
-	public ArrayList<STANDARD_MODULES> getExtendedModules() {
+	public List<String> getExtendedModules() {
 		ArrayList<STANDARD_MODULES> list = new ArrayList<>(extendedStandardModules);
 		if (list.contains(STANDARD_MODULES.Integers)) {
 			list.remove(STANDARD_MODULES.Naturals);
@@ -159,10 +159,10 @@ public class UsedStandardModules extends DepthFirstAdapter {
 			Integer i2 = modules.indexOf(s2);
 			return i1.compareTo(i2);
 		});
-		return list;
+		return list.stream().map(STANDARD_MODULES::name).collect(Collectors.toList());
 	}
 
-	public HashSet<STANDARD_MODULES> getStandardModulesToBeCreated() {
+	public Set<String> getStandardModulesToBeCreated() {
 		// dependencies of standard modules
 		HashSet<STANDARD_MODULES> res = new HashSet<>();
 		for (STANDARD_MODULES module : extendedStandardModules) {
@@ -199,7 +199,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 			}
 
 		}
-		return res;
+		return res.stream().map(STANDARD_MODULES::name).collect(Collectors.toSet());
 	}
 
 	@Override
