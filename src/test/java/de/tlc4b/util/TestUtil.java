@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
-import de.be4.classicalb.core.parser.exceptions.BException;
 import de.tla2b.exceptions.TLA2BException;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.Translator;
@@ -80,17 +79,11 @@ public class TestUtil {
 		assertEquals(expectedB, actualB);
 	}
 
-	public static void tryTranslating(final String machineString) throws BException {
+	public static void tryTranslating(final String machineString) throws BCompoundException {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
 		ToolIO.setMode(ToolIO.TOOL);
-		Translator b2tlaTranslator;
-		try {
-			b2tlaTranslator = new Translator(machineString);
-			b2tlaTranslator.translate();
-		} catch (BCompoundException e) {
-			throw e.getFirstException();
-		}
-
+		Translator b2tlaTranslator = new Translator(machineString);
+		b2tlaTranslator.translate();
 	}
 
 	public static String translateTLA2B(String moduleName, String tlaString, String configString)
@@ -131,25 +124,16 @@ public class TestUtil {
 		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
 	}
 
-	public static void compareEquals(String expected, String machine) throws BException {
-		try {
-			Translator b2tlaTranslator = new Translator(machine);
-			b2tlaTranslator.translate();
-			assertEquals(expected, b2tlaTranslator.getModuleString());
-		} catch (BCompoundException e) {
-			throw e.getFirstException();
-		}
-
+	public static void compareEquals(String expected, String machine) throws BCompoundException {
+		Translator b2tlaTranslator = new Translator(machine);
+		b2tlaTranslator.translate();
+		assertEquals(expected, b2tlaTranslator.getModuleString());
 	}
 
-	public static String translate(String machine) throws BException {
-		try {
-			Translator translator = new Translator(machine);
-			translator.translate();
-			return translator.getModuleString();
-		} catch (BCompoundException e) {
-			throw e.getFirstException();
-		}
+	public static String translate(String machine) throws BCompoundException {
+		Translator translator = new Translator(machine);
+		translator.translate();
+		return translator.getModuleString();
 	}
 
 	public static TLCResult testString(String machineString) throws IOException {
