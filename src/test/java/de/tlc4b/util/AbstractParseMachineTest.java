@@ -15,11 +15,7 @@ public abstract class AbstractParseMachineTest {
 		return new File(path).listFiles((dir, name) -> name.endsWith(MCH_SUFFIX));
 	}
 
-	protected static File[] getMachinesRecursively(String path) {
-		return walk(path).toArray(new File[0]);
-	}
-
-	private static List<File> walk(String path) {
+	protected static List<File> getMachinesRecursively(String path) {
 		File root = new File(path);
 		File[] list = root.listFiles();
 		
@@ -29,7 +25,7 @@ public abstract class AbstractParseMachineTest {
 
 		for (File f : list) {
 			if (f.isDirectory()) {
-				files.addAll(walk(f.getAbsolutePath()));
+				files.addAll(getMachinesRecursively(f.getAbsolutePath()));
 			} else {
 				String name = f.getName();
 				if (name.endsWith(MCH_SUFFIX)) {
@@ -45,9 +41,9 @@ public abstract class AbstractParseMachineTest {
 
 		List<TLCResult> expectedValues = new ArrayList<>();
 		for (String path : list) {
-			File[] machines = getMachinesRecursively(path);
-			allMachines.addAll(Arrays.asList(machines));
-			for (int i = 0; i < machines.length; i++) {
+			List<File> machines = getMachinesRecursively(path);
+			allMachines.addAll(machines);
+			for (int i = 0; i < machines.size(); i++) {
 				expectedValues.add(TLCResult.NoError);
 			}
 		}
