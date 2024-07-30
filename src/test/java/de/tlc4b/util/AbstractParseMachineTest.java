@@ -1,7 +1,6 @@
 package de.tlc4b.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -15,11 +14,11 @@ public abstract class AbstractParseMachineTest {
 		return new File(path).listFiles((dir, name) -> name.endsWith(MCH_SUFFIX));
 	}
 
-	protected static File[] getMachinesRecursively(String path, ArrayList<String> ignoreList) {
-		return walk(path, ignoreList).toArray(new File[0]);
+	protected static File[] getMachinesRecursively(String path) {
+		return walk(path).toArray(new File[0]);
 	}
 
-	private static ArrayList<File> walk(String path, ArrayList<String> ignoreList) {
+	private static ArrayList<File> walk(String path) {
 		File root = new File(path);
 		File[] list = root.listFiles();
 		
@@ -29,21 +28,7 @@ public abstract class AbstractParseMachineTest {
 
 		for (File f : list) {
 			if (f.isDirectory()) {
-				boolean visitDir = true;
-				for (String string : ignoreList) {
-					File ignore = new File(string);
-					try {
-						if(f.getCanonicalPath().equals(ignore.getCanonicalPath())){
-							visitDir = false;
-						}
-					} catch (IOException e) {
-						visitDir = false;
-					}
-				}
-				if(visitDir){
-					files.addAll(walk(f.getAbsolutePath(),ignoreList));
-				}
-				
+				files.addAll(walk(f.getAbsolutePath()));
 			} else {
 				String name = f.getName();
 				if (name.endsWith(MCH_SUFFIX)) {
@@ -54,12 +39,12 @@ public abstract class AbstractParseMachineTest {
 		return files;
 	}
 
-	protected static Configuration getConfiguration2(ArrayList<String> list, ArrayList<String> ignoreList) {
+	protected static Configuration getConfiguration2(ArrayList<String> list) {
 		final ArrayList<File> allMachines = new ArrayList<>();
 
 		final ArrayList<TLCResult> expectedValues = new ArrayList<>();
 		for (String path : list) {
-			File[] machines = getMachinesRecursively(path, ignoreList);
+			File[] machines = getMachinesRecursively(path);
 			allMachines.addAll(Arrays.asList(machines));
 			for (int i = 0; i < machines.length; i++) {
 				expectedValues.add(TLCResult.NoError);

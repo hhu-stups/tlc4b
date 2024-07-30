@@ -39,14 +39,15 @@ public class CoverageTest extends AbstractParseMachineTest {
 	@Config
 	public static Configuration getConfig() {
 		final ArrayList<String> list = new ArrayList<>();
-		final ArrayList<String> ignoreList = new ArrayList<>();
 		list.add("build/prob_examples/public_examples/TLC/");
-
-		list.add("./src/test/resources/");
-		ignoreList.add("./src/test/resources/bugs/");
-		ignoreList.add("./src/test/resources/compound/");
-		ignoreList.add("./src/test/resources/test/");
-		return getConfiguration2(list, ignoreList);
+		// The subdirectories bugs, compound, and test are intentionally not included here.
+		list.add("src/test/resources/basics/");
+		list.add("src/test/resources/composition/");
+		list.add("src/test/resources/errors/");
+		list.add("src/test/resources/laws/");
+		list.add("src/test/resources/ltl/");
+		list.add("src/test/resources/special/");
+		return getConfiguration2(list);
 	}
 
 }
