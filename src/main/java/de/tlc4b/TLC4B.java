@@ -521,7 +521,7 @@ public class TLC4B {
 		InputStream is = null;
 		FileOutputStream fos = null;
 		try {
-			is = this.getClass().getClassLoader().getResourceAsStream("standardModules/" + name + ".tla");
+			is = TLC4B.class.getResourceAsStream("standardModules/" + name + ".tla");
 			if (is == null) {
 				// should never happen
 				throw new TranslationException("Unable to determine the source of the standard module: " + name);
