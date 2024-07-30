@@ -1,7 +1,6 @@
 package de.tlc4b.util;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,23 +9,10 @@ import de.tlc4b.tlc.TLCResults.TLCResult;
 import de.tlc4b.util.PolySuite.Configuration;
 
 public abstract class AbstractParseMachineTest {
-
-	private static final class MachineFilenameFilter implements FilenameFilter {
-		private static final String[] MACHINE_SUFFIX = { ".mch" };
-
-		public boolean accept(final File dir, final String name) {
-			for (String machineSuffix : MACHINE_SUFFIX) {
-				if (name.endsWith(machineSuffix)) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
+	private static final String MCH_SUFFIX = ".mch";
 
 	protected static File[] getMachines(String path) {
-		final File dir = new File(path);
-		return dir.listFiles(new MachineFilenameFilter());
+		return new File(path).listFiles((dir, name) -> name.endsWith(MCH_SUFFIX));
 	}
 
 	protected static File[] getMachinesRecursively(String path, ArrayList<String> ignoreList) {
@@ -60,7 +46,7 @@ public abstract class AbstractParseMachineTest {
 				
 			} else {
 				String name = f.getName();
-				if (name.endsWith(".mch")) {
+				if (name.endsWith(MCH_SUFFIX)) {
 					files.add(f);
 				}
 			}
