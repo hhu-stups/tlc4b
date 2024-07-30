@@ -159,7 +159,6 @@ public class TLC4B {
 				println("Violated Definition: " + violatedDefinition);
 			}
 
-			System.out.println(TLC4BGlobals.isCreateTraceFile());
 			if (results.hasTrace() && TLC4BGlobals.isCreateTraceFile()) {
 				String trace = results.getTrace();
 				String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
