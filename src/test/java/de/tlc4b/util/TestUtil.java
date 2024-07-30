@@ -1,6 +1,7 @@
 package de.tlc4b.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,6 +24,34 @@ import static de.tlc4b.TLC4BOption.NOTRACE;
 import static org.junit.Assert.assertEquals;
 
 public class TestUtil {
+	private static final String MCH_SUFFIX = ".mch";
+
+	public static File[] getMachines(String path) {
+		return new File(path).listFiles((dir, name) -> name.endsWith(MCH_SUFFIX));
+	}
+
+	public static List<File> getMachinesRecursively(String path) {
+		File root = new File(path);
+		File[] list = root.listFiles();
+
+		List<File> files = new ArrayList<>();
+		if (list == null) {
+			return files;
+		}
+
+		for (File f : list) {
+			if (f.isDirectory()) {
+				files.addAll(getMachinesRecursively(f.getAbsolutePath()));
+			} else {
+				String name = f.getName();
+				if (name.endsWith(MCH_SUFFIX)) {
+					files.add(f);
+				}
+			}
+		}
+
+		return files;
+	}
 
 	public static void compare(final String expectedModule, final String machineString) throws BCompoundException, TLA2BException {
 		TLC4BGlobals.setForceTLCToEvalConstants(false);
