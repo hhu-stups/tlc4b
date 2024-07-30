@@ -3,6 +3,7 @@ package de.tlc4b.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import de.tlc4b.tlc.TLCResults.TLCResult;
 import de.tlc4b.util.PolySuite.Configuration;
@@ -18,11 +19,11 @@ public abstract class AbstractParseMachineTest {
 		return walk(path).toArray(new File[0]);
 	}
 
-	private static ArrayList<File> walk(String path) {
+	private static List<File> walk(String path) {
 		File root = new File(path);
 		File[] list = root.listFiles();
 		
-		ArrayList<File> files = new ArrayList<>();
+		List<File> files = new ArrayList<>();
 		if (list == null)
 			return files;
 
@@ -39,10 +40,10 @@ public abstract class AbstractParseMachineTest {
 		return files;
 	}
 
-	protected static Configuration getConfiguration2(ArrayList<String> list) {
-		final ArrayList<File> allMachines = new ArrayList<>();
+	protected static Configuration getConfiguration2(List<String> list) {
+		List<File> allMachines = new ArrayList<>();
 
-		final ArrayList<TLCResult> expectedValues = new ArrayList<>();
+		List<TLCResult> expectedValues = new ArrayList<>();
 		for (String path : list) {
 			File[] machines = getMachinesRecursively(path);
 			allMachines.addAll(Arrays.asList(machines));
@@ -70,10 +71,10 @@ public abstract class AbstractParseMachineTest {
 		};
 	}
 
-	protected static Configuration getConfiguration(ArrayList<TestPair> list) {
-		final ArrayList<File> allMachines = new ArrayList<>();
+	protected static Configuration getConfiguration(List<TestPair> list) {
+		List<File> allMachines = new ArrayList<>();
 
-		final ArrayList<TLCResult> expectedValues = new ArrayList<>();
+		List<TLCResult> expectedValues = new ArrayList<>();
 		for (TestPair testPair : list) {
 			File[] machines = getMachines(testPair.getPath());
 			allMachines.addAll(Arrays.asList(machines));

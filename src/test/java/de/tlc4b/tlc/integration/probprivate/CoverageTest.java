@@ -2,6 +2,7 @@ package de.tlc4b.tlc.integration.probprivate;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tlc4b.TLC4B;
 import de.tlc4b.tlc.TLCResults.TLCResult;
@@ -38,7 +39,7 @@ public class CoverageTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<String> list = new ArrayList<>();
+		List<String> list = new ArrayList<>();
 		list.add("build/prob_examples/public_examples/TLC/");
 		// The subdirectories bugs, compound, and test are intentionally not included here.
 		list.add("src/test/resources/basics/");

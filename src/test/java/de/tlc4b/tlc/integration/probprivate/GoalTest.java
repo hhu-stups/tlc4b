@@ -6,6 +6,7 @@ import static de.tlc4b.util.TestUtil.test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +37,7 @@ public class GoalTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<>();
+		List<TestPair> list = new ArrayList<>();
 		list.add(new TestPair(Goal,
 				"build/prob_examples/public_examples/TLC/GOAL"));
 		return getConfiguration(list);

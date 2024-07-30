@@ -2,6 +2,7 @@ package de.tlc4b.tlc.integration.probprivate;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tlc4b.tlc.TLCResults.TLCResult;
 import de.tlc4b.util.AbstractParseMachineTest;
@@ -36,7 +37,7 @@ public class WellDefinednessTest extends AbstractParseMachineTest  {
 
 		@Config
 		public static Configuration getConfig() {
-			final ArrayList<TestPair> list = new ArrayList<>();
+			List<TestPair> list = new ArrayList<>();
 			list.add(new TestPair(WellDefinednessError, "build/prob_examples/public_examples/TLC/WellDefinednessError"));
 			return getConfiguration(list);
 		}

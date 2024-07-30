@@ -6,6 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +37,7 @@ public class InvariantViolationTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<>();
+		List<TestPair> list = new ArrayList<>();
 		list.add(new TestPair(InvariantViolation,
 				"build/prob_examples/public_examples/TLC/InvariantViolation"));
 		return getConfiguration(list);

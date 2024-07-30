@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static de.tlc4b.TLC4BOption.DFID;
 import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
@@ -42,7 +43,7 @@ public class BasicTest extends AbstractParseMachineTest {
 
 	@Config
 	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<>();
+		List<TestPair> list = new ArrayList<>();
 		list.add(new TestPair(NoError, "./src/test/resources/composition/sees"));
 		list.add(new TestPair(NoError, "./src/test/resources/composition/sees2"));
 		list.add(new TestPair(NoError, "./src/test/resources/basics"));
