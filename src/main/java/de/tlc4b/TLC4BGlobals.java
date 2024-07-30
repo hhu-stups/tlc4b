@@ -27,8 +27,6 @@ public class TLC4BGlobals {
 	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
 
-	private static boolean cleanup;
-
 	private static boolean forceTLCToEvalConstants;
 
 	private static int workers;
@@ -60,8 +58,6 @@ public class TLC4BGlobals {
 		silent = false;
 
 		proBconstantsSetup = false;
-
-		cleanup = true;
 
 		workers = 1;
 		dfid_initial_depth = -1; // option not selected
@@ -210,14 +206,6 @@ public class TLC4BGlobals {
 
 	public static int getDfidInitialDepth() {
 		return TLC4BGlobals.dfid_initial_depth;
-	}
-
-	public static boolean isCleanup() {
-		return cleanup;
-	}
-
-	public static void setCleanup(boolean cleanup) {
-		TLC4BGlobals.cleanup = cleanup;
 	}
 
 	public static boolean isProBconstantsSetup() {
