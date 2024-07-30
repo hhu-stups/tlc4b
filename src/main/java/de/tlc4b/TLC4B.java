@@ -40,7 +40,6 @@ import static de.tlc4b.MP.*;
 public class TLC4B {
 	private static final String CSV_DELIMITER = ";";
 
-	private String filename;
 	private File mainfile, traceFile;
 	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
@@ -272,7 +271,7 @@ public class TLC4B {
 			if (remainingArgs.length != 1) {
 				throw new TLC4BIOException("Main machine required!");
 			} else {
-				filename = remainingArgs[0];
+				mainfile = new File(remainingArgs[0]);
 			}
 
 			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE.arg()));
@@ -401,7 +400,6 @@ public class TLC4B {
 	}
 
 	private void handleMainFileName() {
-		mainfile = new File(filename);
 		if (!mainfile.exists()) {
 			throw new TLC4BIOException("The file " + mainfile.getPath() + " does not exist.");
 		}
