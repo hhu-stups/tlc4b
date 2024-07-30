@@ -1,7 +1,6 @@
 package de.tlc4b.util;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,9 +12,7 @@ import java.util.List;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.be4.classicalb.core.parser.exceptions.BException;
-import de.tla2b.exceptions.FrontEndException;
 import de.tla2b.exceptions.TLA2BException;
-import de.tlc4b.TLC4B;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.Translator;
 import de.tlc4b.tlc.TLCResults.TLCResult;
@@ -208,21 +205,6 @@ public class TestUtil {
 		processBuilder.redirectErrorStream(true);
 		return processBuilder.start();
 	}
-
-	public static void testParse(String[] args, boolean deleteFiles) throws IOException, BCompoundException, FrontEndException {
-		TLC4BGlobals.resetGlobals();
-		TLC4BGlobals.setDeleteOnExit(deleteFiles);
-		TLC4BGlobals.setCreateTraceFile(false);
-		TLC4BGlobals.setTestingMode(true);
-		// B2TLAGlobals.setCleanup(true);
-		TLC4B tlc4b = new TLC4B();
-		tlc4b.process(args);
-		File module = new File(tlc4b.getBuildDir(), tlc4b.getMachineFileNameWithoutFileExtension() + ".tla");
-
-		// parse result
-		new de.tla2bAst.Translator(module.getCanonicalPath());
-	}
-
 }
 
 class StreamGobbler extends Thread {

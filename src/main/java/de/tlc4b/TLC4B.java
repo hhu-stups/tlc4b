@@ -525,10 +525,6 @@ public class TLC4B {
 		}
 	}
 
-	public File getBuildDir() {
-		return buildDir;
-	}
-
 	public String getMachineFileNameWithoutFileExtension() {
 		return machineFileNameWithoutFileExtension;
 	}
