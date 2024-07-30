@@ -116,7 +116,7 @@ public class TestUtil {
 		// TODO Check that re-translated B machine matches original input?
 	}
 
-	public static void compareEqualsConfig(String expectedModule, String expectedConfig, String machine)
+	public static void compareModuleAndConfig(String expectedModule, String expectedConfig, String machine)
 			throws Exception {
 		Translator b2tlaTranslator = new Translator(machine);
 		b2tlaTranslator.translate();
@@ -129,10 +129,6 @@ public class TestUtil {
 
 		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
 		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
-	}
-
-	public static void compareModuleAndConfig(String expectedModule, String expectedConfig, String machine) throws Exception {
-		compareEqualsConfig(expectedModule, expectedConfig, machine);
 	}
 
 	public static void compareEquals(String expected, String machine) throws BException {

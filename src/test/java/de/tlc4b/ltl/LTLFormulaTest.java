@@ -1,7 +1,7 @@
 package de.tlc4b.ltl;
 
 
-import static de.tlc4b.util.TestUtil.compareEqualsConfig;
+import static de.tlc4b.util.TestUtil.compareModuleAndConfig;
 import static de.tlc4b.util.TestUtil.compareLTLFormula;
 
 import org.junit.BeforeClass;
@@ -284,7 +284,7 @@ public class LTLFormulaTest {
 				+ "====";
 		final String config = "SPECIFICATION Spec\nINVARIANT Invariant\nPROPERTIES ASSERT_LTL\n";
 		
-		compareEqualsConfig(expected, config, machine);
+		compareModuleAndConfig(expected, config, machine);
 	}
 	
 }

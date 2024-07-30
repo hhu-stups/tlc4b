@@ -17,6 +17,6 @@ public class EnumeratedSetsTest {
 				+ "set2 == {d}\n" 
 				+ "====";
 		final String config = "CONSTANTS\na = a\nb = b\nc = c\nd = d\n";
-		compareEqualsConfig(expected, config, machine);
+		compareModuleAndConfig(expected, config, machine);
 	}
 }
