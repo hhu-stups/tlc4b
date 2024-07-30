@@ -44,7 +44,7 @@ public class TLC4B {
 	private File mainfile, traceFile;
 	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
-	private String logFileString;
+	private File logFile;
 
 	private File buildDir;
 
@@ -298,10 +298,11 @@ public class TLC4B {
 				buildDir = new File(System.getProperty("java.io.tmpdir"));
 			}
 			if (line.hasOption(LOG.arg())) {
-				logFileString = line.getOptionValue(LOG.arg());
+				String logFileString = line.getOptionValue(LOG.arg());
 				if (logFileString == null) {
 					throw new TLC4BIOException("Error: File required after option '-log'.");
 				}
+				logFile = new File(logFileString);
 			}
 			if (line.hasOption(MAXINT.arg())) {
 				String maxint = line.getOptionValue(MAXINT.arg());
@@ -485,9 +486,8 @@ public class TLC4B {
 	}
 
 	private void createLogFile(TLCResults results) {
-		if (logFileString != null) {
+		if (logFile != null) {
 			String logCsvString = getLogCsvString(results);
-			File logFile = new File(logFileString);
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
 				fw.write(logCsvString);
 				fw.close();
