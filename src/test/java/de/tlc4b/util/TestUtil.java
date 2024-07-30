@@ -113,6 +113,7 @@ public class TestUtil {
 
 		String name = b2tlaTranslator.getMachineName();
 		translateTLA2B(name, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
+		// TODO Check that re-translated B machine matches original input?
 	}
 
 	public static void compareEqualsConfig(String expectedModule, String expectedConfig, String machine)
@@ -124,30 +125,14 @@ public class TestUtil {
 
 		// parse check
 		translateTLA2B(name, b2tlaTranslator.getModuleString(), b2tlaTranslator.getConfigString());
+		// TODO Check that re-translated B machine matches original input?
 
 		assertEquals(expectedModule, b2tlaTranslator.getModuleString());
 		assertEquals(expectedConfig, b2tlaTranslator.getConfigString());
 	}
 
-	public static void compareModuleAndConfig(String expectedModule, String expectedConfig, String machine)
-		throws BCompoundException, TLA2BException {
-		Translator b2tlaTranslator = new Translator(machine);
-		b2tlaTranslator.translate();
-
-		// TODO include config file in back translation from TLA+ to B
-
-		// String name = b2tlaTranslator.getMachineName();
-		// StringBuilder sb1 = de.tla2b.translation.Tla2BTranslator
-		// .translateString(name, b2tlaTranslator.getModuleString(),
-		// b2tlaTranslator.getConfigString());
-		// StringBuilder sb2 = de.tla2b.translation.Tla2BTranslator
-		// .translateString(name, expectedModule, expectedConfig);
-		// if (!sb2.toString().equals(sb1.toString())) {
-		// fail("expected:\n" + expectedModule + "\nbut was:\n"
-		// + b2tlaTranslator.getModuleString() + "\n\nexpected:\n"
-		// + expectedConfig + "\nbut was:\n"
-		// + b2tlaTranslator.getConfigString());
-		// }
+	public static void compareModuleAndConfig(String expectedModule, String expectedConfig, String machine) throws Exception {
+		compareEqualsConfig(expectedModule, expectedConfig, machine);
 	}
 
 	public static void compareEquals(String expected, String machine) throws BException {
