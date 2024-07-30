@@ -19,7 +19,7 @@ import de.tlc4b.tlc.TLCResults.TLCResult;
 
 import util.ToolIO;
 
-import static de.tlc4b.TLC4BCliOptions.TLCOption.NOTRACE;
+import static de.tlc4b.TLC4BOption.NOTRACE;
 import static org.junit.Assert.assertEquals;
 
 public class TestUtil {

@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.util.ArrayList;
 
-import static de.tlc4b.TLC4BCliOptions.TLCOption.DFID;
+import static de.tlc4b.TLC4BOption.DFID;
 import static de.tlc4b.tlc.TLCResults.TLCResult.NoError;
 import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;

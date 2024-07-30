@@ -1,6 +1,6 @@
 package de.tlc4b.tlc.integration;
 
-import static de.tlc4b.TLC4BCliOptions.TLCOption.*;
+import static de.tlc4b.TLC4BOption.*;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.*;

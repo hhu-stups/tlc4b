@@ -33,8 +33,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import static de.tlc4b.TLC4BCliOptions.*;
-import static de.tlc4b.TLC4BCliOptions.TLCOption.*;
+import static de.tlc4b.TLC4BOption.*;
 import static de.tlc4b.util.StopWatch.Watches.*;
 import static de.tlc4b.MP.*;
 
@@ -253,6 +252,14 @@ public class TLC4B {
 			tlc4b.printResults(results);
 			System.exit(0);
 		}
+	}
+	
+	private static Options getCommandlineOptions() {
+		Options options = new Options();
+		for (TLC4BOption option : TLC4BOption.values()) {
+			options.addOption(option.arg(), option.expectsArg() != null, option.desc());
+		}
+		return options;
 	}
 
 	private void handleParameter(String[] args) {
