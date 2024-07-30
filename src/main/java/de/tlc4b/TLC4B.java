@@ -112,7 +112,8 @@ public class TLC4B {
 			try {
 				TLC4B tlc4B = new TLC4B();
 				tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
-				tlc4B.translate(false);
+				tlc4B.translate();
+				// tlc4B.createFiles() is intentionally not called here!
 				return null;
 			} catch (BCompoundException | IOException | TLC4BException e) {
 				return e;
@@ -368,7 +369,7 @@ public class TLC4B {
 		printlnVerbose("");
 	}
 
-	private void translate(boolean createFiles) throws IOException, BCompoundException {
+	private void translate() throws IOException, BCompoundException {
 		StopWatch.start(PARSING_TIME);
 		MP.printSilent("Parsing... ");
 		translator = new Translator(machineFileNameWithoutFileExtension,
@@ -384,14 +385,13 @@ public class TLC4B {
 		this.tlcOutputInfo = translator.getTLCOutputInfo();
 		StopWatch.stop(TRANSLATION_TIME);
 		printlnSilent("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
-		if (createFiles)
-			createFiles();
 	}
 
 	public void process(String[] args) throws IOException, BCompoundException {
 		processArgs(args);
 		if (TLC4BGlobals.isTranslate()) {
-			translate(true);
+			translate();
+			createFiles();
 		}
 	}
 
