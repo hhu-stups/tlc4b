@@ -59,9 +59,7 @@ public class Log {
 		Map<String, Long> operationCount = tlcResults.getOperationCount();
 		List<String> opCountString = new ArrayList<>();
 		if (operationCount != null) {
-			for (String operation : operationCount.keySet()) {
-				opCountString.add(operation + DELIMITER + operationCount.get(operation));
-			}
+			operationCount.forEach((operation, count) -> opCountString.add(operation + DELIMITER + count));
 		}
 		fieldValues.add(!opCountString.isEmpty() ? String.join(DELIMITER, opCountString) : "");
 
