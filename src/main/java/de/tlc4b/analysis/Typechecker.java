@@ -252,7 +252,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Expected '" + expected + "', found '" + found + "' at definition call\n");
+			throw new TypeErrorException("Expected '" + expected + "', found '" + found + "' at definition call\n", e);
 		}
 		LinkedList<PExpression> params = ((AExpressionDefinitionDefinition) originalDef).getParameters();
 		List<PExpression> copy = new ArrayList<>(node.getParameters());
@@ -272,7 +272,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Expected '" + expected + "', found '" + found + "' at definition call\n");
+			throw new TypeErrorException("Expected '" + expected + "', found '" + found + "' at definition call\n", e);
 		}
 		LinkedList<PExpression> params = ((APredicateDefinitionDefinition) originalDef).getParameters();
 		List<PExpression> copy = new ArrayList<>(node.getParameters());
@@ -388,8 +388,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "' at identifier " + name
-					+ "\n" + node.getStartPos());
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "' at identifier " + name + "\n" + node.getStartPos(), e);
 		}
 	}
 
@@ -398,7 +397,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at '=' \n" + node.getStartPos());
+			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at '=' \n" + node.getStartPos(), e);
 		}
 
 		UntypedType x = new UntypedType();
@@ -427,7 +426,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at '=' \n" + node.getClass());
+			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at '=' \n" + node.getClass(), e);
 		}
 
 		UntypedType x = new UntypedType();
@@ -442,7 +441,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at 'For All' \n");
+			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at 'For All' \n", e);
 		}
 
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
@@ -460,7 +459,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at 'Exists' \n");
+			throw new TypeErrorException("Expected '" + getType(node) + "', found BOOL at 'Exists' \n", e);
 		}
 
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
@@ -606,8 +605,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException(
-					"Excepted '" + getType(node) + "' , found 'INTEGER' in '" + node.getLiteral().getText() + "'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in '" + node.getLiteral().getText() + "'", e);
 		}
 	}
 
@@ -617,7 +615,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'INTEGER'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'INTEGER'", e);
 		}
 	}
 
@@ -627,7 +625,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NATURAL'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NATURAL'", e);
 		}
 	}
 
@@ -637,7 +635,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NATURAL1'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NATURAL1'", e);
 		}
 	}
 
@@ -647,7 +645,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'INT'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'INT'", e);
 		}
 	}
 
@@ -657,7 +655,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NAT'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NAT'", e);
 		}
 	}
 
@@ -667,7 +665,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NAT1'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' in 'NAT1'", e);
 		}
 	}
 
@@ -676,7 +674,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in '-'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in '-'", e);
 		}
 	}
 
@@ -686,8 +684,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(IntegerType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException(
-					"Excepted '" + getType(node) + "' , found 'POW(INTEGER)' at interval operator");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(INTEGER)' at interval operator", e);
 		}
 
 		setType(node.getLeftBorder(), IntegerType.getInstance());
@@ -711,7 +708,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' > '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' > '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -724,7 +721,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' < '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' < '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -737,7 +734,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' >= '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' >= '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -750,7 +747,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' <= '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' <= '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -763,7 +760,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' min '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' min '", e);
 		}
 		setType(node.getExpression(), new SetType(IntegerType.getInstance()));
 		node.getExpression().apply(this);
@@ -774,7 +771,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' min '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' min '", e);
 		}
 		setType(node.getExpression(), new SetType(IntegerType.getInstance()));
 		node.getExpression().apply(this);
@@ -785,7 +782,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' + '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' + '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -817,8 +814,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			result = expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "' at "
-					+ node.getClass().getSimpleName() + "\n " + node.getStartPos());
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "' at " + node.getClass().getSimpleName() + "\n " + node.getStartPos(), e);
 		}
 		//
 		// BType res2 = getType(node);
@@ -852,7 +848,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' / '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' / '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -865,7 +861,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' ** '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' ** '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -878,7 +874,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' mod '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'INTEGER' in ' mod '", e);
 		}
 		setType(node.getLeft(), IntegerType.getInstance());
 		setType(node.getRight(), IntegerType.getInstance());
@@ -904,7 +900,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + "INTEGER" + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + "INTEGER" + "'", e);
 		}
 
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
@@ -926,7 +922,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			IntegerType.getInstance().unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + "INTEGER" + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + "INTEGER" + "'", e);
 		}
 
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
@@ -951,7 +947,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in 'TRUE'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in 'TRUE'", e);
 		}
 	}
 
@@ -960,7 +956,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in 'FALSE'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in 'FALSE'", e);
 		}
 	}
 
@@ -970,7 +966,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			SetType found = new SetType(BoolType.getInstance());
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(BOOL)' in 'BOOL'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'POW(BOOL)' in 'BOOL'", e);
 		}
 	}
 
@@ -979,7 +975,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in 'bool(...)'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in 'bool(...)'", e);
 		}
 		setType(node.getPredicate(), BoolType.getInstance());
 		node.getPredicate().apply(this);
@@ -994,8 +990,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException(
-					"Excepted '" + getType(node) + "' , found 'BOOL' in ' & '." + node.getStartPos());
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' & '." + node.getStartPos(), e);
 		}
 		setType(node.getLeft(), BoolType.getInstance());
 		setType(node.getRight(), BoolType.getInstance());
@@ -1008,7 +1003,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' or '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' or '", e);
 		}
 		setType(node.getLeft(), BoolType.getInstance());
 		setType(node.getRight(), BoolType.getInstance());
@@ -1021,7 +1016,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' => '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' => '", e);
 		}
 		setType(node.getLeft(), BoolType.getInstance());
 		setType(node.getRight(), BoolType.getInstance());
@@ -1035,7 +1030,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
 			System.out.println(node.parent().getClass());
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' <=> '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' <=> '", e);
 		}
 		setType(node.getLeft(), BoolType.getInstance());
 		setType(node.getRight(), BoolType.getInstance());
@@ -1048,7 +1043,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' not '");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' not '", e);
 		}
 		setType(node.getPredicate(), BoolType.getInstance());
 		node.getPredicate().apply(this);
@@ -1172,7 +1167,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found " + found + "'", e);
 		}
 
 		setType(node.getPredicates(), BoolType.getInstance());
@@ -1220,7 +1215,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found = found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found 'POW(POW(_A))' in 'POW'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found 'POW(POW(_A))' in 'POW'", e);
 		}
 
 		setType(expr, found.getSubtype());
@@ -1254,7 +1249,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found = found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 		setType(left, found);
 		setType(right, found);
@@ -1285,7 +1280,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 
 		setType(node.getExpression(), new UntypedType());
@@ -1324,7 +1319,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'", e);
 		}
 		SetType set = new SetType(new UntypedType());
 
@@ -1341,7 +1336,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'", e);
 		}
 
 		SetType set = new SetType(new UntypedType());
@@ -1359,7 +1354,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'", e);
 		}
 
 		SetType set = new SetType(new UntypedType());
@@ -1377,7 +1372,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found 'BOOL'", e);
 		}
 
 		SetType set = new SetType(new UntypedType());
@@ -1400,7 +1395,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "'", e);
 		}
 	}
 
@@ -1415,7 +1410,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "'", e);
 		}
 	}
 
@@ -1438,7 +1433,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -1461,7 +1456,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -1497,7 +1492,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -1522,7 +1517,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			rangeFound.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + rangeFound + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + rangeFound + "'", e);
 		}
 
 		ArrayList<PExpression> copy = new ArrayList<>(node.getParameters());
@@ -1540,7 +1535,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			domainFound.unify(p, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + domainFound + "' , found '" + makePair(foundList) + "'");
+			throw new TypeErrorException("Excepted '" + domainFound + "' , found '" + makePair(foundList) + "'", e);
 		}
 	}
 
@@ -1562,7 +1557,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			domainFound.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + domainFound + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + domainFound + "'", e);
 		}
 	}
 
@@ -1584,7 +1579,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			rangeFound.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found '" + rangeFound + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found '" + rangeFound + "'", e);
 		}
 	}
 
@@ -1686,7 +1681,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -1715,7 +1710,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -1734,7 +1729,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -1871,7 +1866,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 
 		node.getLeft().apply(this);
@@ -2009,8 +2004,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "' at "
-					+ node.getClass().getSimpleName() + "\n " + node.getStartPos() + ":" + node.getEndPos());
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "' at " + node.getClass().getSimpleName() + "\n " + node.getStartPos() + ":" + node.getEndPos(), e);
 		}
 	}
 
@@ -2021,7 +2015,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -2208,7 +2202,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found = found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 		BType subtype;
 		if (found instanceof FunctionType) {
@@ -2249,7 +2243,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			unify(expected, found, node);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -2268,7 +2262,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			unify(expected, found, node);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -2294,7 +2288,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(expected, this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "'", e);
 		}
 	}
 
@@ -2307,7 +2301,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			StringType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found " + StringType.getInstance() + "'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found " + StringType.getInstance() + "'", e);
 		}
 	}
 
@@ -2317,7 +2311,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			found.unify(getType(node), this);
 		} catch (UnificationException e) {
-			throw new TypeErrorException("Excepted '" + getType(node) + "' , found " + found + "'");
+			throw new TypeErrorException("Excepted '" + getType(node) + "' , found " + found + "'", e);
 		}
 	}
 

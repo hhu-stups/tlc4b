@@ -358,7 +358,7 @@ public class TLC4B {
 		} catch (ParseException e) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("[file]", options);
-			throw new TLC4BIOException(e.getMessage());
+			throw new TLC4BIOException(e);
 		}
 	}
 
@@ -415,7 +415,7 @@ public class TLC4B {
 		try {
 			mainfile = mainfile.getCanonicalFile();
 		} catch (IOException e) {
-			throw new TLC4BIOException("The file '" + mainfile.getPath() + "' can not be accessed.");
+			throw new TLC4BIOException("The file '" + mainfile.getPath() + "' can not be accessed.", e);
 		}
 
 		machineFileNameWithoutFileExtension = mainfile.getName().substring(0,
@@ -493,7 +493,7 @@ public class TLC4B {
 				fw.close();
 				println("Log file: " + logFile.getAbsolutePath());
 			} catch (IOException e) {
-				throw new TLC4BIOException(e.getLocalizedMessage());
+				throw new TLC4BIOException(e);
 			}
 		}
 	}
@@ -546,7 +546,7 @@ public class TLC4B {
 			}
 			println("Standard module '" + file.getName() + "' created.");
 		} catch (IOException e) {
-			throw new TLC4BIOException(e.getMessage());
+			throw new TLC4BIOException(e);
 		} finally {
 			if (TLC4BGlobals.isDeleteOnExit() && file.exists()) {
 				file.deleteOnExit();
@@ -560,7 +560,7 @@ public class TLC4B {
 					fos.close();
 				}
 			} catch (IOException ex) {
-				throw new TLC4BIOException(ex.getMessage());
+				throw new TLC4BIOException(ex);
 			}
 		}
 	}
@@ -576,7 +576,7 @@ public class TLC4B {
 			out.close();
 			return file;
 		} catch (IOException e) {
-			throw new TLC4BIOException(e.getMessage());
+			throw new TLC4BIOException(e);
 		} finally {
 			if (deleteOnExit && exists) {
 				file.deleteOnExit();

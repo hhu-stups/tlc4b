@@ -78,7 +78,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 			this.ltlFormulaStart = parseLTLFormula(ltlFormula);
 		} catch (Exception e) {
 			String message = "Parsing definition " + name + " (line " + def.getStartPos().getLine() + "):\n";
-			throw new LTLParseException(message + e.getMessage());
+			throw new LTLParseException(message + e.getMessage(), e);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		try {
 			this.ltlFormulaStart = parseLTLFormula(ltlString);
 		} catch (Exception e) {
-			throw new LTLParseException(e.getMessage());
+			throw new LTLParseException(e);
 		}
 	}
 
@@ -155,7 +155,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		try {
 			start = parser.parsePredicate(text);
 		} catch (BCompoundException e) {
-			throw new LTLParseException(e.getMessage());
+			throw new LTLParseException(e);
 		}
 
 		return start;

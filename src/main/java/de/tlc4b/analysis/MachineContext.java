@@ -331,7 +331,7 @@ public class MachineContext extends DepthFirstAdapter {
 			try {
 				identifierAlreadyExists(name);
 			} catch (ScopeException e2) {
-				throw new ScopeException("Machine '" + name + "' is seen twice.");
+				throw new ScopeException("Machine '" + name + "' is seen twice.", e2);
 			}
 			seenMachines.put(name, p);
 		}

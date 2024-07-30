@@ -84,9 +84,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
 				TLC4BGlobals.setDEFERRED_SET_SIZE(value);
 			} catch (ClassCastException e) {
-				throw new TranslationException(
-						"Unable to determine the default set size from definition SET_PREF_DEFAULT_SETSIZE: "
-								+ node.getEndPos());
+				throw new TranslationException("Unable to determine the default set size from definition SET_PREF_DEFAULT_SETSIZE: " + node.getEndPos(), e);
 			}
 		}
 
@@ -98,9 +96,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
 				TLC4BGlobals.setMAX_INT(value);
 			} catch (ClassCastException e) {
-				throw new TranslationException(
-						"Unable to determine MAXINT from definition SET_PREF_MAXINT: "
-								+ node.getEndPos());
+				throw new TranslationException("Unable to determine MAXINT from definition SET_PREF_MAXINT: " + node.getEndPos(), e);
 			}
 		}
 
@@ -121,8 +117,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 				}
 				TLC4BGlobals.setMIN_INT(value);
 			} catch (ClassCastException e) {
-				throw new TranslationException(
-						"Unable to determine the MININT from definition SET_PREF_MININT: " + node.getEndPos());
+				throw new TranslationException("Unable to determine the MININT from definition SET_PREF_MININT: " + node.getEndPos(), e);
 			}
 		}
 	}
