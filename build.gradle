@@ -92,6 +92,9 @@ clean {
 }
 
 task regressionTests(dependsOn: extractPublicExamples, type: Test) {
+	testClassesDirs = testing.suites.test.sources.output.classesDirs
+	classpath = testing.suites.test.sources.runtimeClasspath
+
 	include('de/tlc4b/tlc/integration/probprivate/**')
 }
 check.dependsOn(regressionTests)
