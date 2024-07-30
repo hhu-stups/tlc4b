@@ -66,11 +66,7 @@ public class Translator {
 		this.ltlFormula = ltlFormula;
 
 		BParser parser = new BParser(machineName);
-		try {
-			start = parser.parseFile(machineFile);
-		} catch (NoClassDefFoundError e) {
-			throw new TLC4BIOException("Definitions file cannot be found.", e);
-		}
+		start = parser.parseFile(machineFile);
 
 		// Definitions of definitions files are injected in the ast of the main
 		// machine
