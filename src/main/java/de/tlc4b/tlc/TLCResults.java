@@ -180,7 +180,7 @@ public class TLCResults implements ToolGlobals {
 	private void evalTrace() {
 		List<TLCStateInfo> trace = OutputCollector.getTrace();
 		TracePrinter printer = null;
-		if (trace != null) {
+		if (!trace.isEmpty()) {
 			printer = new TracePrinter(trace, tlcOutputInfo);
 		} else if (OutputCollector.getInitialState() != null) {
 			printer = new TracePrinter(OutputCollector.getInitialState(), tlcOutputInfo);
