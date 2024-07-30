@@ -28,7 +28,6 @@ import de.tlc4b.analysis.transformation.SetComprehensionOptimizer;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.analysis.unchangedvariables.InvariantPreservationAnalysis;
 import de.tlc4b.analysis.unchangedvariables.UnchangedVariablesFinder;
-import de.tlc4b.exceptions.TLC4BIOException;
 import de.tlc4b.prettyprint.TLAPrinter;
 import de.tlc4b.tla.Generator;
 import de.tlc4b.tlc.TLCOutputInfo;

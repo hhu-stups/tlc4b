@@ -128,7 +128,7 @@ public class TLC4B {
 		}
 	}
 
-	private void printResults(TLCResults results) {
+	private void printResults(TLCResults results) throws IOException {
 		printOperationsCount(results);
 		// options
 		printlnSilent("Used Options");
@@ -476,20 +476,18 @@ public class TLC4B {
 		return sb.toString();
 	}
 
-	private void createLogFile(TLCResults results) {
+	private void createLogFile(TLCResults results) throws IOException {
 		if (logFile != null) {
 			String logCsvString = getLogCsvString(results);
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
 				fw.write(logCsvString);
 				fw.close();
 				println("Log file: " + logFile.getAbsolutePath());
-			} catch (IOException e) {
-				throw new TLC4BIOException(e);
 			}
 		}
 	}
 
-	private void createFiles() {
+	private void createFiles() throws IOException {
 		boolean dirCreated = buildDir.mkdir();
 		if (dirCreated && TLC4BGlobals.isDeleteOnExit()) {
 			buildDir.deleteOnExit();
@@ -508,13 +506,13 @@ public class TLC4B {
 		createStandardModules();
 	}
 
-	private void createStandardModules() {
+	private void createStandardModules() throws IOException {
 		for (String module : translator.getStandardModuleToBeCreated()) {
 			createStandardModule(buildDir, module);
 		}
 	}
 
-	private void createStandardModule(File path, String name) {
+	private void createStandardModule(File path, String name) throws IOException {
 		// standard modules are copied from the standardModules folder to the current directory
 
 		File file = new File(path, name + ".tla");
@@ -536,27 +534,21 @@ public class TLC4B {
 				fos.write(bytes, 0, read);
 			}
 			println("Standard module '" + file.getName() + "' created.");
-		} catch (IOException e) {
-			throw new TLC4BIOException(e);
 		} finally {
 			if (TLC4BGlobals.isDeleteOnExit() && file.exists()) {
 				file.deleteOnExit();
 			}
-			try {
-				if (is != null) {
-					is.close();
-				}
-				if (fos != null) {
-					fos.flush();
-					fos.close();
-				}
-			} catch (IOException ex) {
-				throw new TLC4BIOException(ex);
+			if (is != null) {
+				is.close();
+			}
+			if (fos != null) {
+				fos.flush();
+				fos.close();
 			}
 		}
 	}
 
-	private static File createFile(File dir, String fileName, String text, boolean deleteOnExit) {
+	private static File createFile(File dir, String fileName, String text, boolean deleteOnExit) throws IOException {
 		File file = new File(dir, fileName);
 		boolean exists = false;
 		try {
@@ -566,8 +558,6 @@ public class TLC4B {
 			out.write(text);
 			out.close();
 			return file;
-		} catch (IOException e) {
-			throw new TLC4BIOException(e);
 		} finally {
 			if (deleteOnExit && exists) {
 				file.deleteOnExit();
