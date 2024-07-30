@@ -79,13 +79,6 @@ public class TestUtil {
 		assertEquals(expectedB, actualB);
 	}
 
-	public static void tryTranslating(final String machineString) throws BCompoundException {
-		TLC4BGlobals.setForceTLCToEvalConstants(false);
-		ToolIO.setMode(ToolIO.TOOL);
-		Translator b2tlaTranslator = new Translator(machineString);
-		b2tlaTranslator.translate();
-	}
-
 	public static String translateTLA2B(String moduleName, String tlaString, String configString)
 			throws TLA2BException {
 		return de.tla2bAst.Translator.translateModuleString(moduleName, tlaString, configString);
