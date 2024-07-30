@@ -91,8 +91,7 @@ public class TLC4B {
 				results = new TLCResults(tlc4b.tlcOutputInfo);
 				results.evalResults();
 				tlc4b.printResults(results);
-				Log log = new Log(tlc4b, results);
-				tlc4b.createLogFile(log);
+				tlc4b.createLogFile(results);
 			} catch (NoClassDefFoundError e) {
 				printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
 			}
@@ -213,8 +212,7 @@ public class TLC4B {
 			TLCResults results = new TLCResults(tlc4b.tlcOutputInfo);
 			results.evalResults();
 			tlc4b.printResults(results);
-			Log log = new Log(tlc4b, results);
-			tlc4b.createLogFile(log);
+			tlc4b.createLogFile(results);
 
 			System.exit(0);
 		}
@@ -421,11 +419,12 @@ public class TLC4B {
 		}
 	}
 
-	private void createLogFile(Log log) {
+	private void createLogFile(TLCResults results) {
 		if (logFileString != null) {
+			String logCsvString = Log.getCSVString(this, results);
 			File logFile = new File(logFileString);
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
-				fw.write(log.getCSVString());
+				fw.write(logCsvString);
 				fw.close();
 				println("Log file: " + logFile.getAbsolutePath());
 			} catch (IOException e) {

@@ -10,14 +10,16 @@ import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.util.StopWatch;
 import de.tlc4b.util.StopWatch.Watches;
 
-public class Log {
+public final class Log {
 
 	public static final String DELIMITER = ";";
 
-	private final List<String> fieldNames = new ArrayList<>();
-	private final List<String> fieldValues = new ArrayList<>();
+	private Log() {}
 
-	public Log(TLC4B tlc4b, TLCResults tlcResults) {
+	public static String getCSVString(TLC4B tlc4b, TLCResults tlcResults) {
+		List<String> fieldNames = new ArrayList<>();
+		List<String> fieldValues = new ArrayList<>();
+
 		fieldNames.add("Machine File");
 		String machineFile = tlc4b.getMainFile().getAbsolutePath();
 		fieldValues.add(machineFile);
@@ -65,14 +67,11 @@ public class Log {
 
 		fieldNames.add("Trace File");
 		fieldValues.add(tlc4b.getTraceFile() != null ? tlc4b.getTraceFile().getAbsolutePath() : "");
-	}
 
-	public String getCSVString() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < fieldNames.size(); i++) {
 			sb.append(fieldNames.get(i)).append(DELIMITER).append(fieldValues.get(i)).append("\n");
 		}
 		return sb.toString();
 	}
-
 }
