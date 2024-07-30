@@ -178,19 +178,15 @@ public class TestUtil {
 	}
 
 	public static TLCResult test(String[] args) throws IOException {
-		return test(args, false);
+		String[] newArgs = Arrays.copyOf(args, args.length + 1);
+		newArgs[args.length] = NOTRACE.cliArg();
+		String runnerClassName = TLC4BTester.class.getCanonicalName();
+		return runTLC(runnerClassName, newArgs);
 	}
 
-	public static TLCResult test(String[] args, boolean createTrace) throws IOException {
+	public static TLCResult testWithTrace(String[] args) throws IOException {
 		String runnerClassName = TLC4BTester.class.getCanonicalName();
-		String[] newArgs;
-		if (createTrace) {
-			newArgs = args;
-		} else {
-			newArgs = Arrays.copyOf(args, args.length + 1);
-			newArgs[args.length] = NOTRACE.cliArg();
-		}
-		return runTLC(runnerClassName, newArgs);
+		return runTLC(runnerClassName, args);
 	}
 
 	private static TLCResult runTLC(String runnerClassName, String[] args) throws IOException {

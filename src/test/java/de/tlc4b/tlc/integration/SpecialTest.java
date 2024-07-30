@@ -3,6 +3,7 @@ package de.tlc4b.tlc.integration;
 import static de.tlc4b.TLC4BOption.*;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import static de.tlc4b.util.TestUtil.test;
+import static de.tlc4b.util.TestUtil.testWithTrace;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -65,7 +66,7 @@ public class SpecialTest {
 	public void testCustomOutputDir() throws Exception {
 		Path specialDir = Paths.get("./src/test/resources/special/veryspecialoutput");
 		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch", OUTPUT.cliArg(), specialDir.toString()};
-		assertEquals(InvariantViolation, test(a, true));
+		assertEquals(InvariantViolation, testWithTrace(a));
 
 		assertTrue(Files.deleteIfExists(specialDir.resolve("InvariantError.tla")));
 		assertTrue(Files.deleteIfExists(specialDir.resolve("InvariantError.cfg")));
@@ -81,7 +82,7 @@ public class SpecialTest {
 		logFile.toFile().delete();
 
 		String[] a = new String[] { machineFile.toString(), LOG.cliArg(), logFile.toString(), COVERAGE.cliArg()};
-		assertEquals(InvariantViolation, test(a, true));
+		assertEquals(InvariantViolation, testWithTrace(a));
 
 		List<String> lines = Files.readAllLines(logFile);
 		assertEquals(lines.size(), 12);
