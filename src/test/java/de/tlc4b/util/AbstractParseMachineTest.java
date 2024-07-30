@@ -59,10 +59,10 @@ public abstract class AbstractParseMachineTest {
 				}
 				
 			} else {
-				String name =f.getName();
-					if (name.endsWith(".mch")) {
-						files.add(f);
-					}
+				String name = f.getName();
+				if (name.endsWith(".mch")) {
+					files.add(f);
+				}
 			}
 		}
 		return files;
