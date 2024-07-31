@@ -103,19 +103,36 @@ public class TLC4B {
 	}
 
 	/**
+	 * Check whether TLC4B is applicable to the provided machine.
+	 * This method has no return value - if it returns without throwing an exception, then TLC4B is applicable.
+	 * Be aware that this method may take a long time to run for large/complex machines.
+	 *
+	 * @param path path to B machine file
+	 * @throws IOException if files could not be read
+	 * @throws BCompoundException if the machine file could not be parsed
+	 * @throws TLC4BException if translation fails for any other reason
+	 */
+	public static void checkTLC4BIsApplicable(String path) throws IOException, BCompoundException {
+		TLC4B tlc4B = new TLC4B();
+		tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
+		tlc4B.translate();
+		// tlc4B.createFiles() is intentionally not called here!
+	}
+
+	/**
 	 * Quickly check whether TLC4B is applicable to the provided machine.
 	 *
 	 * @param path path to B machine file
 	 * @param timeOut time out in seconds
 	 * @return Exception if TLC4B is not applicable, else null (also if unknown)
+	 * @deprecated This method creates an executor that is never shut down.
+	 *     Use {@link #checkTLC4BIsApplicable(String)} instead and implement the timeout logic yourself as appropriate for your application.
 	 */
+	@Deprecated
 	public static Exception checkTLC4BIsApplicable(final String path, int timeOut) {
 		Future<Exception> future = Executors.newSingleThreadExecutor().submit(() -> {
 			try {
-				TLC4B tlc4B = new TLC4B();
-				tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
-				tlc4B.translate();
-				// tlc4B.createFiles() is intentionally not called here!
+				checkTLC4BIsApplicable(path);
 				return null;
 			} catch (BCompoundException | IOException | TLC4BException e) {
 				return e;
