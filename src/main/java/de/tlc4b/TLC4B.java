@@ -108,11 +108,10 @@ public class TLC4B {
 	 * Be aware that this method may take a long time to run for large/complex machines.
 	 *
 	 * @param path path to B machine file
-	 * @throws IOException if files could not be read
 	 * @throws BCompoundException if the machine file could not be parsed
 	 * @throws TLC4BException if translation fails for any other reason
 	 */
-	public static void checkTLC4BIsApplicable(String path) throws IOException, BCompoundException {
+	public static void checkTLC4BIsApplicable(String path) throws BCompoundException {
 		TLC4B tlc4B = new TLC4B();
 		tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
 		tlc4B.translate();
@@ -134,7 +133,7 @@ public class TLC4B {
 			try {
 				checkTLC4BIsApplicable(path);
 				return null;
-			} catch (BCompoundException | IOException | TLC4BException e) {
+			} catch (BCompoundException | TLC4BException e) {
 				return e;
 			}
 		});
@@ -386,7 +385,7 @@ public class TLC4B {
 		printlnVerbose("");
 	}
 
-	private void translate() throws IOException, BCompoundException {
+	private void translate() throws BCompoundException {
 		StopWatch.start(PARSING_TIME);
 		MP.printSilent("Parsing... ");
 		translator = new Translator(machineFileNameWithoutFileExtension,

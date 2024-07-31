@@ -1,7 +1,6 @@
 package de.tlc4b;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,8 +57,7 @@ public class Translator {
 		start = parser.parseMachine(machineString);
 	}
 
-	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup)
-			throws BCompoundException, IOException {
+	public Translator(String machineName, File machineFile, String ltlFormula, String constantSetup) throws BCompoundException {
 		this.machineName = machineName;
 		this.ltlFormula = ltlFormula;
 
