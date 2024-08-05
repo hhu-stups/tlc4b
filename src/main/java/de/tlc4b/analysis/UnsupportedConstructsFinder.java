@@ -12,7 +12,7 @@ import de.be4.classicalb.core.parser.node.*;
 import de.tlc4b.exceptions.NotSupportedException;
 
 public class UnsupportedConstructsFinder extends DepthFirstAdapter {
-	private final Start start;
+
 	private static final Set<Class<? extends Node>> unsupportedClasses = new HashSet<>();
 
 	static {
@@ -36,14 +36,6 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 
 	private static void add(Class<? extends Node> clazz) {
 		unsupportedClasses.add(clazz);
-	}
-
-	public UnsupportedConstructsFinder(Start start) {
-		this.start = start;
-	}
-
-	public void find() {
-		start.apply(this);
 	}
 
 	private static final List<String> SUM_TYPE = new LinkedList<>(

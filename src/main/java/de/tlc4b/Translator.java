@@ -88,8 +88,7 @@ public class Translator {
 	}
 
 	public void translate() {
-		UnsupportedConstructsFinder unsupportedConstructsFinder = new UnsupportedConstructsFinder(start);
-		unsupportedConstructsFinder.find();
+		start.apply(new UnsupportedConstructsFinder());
 
 		// ast transformation
 		SeesEliminator.eliminateSeesClauses(start, parsedMachines);
