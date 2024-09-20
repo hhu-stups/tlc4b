@@ -81,8 +81,7 @@ public class TLC4B {
 	 * @return results of TLC model check
 	 */
 	public static TLCResults run(String[] args) throws TLC4BException, IOException, BCompoundException {
-		System.setProperty("apple.awt.UIElement", "true");
-		// avoiding pop up window
+		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up window
 
 		TLC4B tlc4b = new TLC4B();
 		tlc4b.process(args);
@@ -150,6 +149,8 @@ public class TLC4B {
 		printOperationsCount(results);
 		// options
 		printlnSilent("Used Options");
+		if (TLC4BGlobals.getDfidInitialDepth() > 0) // -1 if disabled
+			printlnSilent("| Use DFS with initial depth: " + TLC4BGlobals.getDfidInitialDepth());
 		printlnSilent("| Number of workers: " + TLC4BGlobals.getWorkers());
 		printlnSilent("| Invariants check: " + TLC4BGlobals.isInvariant());
 		printlnSilent("| Deadlock check: " + TLC4BGlobals.isDeadlockCheck());
@@ -208,8 +209,6 @@ public class TLC4B {
 
 	public static void test(String[] args, boolean deleteFiles) throws Exception {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
-		TLC4BGlobals.resetGlobals();
-		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4B tlc4b = new TLC4B();
 		try {
 			tlc4b.process(args);
@@ -218,6 +217,7 @@ public class TLC4B {
 			printlnErr(e.getMessage());
 			throw e;
 		}
+		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		if (TLC4BGlobals.isRunTLC()) {
 			MP.TLCOutputStream.changeOutputStream();
 			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
@@ -233,7 +233,6 @@ public class TLC4B {
 
 	public static void testString(String machineString, boolean deleteFiles) throws Exception {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
-		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4B tlc4b = new TLC4B();
 		tlc4b.buildDir = new File("temp/");
@@ -288,6 +287,8 @@ public class TLC4B {
 				mainfile = new File(remainingArgs[0]);
 			}
 
+			// reset all parameters to default, then apply current args
+			TLC4BGlobals.resetGlobals();
 			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE.arg()));
 			TLC4BGlobals.setSilent(line.hasOption(SILENT.arg()));
 			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD.arg()));

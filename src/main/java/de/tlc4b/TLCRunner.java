@@ -19,6 +19,7 @@ import java.util.Set;
 
 import de.tlc4b.tlc.TLCMessageListener;
 import de.tlc4b.util.StopWatch;
+import tlc2.TLCGlobals;
 import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
@@ -105,10 +106,18 @@ public class TLCRunner {
 		if (TLC4BGlobals.getWorkers() > 1) {
 			list.add("-workers");
 			list.add("" + TLC4BGlobals.getWorkers());
+		} else {
+			// When running multiple model checks from ProB2, the global state is not reset.
+			// Reset number of workers manually here, are there any other problematic options?!
+			TLCGlobals.setNumWorkers(1);
 		}
 		if (TLC4BGlobals.getDfidInitialDepth() >= 0) {
 			list.add("-dfid");
 			list.add("" + TLC4BGlobals.getDfidInitialDepth());
+		} else {
+			// When running multiple model checks from ProB2, the global state is not reset.
+			// Reset DFID manually here if not selected, are there any other problematic options?!
+			TLCGlobals.DFIDMax = -1;
 		}
 
 		if (TLC4BGlobals.isPrintCoverage()) {
