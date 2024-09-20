@@ -209,6 +209,8 @@ public class TLC4B {
 
 	public static void test(String[] args, boolean deleteFiles) throws Exception {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
+		TLC4BGlobals.resetGlobals();
+		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4B tlc4b = new TLC4B();
 		try {
 			tlc4b.process(args);
@@ -217,7 +219,6 @@ public class TLC4B {
 			printlnErr(e.getMessage());
 			throw e;
 		}
-		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		if (TLC4BGlobals.isRunTLC()) {
 			MP.TLCOutputStream.changeOutputStream();
 			TLCRunner.runTLC(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
@@ -233,6 +234,7 @@ public class TLC4B {
 
 	public static void testString(String machineString, boolean deleteFiles) throws Exception {
 		System.setProperty("apple.awt.UIElement", "true"); // avoiding pop up windows
+		TLC4BGlobals.resetGlobals();
 		TLC4BGlobals.setDeleteOnExit(deleteFiles);
 		TLC4B tlc4b = new TLC4B();
 		tlc4b.buildDir = new File("temp/");
