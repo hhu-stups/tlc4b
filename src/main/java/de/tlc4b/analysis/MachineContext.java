@@ -11,6 +11,7 @@ import de.tlc4b.MP;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.transformation.DefinitionsSorter;
 import de.tlc4b.analysis.transformation.MachineClauseSorter;
+import de.tlc4b.exceptions.NotSupportedException;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
@@ -652,6 +653,9 @@ public class MachineContext extends DepthFirstAdapter {
 
 	@Override
 	public void caseAOperationCallSubstitution(AOperationCallSubstitution node) {
+		if (!node.getResultIdentifiers().isEmpty()) {
+			throw new NotSupportedException("Operation calls with return values are not supported.");
+		}
 		String name = Utils.getTIdentifierListAsString(node.getOperation());
 		Node o = operations.get(name);
 		if (o != null) {
