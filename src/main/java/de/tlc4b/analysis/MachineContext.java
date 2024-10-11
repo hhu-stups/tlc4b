@@ -2,6 +2,7 @@ package de.tlc4b.analysis;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
@@ -650,16 +651,16 @@ public class MachineContext extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAOpSubstitution(AOpSubstitution node) {
-		if (node.getName() != null) {
-			AIdentifierExpression op = (AIdentifierExpression) node.getName();
-			String name = Utils.getTIdentifierListAsString(op.getIdentifier());
-			Node o = operations.get(name);
-			if (o != null) {
-				this.referencesTable.put(op, o);
-			} else {
-				throw new ScopeException("Unknown operation '" + name + "'");
-			}
+	public void caseAOperationCallSubstitution(AOperationCallSubstitution node) {
+		String name = Utils.getTIdentifierListAsString(node.getOperation());
+		Node o = operations.get(name);
+		if (o != null) {
+			AIdentifierExpression op = new AIdentifierExpression(node.getOperation().stream()
+				.map(TIdentifierLiteral::clone)
+				.collect(Collectors.toList()));
+			this.referencesTable.put(op, o);
+		} else {
+			throw new ScopeException("Unknown operation '" + name + "'");
 		}
 		{
 			List<PExpression> copy = new ArrayList<>(node.getParameters());
