@@ -818,16 +818,6 @@ public class MachineContext extends DepthFirstAdapter {
 		contextTable.remove(contextTable.size() - 1);
 	}
 
-	@Override
-	public void caseARecEntry(ARecEntry node) {
-		node.getValue().apply(this);
-	}
-
-	@Override
-	public void caseARecordFieldExpression(ARecordFieldExpression node) {
-		node.getRecord().apply(this);
-	}
-
 	public String getMachineName() {
 		return machineName;
 	}

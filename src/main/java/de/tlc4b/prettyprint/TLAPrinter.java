@@ -2927,7 +2927,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseARecEntry(ARecEntry node) {
-		node.getIdentifier().apply(this);
+		moduleStringAppend(node.getIdentifier().getText());
 		if (typechecker.getType(node.parent()) instanceof StructType) {
 			moduleStringAppend(" |-> ");
 		} else {
@@ -2942,7 +2942,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		inARecordFieldExpression(node);
 		node.getRecord().apply(this);
 		moduleStringAppend(".");
-		node.getIdentifier().apply(this);
+		moduleStringAppend(node.getIdentifier().getText());
 		outARecordFieldExpression(node);
 	}
 

@@ -2235,8 +2235,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(e.getValue(), new UntypedType());
 			e.getValue().apply(this);
 
-			AIdentifierExpression i = (AIdentifierExpression) e.getIdentifier();
-			String name = Utils.getTIdentifierListAsString(i.getIdentifier());
+			String name = e.getIdentifier().getText();
 			found.add(name, getType(e.getValue()));
 		}
 		BType expected = getType(node);
@@ -2250,8 +2249,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	@Override
 	public void caseARecordFieldExpression(ARecordFieldExpression node) {
 		StructType s = new StructType();
-		AIdentifierExpression i = (AIdentifierExpression) node.getIdentifier();
-		String fieldName = Utils.getTIdentifierListAsString(i.getIdentifier());
+		String fieldName = node.getIdentifier().getText();
 		s.add(fieldName, new UntypedType());
 		setType(node.getRecord(), s);
 
@@ -2277,8 +2275,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(e.getValue(), new SetType(new UntypedType()));
 			e.getValue().apply(this);
 
-			AIdentifierExpression i = (AIdentifierExpression) e.getIdentifier();
-			String name = Utils.getTIdentifierListAsString(i.getIdentifier());
+			String name = e.getIdentifier().getText();
 			BType t = ((SetType) getType(e.getValue())).getSubtype();
 			s.add(name, t);
 		}

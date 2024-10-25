@@ -7,14 +7,13 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ARecEntry;
 import de.be4.classicalb.core.parser.node.AStructExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PRecEntry;
+import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
-import de.tlc4b.util.UtilMethods;
 
 public class StructType extends AbstractHasFollowers {
 
@@ -190,9 +189,7 @@ public class StructType extends AbstractHasFollowers {
 		for (Entry<String, BType> entry : entrySet) {
 			String name = entry.getKey();
 			BType type = entry.getValue();
-			AIdentifierExpression id = UtilMethods.createAIdentifierExpression(name);
-			ARecEntry recEntry = new ARecEntry(id,
-					type.createASTNode(typechecker));
+			ARecEntry recEntry = new ARecEntry(new TIdentifierLiteral(name), type.createASTNode(typechecker));
 			list.add(recEntry);
 		}
 		AStructExpression node = new AStructExpression(list);
