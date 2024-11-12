@@ -15,11 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.tlc4b.exceptions.TLC4BException;
@@ -115,34 +110,6 @@ public class TLC4B {
 		tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
 		tlc4B.translate();
 		// tlc4B.createFiles() is intentionally not called here!
-	}
-
-	/**
-	 * Quickly check whether TLC4B is applicable to the provided machine.
-	 *
-	 * @param path path to B machine file
-	 * @param timeOut time out in seconds
-	 * @return Exception if TLC4B is not applicable, else null (also if unknown)
-	 * @deprecated This method creates an executor that is never shut down.
-	 *     Use {@link #checkTLC4BIsApplicable(String)} instead and implement the timeout logic yourself as appropriate for your application.
-	 */
-	@Deprecated
-	public static Exception checkTLC4BIsApplicable(final String path, int timeOut) {
-		Future<Exception> future = Executors.newSingleThreadExecutor().submit(() -> {
-			try {
-				checkTLC4BIsApplicable(path);
-				return null;
-			} catch (BCompoundException | TLC4BException e) {
-				return e;
-			}
-		});
-
-		try {
-			return future.get(timeOut, TimeUnit.SECONDS);
-		} catch (TimeoutException | InterruptedException | ExecutionException e) {
-			future.cancel(true);
-			return null; // unknown if TLC4B is applicable, exceptions can be ignored
-		}
 	}
 
 	private void printResults(TLCResults results) throws IOException {
