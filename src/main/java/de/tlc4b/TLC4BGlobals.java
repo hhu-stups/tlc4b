@@ -15,25 +15,19 @@ public class TLC4BGlobals {
 	private static boolean partialInvariantEvaluation;
 	private static boolean useSymmetry;
 	private static boolean printCoverage;
-	
-	private static boolean checkOnlyMainAssertions;
+	private static boolean verbose;
+	private static boolean silent;
 
 	private static boolean deleteFilesOnExit;
 
 	private static boolean runTLC;
 	private static boolean translate;
-	private static boolean hideTLCConsoleOutput;
 	private static boolean createTraceFile;
-
-	private static boolean testingMode;
-
-	private static boolean cleanup;
 
 	private static boolean forceTLCToEvalConstants;
 
 	private static int workers;
-
-	private static boolean runTestscript;
+	private static int dfid_initial_depth;
 
 	static {
 		resetGlobals();
@@ -54,25 +48,19 @@ public class TLC4BGlobals {
 		useSymmetry = false;
 		printCoverage = false;
 		forceTLCToEvalConstants = false;
-		checkOnlyMainAssertions = false;
+		verbose = false;
+		silent = false;
 
 		proBconstantsSetup = false;
 
-		cleanup = true;
-
 		workers = 1;
+		dfid_initial_depth = -1; // option not selected
 
 		// for debugging purposes
 		runTLC = true;
 		translate = true;
-		hideTLCConsoleOutput = false; // is mapped to TOOLIO.tool
-		deleteFilesOnExit = false; // if enabled: deletes all created '.tla',
-									// '.cfg' files on exit of the JVM. This
-									// includes
-									// the created B2TLA standard modules (e.g.
-									// Relation, but not Naturals etc.).
-		runTestscript = false;
-		testingMode = false;
+		deleteFilesOnExit = false; // if enabled: deletes all created '.tla', '.cfg' files on exit of the JVM.
+			// This includes the created B2TLA standard modules (e.g. Relation, but not Naturals etc.).
 		createTraceFile = true;
 	}
 
@@ -82,14 +70,6 @@ public class TLC4BGlobals {
 
 	public static void setCreateTraceFile(boolean createTraceFile) {
 		TLC4BGlobals.createTraceFile = createTraceFile;
-	}
-
-	public static boolean isRunTestscript() {
-		return runTestscript;
-	}
-
-	public static void setRunTestscript(boolean runTestscript) {
-		TLC4BGlobals.runTestscript = runTestscript;
 	}
 
 	public static int getDEFERRED_SET_SIZE() {
@@ -132,10 +112,6 @@ public class TLC4BGlobals {
 		return checkLTL;
 	}
 
-	public static boolean isTool() {
-		return hideTLCConsoleOutput;
-	}
-
 	public static boolean isDeleteOnExit() {
 		return deleteFilesOnExit;
 	}
@@ -148,20 +124,20 @@ public class TLC4BGlobals {
 		partialInvariantEvaluation = b;
 	}
 
-	public static void setDEFERRED_SET_SIZE(int dEFERRED_SET_SIZE) {
-		DEFERRED_SET_SIZE = dEFERRED_SET_SIZE;
+	public static void setDEFERRED_SET_SIZE(int deferredSetSize) {
+		TLC4BGlobals.DEFERRED_SET_SIZE = deferredSetSize;
 	}
 
-	public static void setMAX_INT(int mAX_INT) {
-		MAX_INT = mAX_INT;
+	public static void setMAX_INT(int maxInt) {
+		TLC4BGlobals.MAX_INT = maxInt;
 	}
 
-	public static void setMIN_INT(int mIN_INT) {
-		MIN_INT = mIN_INT;
+	public static void setMIN_INT(int minInt) {
+		TLC4BGlobals.MIN_INT = minInt;
 	}
 
-	public static void setGOAL(boolean gOAL) {
-		checkGOAL = gOAL;
+	public static void setGOAL(boolean goal) {
+		TLC4BGlobals.checkGOAL = goal;
 	}
 
 	public static void setDeadlockCheck(boolean deadlockCheck) {
@@ -188,10 +164,6 @@ public class TLC4BGlobals {
 		TLC4BGlobals.checkLTL = checkltl;
 	}
 
-	public static void setTool(boolean tool) {
-		TLC4BGlobals.hideTLCConsoleOutput = tool;
-	}
-
 	public static void setDeleteOnExit(boolean deleteOnExit) {
 		TLC4BGlobals.deleteFilesOnExit = deleteOnExit;
 	}
@@ -204,12 +176,12 @@ public class TLC4BGlobals {
 		return TLC4BGlobals.workers;
 	}
 
-	public static boolean isCleanup() {
-		return cleanup;
+	public static void setDfidInitialDepth(int depth) {
+		TLC4BGlobals.dfid_initial_depth = depth;
 	}
 
-	public static void setCleanup(boolean cleanup) {
-		TLC4BGlobals.cleanup = cleanup;
+	public static int getDfidInitialDepth() {
+		return TLC4BGlobals.dfid_initial_depth;
 	}
 
 	public static boolean isProBconstantsSetup() {
@@ -218,14 +190,6 @@ public class TLC4BGlobals {
 
 	public static void setProBconstantsSetup(boolean proBconstantsSetup) {
 		TLC4BGlobals.proBconstantsSetup = proBconstantsSetup;
-	}
-
-	public static void setTestingMode(boolean b) {
-		TLC4BGlobals.testingMode = b;
-	}
-
-	public static boolean getTestingMode() {
-		return TLC4BGlobals.testingMode;
 	}
 
 	public static void setWelldefinednessCheck(boolean b) {
@@ -240,8 +204,7 @@ public class TLC4BGlobals {
 		return forceTLCToEvalConstants;
 	}
 
-	public static void setForceTLCToEvalConstants(
-			boolean forceTLCToEvalConstants) {
+	public static void setForceTLCToEvalConstants(boolean forceTLCToEvalConstants) {
 		TLC4BGlobals.forceTLCToEvalConstants = forceTLCToEvalConstants;
 	}
 
@@ -260,9 +223,20 @@ public class TLC4BGlobals {
 	public static boolean isPrintCoverage() {
 		return printCoverage;
 	}
-	
-	public static boolean isCheckOnlyMainAssertions(){
-		return checkOnlyMainAssertions;
+
+	public static void setVerbose(boolean b) {
+		verbose = b;
 	}
 
+	public static boolean isVerbose() {
+		return verbose;
+	}
+
+	public static void setSilent(boolean b) {
+		silent = b;
+	}
+
+	public static boolean isSilent() {
+		return silent;
+	}
 }

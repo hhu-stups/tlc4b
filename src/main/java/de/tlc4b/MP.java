@@ -4,8 +4,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class MP {
-	private static PrintStream out = System.out;
-	private static PrintStream err = System.err;
+	private static final PrintStream out = System.out;
+	private static final PrintStream err = System.err;
 
 	private MP() {
 	}
@@ -13,6 +13,26 @@ public class MP {
 	public static void printlnErr(String errorMessage) {
 		err.print("Error: ");
 		err.println(errorMessage);
+	}
+
+	public static void printlnSilent(String message) {
+		if (!TLC4BGlobals.isSilent() || TLC4BGlobals.isVerbose())
+			out.println(message);
+	}
+
+	public static void printSilent(String message) {
+		if (!TLC4BGlobals.isSilent() || TLC4BGlobals.isVerbose())
+			out.print(message);
+	}
+
+	public static void printlnVerbose(String message) {
+		if (TLC4BGlobals.isVerbose())
+			out.println(message);
+	}
+
+	public static void printVerbose(String message) {
+		if (TLC4BGlobals.isVerbose())
+			out.print(message);
 	}
 
 	public static void println(String message) {
@@ -27,8 +47,17 @@ public class MP {
 		static final PrintStream origOut = System.out;
 
 		public static void changeOutputStream() {
-			MP.TLCOutputStream tlcOutputStream = new TLCOutputStream(origOut);
-			System.setOut(tlcOutputStream);
+			if (TLC4BGlobals.isSilent()) {
+				origOut.println("Run TLC...");
+				System.setOut(new PrintStream(new OutputStream() {
+					@Override
+					public void write(int b) {
+						// ignore
+					}
+				}));
+				return;
+			}
+			System.setOut(new TLCOutputStream(origOut));
 		}
 
 		public static void resetOutputStream() {

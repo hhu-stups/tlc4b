@@ -70,7 +70,7 @@ RelSeqConcat(s1, s2) ==
   WDcheck(s1 \cup {<<x[1]+Cardinality(s1), x[2]>> : x \in s2} , SeqTest(s1) /\ SeqTest(s2), "Error: The arguments of the concatenation-operator should be sequences.")
  \* The concatenation of sequence s1 and sequence s2
 
-RelSeqPrepand(e, s) ==
+RelSeqPrepend(e, s) ==
   IF  Assert(SeqTest(s), "Error: The second argument of the prepend-operator should be a sequence.")
   THEN {<<1,e>>} \cup {<<x[1]+1, x[2]>> : x \in s}
   ELSE {} \* dummy

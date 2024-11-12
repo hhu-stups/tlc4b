@@ -1,6 +1,7 @@
 package de.tlc4b.tlc;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.FunctionType;
@@ -11,52 +12,27 @@ import de.tlc4b.exceptions.NotSupportedException;
 import tla2sany.semantic.OpDeclNode;
 import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
-import tlc2.value.FcnLambdaValue;
-import tlc2.value.FcnRcdValue;
-import tlc2.value.IntervalValue;
-import tlc2.value.LazyValue;
-import tlc2.value.ModelValue;
-import tlc2.value.RecordValue;
-import tlc2.value.SetCapValue;
-import tlc2.value.SetCupValue;
-import tlc2.value.SetDiffValue;
-import tlc2.value.SetEnumValue;
-import tlc2.value.SetOfFcnsValue;
-import tlc2.value.SetOfRcdsValue;
-import tlc2.value.SetOfTuplesValue;
-import tlc2.value.SetPredValue;
-import tlc2.value.StringValue;
-import tlc2.value.SubsetValue;
-import tlc2.value.TupleValue;
-import tlc2.value.UnionValue;
-import tlc2.value.Value;
-import tlc2.value.ValueEnumeration;
-import tlc2.value.ValueVec;
+import tlc2.value.impl.*;
 import util.UniqueString;
 import static tlc2.value.ValueConstants.*;
 
 public class TracePrinter {
 
-	ArrayList<TLCStateInfo> trace;
+	List<TLCStateInfo> trace;
 	TLCState initialState;
-	TLCOutputInfo tlcOutputInfo;
+	final TLCOutputInfo tlcOutputInfo;
 
-	ArrayList<OpDeclNode> constants;
-	ArrayList<OpDeclNode> variables;
+	List<OpDeclNode> constants;
+	List<OpDeclNode> variables;
 
 	StringBuilder traceBuilder;
 
-	public TracePrinter(ArrayList<TLCStateInfo> trace,
-			TLCOutputInfo tlcOutputInfo) {
+	public TracePrinter(List<TLCStateInfo> trace, TLCOutputInfo tlcOutputInfo) {
 		this.trace = trace;
 		this.tlcOutputInfo = tlcOutputInfo;
 
-		setup();
-	}
-
-	private void setup() {
-		constants = new ArrayList<OpDeclNode>();
-		variables = new ArrayList<OpDeclNode>();
+		constants = new ArrayList<>();
+		variables = new ArrayList<>();
 		for (int i = 0; i < TLCState.vars.length; i++) {
 			String tlaName = TLCState.vars[i].getName().toString();
 			String bName = tlcOutputInfo.getBName(tlaName);
@@ -67,12 +43,6 @@ public class TracePrinter {
 			}
 		}
 		evalTrace();
-	}
-
-	public TracePrinter(TLCState initialState, TLCOutputInfo tlcOutputInfo) {
-		this.initialState = initialState;
-		this.tlcOutputInfo = tlcOutputInfo;
-		setup();
 	}
 
 	public StringBuilder getTrace() {
@@ -101,7 +71,7 @@ public class TracePrinter {
 	private StringBuilder setupConstants(TLCState state) {
 		StringBuilder expression = new StringBuilder();
 		if (tlcOutputInfo.constantSetup) {
-			if (constants.size() == 0) {
+			if (constants.isEmpty()) {
 				expression.append("1 = 1");
 			} else {
 				for (int i = 0; i < constants.size(); i++) {
@@ -111,8 +81,7 @@ public class TracePrinter {
 					UniqueString var = constants.get(i).getName();
 					String bName = tlcOutputInfo.getBName(var.toString());
 					BType type = tlcOutputInfo.getBType(var.toString());
-					String value = parseValue(state.lookup(var), type)
-							.toString();
+					String value = parseValue((Value) state.lookup(var), type).toString();
 					expression.append(bName).append(" = ").append(value);
 				}
 			}
@@ -131,7 +100,7 @@ public class TracePrinter {
 			UniqueString var = variables.get(i).getName();
 			String bName = tlcOutputInfo.getBName(var.toString());
 			BType type = tlcOutputInfo.getBType(var.toString());
-			String value = parseValue(state.lookup(var), type).toString();
+			String value = parseValue((Value) state.lookup(var), type).toString();
 			expression.append(bName).append(" = ").append(value);
 		}
 		return expression;
@@ -175,18 +144,17 @@ public class TracePrinter {
 			} else if (type instanceof FunctionType) {
 				if (((TupleValue) val).elems.length == 0) {
 					res.append("{}");
-					return res;
 				} else {
 					BType subtype = ((FunctionType) type).getRange();
 					res.append("[");
 					res.append(parseEnumerationValue(((TupleValue) val).elems,
 							subtype));
 					res.append("]");
-					return res;
 				}
+				return res;
 
 			}
-			throw new NotSupportedException("Unkown type of tuple.");
+			throw new NotSupportedException("Unknown type of tuple.");
 
 		case RECORDVALUE: {
 			RecordValue rec = (RecordValue) val;
@@ -319,7 +287,7 @@ public class TracePrinter {
 
 		case LAZYVALUE: {
 			LazyValue s = (LazyValue) val;
-			res.append(parseValue(s.val, type));
+			res.append(parseValue(s.getValue(), type));
 			return res;
 		}
 

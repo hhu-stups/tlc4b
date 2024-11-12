@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -25,12 +24,11 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PPredicate;
-import de.be4.classicalb.core.parser.node.TIdentifierLiteral;
 
 public class ConstantsEliminator extends DepthFirstAdapter {
 
 	private final Hashtable<Node, HashSet<Node>> dependsOnIdentifierTable;
-	private MachineContext machineContext;
+	private final MachineContext machineContext;
 	private ValuesOfIdentifierFinder valuesOfConstantsFinder;
 	private final HashMap<Node, Integer> integerValueTable;
 	
@@ -49,8 +47,8 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 	}
 
 	public ConstantsEliminator(MachineContext machineContext) {
-		this.dependsOnIdentifierTable = new Hashtable<Node, HashSet<Node>>();
-		this.integerValueTable = new HashMap<Node, Integer>();
+		this.dependsOnIdentifierTable = new Hashtable<>();
+		this.integerValueTable = new HashMap<>();
 		this.machineContext = machineContext;
 	}
 
@@ -71,12 +69,12 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 
 		this.valuesOfConstantsFinder = new ValuesOfIdentifierFinder();
 
-		this.valueOfIdentifier = new LinkedHashMap<Node, Node>();
+		this.valueOfIdentifier = new LinkedHashMap<>();
 
 		// creating a new list of the constants, because constants will be
 		// removed from the original list
-		LinkedList<Node> oldConstants = new LinkedList<Node>(machineContext.getConstantArrayList());
-		if (oldConstants.size() > 0) {
+		LinkedList<Node> oldConstants = new LinkedList<>(machineContext.getConstantArrayList());
+		if (!oldConstants.isEmpty()) {
 			evalIdentifier(oldConstants);
 		}
 
@@ -85,28 +83,25 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 	}
 
 	private void evalIdentifier(Collection<Node> ids) {
-		LinkedList<PDefinition> defsList = new LinkedList<PDefinition>();
+		LinkedList<PDefinition> defsList = new LinkedList<>();
 		boolean newRun = true;
 		while (newRun) {
 			newRun = false;
-			Iterator<Node> itr = ids.iterator();
-			while (itr.hasNext()) {
-				AIdentifierExpression id = (AIdentifierExpression) itr.next();
+			for (Node node : ids) {
+				AIdentifierExpression id = (AIdentifierExpression) node;
 				if (valueOfIdentifier.containsKey(id))
 					continue;
-				HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable
-						.get(id);
+				HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable.get(id);
 				for (Node val : idValues) {
 					HashSet<Node> idsInVal = dependsOnIdentifierTable.get(val);
-					if (idsInVal.size() == 0) {
+					if (idsInVal.isEmpty()) {
 						// remove constants assignment of the properties clause
 						removeAssignmentInPropertiesClause(val);
 						removeConstant(id);
 						AExpressionDefinitionDefinition def = new AExpressionDefinitionDefinition(
-								(TIdentifierLiteral) id.getIdentifier().get(0)
-										.clone(),
-								new LinkedList<PExpression>(),
-								(PExpression) val);
+							id.getIdentifier().get(0).clone(),
+							new LinkedList<>(),
+							(PExpression) val);
 						machineContext.getReferences().put(def, id);
 						machineContext.getReferences().put(id, def);
 						defsList.add(def);
@@ -120,9 +115,8 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			}
 		}
 
-		if (defsList.size() > 0) {
-			ADefinitionsMachineClause clause = machineContext
-					.getDefinitionMachineClause();
+		if (!defsList.isEmpty()) {
+			ADefinitionsMachineClause clause = machineContext.getDefinitionMachineClause();
 			if (null == clause) {
 				clause = new ADefinitionsMachineClause(defsList);
 				machineContext.getAbstractMachineParseUnit()
@@ -168,19 +162,14 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			}
 		} else if (parent instanceof APropertiesMachineClause) {
 			machineContext.setPropertiesMachineClaus(null);
-			machineContext.getAbstractMachineParseUnit().getMachineClauses()
-					.remove(parent);
+			machineContext.getAbstractMachineParseUnit().getMachineClauses().remove(parent);
 		}
-
 	}
 
 	private void removeIdentifier(Collection<Node> collection,
 			Node identifierToRemove) {
-		Iterator<Node> itr = collection.iterator();
-		while (itr.hasNext()) {
-			Node id = itr.next();
-			HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable
-					.get(id);
+		for (Node id : collection) {
+			HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable.get(id);
 			for (Node val : idValues) {
 				HashSet<Node> idsInVal = dependsOnIdentifierTable.get(val);
 				idsInVal.remove(identifierToRemove);
@@ -191,7 +180,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 	class ConstantsInTreeFinder extends DepthFirstAdapter {
 		@Override
 		public void defaultIn(Node node) {
-			dependsOnIdentifierTable.put(node, new HashSet<Node>());
+			dependsOnIdentifierTable.put(node, new HashSet<>());
 		}
 
 		@Override
@@ -228,39 +217,33 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 	}
 
 	class ValuesOfIdentifierFinder extends DepthFirstAdapter {
-		private Hashtable<Node, HashSet<Node>> valuesOfIdentifierTable;
-		private HashSet<Node> identifiers;
+		private final Hashtable<Node, HashSet<Node>> valuesOfIdentifierTable;
+		private final HashSet<Node> identifiers;
 
 		public ValuesOfIdentifierFinder() {
-			valuesOfIdentifierTable = new Hashtable<Node, HashSet<Node>>();
+			valuesOfIdentifierTable = new Hashtable<>();
 
-			this.identifiers = new HashSet<Node>();
+			this.identifiers = new HashSet<>();
 			identifiers.addAll(machineContext.getConstants().values());
 			identifiers.addAll(machineContext.getScalarParameter().values());
 
-			Iterator<Node> itr = identifiers.iterator();
-			while (itr.hasNext()) {
-				Node id = itr.next();
-				valuesOfIdentifierTable.put(id, new HashSet<Node>());
+			for (Node id : identifiers) {
+				valuesOfIdentifierTable.put(id, new HashSet<>());
 			}
 
-			Node constraints = machineContext.getConstraintMachineClause();
+			AConstraintsMachineClause constraints = machineContext.getConstraintMachineClause();
 			if (constraints != null) {
-				analysePredicate(((AConstraintsMachineClause) constraints)
-						.getPredicates());
+				analysePredicate(constraints.getPredicates());
 			}
-			Node properties = machineContext.getPropertiesMachineClause();
+			APropertiesMachineClause properties = machineContext.getPropertiesMachineClause();
 			if (properties != null) {
-				analysePredicate(((APropertiesMachineClause) properties)
-						.getPredicates());
+				analysePredicate(properties.getPredicates());
 			}
-
 		}
 
 		private void analysePredicate(Node n) {
 			if (n instanceof AEqualPredicate) {
 				analyseEqualsPredicate((AEqualPredicate) n);
-				return;
 			} else if (n instanceof AGreaterPredicate) {
 				// analyseGreaterPredicate((AGreaterPredicate) n);
 			} else if (n instanceof ALessEqualPredicate) {
@@ -268,7 +251,6 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			} else if (n instanceof AConjunctPredicate) {
 				analysePredicate(((AConjunctPredicate) n).getLeft());
 				analysePredicate(((AConjunctPredicate) n).getRight());
-				return;
 			}
 
 		}
@@ -280,8 +262,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			Node right_ref = machineContext.getReferences().get(right);
 
 			if (left instanceof ACardExpression) {
-				Node ref = machineContext.getReferences().get(
-						((ACardExpression) left).getExpression());
+				Node ref = machineContext.getReferences().get(((ACardExpression) left).getExpression());
 				try {
 					AIntegerExpression intExpr = (AIntegerExpression) right;
 					int size = Integer.parseInt(intExpr.getLiteral().getText());
@@ -297,7 +278,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 					AIntegerExpression intExpr = (AIntegerExpression) left;
 					int size = Integer.parseInt(intExpr.getLiteral().getText());
 					integerValueTable.put(ref, size);
-				} catch (ClassCastException e) {
+				} catch (ClassCastException ignored) {
 				}
 			}
 
@@ -308,8 +289,6 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			if (identifiers.contains(right_ref)) {
 				valuesOfIdentifierTable.get(right_ref).add(left);
 			}
-			return;
-
 		}
 
 	}

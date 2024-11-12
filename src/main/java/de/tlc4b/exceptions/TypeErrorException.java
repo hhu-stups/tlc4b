@@ -1,10 +1,16 @@
 package de.tlc4b.exceptions;
 
-@SuppressWarnings("serial")
 public class TypeErrorException extends TLC4BException {
+	public TypeErrorException(String message) {
+		super(message);
+	}
 
-	public TypeErrorException(String e) {
-		super(e);
+	public TypeErrorException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public TypeErrorException(Throwable cause) {
+		super(cause);
 	}
 
 	@Override

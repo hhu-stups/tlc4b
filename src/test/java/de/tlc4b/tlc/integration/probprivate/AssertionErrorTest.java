@@ -1,43 +1,33 @@
 package de.tlc4b.tlc.integration.probprivate;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import de.tlc4b.tlc.TLCResults.TLCResult;
-import de.tlc4b.util.AbstractParseMachineTest;
-import de.tlc4b.util.PolySuite;
-import de.tlc4b.util.PolySuite.Config;
-import de.tlc4b.util.PolySuite.Configuration;
-import de.tlc4b.util.TestPair;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import static de.tlc4b.tlc.TLCResults.TLCResult.AssertionError;
 import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(PolySuite.class)
-public class AssertionErrorTest extends AbstractParseMachineTest {
-
+@RunWith(Parameterized.class)
+public class AssertionErrorTest {
 	private final File machine;
-	private final TLCResult error;
 
-	public AssertionErrorTest(File machine, TLCResult result) {
+	public AssertionErrorTest(File machine) {
 		this.machine = machine;
-		this.error = result;
 	}
 
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(error, test(a));
+		assertEquals(TLCResult.AssertionError, test(a));
 	}
 
-	@Config
-	public static Configuration getConfig() {
-		final ArrayList<TestPair> list = new ArrayList<TestPair>();
-		list.add(new TestPair(AssertionError, "build/prob_examples/public_examples/TLC/AssertionError"));
-		return getConfiguration(list);
+	@Parameterized.Parameters(name = "{0}")
+	public static File[] data() {
+		return TestUtil.getMachines("build/prob_examples/public_examples/TLC/AssertionError");
 	}
 }

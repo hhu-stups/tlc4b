@@ -37,7 +37,7 @@ public class ErrorTest {
 	@Test
 	public void testNoFile() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/NoFile.mch" };
-		assertEquals(null, test(a));
+		assertNull(test(a));
 	}
 
 	@Test
@@ -46,7 +46,6 @@ public class ErrorTest {
 		assertEquals(NoError, test(a));
 	}
 
-	@Ignore
 	@Test
 	public void testEnumerationError() throws Exception {
 		String[] a = new String[] { "./src/test/resources/errors/EnumerationError.mch" };

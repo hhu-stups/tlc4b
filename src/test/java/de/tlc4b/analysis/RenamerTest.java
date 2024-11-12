@@ -1,8 +1,9 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.*;
-
 import org.junit.Test;
+
+import static de.tlc4b.util.TestUtil.*;
+import static org.junit.Assert.assertEquals;
 
 public class RenamerTest {
 
@@ -104,7 +105,7 @@ public class RenamerTest {
 				+ "S == {aa}\n"
 				+ "ASSUME \\E aa_1 \\in {1} : TRUE\n"
 				+ "====";
-		compareEquals(expected, machine);
+		assertEquals(expected, translate(machine));
 	}
 	
 }

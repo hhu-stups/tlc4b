@@ -190,7 +190,7 @@ public class SetTest {
 				+ "ASSUME UNION({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {1, 2}\n"
 				+ "====";
 		//TODO ERROR in TLA2B
-		compareEquals(expected, machine);
+		assertEquals(expected, translate(machine));
 	}
 	
 	@Test
@@ -201,7 +201,7 @@ public class SetTest {
 				+ "EXTENDS BBuiltIns\n"
 				+ "ASSUME Inter({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {}\n"
 				+ "====";
-		compareEquals(expected, machine);
+		assertEquals(expected, translate(machine));
 	}
 	
 }

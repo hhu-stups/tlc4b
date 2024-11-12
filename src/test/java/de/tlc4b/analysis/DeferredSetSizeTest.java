@@ -10,10 +10,10 @@ public class DeferredSetSizeTest {
 		String machine = "MACHINE test\n"
 				+ "SETS S \n"
 				+ "END";
-		String expectedModule = "---- MODULE test----\n"
+		String expectedModule = "---- MODULE test ----\n"
 				+ "CONSTANTS S\n"
-				+ "======";
-		String expectedConfig = "CONSTANTS S = {S1, S2, S3} "; 
+				+ "====";
+		String expectedConfig = "CONSTANTS\nS = {S1,S2,S3}\n"; 
 		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -23,12 +23,12 @@ public class DeferredSetSizeTest {
 				+ "SETS S \n"
 				+ "PROPERTIES card(S) = 4"
 				+ "END";
-		String expectedModule = "---- MODULE test----\n"
-				+ "EXTENDS FiniteSets \n"
+		String expectedModule = "---- MODULE test ----\n"
+				+ "EXTENDS FiniteSets\n"
 				+ "CONSTANTS S\n"
-				+ "ASSUME Cardinality(S) = 4 \n"
-				+ "======";
-		String expectedConfig = "CONSTANTS S = {S1, S2, S3, S4} "; 
+				+ "ASSUME Cardinality(S) = 4\n"
+				+ "====";
+		String expectedConfig = "CONSTANTS\nS = {S1,S2,S3,S4}\n"; 
 		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -38,12 +38,12 @@ public class DeferredSetSizeTest {
 				+ "SETS S \n"
 				+ "PROPERTIES 4 = card(S)"
 				+ "END";
-		String expectedModule = "---- MODULE test----\n"
-				+ "EXTENDS FiniteSets \n"
+		String expectedModule = "---- MODULE test ----\n"
+				+ "EXTENDS FiniteSets\n"
 				+ "CONSTANTS S\n"
-				+ "ASSUME 4 = Cardinality(S) \n"
-				+ "======";
-		String expectedConfig = "CONSTANTS S = {S1, S2, S3, S4} "; 
+				+ "ASSUME 4 = Cardinality(S)\n"
+				+ "====";
+		String expectedConfig = "CONSTANTS\nS = {S1,S2,S3,S4}\n"; 
 		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 }

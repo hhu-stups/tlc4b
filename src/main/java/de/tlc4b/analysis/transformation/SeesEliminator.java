@@ -24,7 +24,6 @@ import de.be4.classicalb.core.parser.node.PParseUnit;
 import de.be4.classicalb.core.parser.node.PPredicate;
 import de.be4.classicalb.core.parser.node.Start;
 import de.be4.classicalb.core.parser.util.Utils;
-import de.tlc4b.TLC4BGlobals;
 
 public class SeesEliminator extends DepthFirstAdapter {
 
@@ -32,19 +31,16 @@ public class SeesEliminator extends DepthFirstAdapter {
 	private final Map<String, Start> parsedMachines;
 	private final ArrayList<String> resolvedMachines;
 
-	public static void eliminateSeesClauses(Start start,
-			Map<String, Start> parsedMachines) {
-		new SeesEliminator(start, parsedMachines, new ArrayList<String>());
+	public static void eliminateSeesClauses(Start start, Map<String, Start> parsedMachines) {
+		new SeesEliminator(start, parsedMachines, new ArrayList<>());
 	}
 
-	private void eliminateSeenMachinesRecursively(Start start,
-			Map<String, Start> parsedMachines,
-			ArrayList<String> resolvedMachines) {
+	private void eliminateSeenMachinesRecursively(Start start, Map<String, Start> parsedMachines,
+	                                              ArrayList<String> resolvedMachines) {
 		new SeesEliminator(start, parsedMachines, resolvedMachines);
 	}
 
-	private SeesEliminator(Start start, Map<String, Start> parsedMachines,
-			ArrayList<String> resolvedMachines) {
+	private SeesEliminator(Start start, Map<String, Start> parsedMachines, ArrayList<String> resolvedMachines) {
 		this.main = start;
 		this.parsedMachines = parsedMachines;
 		this.resolvedMachines = resolvedMachines;
@@ -55,14 +51,12 @@ public class SeesEliminator extends DepthFirstAdapter {
 	public void inASeesMachineClause(ASeesMachineClause node) {
 		for (PMachineReferenceNoParams pExpression : node.getMachineNames()) {
 			AMachineReferenceNoParams id = (AMachineReferenceNoParams) pExpression;
-			String machineName = Utils
-					.getTIdentifierListAsString(id.getMachineName());
+			String machineName = Utils.getTIdentifierListAsString(id.getMachineName());
 			if (!resolvedMachines.contains(machineName)) {
 				resolvedMachines.add(machineName);
 				Start start = parsedMachines.get(machineName);
 				DefinitionsEliminator.eliminateDefinitions(start);
-				eliminateSeenMachinesRecursively(start, parsedMachines,
-						resolvedMachines);
+				eliminateSeenMachinesRecursively(start, parsedMachines, resolvedMachines);
 				new MachineClauseAdder(main, start);
 				if (node.parent() != null) {
 					node.replaceBy(null);
@@ -71,29 +65,26 @@ public class SeesEliminator extends DepthFirstAdapter {
 		}
 	}
 
-	class MachineClauseAdder extends DepthFirstAdapter {
-		private final ArrayList<PMachineClause> machineClausesList;
+	static class MachineClauseAdder extends DepthFirstAdapter {
 		private final HashMap<Class<? extends PMachineClause>, PMachineClause> machineClauseHashMap;
 		private final LinkedList<PMachineClause> additionalMachineClauseList;
 
 		public MachineClauseAdder(Start main, Start seenMachineStart) {
-			this.machineClausesList = new ArrayList<PMachineClause>();
-			this.machineClauseHashMap = new LinkedHashMap<Class<? extends PMachineClause>, PMachineClause>();
-			this.additionalMachineClauseList = new LinkedList<PMachineClause>();
+			ArrayList<PMachineClause> machineClausesList = new ArrayList<>();
+			this.machineClauseHashMap = new LinkedHashMap<>();
+			this.additionalMachineClauseList = new LinkedList<>();
 
 			PParseUnit pParseUnit = main.getPParseUnit();
 			AAbstractMachineParseUnit machineParseUnit = (AAbstractMachineParseUnit) pParseUnit;
 
-			for (PMachineClause machineClause : machineParseUnit
-					.getMachineClauses()) {
+			for (PMachineClause machineClause : machineParseUnit.getMachineClauses()) {
 				machineClausesList.add(machineClause);
-				machineClauseHashMap.put(machineClause.getClass(),
-						machineClause);
+				machineClauseHashMap.put(machineClause.getClass(), machineClause);
 			}
 
 			seenMachineStart.apply(this);
 
-			LinkedList<PMachineClause> newMachineClauseList = new LinkedList<PMachineClause>();
+			LinkedList<PMachineClause> newMachineClauseList = new LinkedList<>();
 			for (PMachineClause pMachineClause : machineClausesList) {
 				pMachineClause.replaceBy(null); // delete parent of clause
 				newMachineClauseList.add(pMachineClause);
@@ -104,46 +95,38 @@ public class SeesEliminator extends DepthFirstAdapter {
 
 		@Override
 		public void caseAConstantsMachineClause(AConstantsMachineClause node) {
-			AConstantsMachineClause main = (AConstantsMachineClause) machineClauseHashMap
-					.get(node.getClass());
+			AConstantsMachineClause main = (AConstantsMachineClause) machineClauseHashMap.get(node.getClass());
 
 			if (main == null) {
 				additionalMachineClauseList.add(node);
 			} else {
-				ArrayList<PExpression> oldConstantsList = new ArrayList<PExpression>(
-						main.getIdentifiers());
-				ArrayList<PExpression> newConstantsList = new ArrayList<PExpression>();
+				ArrayList<PExpression> oldConstantsList = new ArrayList<>(main.getIdentifiers());
+				ArrayList<PExpression> newConstantsList = new ArrayList<>();
 				for (PExpression pExpression : oldConstantsList) {
 					pExpression.replaceBy(null); // delete parent
 					newConstantsList.add(pExpression);
 				}
-				ArrayList<PExpression> otherConstants = new ArrayList<PExpression>(
-						node.getIdentifiers());
+				ArrayList<PExpression> otherConstants = new ArrayList<>(node.getIdentifiers());
 
 				for (PExpression pExpression : otherConstants) {
 					pExpression.replaceBy(null); // delete parent
 					newConstantsList.add(pExpression);
-
 				}
 				main.setIdentifiers(newConstantsList);
 			}
 		}
 
-		public void caseAAbstractConstantsMachineClause(
-				AAbstractConstantsMachineClause node) {
-			AAbstractConstantsMachineClause main = (AAbstractConstantsMachineClause) machineClauseHashMap
-					.get(node.getClass());
+		public void caseAAbstractConstantsMachineClause(AAbstractConstantsMachineClause node) {
+			AAbstractConstantsMachineClause main = (AAbstractConstantsMachineClause) machineClauseHashMap.get(node.getClass());
 
 			if (main != null) {
-				ArrayList<PExpression> oldConstantsList = new ArrayList<PExpression>(
-						main.getIdentifiers());
-				ArrayList<PExpression> newConstantsList = new ArrayList<PExpression>();
+				ArrayList<PExpression> oldConstantsList = new ArrayList<>(main.getIdentifiers());
+				ArrayList<PExpression> newConstantsList = new ArrayList<>();
 				for (PExpression pExpression : oldConstantsList) {
 					pExpression.replaceBy(null); // delete parent
 					newConstantsList.add(pExpression);
 				}
-				ArrayList<PExpression> otherConstants = new ArrayList<PExpression>(
-						node.getIdentifiers());
+				ArrayList<PExpression> otherConstants = new ArrayList<>(node.getIdentifiers());
 
 				for (PExpression pExpression : otherConstants) {
 					pExpression.replaceBy(null); // delete parent
@@ -159,8 +142,7 @@ public class SeesEliminator extends DepthFirstAdapter {
 
 		@Override
 		public void caseAPropertiesMachineClause(APropertiesMachineClause node) {
-			APropertiesMachineClause main = (APropertiesMachineClause) machineClauseHashMap
-					.get(node.getClass());
+			APropertiesMachineClause main = (APropertiesMachineClause) machineClauseHashMap.get(node.getClass());
 			if (main == null) {
 				additionalMachineClauseList.add(node);
 			} else {
@@ -174,21 +156,18 @@ public class SeesEliminator extends DepthFirstAdapter {
 
 		@Override
 		public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
-			ADefinitionsMachineClause main = (ADefinitionsMachineClause) machineClauseHashMap
-					.get(node.getClass());
+			ADefinitionsMachineClause main = (ADefinitionsMachineClause) machineClauseHashMap.get(node.getClass());
 
 			if (main == null) {
 				additionalMachineClauseList.add(node);
 			} else {
-				ArrayList<PDefinition> oldDefinitions = new ArrayList<PDefinition>(
-						main.getDefinitions());
-				ArrayList<PDefinition> newDefinitionsList = new ArrayList<PDefinition>();
+				ArrayList<PDefinition> oldDefinitions = new ArrayList<>(main.getDefinitions());
+				ArrayList<PDefinition> newDefinitionsList = new ArrayList<>();
 				for (PDefinition pExpression : oldDefinitions) {
 					pExpression.replaceBy(null); // delete parent
 					newDefinitionsList.add(pExpression);
 				}
-				ArrayList<PDefinition> otherConstants = new ArrayList<PDefinition>(
-						node.getDefinitions());
+				ArrayList<PDefinition> otherConstants = new ArrayList<>(node.getDefinitions());
 
 				for (PDefinition definition : otherConstants) {
 					if (definition.parent() != null) {
@@ -202,22 +181,17 @@ public class SeesEliminator extends DepthFirstAdapter {
 		}
 
 		public void caseAAssertionsMachineClause(AAssertionsMachineClause node) {
-			if (TLC4BGlobals.isCheckOnlyMainAssertions())
-				return;
-			AAssertionsMachineClause main = (AAssertionsMachineClause) machineClauseHashMap
-					.get(node.getClass());
+			AAssertionsMachineClause main = (AAssertionsMachineClause) machineClauseHashMap.get(node.getClass());
 			if (main == null) {
 				additionalMachineClauseList.add(node);
 			} else {
-				ArrayList<PPredicate> old = new ArrayList<PPredicate>(
-						main.getPredicates());
-				ArrayList<PPredicate> newList = new ArrayList<PPredicate>();
+				ArrayList<PPredicate> old = new ArrayList<>(main.getPredicates());
+				ArrayList<PPredicate> newList = new ArrayList<>();
 				for (PPredicate p : old) {
 					p.replaceBy(null); // delete parent
 					newList.add(p);
 				}
-				ArrayList<PPredicate> otherAssertions = new ArrayList<PPredicate>(
-						node.getPredicates());
+				ArrayList<PPredicate> otherAssertions = new ArrayList<>(node.getPredicates());
 
 				for (PPredicate p : otherAssertions) {
 					if (p.parent() != null) {
@@ -228,8 +202,6 @@ public class SeesEliminator extends DepthFirstAdapter {
 				}
 				main.setPredicates(newList);
 			}
-
 		}
-
 	}
 }

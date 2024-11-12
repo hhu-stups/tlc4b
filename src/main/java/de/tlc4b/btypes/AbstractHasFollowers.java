@@ -8,7 +8,7 @@ public abstract class AbstractHasFollowers implements BType {
 
 	public abstract boolean contains(BType other);
 
-	private ArrayList<Object> followers = new ArrayList<Object>();
+	private final ArrayList<Object> followers = new ArrayList<>();
 
 	public ArrayList<Object> getFollowers() {
 		return this.followers;
@@ -20,7 +20,7 @@ public abstract class AbstractHasFollowers implements BType {
 	}
 
 	public String printFollower() {
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		res.append("[");
 		for (Object o : followers) {
 			if (!(o instanceof Node)) {
@@ -41,7 +41,7 @@ public abstract class AbstractHasFollowers implements BType {
 		if (this == newType) {
 			return;
 		}
-		ArrayList<Object> list = new ArrayList<Object>(followers);
+		ArrayList<Object> list = new ArrayList<>(followers);
 		for (Object obj : list) {
 			if (obj instanceof Node) {
 				typechecker.setType((Node) obj, newType);

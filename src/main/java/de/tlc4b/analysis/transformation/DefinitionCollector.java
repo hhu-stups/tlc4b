@@ -23,11 +23,11 @@ import de.be4.classicalb.core.parser.node.Start;
 
 public class DefinitionCollector extends DepthFirstAdapter {
 
-	private Hashtable<String, PDefinition> definitionsTable;
+	private final Hashtable<String, PDefinition> definitionsTable;
 	private ADefinitionsMachineClause definitionsMachineClause;
 
 	public Hashtable<String, PDefinition> getDefinitions() {
-		return new Hashtable<String, PDefinition>(definitionsTable);
+		return new Hashtable<>(definitionsTable);
 	}
 
 	public ADefinitionsMachineClause getDefinitionsMachineClause() {
@@ -35,7 +35,7 @@ public class DefinitionCollector extends DepthFirstAdapter {
 	}
 
 	public DefinitionCollector(Start tree) {
-		definitionsTable = new Hashtable<String, PDefinition>();
+		definitionsTable = new Hashtable<>();
 		tree.apply(this);
 	}
 
@@ -47,19 +47,19 @@ public class DefinitionCollector extends DepthFirstAdapter {
 	@Override
 	public void caseAPredicateDefinitionDefinition(
 			APredicateDefinitionDefinition node) {
-		definitionsTable.put(node.getName().getText().toString(), node);
+		definitionsTable.put(node.getName().getText(), node);
 	}
 
 	@Override
 	public void caseASubstitutionDefinitionDefinition(
 			ASubstitutionDefinitionDefinition node) {
-		definitionsTable.put(node.getName().getText().toString(), node);
+		definitionsTable.put(node.getName().getText(), node);
 	}
 
 	@Override
 	public void caseAExpressionDefinitionDefinition(
 			AExpressionDefinitionDefinition node) {
-		definitionsTable.put(node.getName().getText().toString(), node);
+		definitionsTable.put(node.getName().getText(), node);
 	}
 
 	/***************************************************************************

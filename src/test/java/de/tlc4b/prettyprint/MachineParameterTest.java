@@ -24,12 +24,13 @@ public class MachineParameterTest {
 				+ "CONSTRAINTS a : {1,2,3}\n"
 				+ "END";
 		
-		String expectedModule = "---- MODULE test----\n" 
+		String expectedModule = "---- MODULE test ----\n"
 				+ "VARIABLES a\n"
-				+ "Init == a \\in {1,2,3}\n"
+				+ "Init == a \\in {1, 2, 3}\n"
+				+ "\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<a>>\n"
-				+ "======";
-		String expectedConfig = "INIT Init\nNEXT Next";
+				+ "====";
+		String expectedConfig = "INIT Init\nNEXT Next\n";
 		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -51,10 +52,10 @@ public class MachineParameterTest {
 		String machine = "MACHINE test(AA)\n"
 				+ "END";
 		
-		String expectedModule = "---- MODULE test----\n" 
+		String expectedModule = "---- MODULE test ----\n"
 				+ "CONSTANTS AA\n"
-				+ "======";
-		String expectedConfig = "CONSTANTS AA = {AA1, AA2, AA3}";
+				+ "====";
+		String expectedConfig = "CONSTANTS\nAA = {AA1,AA2,AA3}\n";
 		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
@@ -69,7 +70,7 @@ public class MachineParameterTest {
 				+ "a == 1\n"
 				+ "ASSUME Cardinality(B) = 2\n"
 				+ "====";
-		String expectedConfig = "CONSTANTS B = {B1, B2, B3}";
+		String expectedConfig = "CONSTANTS\nB = {B1,B2,B3}\n";
 		compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	

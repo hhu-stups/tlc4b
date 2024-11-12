@@ -3,6 +3,7 @@ package de.tlc4b.analysis;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
@@ -17,15 +18,15 @@ import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.exceptions.ScopeException;
 
 public class PrimedNodesMarker extends DepthFirstAdapter {
-	private ArrayList<POperation> operations;
-	private MachineContext machineContext;
-	private HashSet<Node> primedNodes;
+	private final ArrayList<POperation> operations;
+	private final MachineContext machineContext;
+	private final HashSet<Node> primedNodes;
 
 	private HashSet<Node> nodesToPrime;
 
-	public PrimedNodesMarker(ArrayList<POperation> operations,
-			MachineContext machineContext) {
-		this.primedNodes = new HashSet<Node>();
+	public PrimedNodesMarker(ArrayList<POperation> operations, MachineContext machineContext,
+	                         Set<Node> primedNodes) {
+		this.primedNodes = new HashSet<>(primedNodes);
 		this.operations = operations;
 		this.machineContext = machineContext;
 	}
@@ -41,25 +42,22 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getLhsExpression());
+		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
-			if (machineContext.getVariables().values().contains(ref)) {
+			if (machineContext.getVariables().containsValue(ref)) {
 				primedNodes.add(e);
 			}
-
 		}
 	}
 
 	@Override
-	public void caseABecomesElementOfSubstitution(
-			ABecomesElementOfSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+	public void caseABecomesElementOfSubstitution(ABecomesElementOfSubstitution node) {
+		List<PExpression> copy = new ArrayList<>(
+			node.getIdentifiers());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
-			if (machineContext.getVariables().values().contains(ref)) {
+			if (machineContext.getVariables().containsValue(ref)) {
 				primedNodes.add(e);
 			}
 		}
@@ -67,9 +65,8 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
-		nodesToPrime = new HashSet<Node>();
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
+		nodesToPrime = new HashSet<>();
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
 			nodesToPrime.add(ref);
@@ -91,14 +88,14 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseAPrimedIdentifierExpression(APrimedIdentifierExpression node) {
-		if(nodesToPrime != null){
+		if (nodesToPrime != null){
 			Node ref = machineContext.getReferences().get(node);
 			if (nodesToPrime.contains(ref)) {
 				return;
 			}
 		}
 		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
-		throw new ScopeException("Unkown identifier: '"+name+"$0'");
+		throw new ScopeException("Unknown identifier: '"+name+"$0'");
 	}
 
 	public boolean isPrimed(Node node) {

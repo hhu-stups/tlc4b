@@ -1,10 +1,9 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.*;
-
 import org.junit.Test;
 
-
+import static de.tlc4b.util.TestUtil.*;
+import static org.junit.Assert.assertEquals;
 
 public class FunctionTest {
 
@@ -97,7 +96,7 @@ public class FunctionTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME [{1} -> {1}] = [{1} -> {1}]\n"
 				+ "====";
-		compareEquals(expected, machine);
+		assertEquals(expected, translate(machine));
 	}
 	
 
@@ -109,7 +108,7 @@ public class FunctionTest {
 				+ "EXTENDS Functions\n"
 				+ "ASSUME {} = ParFunc({1, 2}, {1, 2})\n"
 				+ "====";
-		compareEquals(expected, machine);
+		assertEquals(expected, translate(machine));
 	}
 	
 }

@@ -57,15 +57,15 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	private final ArrayList<LTLBPredicate> bPredicates;
 	private final Hashtable<String, AIdentifierExpression> ltlIdentifierTable;
 
-	private ArrayList<Hashtable<String, AIdentifierExpression>> contextTable;
+	private final ArrayList<Hashtable<String, AIdentifierExpression>> contextTable;
 
 	public LTLFormulaVisitor(String name, MachineContext machineContext) {
 		this.name = name;
 		this.machineContext = machineContext;
-		this.bPredicates = new ArrayList<LTLBPredicate>();
-		this.ltlNodeToBNodeTable = new LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node>();
-		this.ltlIdentifierTable = new Hashtable<String, AIdentifierExpression>();
-		this.contextTable = new ArrayList<Hashtable<String, AIdentifierExpression>>();
+		this.bPredicates = new ArrayList<>();
+		this.ltlNodeToBNodeTable = new LinkedHashMap<>();
+		this.ltlIdentifierTable = new Hashtable<>();
+		this.contextTable = new ArrayList<>();
 	}
 
 	public void parseDefinition(AExpressionDefinitionDefinition def) {
@@ -78,7 +78,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 			this.ltlFormulaStart = parseLTLFormula(ltlFormula);
 		} catch (Exception e) {
 			String message = "Parsing definition " + name + " (line " + def.getStartPos().getLine() + "):\n";
-			throw new LTLParseException(message + e.getMessage());
+			throw new LTLParseException(message + e.getMessage(), e);
 		}
 	}
 
@@ -86,7 +86,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		try {
 			this.ltlFormulaStart = parseLTLFormula(ltlString);
 		} catch (Exception e) {
-			throw new LTLParseException(e.getMessage());
+			throw new LTLParseException(e);
 		}
 	}
 
@@ -132,7 +132,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 		PushbackReader r = new PushbackReader(reader);
 		Lexer l = new LtlLexer(r);
 		Parser p = new Parser(l);
-		Start ast = null;
+		Start ast;
 		ast = p.parse();
 		return ast;
 	}
@@ -150,13 +150,12 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	}
 
 	private de.be4.classicalb.core.parser.node.Start parseBPredicate(String text) {
-		String bPredicate = "#PREDICATE " + text;
 		BParser parser = new BParser("Testing");
-		de.be4.classicalb.core.parser.node.Start start = null;
+		de.be4.classicalb.core.parser.node.Start start;
 		try {
-			start = parser.parse(bPredicate, false);
+			start = parser.parsePredicate(text);
 		} catch (BCompoundException e) {
-			throw new LTLParseException(e.getMessage());
+			throw new LTLParseException(e);
 		}
 
 		return start;
@@ -177,12 +176,12 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 			String bPredicateString, PLtl ltl) {
 		// create an identifier (b ast node) for the parameter of the
 		// quantification
-		List<TIdentifierLiteral> list = new ArrayList<TIdentifierLiteral>();
+		List<TIdentifierLiteral> list = new ArrayList<>();
 		list.add(new TIdentifierLiteral(parameterName));
 		AIdentifierExpression parameterNode = new AIdentifierExpression(list);
 
 		// add the created identifier to the current context
-		Hashtable<String, AIdentifierExpression> currentContext = new Hashtable<String, AIdentifierExpression>();
+		Hashtable<String, AIdentifierExpression> currentContext = new Hashtable<>();
 		currentContext.put(parameterName, parameterNode);
 		this.contextTable.add(currentContext);
 
@@ -208,9 +207,9 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	}
 
 	private LinkedHashMap<String, Node> getUnifiedContext() {
-		LinkedHashMap<String, Node> context = new LinkedHashMap<String, Node>();
-		for (int i = 0; i < contextTable.size(); i++) {
-			context.putAll(contextTable.get(i));
+		LinkedHashMap<String, Node> context = new LinkedHashMap<>();
+		for (Hashtable<String, AIdentifierExpression> stringAIdentifierExpressionHashtable : contextTable) {
+			context.putAll(stringAIdentifierExpressionHashtable);
 		}
 		return context;
 	}

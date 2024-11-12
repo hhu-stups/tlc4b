@@ -34,7 +34,7 @@ import de.tlc4b.exceptions.SubstitutionException;
 /**
  * 
  * This class is a tree walker which searches for all assigned variables in a
- * branch of a operation body. The algorithm works in a bottom up style. The
+ * branch of an operation body. The algorithm works in a bottom up style. The
  * {@link assignedVariablesTable} will finally contain all assigned variables
  * for a node. For example a {@link AParallelSubstitution} node will get a list
  * of all assigned variables of its children. Operation output parameter are
@@ -47,7 +47,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	private final MachineContext machineContext;
 
 	public AssignedVariablesFinder(MachineContext machineContext) {
-		this.assignedVariablesTable = new Hashtable<Node, HashSet<Node>>();
+		this.assignedVariablesTable = new Hashtable<>();
 		this.machineContext = machineContext;
 		machineContext.getStartNode().apply(this);
 
@@ -65,9 +65,9 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	public void defaultOut(final Node node) {
 		/*
 		 * This case is important if the parent node is not visited by the
-		 * visitor. The assigned variables are transfered up in the tree. e.g.
+		 * visitor. The assigned variables are transferred up in the tree. e.g.
 		 * if the parent node is a block substitution, the assigned variables
-		 * are transfered to parent of the block substitution
+		 * are transferred to parent of the block substitution
 		 */
 		HashSet<Node> assignedVariables = assignedVariablesTable.get(node);
 		if (null != assignedVariables) {
@@ -102,14 +102,11 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 		/*
 		 * In the INITIALISATION clause all variables must be assigned.
 		 */
-		HashSet<Node> allVariables = new HashSet<Node>(machineContext
-				.getVariables().values());
-		HashSet<Node> foundVariables = new HashSet<Node>(
-				getVariableList(node.getSubstitutions()));
+		HashSet<Node> allVariables = new HashSet<>(machineContext.getVariables().values());
+		HashSet<Node> foundVariables = new HashSet<>(getVariableList(node.getSubstitutions()));
 
 		if (allVariables.retainAll(foundVariables)) {
-			HashSet<Node> missingVariables = new HashSet<Node>(machineContext
-					.getVariables().values());
+			HashSet<Node> missingVariables = new HashSet<>(machineContext.getVariables().values());
 			missingVariables.removeAll(allVariables);
 			throw new SubstitutionException(
 					"Initialisation Error: Missing assignment for variable(s): "
@@ -120,9 +117,8 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		HashSet<Node> list = new HashSet<Node>();
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>();
 		for (PExpression e : copy) {
 			Node identifier = machineContext.getReferenceNode(e);
 			list.add(identifier);
@@ -132,17 +128,15 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	}
 
 	public void caseAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getLhsExpression());
-		HashSet<Node> list = new HashSet<Node>();
+		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
+		HashSet<Node> list = new HashSet<>();
 		for (PExpression e : copy) {
 			if (e instanceof AIdentifierExpression) {
 				Node identifier = machineContext.getReferenceNode(e);
 				list.add(identifier);
 			} else {
 				AFunctionExpression func = (AFunctionExpression) e;
-				Node identifier = machineContext.getReferenceNode(
-						func.getIdentifier());
+				Node identifier = machineContext.getReferenceNode(func.getIdentifier());
 				list.add(identifier);
 			}
 		}
@@ -151,12 +145,9 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseABecomesElementOfSubstitution(
-			ABecomesElementOfSubstitution node) {
-
-		List<PExpression> copy = new ArrayList<PExpression>(
-				node.getIdentifiers());
-		HashSet<Node> list = new HashSet<Node>();
+	public void caseABecomesElementOfSubstitution(ABecomesElementOfSubstitution node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		HashSet<Node> list = new HashSet<>();
 		for (PExpression e : copy) {
 			Node identifier = machineContext.getReferenceNode(e);
 			list.add(identifier);
@@ -167,9 +158,8 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseAChoiceSubstitution(AChoiceSubstitution node) {
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getSubstitutions());
-		HashSet<Node> list = new HashSet<Node>();
+		List<PSubstitution> copy = new ArrayList<>(node.getSubstitutions());
+		HashSet<Node> list = new HashSet<>();
 		for (PSubstitution e : copy) {
 			e.apply(this);
 			list.addAll(getVariableList(e));
@@ -181,19 +171,16 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	@Override
 	public void caseAChoiceOrSubstitution(AChoiceOrSubstitution node) {
 		node.getSubstitution().apply(this);
-		assignedVariablesTable.put(node,
-				getVariableList(node.getSubstitution()));
+		assignedVariablesTable.put(node, getVariableList(node.getSubstitution()));
 		defaultOut(node);
 	}
 
 	@Override
 	public void caseAIfSubstitution(AIfSubstitution node) {
-		HashSet<Node> list = new HashSet<Node>();
 		node.getThen().apply(this);
-		list.addAll(getVariableList(node.getThen()));
+		HashSet<Node> list = new HashSet<>(getVariableList(node.getThen()));
 
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getElsifSubstitutions());
+		List<PSubstitution> copy = new ArrayList<>(node.getElsifSubstitutions());
 		for (PSubstitution e : copy) {
 			e.apply(this);
 			list.addAll(getVariableList(e));
@@ -209,9 +196,8 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseAIfElsifSubstitution(AIfElsifSubstitution node) {
-		HashSet<Node> list = new HashSet<Node>();
 		node.getThenSubstitution().apply(this);
-		list.addAll(getVariableList(node.getThenSubstitution()));
+		HashSet<Node> list = new HashSet<>(getVariableList(node.getThenSubstitution()));
 
 		assignedVariablesTable.put(node, list);
 		defaultOut(node);
@@ -219,17 +205,16 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseAParallelSubstitution(AParallelSubstitution node) {
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getSubstitutions());
+		List<PSubstitution> copy = new ArrayList<>(node.getSubstitutions());
 		for (PSubstitution e : copy) {
 			e.apply(this);
 		}
-		HashSet<Node> list = new HashSet<Node>();
+		HashSet<Node> list = new HashSet<>();
 		for (PSubstitution e : copy) {
 			HashSet<Node> listOfe = getVariableList(e);
-			HashSet<Node> temp = new HashSet<Node>(list);
+			HashSet<Node> temp = new HashSet<>(list);
 			temp.retainAll(listOfe);
-			if (temp.size() > 0) {
+			if (!temp.isEmpty()) {
 				throw new SubstitutionException("The variable(s) " + temp
 						+ " are assigned twice");
 			}
@@ -241,11 +226,9 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseASelectSubstitution(ASelectSubstitution node) {
-		HashSet<Node> list = new HashSet<Node>();
 		node.getThen().apply(this);
-		list.addAll(getVariableList(node.getThen()));
-		List<PSubstitution> copy = new ArrayList<PSubstitution>(
-				node.getWhenSubstitutions());
+		HashSet<Node> list = new HashSet<>(getVariableList(node.getThen()));
+		List<PSubstitution> copy = new ArrayList<>(node.getWhenSubstitutions());
 		for (PSubstitution e : copy) {
 			e.apply(this);
 			list.addAll(getVariableList(e));
@@ -261,16 +244,13 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	@Override
 	public void caseASelectWhenSubstitution(ASelectWhenSubstitution node) {
 		node.getSubstitution().apply(this);
-		assignedVariablesTable.put(node,
-				getVariableList(node.getSubstitution()));
-		assignedVariablesTable.put(node.parent(),
-				getVariableList(node.getSubstitution()));
+		assignedVariablesTable.put(node, getVariableList(node.getSubstitution()));
+		assignedVariablesTable.put(node.parent(), getVariableList(node.getSubstitution()));
 	}
 
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
-		List<PDefinition> copy = new ArrayList<PDefinition>(
-				node.getDefinitions());
+		List<PDefinition> copy = new ArrayList<>(node.getDefinitions());
 		for (PDefinition e : copy) {
 			e.apply(this);
 		}
@@ -286,7 +266,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseASkipSubstitution(ASkipSubstitution node) {
-		HashSet<Node> list = new HashSet<Node>();
+		HashSet<Node> list = new HashSet<>();
 		assignedVariablesTable.put(node, list);
 		defaultOut(node);
 	}

@@ -3,7 +3,7 @@ package de.tlc4b.tla;
 import de.be4.classicalb.core.parser.node.Node;
 
 public class TLADefinition {
-	private Node name;
+	private final Node name;
 	private Node definition;
 	private Integer intValue;
 	

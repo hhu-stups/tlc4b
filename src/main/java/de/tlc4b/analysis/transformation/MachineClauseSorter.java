@@ -1,7 +1,6 @@
 package de.tlc4b.analysis.transformation;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -36,13 +35,13 @@ public class MachineClauseSorter extends DepthFirstAdapter {
 
 		LinkedList<PMachineClause> machineClauses = node.getMachineClauses();
 
-		PMachineClauseComparator comperator = new PMachineClauseComparator();
+		PMachineClauseComparator comparator = new PMachineClauseComparator();
 		// Sort the machine clauses:
 		// 1. import clauses
 		// 2. declaration clauses
 		// 3. properties clauses
 		// 4. operation clauses
-		Collections.sort(machineClauses, comperator);
+		machineClauses.sort(comparator);
 	}
 }
 
@@ -50,7 +49,7 @@ class PMachineClauseComparator implements Comparator<PMachineClause>,
 		Serializable {
 
 	private static final long serialVersionUID = 2606332412649258695L;
-	private static Hashtable<Object, Integer> priority = new Hashtable<Object, Integer>();
+	private static final Hashtable<Object, Integer> priority = new Hashtable<>();
 	static {
 		// declarations clauses
 
@@ -72,16 +71,7 @@ class PMachineClauseComparator implements Comparator<PMachineClause>,
 	}
 
 	public int compare(PMachineClause arg0, PMachineClause arg1) {
-		if (priority.get(arg0.getClass()).intValue() < priority.get(
-				arg1.getClass()).intValue()) {
-			return 1;
-		}
-		if (priority.get(arg0.getClass()).intValue() > priority.get(
-				arg1.getClass()).intValue()) {
-			return -1;
-		}
-
-		return 0;
+		return priority.get(arg1.getClass()).compareTo(priority.get(arg0.getClass()));
 	}
 
 }

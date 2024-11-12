@@ -1,26 +1,16 @@
 package de.tlc4b.ltl;
 
-
-import static de.tlc4b.util.TestUtil.compareEqualsConfig;
-import static de.tlc4b.util.TestUtil.compareLTLFormula;
-
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.exceptions.LTLParseException;
 import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.exceptions.TypeErrorException;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static de.tlc4b.util.TestUtil.compareLTLFormula;
+import static de.tlc4b.util.TestUtil.compareModuleAndConfig;
 
 public class LTLFormulaTest {
-
-	@BeforeClass
-	public static void setUp(){
-		TLC4BGlobals.setTestingMode(true);
-	}
-	
 	@Test (expected = ScopeException.class)
 	public void testScopeException() throws Exception {
 		String machine = "MACHINE test\n"
@@ -59,7 +49,7 @@ public class LTLFormulaTest {
 	@Test 
 	public void testFinally() throws Exception {
 		String machine = "MACHINE test END";
-		compareLTLFormula("<>(1=1)", machine, "F{1 = 1}");
+		compareLTLFormula("<>(1 = 1)", machine, "F{1 = 1}");
 	}
 	
 	@Test 
@@ -222,7 +212,7 @@ public class LTLFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = skip\n"
 				+ "END";
-		String expected = "([]<><<foo>>_vars\\/[]<>~ENABLED(foo)\\/[]<>ENABLED(foo/\\x'=x))=>TRUE";
+		String expected = "([]<><<foo>>_vars \\/ []<>~ENABLED(foo) \\/ []<>ENABLED(foo /\\ x' = x)) => TRUE";
 		compareLTLFormula(expected, machine, "WF(foo) => true");
 	}
 	
@@ -234,14 +224,14 @@ public class LTLFormulaTest {
 				+ "INITIALISATION x := 1\n"
 				+ "OPERATIONS foo = x := 1"
 				+ "END";
-		String expected = "([]<><<foo>>_vars\\/<>[]~ENABLED(foo)\\/[]<>ENABLED(foo/\\x'=x))=>TRUE";
+		String expected = "([]<><<foo>>_vars \\/ <>[]~ENABLED(foo) \\/ []<>ENABLED(foo /\\ x' = x)) => TRUE";
 		compareLTLFormula(expected, machine, "SF(foo) => true");
 	}
 	
 	@Test 
 	public void testExistentialQuantification() throws Exception {
 		String machine = "MACHINE test END";
-		compareLTLFormula(" \\E p \\in {1}: p = 1", machine, "#p.({p=1} & {p = 1})");
+		compareLTLFormula("\\E p \\in {1}: p = 1", machine, "#p.({p=1} & {p = 1})");
 	}
 	
 	@Test 
@@ -284,7 +274,7 @@ public class LTLFormulaTest {
 				+ "====";
 		final String config = "SPECIFICATION Spec\nINVARIANT Invariant\nPROPERTIES ASSERT_LTL\n";
 		
-		compareEqualsConfig(expected, config, machine);
+		compareModuleAndConfig(expected, config, machine);
 	}
 	
 }

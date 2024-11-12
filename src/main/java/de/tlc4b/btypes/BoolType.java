@@ -7,7 +7,7 @@ import de.tlc4b.exceptions.UnificationException;
 
 public class BoolType implements BType {
 
-	private static BoolType instance = new BoolType();
+	private static final BoolType instance = new BoolType();
 
 	public static BoolType getInstance() {
 		return instance;
@@ -37,10 +37,7 @@ public class BoolType implements BType {
 	}
 
 	public boolean compare(BType other) {
-		if (other instanceof UntypedType || other instanceof BoolType)
-			return true;
-		else
-			return false;
+		return other instanceof UntypedType || other instanceof BoolType;
 	}
 
 	public boolean containsInfiniteType() {

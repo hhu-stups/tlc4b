@@ -112,7 +112,7 @@ public class ScopeTest {
 	}
 
 	@Test(expected = ScopeException.class)
-	public void testUnkownOperation() throws Exception {
+	public void testUnknownOperation() throws Exception {
 		String machine = "MACHINE test\n" + "INITIALISATION foo \n" + "END";
 		checkMachine(machine);
 	}

@@ -12,9 +12,9 @@ public abstract class ConfigFileAssignment {
 	public abstract String getString(Renamer renamer);
 	
 	public String getIdentifier(AIdentifierExpression node) {
-		StringBuffer res = new StringBuffer();
+		StringBuilder res = new StringBuilder();
 		
-		List<TIdentifierLiteral> copy = new ArrayList<TIdentifierLiteral>(
+		List<TIdentifierLiteral> copy = new ArrayList<>(
 				node.getIdentifier());
 		for (TIdentifierLiteral e : copy) {
 			res.append(e.getText());

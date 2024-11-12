@@ -1,4 +1,4 @@
-image: openjdk:8-jdk-slim
+image: eclipse-temurin:8
 
 stages:
   - test
@@ -6,14 +6,14 @@ stages:
 
 variables:
   GRADLE_OPTIONS: --no-daemon --info --stacktrace --warning-mode=all
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
 
 cache:
   paths:
-    - .gradle/wrapper
     - .gradle/caches
-
-before_script:
-  - export GRADLE_USER_HOME=`pwd`/.gradle
+    - .gradle/native
+    - .gradle/notifications
+    - .gradle/wrapper
 
 tests:
   stage: test
@@ -21,18 +21,22 @@ tests:
 
 tests:jdk-11:
   extends: tests
-  image: openjdk:11-jdk-slim
+  image: eclipse-temurin:11
 
 tests:jdk-17:
   extends: tests
-  image: openjdk:17-jdk-slim
+  image: eclipse-temurin:17
+
+tests:jdk-21:
+  extends: tests
+  image: eclipse-temurin:21
 
 publish:
   stage: deploy
   script:
-    - openssl aes-256-cbc -pass "env:ENCRYPTION_PASSWORD" -d -a -md md5 -in secring.gpg.enc -out secring.gpg
-    - openssl aes-256-cbc -pass "env:ENCRYPTION_PASSWORD" -d -a -md md5 -in pubring.gpg.enc -out pubring.gpg
-    - openssl aes-256-cbc -pass "env:ENCRYPTION_PASSWORD" -d -a -md md5 -in gradle.properties.enc -out gradle.properties
+    - openssl aes-256-cbc -d -base64 -pbkdf2 -pass "env:ENCRYPTION_PASSWORD" -in gradle.properties.enc -out gradle.properties
+    - openssl aes-256-cbc -d -base64 -pbkdf2 -pass "env:ENCRYPTION_PASSWORD" -in pubring.gpg.enc -out pubring.gpg
+    - openssl aes-256-cbc -d -base64 -pbkdf2 -pass "env:ENCRYPTION_PASSWORD" -in secring.gpg.enc -out secring.gpg
     - ./gradlew ${GRADLE_OPTIONS} publish
   only:
     - master@general/stups/tlc4b
