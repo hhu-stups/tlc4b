@@ -57,7 +57,7 @@ public class TLCRunner {
 				+ separator + "java";
 		String classpath = System.getProperty("java.class.path");
 
-		List<String> command = Arrays.asList(jvm, "-cp", classpath, mainClass);
+		List<String> command = new ArrayList<>(Arrays.asList(jvm, "-cp", classpath, mainClass));
 		command.addAll(Arrays.asList(arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
