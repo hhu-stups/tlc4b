@@ -7,6 +7,7 @@ build.xml
 TODO.txt
 .gradle
 .settings
+.idea
 build
 src/test/java/testing
 src/test/resources/other
