@@ -50,10 +50,8 @@ public class TLCRunner {
 	private static Process startJVM(final String mainClass, final List<String> arguments)
 			throws IOException {
 
-		String separator = FileSystems.getDefault().getSeparator();
-
 		boolean isWindows = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows");
-		String jvm = System.getProperty("java.home") + separator + "bin" + separator + (isWindows ? "java.exe" : "java");
+		String jvm = System.getProperty("java.home") + File.separator + "bin" + File.separator + (isWindows ? "java.exe" : "java");
 		String classpath = System.getProperty("java.class.path");
 
 		List<String> command = new ArrayList<>();
