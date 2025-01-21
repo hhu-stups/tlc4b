@@ -53,7 +53,7 @@ public class TLCRunner {
 		String separator = FileSystems.getDefault().getSeparator();
 
 		boolean isWindows = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows");
-		String jvm = System.getProperty("java.home") + separator + "bin" + separator + (isWindows ? "java" : "java.exe");
+		String jvm = System.getProperty("java.home") + separator + "bin" + separator + (isWindows ? "java.exe" : "java");
 		String classpath = System.getProperty("java.class.path");
 
 		List<String> command = new ArrayList<>();
