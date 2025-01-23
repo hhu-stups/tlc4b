@@ -147,5 +147,31 @@ public class ConstantsTest {
 				+ "======";
 		compare(expected, machine);
 	}
+
+	@Test
+	public void testPropertiesDescPragma() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS n\n"
+				+ "PROPERTIES n = 1 /*@desc description*/\n"
+				+ "END";
+
+		String expected = "---- MODULE test----\n"
+				+ "n == 1\n"
+				+ "======";
+		compare(expected, machine);
+	}
+
+	@Test
+	public void testPropertiesLabelAndDescPragma() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "CONSTANTS n\n"
+				+ "PROPERTIES /*@label lbl1 */ n = 1 /*@desc description*/\n"
+				+ "END";
+
+		String expected = "---- MODULE test----\n"
+				+ "n == 1\n"
+				+ "======";
+		compare(expected, machine);
+	}
 	
 }
