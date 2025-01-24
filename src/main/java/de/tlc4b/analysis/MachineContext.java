@@ -16,9 +16,6 @@ import de.tlc4b.exceptions.ScopeException;
 import de.tlc4b.ltl.LTLBPredicate;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 
-import static de.tlc4b.util.UtilMethods.getIdentifierExpression;
-import static de.tlc4b.util.UtilMethods.getOperation;
-
 public class MachineContext extends DepthFirstAdapter {
 
 	private String machineName;
@@ -391,7 +388,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	private void extractIdentifierExpressions(List<PExpression> copy, Map<String, Node> addToMap) {
 		for (PExpression e : copy) {
-			AIdentifierExpression identifier = getIdentifierExpression(e);
+			AIdentifierExpression identifier = (AIdentifierExpression) e;
 			String name = Utils.getTIdentifierListAsString(identifier.getIdentifier());
 			exist(identifier.getIdentifier());
 			addToMap.put(name, identifier);
@@ -557,7 +554,7 @@ public class MachineContext extends DepthFirstAdapter {
 		List<POperation> copy = new ArrayList<>(node.getOperations());
 		// first collect all operations
 		for (POperation e : copy) {
-			AOperation op = getOperation(e);
+			AOperation op = (AOperation) e;
 			String name = Utils.getTIdentifierListAsString(op.getOpName());
 			// existString(name);
 			if (operations.containsKey(name)) {

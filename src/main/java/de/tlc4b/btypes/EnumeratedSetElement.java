@@ -2,9 +2,9 @@ package de.tlc4b.btypes;
 
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.PExpression;
+import de.be4.classicalb.core.parser.util.ASTBuilder;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.UnificationException;
-import de.tlc4b.util.UtilMethods;
 
 public class EnumeratedSetElement implements BType {
 	private final String name;
@@ -58,7 +58,7 @@ public class EnumeratedSetElement implements BType {
 	}
 
 	public PExpression createASTNode(Typechecker typechecker) {
-		AIdentifierExpression id = UtilMethods.createAIdentifierExpression(name);
+		AIdentifierExpression id = ASTBuilder.createIdentifier(name);
 		typechecker.setType(id, new SetType(this));
 		return id;
 	}
