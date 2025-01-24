@@ -147,13 +147,11 @@ public class Renamer extends DepthFirstAdapter {
 		for (PDefinition e : copy) {
 			String name = null;
 			if (e instanceof AExpressionDefinitionDefinition) {
-				name = ((AExpressionDefinitionDefinition) e).getName()
-						.getText();
+				name = ((AExpressionDefinitionDefinition) e).getName().getText();
 			} else if (e instanceof APredicateDefinitionDefinition) {
 				name = ((APredicateDefinitionDefinition) e).getName().getText();
 			} else if (e instanceof ASubstitutionDefinitionDefinition) {
-				name = ((ASubstitutionDefinitionDefinition) e).getName()
-						.getText();
+				name = ((ASubstitutionDefinitionDefinition) e).getName().getText();
 			}
 			String newName = incName(name);
 			namesTable.put(e, newName);

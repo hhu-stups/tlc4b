@@ -247,16 +247,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 		}
 		// CONSTANTS
-		ArrayList<ConfigFileAssignment> assignments = configFile
-				.getAssignments();
+		List<ConfigFileAssignment> assignments = configFile.getAssignments();
 		if (!assignments.isEmpty()) {
 			configFileString.append("CONSTANTS\n");
 			for (ConfigFileAssignment assignment : assignments) {
 				configFileString.append(assignment.getString(renamer));
 			}
 		}
-		if (TLC4BGlobals.useSymmetry()
-				&& !machineContext.getDeferredSets().isEmpty()) {
+		if (TLC4BGlobals.useSymmetry() && !machineContext.getDeferredSets().isEmpty()) {
 			configFileString.append("SYMMETRY Symmetry\n");
 		}
 

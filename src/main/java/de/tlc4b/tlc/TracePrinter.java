@@ -147,8 +147,7 @@ public class TracePrinter {
 				} else {
 					BType subtype = ((FunctionType) type).getRange();
 					res.append("[");
-					res.append(parseEnumerationValue(((TupleValue) val).elems,
-							subtype));
+					res.append(parseEnumerationValue(((TupleValue) val).elems, subtype));
 					res.append("]");
 				}
 				return res;
