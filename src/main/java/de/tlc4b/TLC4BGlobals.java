@@ -1,5 +1,15 @@
 package de.tlc4b;
 
+import tla2sany.semantic.ExprNode;
+import tla2sany.st.Location;
+import tlc2.output.Message;
+import tlc2.output.OutputCollector;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TLC4BGlobals {
 	private static int DEFERRED_SET_SIZE;
 	private static int MAX_INT;
@@ -28,6 +38,10 @@ public class TLC4BGlobals {
 
 	private static int workers;
 	private static int dfid_initial_depth;
+
+	private static final List<Message> handledMessages = new ArrayList<>();
+	private static final Map<Location, Long> handledLineCounts = new HashMap<>();
+	private static final List<ExprNode> handledViolatedAssumptions = new ArrayList<>();
 
 	static {
 		resetGlobals();
@@ -62,6 +76,37 @@ public class TLC4BGlobals {
 		deleteFilesOnExit = false; // if enabled: deletes all created '.tla', '.cfg' files on exit of the JVM.
 			// This includes the created B2TLA standard modules (e.g. Relation, but not Naturals etc.).
 		createTraceFile = true;
+
+		resetOutputCollector();
+		// TODO: do we also have to reset TLCGlobals?
+	}
+
+	private static void resetOutputCollector() {
+		// otherwise we will analyse old messages from previous checks -> wrong results in the same JVM (important for ProB2(-UI))
+		OutputCollector.setModuleNode(null);
+		OutputCollector.setInitialState(null);
+		OutputCollector.setTrace(new ArrayList<>());
+		handledMessages.addAll(OutputCollector.getAllMessages());
+		handledLineCounts.putAll(OutputCollector.getLineCountTable());
+		handledViolatedAssumptions.addAll(OutputCollector.getViolatedAssumptions());
+	}
+
+	public static List<Message> getCurrentMessages() {
+		List<Message> messages = new ArrayList<>(OutputCollector.getAllMessages()); // all messages including old
+		messages.removeAll(handledMessages); // remove already handled messages from old checks
+		return messages;
+	}
+
+	public static Map<Location, Long> getCurrentLineCounts() {
+		Map<Location, Long> lineCounts = new HashMap<>(OutputCollector.getLineCountTable());
+		handledLineCounts.forEach(lineCounts::remove);
+		return lineCounts;
+	}
+
+	public static List<ExprNode> getCurrentViolatedAssumptions() {
+		List<ExprNode> violatedAssumptions = new ArrayList<>(OutputCollector.getViolatedAssumptions());
+		violatedAssumptions.removeAll(handledViolatedAssumptions);
+		return violatedAssumptions;
 	}
 
 	public static boolean isCreateTraceFile() {
