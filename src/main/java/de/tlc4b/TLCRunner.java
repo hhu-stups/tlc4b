@@ -4,22 +4,22 @@ import static de.tlc4b.util.StopWatch.Watches.MODEL_CHECKING_TIME;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import de.tlc4b.tlc.TLCMessageListener;
 import de.tlc4b.util.StopWatch;
 import tlc2.TLCGlobals;
+import tlc2.tool.fp.FPSetFactory;
 import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
@@ -47,26 +47,26 @@ public class TLCRunner {
 		}
 	}
 
-	private static Process startJVM(final String optionsAsString,
-			final String mainClass, final String[] arguments)
+	private static Process startJVM(final String mainClass, final List<String> arguments)
 			throws IOException {
 
-		String separator = FileSystems.getDefault().getSeparator();
-
-		String jvm = System.getProperty("java.home") + separator + "bin"
-				+ separator + "java";
+		boolean isWindows = System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows");
+		String jvm = System.getProperty("java.home") + File.separator + "bin" + File.separator + (isWindows ? "java.exe" : "java");
 		String classpath = System.getProperty("java.class.path");
 
-		List<String> command = Arrays.asList(jvm, "-cp", classpath, mainClass);
-		command.addAll(Arrays.asList(arguments));
+		List<String> command = new ArrayList<>();
+		command.add(jvm);
+		command.addAll(Arrays.asList("-XX:+UseParallelGC", "-Dfile.encoding=UTF-8", "-Dtlc2.tool.fp.FPSet.impl=" + FPSetFactory.getImplementationDefault()));
+		command.add(mainClass);
+		command.addAll(arguments);
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
+		processBuilder.environment().put("CLASSPATH", classpath);
 		return processBuilder.start();
 	}
 
-	public static ArrayList<String> runTLCInANewJVM(String machineName,
-			String path) throws IOException {
-		ArrayList<String> list = new ArrayList<>();
+	public static ArrayList<String> runTLCInANewJVM(String machineName, String path) throws IOException {
+		List<String> list = new ArrayList<>();
 		list.add(path);
 		list.add(machineName);
 		if (!TLC4BGlobals.isDeadlockCheck()) {
@@ -79,8 +79,7 @@ public class TLCRunner {
 		// list.add("-coverage");
 		// list.add("1");
 
-		String[] args = list.toArray(new String[0]);
-		final Process p = startJVM("", TLCRunner.class.getCanonicalName(), args);
+		final Process p = startJVM(TLCRunner.class.getCanonicalName(), list);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
 		stdOut.start();
 		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());

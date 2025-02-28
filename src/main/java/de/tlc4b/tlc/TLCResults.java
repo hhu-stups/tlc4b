@@ -105,14 +105,14 @@ public class TLCResults implements ToolGlobals {
 			tlcResult = InitialStateError;
 		}
 
-		if (TLC4BGlobals.isPrintCoverage() && !OutputCollector.getLineCountTable().isEmpty()) {
+		if (TLC4BGlobals.isPrintCoverage() && !TLC4BGlobals.getCurrentLineCounts().isEmpty()) {
 			evalCoverage();
 		}
 	}
 
 	private void evalCoverage() {
 		Hashtable<Integer, Long> lineCount = new Hashtable<>();
-		Set<Entry<Location, Long>> entrySet = OutputCollector.getLineCountTable().entrySet();
+		Set<Entry<Location, Long>> entrySet = TLC4BGlobals.getCurrentLineCounts().entrySet();
 		for (Entry<Location, Long> entry : entrySet) {
 			int endline = entry.getKey().endLine();
 			if (lineCount.containsKey(endline)) {
@@ -193,7 +193,7 @@ public class TLCResults implements ToolGlobals {
 
 	private void evalAllMessages() {
 
-		List<Message> messages = new ArrayList<>(OutputCollector.getAllMessages());
+		List<Message> messages = new ArrayList<>(TLC4BGlobals.getCurrentMessages());
 		for (Message m : messages) {
 			switch (m.getMessageClass()) {
 				case ERROR:
@@ -282,7 +282,7 @@ public class TLCResults implements ToolGlobals {
 
 			case EC.TLC_ASSUMPTION_FALSE:
 				// get the violated assumption expr from the OutputCollector
-				List<ExprNode> violatedAssumptions = OutputCollector.getViolatedAssumptions();
+				List<ExprNode> violatedAssumptions = TLC4BGlobals.getCurrentViolatedAssumptions();
 				if (!violatedAssumptions.isEmpty()) {
 					// try to find the assume node contain the expr in order to get
 					// the name of the assumption

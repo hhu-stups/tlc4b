@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import de.be4.classicalb.core.parser.Definitions;
+import de.be4.classicalb.core.parser.IDefinitions;
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.analysis.checking.DefinitionCollector;
 import de.be4.classicalb.core.parser.node.AAbstractMachineParseUnit;
 import de.be4.classicalb.core.parser.node.ADefinitionExpression;
 import de.be4.classicalb.core.parser.node.ADefinitionPredicate;
@@ -34,7 +37,7 @@ import de.tlc4b.analysis.StandardModules;
  */
 public class DefinitionsEliminator extends DepthFirstAdapter {
 
-	private final Hashtable<String, PDefinition> definitionsTable;
+	private final IDefinitions definitions = new Definitions();
 	private final ArrayList<Hashtable<String, PExpression>> contextStack;
 
 	public static void eliminateDefinitions(Start start){
@@ -42,8 +45,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	}
 	
 	private DefinitionsEliminator(Start node) {
-		DefinitionCollector collector = new DefinitionCollector(node);
-		definitionsTable = collector.getDefinitions();
+		new DefinitionCollector(definitions).collectDefinitions(node);
 		contextStack = new ArrayList<>();
 		node.apply(this);
 	}
@@ -113,7 +115,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionSubstitution(ADefinitionSubstitution node) {
 		String name = node.getDefLiteral().getText();
-		PDefinition def = definitionsTable.get(name);
+		PDefinition def = definitions.getDefinition(name);
 
 		ASubstitutionDefinitionDefinition clone = (ASubstitutionDefinitionDefinition) def.clone();
 		Hashtable<String, PExpression> context = new Hashtable<>();
@@ -144,7 +146,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 			return;
 		}
 
-		PDefinition def = definitionsTable.get(name);
+		PDefinition def = definitions.getDefinition(name);
 		AExpressionDefinitionDefinition clone = (AExpressionDefinitionDefinition) def.clone();
 		Hashtable<String, PExpression> context = new Hashtable<>();
 
@@ -164,7 +166,7 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionPredicate(ADefinitionPredicate node) {
 		String name = node.getDefLiteral().getText();
-		PDefinition def = definitionsTable.get(name);
+		PDefinition def = definitions.getDefinition(name);
 
 		ArrayList<PExpression> arguments = new ArrayList<>(node.getParameters());
 		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {

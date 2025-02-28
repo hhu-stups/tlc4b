@@ -63,14 +63,11 @@ public class TLCOutputInfo {
 		identifiers.putAll(machineContext.getEnumValues());
 		//TODO add sets of modelvalues
 		
-		
-		for (Entry<String, Node> entry : identifiers.entrySet()) {
-			String name = entry.getKey();
-			Node node = entry.getValue();
+		identifiers.forEach((name, node) -> {
 			String newName = renamer.getNameOfRef(node);
 			namesMapping.put(newName, name);
 			typesTable.put(newName, typechecker.getType(node));
-		}
+		});
 	}
 
 }

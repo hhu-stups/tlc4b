@@ -13,9 +13,7 @@ public class ModelValueAssignment extends ConfigFileAssignment{
 
 	public String getString(Renamer renamer) {
 		AIdentifierExpression id = (AIdentifierExpression) node;
-		getIdentifier(id);
 		String conString = renamer.getNameOfRef(id);
-		return conString+ " = "+ conString +"\n";
+		return conString + " = " + conString + "\n";
 	}
-	
 }

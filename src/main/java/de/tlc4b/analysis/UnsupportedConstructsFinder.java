@@ -76,4 +76,34 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		}
 	}
 
+	// quick fix: ignore labels and descriptions FIXME: improve
+	@Override
+	public void caseALabelPredicate(ALabelPredicate node) {
+		node.getPredicate().apply(this);
+		node.replaceBy(node.getPredicate());
+	}
+
+	@Override
+	public void caseADescriptionPredicate(ADescriptionPredicate node) {
+		node.getPredicate().apply(this);
+		node.replaceBy(node.getPredicate());
+	}
+
+	@Override
+	public void caseADescriptionExpression(ADescriptionExpression node) {
+		node.getExpression().apply(this);
+		node.replaceBy(node.getExpression());
+	}
+
+	@Override
+	public void caseADescriptionOperation(ADescriptionOperation node) {
+		node.getOperation().apply(this);
+		node.replaceBy(node.getOperation());
+	}
+
+	@Override
+	public void caseADescriptionSet(ADescriptionSet node) {
+		node.getSet().apply(this);
+		node.replaceBy(node.getSet());
+	}
 }

@@ -1,45 +1,40 @@
 package de.tlc4b.tla;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tlc4b.tla.config.ConfigFileAssignment;
 
-
 public class ConfigFile {
 
-	private final ArrayList<ConfigFileAssignment> assignments;
+	private final List<ConfigFileAssignment> assignments;
 	private int invariantNumber;
 	private boolean spec;
 	private boolean init;
 	private boolean next;
 	private int assertionsSize;
 	private boolean goal;
-	
-	
-	public ConfigFile(){
+
+	public ConfigFile() {
 		this.assignments = new ArrayList<>();
 		this.invariantNumber = 0;
 	}
 
-
-	public ArrayList<ConfigFileAssignment> getAssignments() {
+	public List<ConfigFileAssignment> getAssignments() {
 		return assignments;
 	}
 
 	public boolean isSpec(){
 		return spec;
 	}
-	
 
 	public void setInvariantNumber(int number) {
 		this.invariantNumber = number;
 	}
 
-
 	public boolean isInit() {
 		return init;
 	}
-
 
 	public boolean isNext() {
 		return next;
@@ -49,21 +44,17 @@ public class ConfigFile {
 		assignments.add(assignment);
 	}
 
-
 	public int getInvariantNumber() {
 		return this.invariantNumber;
 	}
-
 
 	public void setInit() {
 		this.init = true;
 	}
 
-
 	public void setNext() {
 		this.next = true;
 	}
-
 
 	public void setAssertionSize(int size) {
 		assertionsSize = size;

@@ -8,7 +8,7 @@ plugins {
 }
 
 project.group = 'de.hhu.stups'
-project.version = "1.2.0"
+project.version = "1.2.1"
 
 final isSnapshot = project.version.endsWith("-SNAPSHOT")
 
@@ -16,8 +16,8 @@ repositories {
 	mavenCentral()
 	if (isSnapshot) {
 		maven {
-			name "sonatype snapshots"
-			url "https://oss.sonatype.org/content/repositories/snapshots"
+			name = "sonatype snapshots"
+			url = "https://oss.sonatype.org/content/repositories/snapshots"
 		}
 	}
 }
@@ -26,23 +26,22 @@ configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-def parser_version = '2.13.5'
+def parser_version = '2.15.0'
 
 dependencies {
 	//implementation(group: 'com.microsoft', name: 'tla2tools', version: '1.4.6')
-	implementation(group: 'commons-cli', name: 'commons-cli', version: '1.8.0')
+	implementation(group: 'commons-cli', name: 'commons-cli', version: '1.9.0')
 	implementation(group: 'de.hhu.stups', name: 'tlatools', version: '1.1.0')
 
 	implementation(group: 'de.hhu.stups', name: 'bparser', version: parser_version)
 	implementation(group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
 
 	testImplementation(group: 'junit', name: 'junit', version: '4.13.2')
-	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: '1.4.0')
+	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: '1.4.1')
 }
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
 	
 	withSourcesJar()
 	withJavadocJar()
@@ -144,11 +143,11 @@ publishing {
 		maven {
 			final releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 			final snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-			url isSnapshot ? snapshotsRepoUrl : releasesRepoUrl
+			url = isSnapshot ? snapshotsRepoUrl : releasesRepoUrl
 			if (project.hasProperty("ossrhUsername") && project.hasProperty("ossrhPassword")) {
 				credentials {
-					username project.ossrhUsername
-					password project.ossrhPassword
+					username = project.ossrhUsername
+					password = project.ossrhPassword
 				}
 			}
 		}

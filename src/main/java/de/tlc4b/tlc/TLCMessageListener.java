@@ -1,7 +1,7 @@
 package de.tlc4b.tlc;
 
+import de.tlc4b.TLC4BGlobals;
 import tlc2.output.Message;
-import tlc2.output.OutputCollector;
 
 import java.util.*;
 
@@ -13,7 +13,7 @@ public abstract class TLCMessageListener extends Thread {
 	@Override
 	public void run() {
 		while (tlcRunning) {
-			List<Message> currentMessages = OutputCollector.getAllMessages();
+			List<Message> currentMessages = TLC4BGlobals.getCurrentMessages();
 			int currentMessageIndex = currentMessages.size();
 			if (lastMessageIndex < currentMessageIndex) {
 				for (int i = lastMessageIndex; i < currentMessageIndex; i++) {
