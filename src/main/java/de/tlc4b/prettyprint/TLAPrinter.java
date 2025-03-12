@@ -2,10 +2,12 @@ package de.tlc4b.prettyprint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
@@ -28,6 +30,7 @@ import de.tlc4b.btypes.PairType;
 import de.tlc4b.btypes.SetType;
 import de.tlc4b.btypes.StructType;
 import de.tlc4b.btypes.UntypedType;
+import de.tlc4b.exceptions.TranslationException;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 import de.tlc4b.tla.ConfigFile;
 import de.tlc4b.tla.TLADefinition;
@@ -997,20 +1000,18 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseALetSubstitution(ALetSubstitution node) {
 		inALetSubstitution(node);
+		moduleStringAppend("\\E ");
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		if (!copy.isEmpty()) {
-			moduleStringAppend("\\E ");
-			for (int i = 0; i < copy.size(); i++) {
-				PExpression e = copy.get(i);
-				e.apply(this);
-				moduleStringAppend(" \\in ");
-				typeRestrictor.getRestrictedNode(e).apply(this);
-				if (i < copy.size() - 1) {
-					moduleStringAppend(", ");
-				}
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression e = copy.get(i);
+			e.apply(this);
+			moduleStringAppend(" \\in ");
+			typeRestrictor.getRestrictedNode(e).apply(this);
+			if (i < copy.size() - 1) {
+				moduleStringAppend(", ");
 			}
-			moduleStringAppend(" : ");
 		}
+		moduleStringAppend(" : ");
 
 		if (typeRestrictor.isARemovedNode(node.getPredicate())) {
 			moduleStringAppend("TRUE");
@@ -1023,6 +1024,87 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printUnchangedVariables(node, true);
 
 		outALetSubstitution(node);
+	}
+
+	@Override
+	public void caseALetPredicatePredicate(ALetPredicatePredicate node) {
+		inALetPredicatePredicate(node);
+		moduleStringAppend("\\E ");
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression e = copy.get(i);
+			e.apply(this);
+			moduleStringAppend(" \\in ");
+			typeRestrictor.getRestrictedNode(e).apply(this);
+			if (i < copy.size() - 1) {
+				moduleStringAppend(", ");
+			}
+		}
+		moduleStringAppend(" : ");
+
+		if (typeRestrictor.isARemovedNode(node.getAssignment())) {
+			moduleStringAppend("TRUE");
+		} else {
+			node.getAssignment().apply(this);
+		}
+
+		moduleStringAppend(" /\\ ");
+		node.getPred().apply(this);
+
+		outALetPredicatePredicate(node);
+	}
+
+	private static Map<String, PExpression> getValuesFromEqualPredicates(PPredicate p, Map<String, PExpression> values) {
+		if (p instanceof AEqualPredicate) {
+			AEqualPredicate eq = (AEqualPredicate) p;
+			PExpression left = eq.getLeft();
+			if (left instanceof AIdentifierExpression) {
+				String s = Utils.getAIdentifierAsString((AIdentifierExpression) left);
+				if (values.containsKey(s)) {
+					throw new TranslationException("invalid predicate in LET expr: " + p);
+				}
+				values.put(s, eq.getRight());
+			} else {
+				throw new TranslationException("invalid predicate in LET expr: " + p);
+			}
+		} else if (p instanceof AConjunctPredicate) {
+			AConjunctPredicate conj = (AConjunctPredicate) p;
+			getValuesFromEqualPredicates(conj.getLeft(), values);
+			getValuesFromEqualPredicates(conj.getRight(), values);
+		} else {
+			throw new TranslationException("invalid predicate in LET expr: " + p);
+		}
+
+		return values;
+	}
+
+	@Override
+	public void caseALetExpressionExpression(ALetExpressionExpression node) {
+		inALetExpressionExpression(node);
+		moduleStringAppend("LET ");
+		Map<String, PExpression> values = getValuesFromEqualPredicates(node.getAssignment(), new HashMap<>());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression e = copy.get(i);
+			e.apply(this);
+			moduleStringAppend(" == ");
+
+			String identifier = Utils.getAIdentifierAsString((AIdentifierExpression) e);
+			PExpression value = values.get(identifier);
+			if (value == null) {
+				throw new TranslationException("no equals predicate for identifier " + identifier + " in LET expr");
+			}
+			value.apply(this);
+
+			if (i < copy.size() - 1) {
+				moduleStringAppend(", ");
+			}
+		}
+
+		moduleStringAppend(" IN ");
+		node.getExpr().apply(this);
+
+		outALetExpressionExpression(node);
 	}
 
 	@Override

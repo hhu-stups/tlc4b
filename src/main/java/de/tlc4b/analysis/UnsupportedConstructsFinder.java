@@ -37,9 +37,6 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		// should have been rewritten in parser
 		add(AIfPredicatePredicate.class);
 		add(AIfElsifPredicatePredicate.class);
-
-		add(ALetExpressionExpression.class);
-		add(ALetPredicatePredicate.class);
 	}
 
 	private static void add(Class<? extends Node> clazz) {

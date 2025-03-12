@@ -19,6 +19,8 @@ import de.be4.classicalb.core.parser.node.AGeneralProductExpression;
 import de.be4.classicalb.core.parser.node.AGeneralSumExpression;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.ALetExpressionExpression;
+import de.be4.classicalb.core.parser.node.ALetPredicatePredicate;
 import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
@@ -347,6 +349,34 @@ public class Renamer extends DepthFirstAdapter {
 		}
 		node.getPredicate().apply(this);
 		node.getSubstitution().apply(this);
+		removeLastContext();
+	}
+
+	@Override
+	public void caseALetExpressionExpression(ALetExpressionExpression node) {
+		List<PExpression> list = new ArrayList<>(node.getIdentifiers());
+		evalBoundedVariables(node, list);
+
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
+		node.getAssignment().apply(this);
+		node.getExpr().apply(this);
+		removeLastContext();
+	}
+
+	@Override
+	public void caseALetPredicatePredicate(ALetPredicatePredicate node) {
+		List<PExpression> list = new ArrayList<>(node.getIdentifiers());
+		evalBoundedVariables(node, list);
+
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			e.apply(this);
+		}
+		node.getAssignment().apply(this);
+		node.getPred().apply(this);
 		removeLastContext();
 	}
 

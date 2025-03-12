@@ -25,16 +25,4 @@ public class UnsupportedConstructsTest {
 		final String machine = "MACHINE M FREETYPES F = F1, F2(INTEGER) END";
 		translate(machine);
 	}
-
-	@Test(expected = NotSupportedException.class)
-	public void testLetExpr() throws Exception {
-		final String machine = "MACHINE M VARIABLES x INVARIANT x : INTEGER INITIALISATION x := (LET foo BE foo=42 IN foo END) END";
-		translate(machine);
-	}
-
-	@Test(expected = NotSupportedException.class)
-	public void testLetPred() throws Exception {
-		final String machine = "MACHINE M VARIABLES x INVARIANT x : INTEGER INITIALISATION x : (LET foo BE foo=42 IN x=foo END) END";
-		translate(machine);
-	}
 }

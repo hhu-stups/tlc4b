@@ -605,6 +605,38 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		node.getSubstitution().apply(this);
 	}
 
+	@Override
+	public void caseALetExpressionExpression(ALetExpressionExpression node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			setType(v, new UntypedType());
+		}
+
+		setType(node.getAssignment(), BoolType.getInstance());
+		node.getAssignment().apply(this);
+
+		setType(node.getExpr(), new UntypedType());
+		node.getExpr().apply(this);
+		unify(getType(node), getType(node.getExpr()), node);
+	}
+
+	@Override
+	public void caseALetPredicatePredicate(ALetPredicatePredicate node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			setType(v, new UntypedType());
+		}
+
+		setType(node.getAssignment(), BoolType.getInstance());
+		node.getAssignment().apply(this);
+
+		setType(node.getPred(), BoolType.getInstance());
+		node.getPred().apply(this);
+		unify(getType(node), getType(node.getPred()), node);
+	}
+
 	/****************************************************************************
 	 * Arithmetic operators *
 	 ****************************************************************************/

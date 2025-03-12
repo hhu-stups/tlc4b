@@ -635,6 +635,31 @@ public class MachineContext extends DepthFirstAdapter {
 		}
 		node.getPredicate().apply(this);
 		node.getSubstitution().apply(this);
+		contextTable.remove(contextTable.size() - 1);
+	}
+
+	@Override
+	public void caseALetExpressionExpression(ALetExpressionExpression node) {
+		contextTable.add(new LinkedHashMap<>());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
+		}
+		node.getAssignment().apply(this);
+		node.getExpr().apply(this);
+		contextTable.remove(contextTable.size() - 1);
+	}
+
+	@Override
+	public void caseALetPredicatePredicate(ALetPredicatePredicate node) {
+		contextTable.add(new LinkedHashMap<>());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			putLocalVariableIntoCurrentScope((AIdentifierExpression) e);
+		}
+		node.getAssignment().apply(this);
+		node.getPred().apply(this);
+		contextTable.remove(contextTable.size() - 1);
 	}
 
 	@Override
@@ -646,6 +671,7 @@ public class MachineContext extends DepthFirstAdapter {
 		}
 		node.getWhere().apply(this);
 		node.getThen().apply(this);
+		contextTable.remove(contextTable.size() - 1);
 	}
 
 	@Override
