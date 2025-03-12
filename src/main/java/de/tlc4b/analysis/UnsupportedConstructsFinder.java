@@ -32,6 +32,13 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		add(ARealSetExpression.class);
 		add(AFloatSetExpression.class);
 		add(ARealExpression.class);
+
+		add(AIfElsifExprExpression.class);
+		add(AIfPredicatePredicate.class);
+		add(AIfElsifPredicatePredicate.class);
+
+		add(ALetExpressionExpression.class);
+		add(ALetPredicatePredicate.class);
 	}
 
 	private static void add(Class<? extends Node> clazz) {
