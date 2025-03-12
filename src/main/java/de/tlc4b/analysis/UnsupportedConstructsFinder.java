@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -46,17 +47,20 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 	}
 
 	private static final List<String> SUM_TYPE = new LinkedList<>(
-		Arrays.asList("model_clause", "machine_clause", "substitution", "machine_parse_unit"));
+		Arrays.asList("model_clause", "machine_clause", "machine_parse_unit", "substitution", "expression_expression", "expression", "predicate_predicate", "predicate"));
 
-	private String formatCamel(final String input) {
+	private String formatClassName(String input) {
 		StringWriter out = new StringWriter();
 		char[] chars = input.toCharArray();
-		for (char current : chars) {
-			if (Character.isUpperCase(current)) {
-				out.append('_');
-				out.append(Character.toLowerCase(current));
+		for (int i = 1; i < chars.length; i++) {
+			char c = chars[i];
+			if (Character.isUpperCase(c)) {
+				if (i > 1) {
+					out.append('_');
+				}
+				out.append(Character.toLowerCase(c));
 			} else {
-				out.append(current);
+				out.append(c);
 			}
 		}
 		return out.toString();
@@ -64,20 +68,20 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 
 	public void defaultIn(Node node) {
 		if (unsupportedClasses.contains(node.getClass())) {
-			final String formatedName = formatCamel(node.getClass().getSimpleName());
-			final String className = node.getClass().getSimpleName();
-			for (final String suffix : SUM_TYPE) {
-				if (formatedName.endsWith(suffix)) {
-					final String shortName = formatedName.substring(3, formatedName.length() - suffix.length() - 1)
-							.toUpperCase();
-					final String[] split = suffix.split("_");
-					final String type = split[split.length - 1];
-					if (type.equals("clause") || type.equals("substitution")) {
+			String className = node.getClass().getSimpleName();
+			String formattedName = formatClassName(className);
+			for (String suffix : SUM_TYPE) {
+				if (formattedName.endsWith("_" + suffix)) {
+					String shortName = formattedName.substring(0, formattedName.length() - suffix.length() - 1).toUpperCase(Locale.ROOT);
+					String[] split = suffix.split("_");
+					String type = split[split.length - 1];
+					if (type.equals("clause") || type.equals("substitution") || type.equals("expression") || type.equals("predicate")) {
 						throw new NotSupportedException(shortName + " " + type + " is not supported.");
+					} else if (suffix.endsWith("parse_unit")) {
+						throw new NotSupportedException(shortName + " parse unit is not supported.");
 					} else {
 						throw new NotSupportedException(shortName + " is not supported.");
 					}
-
 				}
 			}
 			throw new NotSupportedException(className + " is not supported.");
