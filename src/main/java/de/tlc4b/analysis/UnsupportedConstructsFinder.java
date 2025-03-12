@@ -21,6 +21,7 @@ public class UnsupportedConstructsFinder extends DepthFirstAdapter {
 		add(APromotesMachineClause.class);
 		add(AIncludesMachineClause.class);
 		add(AImportsMachineClause.class);
+		add(AFreetypesMachineClause.class);
 
 		add(AWhileSubstitution.class);
 		add(AVarSubstitution.class);
