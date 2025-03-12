@@ -412,11 +412,22 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		
 		UntypedType x = new UntypedType();
 		setType(node.getThen(), x);
+		node.getElsifs().forEach(n -> setType(n, x));
 		setType(node.getElse(), x);
 		node.getThen().apply(this);
+		node.getElsifs().forEach(n -> n.apply(this));
 		node.getElse().apply(this);
 		BType found = getType(node.getThen());
 		unify(getType(node), found, node);
+	}
+
+	@Override
+	public void caseAIfElsifExprExpression(AIfElsifExprExpression node) {
+		setType(node.getCondition(), BoolType.getInstance());
+		node.getCondition().apply(this);
+
+		setType(node.getThen(), getType(node));
+		node.getThen().apply(this);
 	}
 
 	@Override

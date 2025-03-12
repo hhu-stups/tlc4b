@@ -1146,13 +1146,34 @@ public class TLAPrinter extends DepthFirstAdapter {
 	
 	@Override
 	public void caseAIfThenElseExpression(AIfThenElseExpression node) {
-		moduleStringAppend("(IF ");
+		if (node.getElsifs().isEmpty()) {
+			moduleStringAppend("(IF ");
+			node.getCondition().apply(this);
+			moduleStringAppend(" THEN ");
+			node.getThen().apply(this);
+			moduleStringAppend(" ELSE ");
+			node.getElse().apply(this);
+			moduleStringAppend(")");
+		} else {
+			moduleStringAppend("(CASE ");
+			node.getCondition().apply(this);
+			moduleStringAppend(" -> ");
+			node.getThen().apply(this);
+			node.getElsifs().forEach(n -> {
+				moduleStringAppend(" [] ");
+				n.apply(this);
+			});
+			moduleStringAppend(" [] OTHER -> ");
+			node.getElse().apply(this);
+			moduleStringAppend(")");
+		}
+	}
+
+	@Override
+	public void caseAIfElsifExprExpression(AIfElsifExprExpression node) {
 		node.getCondition().apply(this);
-		moduleStringAppend(" THEN ");
+		moduleStringAppend(" -> ");
 		node.getThen().apply(this);
-		moduleStringAppend(" ELSE ");
-		node.getElse().apply(this);
-		moduleStringAppend(")");
 	}
 
 	@Override
