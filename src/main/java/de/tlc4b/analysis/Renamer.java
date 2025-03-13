@@ -39,6 +39,7 @@ public class Renamer extends DepthFirstAdapter {
 	private final HashSet<String> globalNames;
 	private final static Set<String> KEYWORDS = new HashSet<>();
 	static {
+		KEYWORDS.add("ACTION");
 		KEYWORDS.add("ASSUME");
 		KEYWORDS.add("ASSUMPTION");
 		KEYWORDS.add("AXIOM");

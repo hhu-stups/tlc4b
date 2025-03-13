@@ -6,7 +6,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-
 public class FixedBugs {
 
 	@Test
@@ -19,5 +18,15 @@ public class FixedBugs {
 				+ "OPERATIONS foo = PRE x = {} THEN x(1) := 2 END \n"
 				+ "END";
 		assertEquals(Deadlock, testString(machine));
+	}
+
+	@Test
+	public void testActionIdentifier() throws Exception {
+		String machine =
+				"MACHINE Test\n"
+				+ "CONSTANTS ACTION\n"
+				+ "PROPERTIES ACTION={1, 2, 3} \n"
+				+ "END";
+		assertEquals(NoError, testString(machine));
 	}
 }
