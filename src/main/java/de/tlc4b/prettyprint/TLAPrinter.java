@@ -669,6 +669,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 			PExpression right = copy2.get(i);
 
 			AIdentifierExpression assigned = getAssignedIdentifier(left);
+			if (!machineContext.getVariables().containsKey(Utils.getAIdentifierAsString(assigned))) {
+				throw new NotSupportedException("can only assign to machine variables");
+			}
 			assigned.apply(this);
 			moduleStringAppend(" = ");
 			printAssignmentRhs(assigned, right);

@@ -127,6 +127,8 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	private final Set<StandardModule> extendedStandardModules;
 	private final Typechecker typechecker;
 
+	private boolean inAssignment = false;
+
 	public UsedStandardModules(Start start, Typechecker typechecker,
 			TypeRestrictor typeRestrictor, TLAModule tlaModule) {
 		this.extendedStandardModules = new HashSet<>();
@@ -435,11 +437,17 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	// Function call
 	public void inAFunctionExpression(AFunctionExpression node) {
 		BType type = typechecker.getType(node.getIdentifier());
-		if (type instanceof FunctionType) {
-			extendedStandardModules.add(StandardModule.Functions);
+		if (inAssignment) {
+			if (type instanceof FunctionType) {
+				extendedStandardModules.add(StandardModule.Functions);
+			} else {
+				extendedStandardModules.add(StandardModule.FunctionsAsRelations);
+				extendedStandardModules.add(StandardModule.Relations);
+			}
 		} else {
-			extendedStandardModules.add(StandardModule.FunctionsAsRelations);
-			extendedStandardModules.add(StandardModule.Relations);
+			if (type instanceof SetType) {
+				extendedStandardModules.add(StandardModule.FunctionsAsRelations);
+			}
 		}
 	}
 
@@ -519,6 +527,28 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public void inAAssignSubstitution(AAssignSubstitution node) {
 		// function assignments are handled in "inAFunctionExpression"
+	}
+
+	@Override
+	public void caseAAssignSubstitution(AAssignSubstitution node) {
+		inAAssignSubstitution(node);
+		{
+			inAssignment = true;
+			List<PExpression> copy = new ArrayList<PExpression>(node.getLhsExpression());
+			for(PExpression e : copy)
+			{
+				e.apply(this);
+			}
+			inAssignment = false;
+		}
+		{
+			List<PExpression> copy = new ArrayList<PExpression>(node.getRhsExpressions());
+			for(PExpression e : copy)
+			{
+				e.apply(this);
+			}
+		}
+		outAAssignSubstitution(node);
 	}
 
 	public void inADirectProductExpression(ADirectProductExpression node) {
