@@ -222,6 +222,7 @@ public class TLC4B {
 		tlc4b.tlcOutputInfo = tlc4b.translator.getTLCOutputInfo();
 		StopWatch.stop(TRANSLATION_TIME);
 		printlnSilent("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
+		printlnSilent("Translated TLA:\n" + tlc4b.tlaModule);
 		tlc4b.createFiles();
 
 		if (TLC4BGlobals.isRunTLC()) {

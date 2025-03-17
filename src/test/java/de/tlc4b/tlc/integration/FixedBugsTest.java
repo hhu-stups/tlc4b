@@ -1,0 +1,53 @@
+package de.tlc4b.tlc.integration;
+
+import static de.tlc4b.tlc.TLCResults.TLCResult.*;
+import static de.tlc4b.util.TestUtil.testString;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+public class FixedBugsTest {
+
+	@Test
+	public void testActionIdentifier() throws Exception {
+		String machine =
+				"MACHINE Test\n"
+				+ "CONSTANTS ACTION\n"
+				+ "PROPERTIES ACTION={1, 2, 3} \n"
+				+ "END";
+		assertEquals(NoError, testString(machine));
+	}
+
+	@Test
+	public void testFunctionAssignment() throws Exception {
+		String machine = "MACHINE Test\n" +
+			                 "VARIABLES x\n" +
+			                 "INVARIANT x : 1..3 +-> 1..3\n" +
+			                 "INITIALISATION x := {}\n" +
+			                 "OPERATIONS foo = SELECT x = {} THEN x(1) := 1 END\n" +
+			                 "END";
+		assertEquals(Deadlock, testString(machine));
+	}
+
+	@Test
+	public void testNestedFunctionAssignment2() throws Exception {
+		String machine = "MACHINE Test\n" +
+			                 "VARIABLES x\n" +
+			                 "INVARIANT x : 1..3 +-> (1..3 +-> 1..3)\n" +
+			                 "INITIALISATION x := {}\n" +
+			                 "OPERATIONS foo = SELECT x = {} THEN x(1)(2) := 1 END\n" +
+			                 "END";
+		assertEquals(Deadlock, testString(machine));
+	}
+
+	@Test
+	public void testNestedFunctionAssignment3() throws Exception {
+		String machine = "MACHINE Test\n" +
+			                 "VARIABLES x\n" +
+			                 "INVARIANT x : 1..3 +-> (1..3 +-> (1..3 +-> 1..3))\n" +
+			                 "INITIALISATION x := {}\n" +
+			                 "OPERATIONS foo = SELECT x = {} THEN x(1)(2)(3) := 1 END\n" +
+			                 "END";
+		assertEquals(Deadlock, testString(machine));
+	}
+}

@@ -3,6 +3,7 @@ package de.tlc4b.util;
 import java.io.File;
 
 import de.tlc4b.TLC4B;
+import de.tlc4b.TLC4BGlobals;
 
 import tlc2.TLCGlobals;
 
@@ -16,6 +17,7 @@ public class TLC4BRunnerTestString {
 		// leading to name conflicts when two tests are started within the same second.
 		// This line works around the issue by instead using a millisecond timestamp as the name.
 		TLCGlobals.metaDir = TLCGlobals.metaRoot + File.separator + System.currentTimeMillis() + File.separator;
+		TLC4BGlobals.setVerbose(true);
 
 		TLC4B.testString(args[0],true);
 	}
