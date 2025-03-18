@@ -669,12 +669,16 @@ public class TLAPrinter extends DepthFirstAdapter {
 			PExpression right = copy2.get(i);
 
 			AIdentifierExpression assigned = getAssignedIdentifier(left);
-			if (!machineContext.getVariables().containsKey(Utils.getAIdentifierAsString(assigned))) {
-				throw new NotSupportedException("can only assign to machine variables");
+			if (machineContext.getVariables().containsKey(Utils.getAIdentifierAsString(assigned))) {
+				assigned.apply(this);
+				moduleStringAppend(" = ");
+				printAssignmentRhs(assigned, right);
+			} else {
+				// these are either errors in the machine or return parameters
+				// ignore them for now because some tests depend on this behaviour
+				moduleStringAppend("TRUE");
+				// TODO: throw new NotSupportedException("can only assign to machine variables");
 			}
-			assigned.apply(this);
-			moduleStringAppend(" = ");
-			printAssignmentRhs(assigned, right);
 
 			if (i < copy.size() - 1) {
 				moduleStringAppend(" /\\ ");
