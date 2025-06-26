@@ -269,42 +269,42 @@ public class TypeRestrictionsTest {
 	@Test
 	public void testAnyEqual() throws Exception {
 		String machine = "MACHINE test\n"
-			                 + "VARIABLES x\n"
-			                 + "INVARIANT x = 1\n"
-			                 + "INITIALISATION x := 1\n"
-			                 + "OPERATIONS\n"
-			                 + "foo = ANY y WHERE y=1 THEN x:=y END\n"
-			                 + "END";
-		String expected = "---- MODULE test ----\n" +
-			                  "VARIABLES x\n" +
-			                  "Invariant1 == x = 1\n" +
-			                  "Init == x = 1\n" +
-			                  "\n" +
-			                  "foo == \\E y \\in {1} : x' = y\n" +
-			                  "\n" +
-			                  "Next == \\/ foo\n" +
-			                  "====";
+			+ "VARIABLES x\n"
+			+ "INVARIANT x = 1\n"
+			+ "INITIALISATION x := 1\n"
+			+ "OPERATIONS\n"
+			+ "foo = ANY y WHERE y=1 THEN x:=y END\n"
+			+ "END";
+		String expected = "---- MODULE test ----\n"
+			+ "VARIABLES x\n"
+			+ "Invariant1 == x = 1\n"
+			+ "Init == x = 1\n"
+			+ "\n"
+			+ "foo == \\E y \\in {1} : x' = y\n"
+			+ "\n"
+			+ "Next == \\/ foo\n"
+			+ "====";
 		compare(expected, machine);
 	}
 
 	@Test
 	public void testAnyMember() throws Exception {
 		String machine = "MACHINE test\n"
-			                 + "VARIABLES x\n"
-			                 + "INVARIANT x = 1\n"
-			                 + "INITIALISATION x := 1\n"
-			                 + "OPERATIONS\n"
-			                 + "foo = ANY y WHERE y:{1} THEN x:=y END\n"
-			                 + "END";
-		String expected = "---- MODULE test ----\n" +
-			                  "VARIABLES x\n" +
-			                  "Invariant1 == x = 1\n" +
-			                  "Init == x = 1\n" +
-			                  "\n" +
-			                  "foo == \\E y \\in {1} : x' = y\n" +
-			                  "\n" +
-			                  "Next == \\/ foo\n" +
-			                  "====";
+			+ "VARIABLES x\n"
+			+ "INVARIANT x = 1\n"
+			+ "INITIALISATION x := 1\n"
+			+ "OPERATIONS\n"
+			+ "foo = ANY y WHERE y:{1} THEN x:=y END\n"
+			+ "END";
+		String expected = "---- MODULE test ----\n"
+			+ "VARIABLES x\n"
+			+ "Invariant1 == x = 1\n"
+			+ "Init == x = 1\n"
+			+ "\n"
+			+ "foo == \\E y \\in {1} : x' = y\n"
+			+ "\n"
+			+ "Next == \\/ foo\n"
+			+ "====";
 		compare(expected, machine);
 	}
 
@@ -312,23 +312,23 @@ public class TypeRestrictionsTest {
 	@Test
 	public void testAnyNestedEqualInIf() throws Exception {
 		String machine = "MACHINE test\n"
-							 + "CONSTANTS B\n"
-							 + "PROPERTIES B:BOOL\n"
-			                 + "VARIABLES x\n"
-			                 + "INVARIANT x = 1\n"
-			                 + "INITIALISATION x := 1\n"
-			                 + "OPERATIONS\n"
-			                 + "foo = ANY y WHERE IF B=TRUE THEN y=1 ELSE y=1 END THEN x:=y END\n"
-			                 + "END";
-		String expected = "---- MODULE test ----\n" +
-			                  "VARIABLES x\n" +
-			                  "Invariant1 == x = 1\n" +
-			                  "Init == x = 1\n" +
-			                  "\n" +
-			                  "foo == \\E y \\in {1} : x' = y\n" +
-			                  "\n" +
-			                  "Next == \\/ foo\n" +
-			                  "====";
+			+ "CONSTANTS B\n"
+			+ "PROPERTIES B:BOOL\n"
+			+ "VARIABLES x\n"
+			+ "INVARIANT x = 1\n"
+			+ "INITIALISATION x := 1\n"
+			+ "OPERATIONS\n"
+			+ "foo = ANY y WHERE IF B=TRUE THEN y=1 ELSE y=1 END THEN x:=y END\n"
+			+ "END";
+		String expected = "---- MODULE test ----\n"
+			+ "VARIABLES x\n"
+			+ "Invariant1 == x = 1\n"
+			+ "Init == x = 1\n"
+			+ "\n"
+			+ "foo == \\E y \\in {1} : x' = y\n"
+			+ "\n"
+			+ "Next == \\/ foo\n"
+			+ "====";
 		compare(expected, machine);
 	}
 }

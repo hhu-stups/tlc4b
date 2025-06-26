@@ -20,34 +20,34 @@ public class FixedBugsTest {
 
 	@Test
 	public void testFunctionAssignment() throws Exception {
-		String machine = "MACHINE Test\n" +
-			                 "VARIABLES x\n" +
-			                 "INVARIANT x : 1..3 +-> 1..3\n" +
-			                 "INITIALISATION x := {}\n" +
-			                 "OPERATIONS foo = SELECT x = {} THEN x(1) := 1 END\n" +
-			                 "END";
+		String machine = "MACHINE Test\n"
+			+ "VARIABLES x\n"
+			+ "INVARIANT x : 1..3 +-> 1..3\n"
+			+ "INITIALISATION x := {}\n"
+			+ "OPERATIONS foo = SELECT x = {} THEN x(1) := 1 END\n"
+			+ "END";
 		assertEquals(Deadlock, testString(machine));
 	}
 
 	@Test
 	public void testNestedFunctionAssignment2() throws Exception {
-		String machine = "MACHINE Test\n" +
-			                 "VARIABLES x\n" +
-			                 "INVARIANT x : 1..3 +-> (1..3 +-> 1..3)\n" +
-			                 "INITIALISATION x := {}\n" +
-			                 "OPERATIONS foo = SELECT x = {} THEN x(1)(2) := 1 END\n" +
-			                 "END";
+		String machine = "MACHINE Test\n"
+			+ "VARIABLES x\n"
+			+ "INVARIANT x : 1..3 +-> (1..3 +-> 1..3)\n"
+			+ "INITIALISATION x := {}\n"
+			+ "OPERATIONS foo = SELECT x = {} THEN x(1)(2) := 1 END\n"
+			+ "END";
 		assertEquals(Deadlock, testString(machine));
 	}
 
 	@Test
 	public void testNestedFunctionAssignment3() throws Exception {
-		String machine = "MACHINE Test\n" +
-			                 "VARIABLES x\n" +
-			                 "INVARIANT x : 1..3 +-> (1..3 +-> (1..3 +-> 1..3))\n" +
-			                 "INITIALISATION x := {}\n" +
-			                 "OPERATIONS foo = SELECT x = {} THEN x(1)(2)(3) := 1 END\n" +
-			                 "END";
+		String machine = "MACHINE Test\n"
+			+ "VARIABLES x\n"
+			+ "INVARIANT x : 1..3 +-> (1..3 +-> (1..3 +-> 1..3))\n"
+			+ "INITIALISATION x := {}\n"
+			+ "OPERATIONS foo = SELECT x = {} THEN x(1)(2)(3) := 1 END\n"
+			+ "END";
 		assertEquals(Deadlock, testString(machine));
 	}
 }

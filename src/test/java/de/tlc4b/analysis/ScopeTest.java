@@ -157,11 +157,11 @@ public class ScopeTest {
 	@Test
 	public void testDoubleFunctionAssign() throws Exception {
 		String machine = "MACHINE test\n"
-			                 + "VARIABLES f\n"
-			                 + "INVARIANT f : 1..3 +-> (1..3 +-> BOOL)\n"
-			                 + "INITIALISATION f := {}\n"
-							 + "OPERATIONS put(x, y, value) = SELECT x : 1..3 & y : 1..3 & value : BOOL THEN f(x)(y) := value END\n"
-			                 + "END";
+			+ "VARIABLES f\n"
+			+ "INVARIANT f : 1..3 +-> (1..3 +-> BOOL)\n"
+			+ "INITIALISATION f := {}\n"
+			+ "OPERATIONS put(x, y, value) = SELECT x : 1..3 & y : 1..3 & value : BOOL THEN f(x)(y) := value END\n"
+			+ "END";
 		translate(machine);
 	}
 }
