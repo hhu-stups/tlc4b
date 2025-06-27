@@ -1,8 +1,8 @@
 ------------------------ MODULE FunctionsAsRelations ----------------------------------
 EXTENDS FiniteSets, Functions, TLC, Sequences
 
-LOCAL RelDom(f) == { x[1] :x \in f} \* The domain of the function
-LOCAL RelRan(f) == { x[2] :x \in f} \* The range of the function
+LOCAL RelDom(f) == { <<x[1], x[2]>>[1] : x \in f } \* The domain of the function, syntax is weird to help TLA2B typechecker
+LOCAL RelRan(f) == { <<x[1], x[2]>>[2] : x \in f } \* The range of the function, syntax is weird to help TLA2B typechecker
 LOCAL MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f} 
  \* Converting a TLA+ function to a set of pairs
 LOCAL Rel(S, T) == SUBSET (S \times T) \* The set of relations
