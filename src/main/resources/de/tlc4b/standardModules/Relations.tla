@@ -1,10 +1,12 @@
 ---------------------------- MODULE Relations ----------------------------
 EXTENDS FiniteSets, Naturals, Sequences, TLC
 
+LOCAL GetKey(x) == <<x[1], x[2]>>[1] \* Get key of relational pair, also used as a type hint for TLA2B
+
 Relations(S, T) == SUBSET (S \times T)
  \* The set of all relations
  
-RelDomain(R) == {x[1]: x \in R}
+RelDomain(R) == {GetKey(x): x \in R}
   \* The domain of the relation R
 
 RelRange(R) == {x[2]: x \in R}
@@ -13,10 +15,10 @@ RelRange(R) == {x[2]: x \in R}
 RelId(S) == {<<x,x>>: x \in S}
  \* The identity relation of set S
 
-RelDomRes(S, R) == {x \in R: x[1] \in S} 
+RelDomRes(S, R) == {x \in R: GetKey(x) \in S}
  \* The restriction on the domain of R for set S
  
-RelDomSub(S, R) == {x \in R: x[1] \notin S} 
+RelDomSub(S, R) == {x \in R: GetKey(x) \notin S}
  \* The subtraction on the domain of R for set S
 
 RelRanRes(R, S) == {x \in R: x[2] \in S} 
@@ -74,7 +76,7 @@ RelClosure1(R)  == \* Warshall algorithm from Leslie Lamport's Hyperbook
     IN W(NR)
  \* The transitive closure of R
 
-RelClosure(R) == RelClosure1( R \cup {<<x[1],x[1]>>: x \in R} \cup RelIterate(R, 0)) 
+RelClosure(R) == RelClosure1( R \cup {<<x[1],x[1]>>: x \in R} \cup RelIterate(R, 0))
  \* The transitive and reflexive closure of R.
 
 RelFnc(R) ==  {<<x, RelImage(R, {x})>> :x \in RelDomain(R)}
