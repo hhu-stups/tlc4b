@@ -127,6 +127,8 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	private final Set<StandardModule> extendedStandardModules;
 	private final Typechecker typechecker;
 
+	private boolean inAssignment = false;
+
 	public UsedStandardModules(Start start, Typechecker typechecker,
 			TypeRestrictor typeRestrictor, TLAModule tlaModule) {
 		this.extendedStandardModules = new HashSet<>();
@@ -434,20 +436,19 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	// Function call
 	public void inAFunctionExpression(AFunctionExpression node) {
-		// System.out.println(node.parent().getClass());
-		if (node.parent() instanceof AAssignSubstitution) {
-			AAssignSubstitution parent = (AAssignSubstitution) node.parent();
-			if (parent.getLhsExpression().contains(node)) {
-				// function assignment (function call on the left side), e.g.
-				// f(x) := 1
-				return;
+		BType type = typechecker.getType(node.getIdentifier());
+		if (inAssignment) {
+			if (type instanceof FunctionType) {
+				extendedStandardModules.add(StandardModule.Functions);
+			} else {
+				extendedStandardModules.add(StandardModule.FunctionsAsRelations);
+				extendedStandardModules.add(StandardModule.Relations);
+			}
+		} else {
+			if (type instanceof SetType) {
+				extendedStandardModules.add(StandardModule.FunctionsAsRelations);
 			}
 		}
-		BType type = typechecker.getType(node.getIdentifier());
-		if (type instanceof SetType) {
-			extendedStandardModules.add(StandardModule.FunctionsAsRelations);
-		}
-
 	}
 
 	public void inATotalFunctionExpression(ATotalFunctionExpression node) {
@@ -525,18 +526,29 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 	public void inAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
-		for (PExpression e : copy) {
-			if (e instanceof AFunctionExpression) {
-				BType type = typechecker.getType(((AFunctionExpression) e)
-						.getIdentifier());
-				if (type instanceof SetType) {
-					extendedStandardModules.add(StandardModule.Relations);
-				} else {
-					extendedStandardModules.add(StandardModule.Functions);
-				}
+		// function assignments are handled in "inAFunctionExpression"
+	}
+
+	@Override
+	public void caseAAssignSubstitution(AAssignSubstitution node) {
+		inAAssignSubstitution(node);
+		{
+			inAssignment = true;
+			List<PExpression> copy = new ArrayList<PExpression>(node.getLhsExpression());
+			for(PExpression e : copy)
+			{
+				e.apply(this);
+			}
+			inAssignment = false;
+		}
+		{
+			List<PExpression> copy = new ArrayList<PExpression>(node.getRhsExpressions());
+			for(PExpression e : copy)
+			{
+				e.apply(this);
 			}
 		}
+		outAAssignSubstitution(node);
 	}
 
 	public void inADirectProductExpression(ADirectProductExpression node) {

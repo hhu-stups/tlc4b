@@ -21,6 +21,7 @@ import de.be4.classicalb.core.parser.node.AIfSubstitution;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AOperation;
 import de.be4.classicalb.core.parser.node.AParallelSubstitution;
+import de.be4.classicalb.core.parser.node.ARecordFieldExpression;
 import de.be4.classicalb.core.parser.node.ASelectSubstitution;
 import de.be4.classicalb.core.parser.node.ASelectWhenSubstitution;
 import de.be4.classicalb.core.parser.node.ASkipSubstitution;
@@ -29,6 +30,7 @@ import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PSubstitution;
 import de.tlc4b.analysis.MachineContext;
+import de.tlc4b.exceptions.NotSupportedException;
 import de.tlc4b.exceptions.SubstitutionException;
 
 /**
@@ -131,17 +133,24 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
 		HashSet<Node> list = new HashSet<>();
 		for (PExpression e : copy) {
-			if (e instanceof AIdentifierExpression) {
-				Node identifier = machineContext.getReferenceNode(e);
-				list.add(identifier);
-			} else {
-				AFunctionExpression func = (AFunctionExpression) e;
-				Node identifier = machineContext.getReferenceNode(func.getIdentifier());
-				list.add(identifier);
-			}
+			Node assigned = getAssignedVariable(e);
+			Node identifier = machineContext.getReferenceNode(assigned);
+			list.add(identifier);
 		}
 		assignedVariablesTable.put(node, list);
 		defaultOut(node);
+	}
+
+	private PExpression getAssignedVariable(PExpression e) {
+		if (e instanceof AIdentifierExpression) {
+			return e;
+		} else if (e instanceof AFunctionExpression) {
+			return getAssignedVariable(((AFunctionExpression) e).getIdentifier());
+		} else if (e instanceof ARecordFieldExpression) {
+			return getAssignedVariable(((ARecordFieldExpression) e).getRecord());
+		} else {
+			throw new NotSupportedException("Unknown assignment lhs: " + e);
+		}
 	}
 
 	@Override

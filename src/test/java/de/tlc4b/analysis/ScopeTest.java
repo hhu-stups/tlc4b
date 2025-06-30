@@ -4,6 +4,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static de.tlc4b.util.TestUtil.checkMachine;
+import static de.tlc4b.util.TestUtil.translate;
+
 import de.tlc4b.exceptions.ScopeException;
 
 public class ScopeTest {
@@ -151,5 +153,15 @@ public class ScopeTest {
 				+ "PROPERTIES #(x,x).(1 = 1 & x = x)\n" + "END";
 		checkMachine(machine);
 	}
-	
+
+	@Test
+	public void testDoubleFunctionAssign() throws Exception {
+		String machine = "MACHINE test\n"
+			+ "VARIABLES f\n"
+			+ "INVARIANT f : 1..3 +-> (1..3 +-> BOOL)\n"
+			+ "INITIALISATION f := {}\n"
+			+ "OPERATIONS put(x, y, value) = SELECT x : 1..3 & y : 1..3 & value : BOOL THEN f(x)(y) := value END\n"
+			+ "END";
+		translate(machine);
+	}
 }

@@ -19,4 +19,10 @@ public class UnsupportedConstructsTest {
 		final String machine = "IMPLEMENTATION test REFINES foo END";
 		translate(machine);
 	}
+
+	@Test(expected = NotSupportedException.class)
+	public void testFreetypes() throws Exception {
+		final String machine = "MACHINE M FREETYPES F = F1, F2(INTEGER) END";
+		translate(machine);
+	}
 }

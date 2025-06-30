@@ -412,11 +412,22 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		
 		UntypedType x = new UntypedType();
 		setType(node.getThen(), x);
+		node.getElsifs().forEach(n -> setType(n, x));
 		setType(node.getElse(), x);
 		node.getThen().apply(this);
+		node.getElsifs().forEach(n -> n.apply(this));
 		node.getElse().apply(this);
 		BType found = getType(node.getThen());
 		unify(getType(node), found, node);
+	}
+
+	@Override
+	public void caseAIfElsifExprExpression(AIfElsifExprExpression node) {
+		setType(node.getCondition(), BoolType.getInstance());
+		node.getCondition().apply(this);
+
+		setType(node.getThen(), getType(node));
+		node.getThen().apply(this);
 	}
 
 	@Override
@@ -592,6 +603,38 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		setType(node.getPredicate(), BoolType.getInstance());
 		node.getPredicate().apply(this);
 		node.getSubstitution().apply(this);
+	}
+
+	@Override
+	public void caseALetExpressionExpression(ALetExpressionExpression node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			setType(v, new UntypedType());
+		}
+
+		setType(node.getAssignment(), BoolType.getInstance());
+		node.getAssignment().apply(this);
+
+		setType(node.getExpr(), new UntypedType());
+		node.getExpr().apply(this);
+		unify(getType(node), getType(node.getExpr()), node);
+	}
+
+	@Override
+	public void caseALetPredicatePredicate(ALetPredicatePredicate node) {
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (PExpression e : copy) {
+			AIdentifierExpression v = (AIdentifierExpression) e;
+			setType(v, new UntypedType());
+		}
+
+		setType(node.getAssignment(), BoolType.getInstance());
+		node.getAssignment().apply(this);
+
+		setType(node.getPred(), BoolType.getInstance());
+		node.getPred().apply(this);
+		unify(getType(node), getType(node.getPred()), node);
 	}
 
 	/****************************************************************************

@@ -25,6 +25,8 @@ import de.be4.classicalb.core.parser.node.AImplicationPredicate;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AIntersectionExpression;
 import de.be4.classicalb.core.parser.node.ALambdaExpression;
+import de.be4.classicalb.core.parser.node.ALetExpressionExpression;
+import de.be4.classicalb.core.parser.node.ALetPredicatePredicate;
 import de.be4.classicalb.core.parser.node.ALetSubstitution;
 import de.be4.classicalb.core.parser.node.AMemberPredicate;
 import de.be4.classicalb.core.parser.node.ANotMemberPredicate;
@@ -453,6 +455,22 @@ public class TypeRestrictor extends DepthFirstAdapter {
 		list.addAll(copy);
 		list.addAll(getExpectedIdentifier(node));
 		analysePredicate(node.getPredicate(), list, new HashSet<>());
+		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
+	}
+
+	@Override
+	public void inALetExpressionExpression(ALetExpressionExpression node) {
+		super.inALetExpressionExpression(node);
+		// no type restriction, will use "LET var == value IN expr" construct
+	}
+
+	@Override
+	public void inALetPredicatePredicate(ALetPredicatePredicate node) {
+		HashSet<Node> list = new HashSet<>();
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		list.addAll(copy);
+		list.addAll(getExpectedIdentifier(node));
+		analysePredicate(node.getAssignment(), list, new HashSet<>());
 		createRestrictedTypeofLocalVariables(new HashSet<>(node.getIdentifiers()), false);
 	}
 

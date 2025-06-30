@@ -1,8 +1,10 @@
 ------------------------ MODULE FunctionsAsRelations ----------------------------------
 EXTENDS FiniteSets, Functions, TLC, Sequences
 
-LOCAL RelDom(f) == { x[1] :x \in f} \* The domain of the function
-LOCAL RelRan(f) == { x[2] :x \in f} \* The range of the function
+LOCAL GetKey(x) == <<x[1], x[2]>>[1] \* Get key of relational pair, also used as a type hint for TLA2B
+
+LOCAL RelDom(f) == {GetKey(x): x \in f} \* The domain of the function
+LOCAL RelRan(f) == {x[2]: x \in f} \* The range of the function
 LOCAL MakeRel(f) == {<<x, f[x]>>: x \in DOMAIN f} 
  \* Converting a TLA+ function to a set of pairs
 LOCAL Rel(S, T) == SUBSET (S \times T) \* The set of relations

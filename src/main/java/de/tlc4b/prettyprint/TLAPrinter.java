@@ -2,10 +2,12 @@ package de.tlc4b.prettyprint;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
@@ -15,7 +17,6 @@ import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.analysis.PrecedenceCollector;
 import de.tlc4b.analysis.PrimedNodesMarker;
 import de.tlc4b.analysis.Renamer;
-import de.tlc4b.analysis.StandardModules;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.analysis.UsedStandardModules;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
@@ -28,6 +29,8 @@ import de.tlc4b.btypes.PairType;
 import de.tlc4b.btypes.SetType;
 import de.tlc4b.btypes.StructType;
 import de.tlc4b.btypes.UntypedType;
+import de.tlc4b.exceptions.NotSupportedException;
+import de.tlc4b.exceptions.TranslationException;
 import de.tlc4b.ltl.LTLFormulaVisitor;
 import de.tlc4b.tla.ConfigFile;
 import de.tlc4b.tla.TLADefinition;
@@ -59,6 +62,8 @@ public class TLAPrinter extends DepthFirstAdapter {
 	private final PrimedNodesMarker primedNodesMarker;
 	private final Renamer renamer;
 	private final InvariantPreservationAnalysis invariantPreservationAnalysis;
+
+	private boolean disablePrimedNodes = false;
 
 	public TLAPrinter(MachineContext machineContext, Typechecker typechecker,
 			UnchangedVariablesFinder unchangedVariablesFinder,
@@ -627,30 +632,6 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseAAssignSubstitution(AAssignSubstitution node) {
-		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
-		List<PExpression> copy2 = new ArrayList<>(node.getRhsExpressions());
-
-		for (int i = 0; i < copy.size(); i++) {
-			PExpression left = copy.get(i);
-			PExpression right = copy2.get(i);
-
-			if (left instanceof AFunctionExpression) {
-				printFunctionAssignment(left, right);
-
-			} else {
-				printNormalAssignment(left, right);
-			}
-
-			if (i < copy.size() - 1) {
-				moduleStringAppend(" /\\ ");
-			}
-		}
-
-		printUnchangedVariables(node, true);
-	}
-
-	@Override
 	public void caseABecomesSuchSubstitution(ABecomesSuchSubstitution node) {
 		inABecomesSuchSubstitution(node);
 		if (node.getPredicate() instanceof AExistsPredicate) {
@@ -678,53 +659,70 @@ public class TLAPrinter extends DepthFirstAdapter {
 		outABecomesSuchSubstitution(node);
 	}
 
-	private void printNormalAssignment(PExpression left, PExpression right) {
-		AIdentifierExpression id = (AIdentifierExpression) left;
-		String name = Utils.getTIdentifierListAsString(id.getIdentifier());
-		if (!machineContext.getVariables().containsKey(name)) {
-			moduleStringAppend("TRUE");
+	@Override
+	public void caseAAssignSubstitution(AAssignSubstitution node) {
+		List<PExpression> copy = new ArrayList<>(node.getLhsExpression());
+		List<PExpression> copy2 = new ArrayList<>(node.getRhsExpressions());
+
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression left = copy.get(i);
+			PExpression right = copy2.get(i);
+
+			AIdentifierExpression assigned = getAssignedIdentifier(left);
+			if (machineContext.getVariables().containsKey(Utils.getAIdentifierAsString(assigned))) {
+				assigned.apply(this);
+				moduleStringAppend(" = ");
+				printAssignmentRhs(assigned, right);
+			} else {
+				// these are either errors in the machine or return parameters
+				// ignore them for now because some tests depend on this behaviour
+				moduleStringAppend("TRUE");
+				// TODO: throw new NotSupportedException("can only assign to machine variables");
+			}
+
+			if (i < copy.size() - 1) {
+				moduleStringAppend(" /\\ ");
+			}
+		}
+
+		printUnchangedVariables(node, true);
+	}
+
+	private AIdentifierExpression getAssignedIdentifier(PExpression left) {
+		if (left instanceof AIdentifierExpression) {
+			return (AIdentifierExpression) left;
+		} else if (left instanceof AFunctionExpression) {
+			return getAssignedIdentifier(((AFunctionExpression) left).getIdentifier());
+		} else if (left instanceof ARecordFieldExpression) {
+			return getAssignedIdentifier(((ARecordFieldExpression) left).getRecord());
 		} else {
-			left.apply(this);
-			moduleStringAppend(" = ");
-			right.apply(this);
+			throw new NotSupportedException("Unsupported assignment lhs: " + left);
 		}
 	}
 
-	private void printFunctionAssignment(PExpression left, PExpression right) {
-		PExpression var = ((AFunctionExpression) left).getIdentifier();
-		LinkedList<PExpression> params = ((AFunctionExpression) left).getParameters();
-		BType type = typechecker.getType(var);
-		var.apply(this);
-		moduleStringAppend("' = ");
-		if (type instanceof FunctionType) {
-			moduleStringAppend(FUNC_ASSIGN);
-			moduleStringAppend("(");
-			var.apply(this);
-			moduleStringAppend(", ");
-			if (params.size() > 1) {
-				moduleStringAppend("<<");
-			}
-			for (Iterator<PExpression> iterator = params.iterator(); iterator
-					.hasNext();) {
-				PExpression pExpression = iterator.next();
-				pExpression.apply(this);
-				if (iterator.hasNext()) {
-					moduleStringAppend(", ");
-				}
-			}
-			if (params.size() > 1) {
-				moduleStringAppend(">>");
-			}
-			moduleStringAppend(", ");
+	private void printAssignmentRhs(Node left, PExpression right) {
+		if (left instanceof AAssignSubstitution) {
 			right.apply(this);
-			moduleStringAppend(")");
-		} else {
-			moduleStringAppend(REL_OVERRIDING + "(");
-			var.apply(this);
-			moduleStringAppend(", {<<");
+			return;
+		}
 
-			if (params.size() > 1) {
-				moduleStringAppend("<<");
+		Node parent = left.parent();
+		if (left instanceof AIdentifierExpression) {
+			printAssignmentRhs(parent, right);
+		} else if (left instanceof AFunctionExpression) {
+			AFunctionExpression func = (AFunctionExpression) left;
+			PExpression ident = func.getIdentifier();
+			List<PExpression> params = func.getParameters();
+
+			BType type = typechecker.getType(ident);
+			if (type instanceof FunctionType) {
+				moduleStringAppend(FUNC_ASSIGN);
+				moduleStringAppend("(");
+				printAssignmentFunctionalOverrideBase(ident);
+				moduleStringAppend(", ");
+				if (params.size() > 1) {
+					moduleStringAppend("<<");
+				}
 				for (Iterator<PExpression> iterator = params.iterator(); iterator.hasNext();) {
 					PExpression pExpression = iterator.next();
 					pExpression.apply(this);
@@ -732,13 +730,136 @@ public class TLAPrinter extends DepthFirstAdapter {
 						moduleStringAppend(", ");
 					}
 				}
-				moduleStringAppend(">>");
+				if (params.size() > 1) {
+					moduleStringAppend(">>");
+				}
+				moduleStringAppend(", ");
+				printAssignmentRhs(parent, right);
+				moduleStringAppend(")");
 			} else {
-				params.get(0).apply(this);
+				moduleStringAppend(REL_OVERRIDING + "(");
+				printAssignmentFunctionalOverrideBase(ident);
+				moduleStringAppend(", {<<");
+				if (params.size() > 1) {
+					moduleStringAppend("<<");
+					for (Iterator<PExpression> iterator = params.iterator(); iterator.hasNext();) {
+						PExpression pExpression = iterator.next();
+						pExpression.apply(this);
+						if (iterator.hasNext()) {
+							moduleStringAppend(", ");
+						}
+					}
+					moduleStringAppend(">>");
+				} else {
+					params.get(0).apply(this);
+				}
+				moduleStringAppend(", ");
+				printAssignmentRhs(parent, right);
+				moduleStringAppend(">>})");
 			}
-			moduleStringAppend(", ");
-			right.apply(this);
-			moduleStringAppend(">>})");
+		} else {
+			throw new NotSupportedException("Unsupported assignment lhs: " + left);
+		}
+	}
+
+	private void printAssignmentFunctionalOverrideBase(PExpression e) {
+		// TODO: optimize for nesting levels > 2
+		if (e instanceof AIdentifierExpression) {
+			// print without primed identifiers
+			disablePrimedNodes = true;
+			e.apply(this);
+			disablePrimedNodes = false;
+		} else if (e instanceof AFunctionExpression) {
+			AFunctionExpression func = (AFunctionExpression) e;
+			PExpression ident = func.getIdentifier();
+			LinkedList<PExpression> params = func.getParameters();
+			moduleStringAppend("(IF ");
+			BType identType = typechecker.getType(ident);
+			BType valueType = typechecker.getType(e);
+			if (identType instanceof FunctionType) {
+				if (params.size() > 1) {
+					moduleStringAppend("<<");
+				}
+				for (Iterator<PExpression> it = params.iterator(); it.hasNext();) {
+					it.next().apply(this);
+					if (it.hasNext()) {
+						moduleStringAppend(", ");
+					}
+				}
+				if (params.size() > 1) {
+					moduleStringAppend(">>");
+				}
+				moduleStringAppend( " \\in ");
+				moduleStringAppend("DOMAIN ");
+				printAssignmentFunctionalOverrideBase(ident);
+			} else {
+				if (params.size() > 1) {
+					moduleStringAppend("<<");
+					for (Iterator<PExpression> it = params.iterator(); it.hasNext();) {
+						it.next().apply(this);
+						if (it.hasNext()) {
+							moduleStringAppend(", ");
+						}
+					}
+					moduleStringAppend(">>");
+				} else {
+					params.get(0).apply(this);
+				}
+				moduleStringAppend(" \\in ");
+				moduleStringAppend(REL_DOMAIN);
+				moduleStringAppend("(");
+				printAssignmentFunctionalOverrideBase(ident);
+				moduleStringAppend(")");
+			}
+			moduleStringAppend(" THEN ");
+			if (identType instanceof FunctionType) {
+				printAssignmentFunctionalOverrideBase(ident);
+				moduleStringAppend("[");
+				if (params.size() > 1) {
+					moduleStringAppend("<<");
+				}
+				for (Iterator<PExpression> it = params.iterator(); it.hasNext();) {
+					it.next().apply(this);
+					if (it.hasNext()) {
+						moduleStringAppend(", ");
+					}
+				}
+				if (params.size() > 1) {
+					moduleStringAppend(">>");
+				}
+				moduleStringAppend("]");
+			} else {
+				if (TLC4BGlobals.checkWelldefinedness()) {
+					moduleStringAppend(REL_CALL);
+				} else {
+					moduleStringAppend(REL_CALL_WITHOUT_WD_CHECK);
+				}
+				moduleStringAppend("(");
+				printAssignmentFunctionalOverrideBase(ident);
+				moduleStringAppend(", ");
+				if (params.size() > 1) {
+					moduleStringAppend("<<");
+					for (Iterator<PExpression> it = params.iterator(); it.hasNext();) {
+						it.next().apply(this);
+						if (it.hasNext()) {
+							moduleStringAppend(", ");
+						}
+					}
+					moduleStringAppend(">>");
+				} else {
+					params.get(0).apply(this);
+				}
+				moduleStringAppend(")");
+			}
+			moduleStringAppend(" ELSE ");
+			if (valueType instanceof FunctionType) {
+				moduleStringAppend("<<>>");
+			} else {
+				moduleStringAppend("{}");
+			}
+			moduleStringAppend(")");
+		} else {
+			throw new NotSupportedException("Unsupported assignment lhs: " + e);
 		}
 	}
 
@@ -997,20 +1118,18 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseALetSubstitution(ALetSubstitution node) {
 		inALetSubstitution(node);
+		moduleStringAppend("\\E ");
 		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
-		if (!copy.isEmpty()) {
-			moduleStringAppend("\\E ");
-			for (int i = 0; i < copy.size(); i++) {
-				PExpression e = copy.get(i);
-				e.apply(this);
-				moduleStringAppend(" \\in ");
-				typeRestrictor.getRestrictedNode(e).apply(this);
-				if (i < copy.size() - 1) {
-					moduleStringAppend(", ");
-				}
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression e = copy.get(i);
+			e.apply(this);
+			moduleStringAppend(" \\in ");
+			typeRestrictor.getRestrictedNode(e).apply(this);
+			if (i < copy.size() - 1) {
+				moduleStringAppend(", ");
 			}
-			moduleStringAppend(" : ");
 		}
+		moduleStringAppend(" : ");
 
 		if (typeRestrictor.isARemovedNode(node.getPredicate())) {
 			moduleStringAppend("TRUE");
@@ -1023,6 +1142,87 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printUnchangedVariables(node, true);
 
 		outALetSubstitution(node);
+	}
+
+	@Override
+	public void caseALetPredicatePredicate(ALetPredicatePredicate node) {
+		inALetPredicatePredicate(node);
+		moduleStringAppend("\\E ");
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression e = copy.get(i);
+			e.apply(this);
+			moduleStringAppend(" \\in ");
+			typeRestrictor.getRestrictedNode(e).apply(this);
+			if (i < copy.size() - 1) {
+				moduleStringAppend(", ");
+			}
+		}
+		moduleStringAppend(" : ");
+
+		if (typeRestrictor.isARemovedNode(node.getAssignment())) {
+			moduleStringAppend("TRUE");
+		} else {
+			node.getAssignment().apply(this);
+		}
+
+		moduleStringAppend(" /\\ ");
+		node.getPred().apply(this);
+
+		outALetPredicatePredicate(node);
+	}
+
+	private static Map<String, PExpression> getValuesFromEqualPredicates(PPredicate p, Map<String, PExpression> values) {
+		if (p instanceof AEqualPredicate) {
+			AEqualPredicate eq = (AEqualPredicate) p;
+			PExpression left = eq.getLeft();
+			if (left instanceof AIdentifierExpression) {
+				String s = Utils.getAIdentifierAsString((AIdentifierExpression) left);
+				if (values.containsKey(s)) {
+					throw new TranslationException("invalid predicate in LET expr: " + p);
+				}
+				values.put(s, eq.getRight());
+			} else {
+				throw new TranslationException("invalid predicate in LET expr: " + p);
+			}
+		} else if (p instanceof AConjunctPredicate) {
+			AConjunctPredicate conj = (AConjunctPredicate) p;
+			getValuesFromEqualPredicates(conj.getLeft(), values);
+			getValuesFromEqualPredicates(conj.getRight(), values);
+		} else {
+			throw new TranslationException("invalid predicate in LET expr: " + p);
+		}
+
+		return values;
+	}
+
+	@Override
+	public void caseALetExpressionExpression(ALetExpressionExpression node) {
+		inALetExpressionExpression(node);
+		moduleStringAppend("LET ");
+		Map<String, PExpression> values = getValuesFromEqualPredicates(node.getAssignment(), new HashMap<>());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
+		for (int i = 0; i < copy.size(); i++) {
+			PExpression e = copy.get(i);
+			e.apply(this);
+			moduleStringAppend(" == ");
+
+			String identifier = Utils.getAIdentifierAsString((AIdentifierExpression) e);
+			PExpression value = values.get(identifier);
+			if (value == null) {
+				throw new TranslationException("no equals predicate for identifier " + identifier + " in LET expr");
+			}
+			value.apply(this);
+
+			if (i < copy.size() - 1) {
+				moduleStringAppend(", ");
+			}
+		}
+
+		moduleStringAppend(" IN ");
+		node.getExpr().apply(this);
+
+		outALetExpressionExpression(node);
 	}
 
 	@Override
@@ -1087,13 +1287,13 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (name == null) {
 			name = Utils.getTIdentifierListAsString(node.getIdentifier());
 		}
-		if (StandardModules.isAbstractConstant(name)) {
+		if (isAbstractConstant(name)) {
 			// in order to pass the member check
 			moduleStringAppend("{}");
 			return;
 		}
 		moduleStringAppend(name);
-		if (primedNodesMarker.isPrimed(node)) {
+		if (!disablePrimedNodes && primedNodesMarker.isPrimed(node)) {
 			moduleStringAppend("'");
 		}
 		outAIdentifierExpression(node);
@@ -1146,13 +1346,34 @@ public class TLAPrinter extends DepthFirstAdapter {
 	
 	@Override
 	public void caseAIfThenElseExpression(AIfThenElseExpression node) {
-		moduleStringAppend("(IF ");
+		if (node.getElsifs().isEmpty()) {
+			moduleStringAppend("(IF ");
+			node.getCondition().apply(this);
+			moduleStringAppend(" THEN ");
+			node.getThen().apply(this);
+			moduleStringAppend(" ELSE ");
+			node.getElse().apply(this);
+			moduleStringAppend(")");
+		} else {
+			moduleStringAppend("(CASE ");
+			node.getCondition().apply(this);
+			moduleStringAppend(" -> ");
+			node.getThen().apply(this);
+			node.getElsifs().forEach(n -> {
+				moduleStringAppend(" [] ");
+				n.apply(this);
+			});
+			moduleStringAppend(" [] OTHER -> ");
+			node.getElse().apply(this);
+			moduleStringAppend(")");
+		}
+	}
+
+	@Override
+	public void caseAIfElsifExprExpression(AIfElsifExprExpression node) {
 		node.getCondition().apply(this);
-		moduleStringAppend(" THEN ");
+		moduleStringAppend(" -> ");
 		node.getThen().apply(this);
-		moduleStringAppend(" ELSE ");
-		node.getElse().apply(this);
-		moduleStringAppend(")");
 	}
 
 	@Override
@@ -1359,7 +1580,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseAExpressionDefinitionDefinition(AExpressionDefinitionDefinition node) {
 		String oldName = node.getName().getText().trim();
-		if (StandardModules.isKeywordInModuleExternalFunctions(oldName)) {
+		if (isKeywordInModuleExternalFunctions(oldName)) {
 			return;
 		}
 		String name = renamer.getName(node);
@@ -1400,7 +1621,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	}
 
 	private void printBDefinition(String name, List<PExpression> args, Node rightSide) {
-		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {
+		if (isKeywordInModuleExternalFunctions(name)) {
 			return;
 		}
 		moduleStringAppend(name);
@@ -1815,7 +2036,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			AIdentifierExpression id = (AIdentifierExpression) node
 					.getIdentifier();
 			String name = Utils.getTIdentifierListAsString(id.getIdentifier());
-			if (StandardModules.isAbstractConstant(name)) {
+			if (isAbstractConstant(name)) {
 
 				moduleStringAppend(name);
 				// node.getIdentifier().apply(this);
