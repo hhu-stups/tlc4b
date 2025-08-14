@@ -426,6 +426,11 @@ public class TLC4B {
 		if (buildDir == null) {
 			buildDir = new File(mainfile.getParentFile(), machineFileNameWithoutFileExtension);
 		}
+
+		if (!TLC4BGlobals.isTranslate()) {
+			// override buildDir because no files will be generated
+			buildDir = mainfile.getParentFile();
+		}
 	}
 
 	private String getLogCsvString(TLCResults tlcResults) {

@@ -96,11 +96,11 @@ public class TLCResults implements ToolGlobals {
 
 		evalAllMessages();
 
-		if (hasTrace()) {
+		if (tlcOutputInfo != null && hasTrace()) {
 			evalTrace();
 		}
 
-		if (tlcResult == NoError && tlcOutputInfo.hasInitialisation() && numberOfDistinctStates == 0) {
+		if (tlcOutputInfo != null && tlcResult == NoError && tlcOutputInfo.hasInitialisation() && numberOfDistinctStates == 0) {
 			// Can not setup constants
 			tlcResult = InitialStateError;
 		}
