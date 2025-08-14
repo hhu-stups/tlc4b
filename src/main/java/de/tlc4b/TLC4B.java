@@ -392,8 +392,13 @@ public class TLC4B {
 			throw new TLC4BIOException("The file '" + mainfile.getPath() + "' can not be accessed.", e);
 		}
 
-		machineFileNameWithoutFileExtension = mainfile.getName().substring(0,
-				mainfile.getName().length() - 4); // deleting .mch
+		String fileName = mainfile.getName();
+		int lastDot = fileName.lastIndexOf('.');
+		if (lastDot > 0) {
+			machineFileNameWithoutFileExtension = fileName.substring(0, lastDot);
+		} else{
+			machineFileNameWithoutFileExtension = fileName;
+		}
 
 		if (buildDir == null) {
 			buildDir = new File(mainfile.getParentFile(), machineFileNameWithoutFileExtension);
