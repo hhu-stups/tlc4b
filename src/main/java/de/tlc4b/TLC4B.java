@@ -97,7 +97,7 @@ public class TLC4B {
 	}
 
 	/**
-	 * Check whether TLC4B is applicable to the provided machine.
+	 * Check whether TLC4B (translation) is applicable to the provided machine.
 	 * This method has no return value - if it returns without throwing an exception, then TLC4B is applicable.
 	 * Be aware that this method may take a long time to run for large/complex machines.
 	 *
@@ -106,10 +106,33 @@ public class TLC4B {
 	 * @throws TLC4BException if translation fails for any other reason
 	 */
 	public static void checkTLC4BIsApplicable(String path) throws BCompoundException {
+		checkTLC4BIsApplicable(path, false);
+	}
+
+	/**
+	 * Check whether TLC4B is applicable to the provided machine.
+	 * This method has no return value - if it returns without throwing an exception, then TLC4B is applicable.
+	 * Be aware that this method may take a long time to run for large/complex machines.
+	 *
+	 * @param path path to B machine file
+	 * @param noTranslation if a translation is not required
+	 * @throws BCompoundException if the machine file could not be parsed
+	 * @throws TLC4BException if translation fails for any other reason
+	 */
+	public static void checkTLC4BIsApplicable(String path, boolean noTranslation) throws BCompoundException {
 		TLC4B tlc4B = new TLC4B();
-		tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
-		tlc4B.translate();
-		// tlc4B.createFiles() is intentionally not called here!
+		List<String> args = new ArrayList<>();
+		args.add(path);
+		args.add(SILENT.cliArg());
+		if (noTranslation) {
+			args.add(NOTRANSLATION.cliArg());
+		}
+		tlc4B.processArgs(args.toArray(new String[0]));
+		if (TLC4BGlobals.isTranslate()) {
+			tlc4B.translate();
+			// tlc4B.createFiles() is intentionally not called here!
+		}
+		// TODO: verify if machine can be checked with TLC
 	}
 
 	private void printResults(TLCResults results) throws IOException {
