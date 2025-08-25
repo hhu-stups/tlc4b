@@ -177,10 +177,12 @@ public class TLC4B {
 
 			if (results.hasTrace() && TLC4BGlobals.isCreateTraceFile()) {
 				String trace = results.getTrace();
-				String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
-				traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
-				results.addTraceFilePath(traceFile.getAbsolutePath());
-				println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
+				if (trace != null) {
+					String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
+					traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
+					results.addTraceFilePath(traceFile.getAbsolutePath());
+					println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
+				}
 			}
 		}
 
