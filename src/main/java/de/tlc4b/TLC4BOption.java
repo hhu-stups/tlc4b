@@ -20,7 +20,7 @@ public enum TLC4BOption {
 	DEFAULT_SETSIZE("default_setsize", "", Integer.class),
 	MININT("minint", "set value of MININT", Integer.class),
 	WORKERS("workers", "specify number of workers", Integer.class),
-	DFID("dfid", "depth-first model checking with iterative deepening, specify initial depth", Integer.class),
+	DFID("dfid", "depth-first model checking with iterative deepening, specify max depth", Integer.class),
 	CONSTANTSSETUP("constantssetup", "use constants found by ProB for TLC model checking", String.class),
 	LTLFORMULA("ltlformula", "provide an additional LTL formula", String.class),
 	VERBOSE("verbose", "put TLC4B in verbose mode", null),
