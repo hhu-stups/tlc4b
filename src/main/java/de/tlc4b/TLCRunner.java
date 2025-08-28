@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -171,7 +170,8 @@ public final class TLCRunner {
 	}
 }
 
-class StreamGobbler extends Thread {
+final class StreamGobbler extends Thread {
+
 	private final InputStream is;
 	private final ArrayList<String> log;
 
@@ -180,8 +180,10 @@ class StreamGobbler extends Thread {
 	}
 
 	StreamGobbler(InputStream is) {
+		super("StreamGobbler for " + is);
 		this.is = is;
 		this.log = new ArrayList<>();
+		this.setDaemon(true);
 	}
 
 	public void run() {
@@ -190,10 +192,11 @@ class StreamGobbler extends Thread {
 			BufferedReader br = new BufferedReader(isr);
 			String line;
 			while ((line = br.readLine()) != null) {
-				System.out.println("> " + line);
+				if (TLC4BGlobals.isVerbose()) {
+					System.out.println("> " + line);
+				}
 				log.add(line);
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
