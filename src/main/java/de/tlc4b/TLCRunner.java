@@ -24,18 +24,27 @@ import util.SimpleFilenameToStream;
 import util.ToolIO;
 import tlc2.TLC;
 
-public class TLCRunner {
+public final class TLCRunner {
 
 	public static TLCMessageListener listener = null;
+
+	private TLCRunner() {
+		throw new AssertionError();
+	}
 
 	public static void addTLCMessageListener(final TLCMessageListener listener) {
 		TLCRunner.listener = listener;
 	}
 
+	/**
+	 * Don't call yourself, use {@link TLCRunner#runTLCInANewJVM(String, String)}
+	 */
 	public static void main(String[] args) {
 		// this method will be executed in a separate JVM
 		System.setProperty("apple.awt.UIElement", "true");
 		System.out.println("Starting TLC...");
+		ToolIO.reset();
+		ToolIO.setMode(ToolIO.SYSTEM);
 		String path = args[0];
 		ToolIO.setUserDir(path);
 		String[] parameters = new String[args.length - 1];
@@ -65,40 +74,8 @@ public class TLCRunner {
 		return processBuilder.start();
 	}
 
-	public static ArrayList<String> runTLCInANewJVM(String machineName, String path) throws IOException {
+	private static List<String> buildTlcArgs(String machineName) {
 		List<String> list = new ArrayList<>();
-		list.add(path);
-		list.add(machineName);
-		if (!TLC4BGlobals.isDeadlockCheck()) {
-			list.add("-deadlock");
-		}
-
-		if (TLC4BGlobals.isCheckLTL()) {
-			list.add("-cleanup");
-		}
-		// list.add("-coverage");
-		// list.add("1");
-
-		final Process p = startJVM(TLCRunner.class.getCanonicalName(), list);
-		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
-		stdOut.start();
-		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
-		errOut.start();
-		try {
-			p.waitFor();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		return stdOut.getLog();
-	}
-
-	public static void runTLC(String machineName, File path) {
-		StopWatch.start(MODEL_CHECKING_TIME);
-		MP.printlnSilent("--------------------------------");
-		MP.TLCOutputStream.changeOutputStream();
-		ToolIO.setMode(ToolIO.SYSTEM);
-
-		ArrayList<String> list = new ArrayList<>();
 		if (!TLC4BGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
@@ -124,7 +101,7 @@ public class TLCRunner {
 			list.add("-coverage");
 			list.add("" + 60);
 		}
-		
+
 		list.add("-maxSetSize");
 		list.add("100000000");
 
@@ -132,8 +109,36 @@ public class TLCRunner {
 		// list.add("-config");
 		// list.add(machineName + ".cfg");
 		list.add(machineName);
+
+		return list;
+	}
+
+	public static List<String> runTLCInANewJVM(String machineName, String path) throws IOException {
+		List<String> list = buildTlcArgs(machineName);
+		list.add(0, path); // userdir must be first arg
+
+		final Process p = startJVM(TLCRunner.class.getCanonicalName(), list);
+		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
+		stdOut.start();
+		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
+		errOut.start();
+		try {
+			p.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return stdOut.getLog();
+	}
+
+	public static void runTLC(String machineName, File path) {
+		StopWatch.start(MODEL_CHECKING_TIME);
+		MP.printlnSilent("--------------------------------");
+		MP.TLCOutputStream.changeOutputStream();
+		ToolIO.reset();
+		ToolIO.setMode(ToolIO.SYSTEM);
 		ToolIO.setUserDir(path.getPath());
-		String[] args = list.toArray(new String[0]);
+
+		String[] args = buildTlcArgs(machineName).toArray(new String[0]);
 		TLC tlc = new TLC();
 		// handle parameters
 		if (tlc.handleParameters(args)) {
@@ -143,7 +148,7 @@ public class TLCRunner {
 				if (listener != null) listener.start();
 				tlc.process();
 				if (listener != null) listener.finish();
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 			}
 		}
 		// System.setOut(systemOut);
@@ -159,12 +164,10 @@ public class TLCRunner {
 		Set<Thread> threadSet = new HashSet<>(Thread.getAllStackTraces().keySet());
 		Thread[] threadArray = threadSet.toArray(new Thread[0]);
 		for (Thread t : threadArray) {
-			// System.out.println(t.getId()+ " "+t.getThreadGroup());
 			if (t.getName().equals("RMI Reaper")) {
 				t.interrupt();
 			}
 		}
-		// System.exit(0);
 	}
 }
 
