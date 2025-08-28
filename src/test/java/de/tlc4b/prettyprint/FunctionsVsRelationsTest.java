@@ -4,7 +4,7 @@ import static de.tlc4b.util.TestUtil.compare;
 
 import org.junit.Test;
 
-public class FunctionsVsRelations {
+public class FunctionsVsRelationsTest {
 
 	@Test
 	public void testCardOnAFunction() throws Exception {
