@@ -4,7 +4,7 @@ import static de.tlc4b.util.TestUtil.compare;
 
 import org.junit.Test;
 
-public class LogicalPredicates {
+public class LogicalPredicatesTest {
 
 	@Test
 	public void testEquals() throws Exception {
