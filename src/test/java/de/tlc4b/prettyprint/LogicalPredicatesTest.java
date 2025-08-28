@@ -50,5 +50,17 @@ public class LogicalPredicatesTest {
 				+ "======";
 		compare(expected, machine);
 	}
-	
+
+	@Test
+	public void testMembershipIntersection() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES 0 : (INTEGER /\\ {0}) \n"
+				+ "END";
+
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Integers \n"
+				+ "ASSUME 0 \\in Int \\cap {0} \n"
+				+ "======";
+		compare(expected, machine);
+	}
 }
