@@ -1,23 +1,27 @@
 package de.tlc4b.util;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class StopWatch {
-	
+public final class StopWatch {
 
-	private static final Hashtable<Watches, Long> startTime = new Hashtable<>();
-	private static final Hashtable<Watches, Long> runTime = new Hashtable<>();
+	private static final Map<Watches, Long> startTime = new ConcurrentHashMap<>();
+	private static final Map<Watches, Long> runTime = new ConcurrentHashMap<>();
 	
-	public enum Watches{
+	public enum Watches {
 		PARSING_TIME, TRANSLATION_TIME, TLC_TIME, OVERALL_TIME, MODEL_CHECKING_TIME
 	}
-	
-	public static void start(Watches watch){
-		startTime.put(watch, System.currentTimeMillis());
+
+	private static long currentTime() {
+		return System.currentTimeMillis();
+	}
+
+	public static void start(Watches watch) {
+		startTime.put(watch, currentTime());
 	}
 	
 	public static long stop(Watches id) {
-		long stopTime = System.currentTimeMillis() - startTime.remove(id);
+		long stopTime = currentTime() - startTime.remove(id);
 		runTime.put(id, stopTime);
 		return stopTime;
 	}
@@ -26,7 +30,7 @@ public class StopWatch {
 		return runTime.get(id);
 	}
 	
-	public static String getRunTimeAsString(Watches id){
-		return runTime.get(id).toString();
+	public static String getRunTimeAsString(Watches id) {
+		return String.valueOf(getRunTime(id));
 	}
 }
