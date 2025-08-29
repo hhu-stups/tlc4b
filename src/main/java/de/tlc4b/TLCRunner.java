@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,9 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import de.tlc4b.tlc.TLCMessageListener;
 import de.tlc4b.util.StopWatch;
 import tlc2.TLCGlobals;
+import tlc2.output.Message;
 import tlc2.tool.fp.FPSetFactory;
 import util.SimpleFilenameToStream;
 import util.ToolIO;
@@ -25,33 +27,63 @@ import tlc2.TLC;
 
 public final class TLCRunner {
 
-	public static TLCMessageListener listener = null;
+	private static TLCMessageHandler handler = null;
 
 	private TLCRunner() {
 		throw new AssertionError();
 	}
 
-	public static void addTLCMessageListener(final TLCMessageListener listener) {
-		TLCRunner.listener = listener;
+	public static void setTLCMessageHandler(TLCMessageHandler handler) {
+		if (TLCRunner.handler != null) {
+			try {
+				TLCRunner.handler.close();
+			} catch (Exception ignored){
+			}
+		}
+		TLCRunner.handler = handler;
 	}
 
 	/**
-	 * Don't call yourself, use {@link TLCRunner#runTLCInANewJVM(String, String)}
+	 * Don't call this yourself, use {@link TLCRunner#runTLCInANewJVM(String, File)} instead.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// this method will be executed in a separate JVM
 		System.setProperty("apple.awt.UIElement", "true");
 		System.out.println("Starting TLC...");
+
+		String path = args[0];
 		ToolIO.reset();
 		ToolIO.setMode(ToolIO.SYSTEM);
-		String path = args[0];
 		ToolIO.setUserDir(path);
-		String[] parameters = new String[args.length - 1];
-		System.arraycopy(args, 1, parameters, 0, parameters.length);
+
+		String socket = args[1];
+		// we are in a new jvm, so the handler is always null
+		TLCMessageListener listener;
+		if ("null".equals(socket)) {
+			listener = null;
+		} else if ("stdout".equals(socket)) {
+			listener = new TLCMessageListener(TLCMessageHandler.printToStream(System.out));
+		} else if ("stderr".equals(socket)) {
+			listener = new TLCMessageListener(TLCMessageHandler.printToStream(System.err));
+		} else {
+			int port = Integer.parseInt(socket);
+			Socket s = new Socket((String) null, port);
+			listener = new TLCMessageListener(TLCMessageHandler.printToStream(s.getOutputStream()));
+		}
+
+		String[] parameters = new String[args.length - 2];
+		System.arraycopy(args, 2, parameters, 0, parameters.length);
 		try {
+			if (listener != null) {
+				listener.start();
+			}
 			TLC.main(parameters);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			if (listener != null) {
+				listener.finish();
+			}
 		}
 	}
 
@@ -70,6 +102,7 @@ public final class TLCRunner {
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.environment().put("CLASSPATH", classpath);
+		processBuilder.redirectErrorStream(true);
 		return processBuilder.start();
 	}
 
@@ -104,7 +137,6 @@ public final class TLCRunner {
 		list.add("-maxSetSize");
 		list.add("100000000");
 
-
 		// list.add("-config");
 		// list.add(machineName + ".cfg");
 		list.add(machineName);
@@ -112,21 +144,36 @@ public final class TLCRunner {
 		return list;
 	}
 
-	public static List<String> runTLCInANewJVM(String machineName, String path) throws IOException {
+	public static void runTLCInANewJVM(String machineName, File path) throws IOException {
 		List<String> list = buildTlcArgs(machineName);
-		list.add(0, path); // userdir must be first arg
+		list.add(0, path.getPath()); // userdir must be first arg
+
+		// socket must be second arg
+		TLCSocketAcceptor socketAcceptor;
+		if (handler != null) {
+			ServerSocket s = new ServerSocket(0);
+			list.add(1, String.valueOf(s.getLocalPort()));
+			socketAcceptor = new TLCSocketAcceptor(s, handler);
+		} else {
+			list.add(1, "null");
+			socketAcceptor = null;
+		}
 
 		final Process p = startJVM(TLCRunner.class.getCanonicalName(), list);
 		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
-		stdOut.start();
-		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
-		errOut.start();
 		try {
+			if (socketAcceptor != null) {
+				socketAcceptor.start();
+			}
+			stdOut.start();
 			p.waitFor();
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (socketAcceptor != null) {
+				socketAcceptor.finish();
+			}
 		}
-		return stdOut.getLog();
 	}
 
 	public static void runTLC(String machineName, File path) {
@@ -137,6 +184,13 @@ public final class TLCRunner {
 		ToolIO.setMode(ToolIO.SYSTEM);
 		ToolIO.setUserDir(path.getPath());
 
+		TLCMessageListener listener;
+		if (handler != null) {
+			listener = new TLCMessageListener(handler);
+		} else {
+			listener = null;
+		}
+
 		String[] args = buildTlcArgs(machineName).toArray(new String[0]);
 		TLC tlc = new TLC();
 		// handle parameters
@@ -144,16 +198,18 @@ public final class TLCRunner {
 			tlc.setResolver(new SimpleFilenameToStream());
 			// call the actual processing method
 			try {
-				if (listener != null) listener.start();
+				if (listener != null) {
+					listener.start();
+				}
 				tlc.process();
-				if (listener != null) listener.finish();
 			} catch (Exception ignored) {
+			} finally {
+				if (listener != null) {
+					listener.finish();
+				}
 			}
 		}
-		// System.setOut(systemOut);
-		// ArrayList<String> messages = btlcStream.getArrayList();
 		closeThreads();
-		// return messages;
 		MP.TLCOutputStream.resetOutputStream();
 		MP.println("--------------------------------");
 		StopWatch.stop(MODEL_CHECKING_TIME);
@@ -168,37 +224,149 @@ public final class TLCRunner {
 			}
 		}
 	}
-}
 
-final class StreamGobbler extends Thread {
+	private static final class StreamGobbler extends Thread {
 
-	private final InputStream is;
-	private final ArrayList<String> log;
+		private final InputStream is;
+		private final ArrayList<String> log;
 
-	public ArrayList<String> getLog() {
-		return log;
-	}
+		public List<String> getLog() {
+			return this.log;
+		}
 
-	StreamGobbler(InputStream is) {
-		super("StreamGobbler for " + is);
-		this.is = is;
-		this.log = new ArrayList<>();
-		this.setDaemon(true);
-	}
+		StreamGobbler(InputStream is) {
+			super("StreamGobbler for " + is);
+			this.setDaemon(true);
+			this.is = is;
+			this.log = new ArrayList<>();
+		}
 
-	public void run() {
-		try {
-			InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
-			BufferedReader br = new BufferedReader(isr);
-			String line;
-			while ((line = br.readLine()) != null) {
-				if (TLC4BGlobals.isVerbose()) {
-					System.out.println("> " + line);
+		public void run() {
+			try {
+				InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
+				BufferedReader br = new BufferedReader(isr);
+				String line;
+				while ((line = br.readLine()) != null) {
+					if (TLC4BGlobals.isVerbose()) {
+						System.out.println("> " + line);
+					}
+					this.log.add(line);
 				}
-				log.add(line);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+	}
+
+	private static final class TLCMessageListener extends Thread {
+
+		private final TLCMessageHandler handler;
+		private int lastMessageIndex = 0;
+
+		public TLCMessageListener(TLCMessageHandler handler) {
+			super("TLCMessageHandler");
+			this.setDaemon(true);
+			this.handler = handler;
+		}
+
+		@Override
+		public void run() {
+			try {
+				while (!this.isInterrupted()) {
+					List<Message> messages = TLC4BGlobals.getCurrentMessages();
+					int count = messages.size();
+					for (Message m : messages.subList(lastMessageIndex, count)) {
+						if (m != null) {
+							this.handler.onMessage(m);
+						}
+					}
+					this.lastMessageIndex = count;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					this.handler.close();
+				} catch (Exception ignored) {
+				}
+			}
+		}
+
+		public void finish() {
+			this.interrupt();
+		}
+	}
+
+	private static final class TLCSocketAcceptor extends Thread {
+
+		private final ServerSocket serverSocket;
+		private final TLCMessageHandler handler;
+		private final List<TLCSocketConnection> connections = new ArrayList<>();
+
+		private TLCSocketAcceptor(ServerSocket serverSocket, TLCMessageHandler handler) {
+			super("TLCSocketAcceptor");
+			this.setDaemon(true);
+			this.serverSocket = serverSocket;
+			this.handler = handler;
+		}
+
+		@Override
+		public void run() {
+			// we only accept a single connection, no loop!
+			try {
+				Socket socket = serverSocket.accept();
+				TLCSocketConnection connection = new TLCSocketConnection(socket, this.handler);
+				this.connections.add(connection);
+				connection.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		public void finish() {
+			this.interrupt();
+			for (TLCSocketConnection connection : this.connections) {
+				connection.finish();
+			}
+			this.connections.clear();
+		}
+	}
+
+	private static final class TLCSocketConnection extends Thread {
+
+		private final Socket socket;
+		private final TLCMessageHandler handler;
+
+		private TLCSocketConnection(Socket socket, TLCMessageHandler handler) {
+			super("TLCSocketConnection-" + socket);
+			this.setDaemon(true);
+			this.socket = socket;
+			this.handler = handler;
+		}
+
+		@Override
+		public void run() {
+			try {
+				BufferedReader r = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				String line;
+				while (!this.isInterrupted() && (line = r.readLine()) != null) {
+					Message message = TLCMessageHandler.fromLine(line);
+					if (message != null) {
+						this.handler.onMessage(message);
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				try {
+					this.socket.close();
+				} catch (Exception ignored) {
+				}
+			}
+		}
+
+		public void finish() {
+			this.interrupt();
 		}
 	}
 }

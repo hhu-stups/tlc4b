@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import static tlc2.output.MP.*;
 
-public class TLCResults implements ToolGlobals {
+public final class TLCResults implements ToolGlobals {
 
 	private TLCResult tlcResult;
 	private String violatedDefinition, tlcErrorMessage;

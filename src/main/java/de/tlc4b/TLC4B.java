@@ -97,6 +97,32 @@ public class TLC4B {
 	}
 
 	/**
+	 * API method to call TLC4B in a new JVM
+	 * @param args same arguments as for the CLI version
+	 * @return results of TLC model check
+	 */
+	public static TLCResults runInANewJVM(String[] args) throws TLC4BException, IOException, BCompoundException {
+		TLC4B tlc4b = new TLC4B();
+		tlc4b.process(args);
+
+		TLCResults results = null;
+		if (TLC4BGlobals.isRunTLC()) {
+			try {
+				TLCRunner.runTLCInANewJVM(tlc4b.machineFileNameWithoutFileExtension, tlc4b.buildDir);
+				// TODO: implement IPC for TLCResults
+				throw new UnsupportedOperationException();
+				/*results = new TLCResults(tlc4b.tlcOutputInfo);
+				results.evalResults();
+				tlc4b.printResults(results);
+				tlc4b.createLogFile(results);*/
+			} catch (NoClassDefFoundError e) {
+				printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
+			}
+		}
+		return results;
+	}
+
+	/**
 	 * Check whether TLC4B (translation) is applicable to the provided machine.
 	 * This method has no return value - if it returns without throwing an exception, then TLC4B is applicable.
 	 * Be aware that this method may take a long time to run for large/complex machines.
