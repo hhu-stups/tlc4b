@@ -129,8 +129,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	private boolean inAssignment = false;
 
-	public UsedStandardModules(Start start, Typechecker typechecker,
-			TypeRestrictor typeRestrictor, TLAModule tlaModule) {
+	public UsedStandardModules(Start start, Typechecker typechecker, TypeRestrictor typeRestrictor, TLAModule tlaModule) {
 		this.extendedStandardModules = new HashSet<>();
 		this.typechecker = typechecker;
 
@@ -140,19 +139,14 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 		List<PDefinition> definitions = tlaModule.getAllDefinitions();
 		if (definitions != null) {
-			for (PDefinition pDefinition : definitions) {
-				pDefinition.apply(this);
-			}
+			definitions.forEach(d -> d.apply(this));
 		}
-		for (Node node : typeRestrictor.getAllRestrictedNodes()) {
-			node.apply(this);
-		}
-
+		typeRestrictor.getAllRestrictedNodes().forEach(n -> n.apply(this));
 		start.apply(this);
 	}
 
 	public List<String> getExtendedModules() {
-		ArrayList<StandardModule> list = new ArrayList<>(extendedStandardModules);
+		List<StandardModule> list = new ArrayList<>(extendedStandardModules);
 		if (list.contains(StandardModule.Integers)) {
 			list.remove(StandardModule.Naturals);
 		}
@@ -166,38 +160,37 @@ public class UsedStandardModules extends DepthFirstAdapter {
 
 	public Set<String> getStandardModulesToBeCreated() {
 		// dependencies of standard modules
-		HashSet<StandardModule> res = new HashSet<>();
+		Set<StandardModule> res = new HashSet<>();
 		for (StandardModule module : extendedStandardModules) {
 			switch (module) {
-			case ExternalFunctions:
-				res.add(StandardModule.ExternalFunctions);
-				break;
-			case FunctionsAsRelations:
-				res.add(StandardModule.FunctionsAsRelations);
-				res.add(StandardModule.Functions);
-				break;
-			case SequencesAsRelations:
-				res.add(StandardModule.SequencesAsRelations);
-				res.add(StandardModule.Relations);
-				res.add(StandardModule.FunctionsAsRelations);
-				res.add(StandardModule.Functions);
-				break;
-			case BBuiltIns:
-				res.add(StandardModule.BBuiltIns);
-				break;
-			case Functions:
-				res.add(StandardModule.Functions);
-				break;
-			case Relations:
-				res.add(StandardModule.Relations);
-				break;
-			case Sequences:
-				break;
-			case SequencesExtended:
-				res.add(StandardModule.SequencesExtended);
-				break;
-			default:
-				break;
+				case ExternalFunctions:
+					res.add(StandardModule.ExternalFunctions);
+					break;
+				case FunctionsAsRelations:
+					res.add(StandardModule.FunctionsAsRelations);
+					res.add(StandardModule.Functions);
+					break;
+				case SequencesAsRelations:
+					res.add(StandardModule.SequencesAsRelations);
+					res.add(StandardModule.Relations);
+					res.add(StandardModule.FunctionsAsRelations);
+					res.add(StandardModule.Functions);
+					break;
+				case BBuiltIns:
+					res.add(StandardModule.BBuiltIns);
+					break;
+				case Functions:
+					res.add(StandardModule.Functions);
+					break;
+				case Relations:
+					res.add(StandardModule.Relations);
+					break;
+				case SequencesExtended:
+					res.add(StandardModule.SequencesExtended);
+					break;
+				case Sequences:
+				default:
+					break;
 			}
 
 		}
@@ -226,7 +219,6 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	/**
 	 * Naturals
 	 */
-
 	@Override
 	public void caseANaturalSetExpression(ANaturalSetExpression node) {
 		extendedStandardModules.add(StandardModule.Naturals);
@@ -272,8 +264,7 @@ public class UsedStandardModules extends DepthFirstAdapter {
 	}
 
 
-	public void inAMinusOrSetSubtractExpression(
-			AMinusOrSetSubtractExpression node) {
+	public void inAMinusOrSetSubtractExpression(AMinusOrSetSubtractExpression node) {
 		BType t = typechecker.getType(node);
 		if (t instanceof IntegerType) {
 			extendedStandardModules.add(StandardModule.Naturals);
@@ -376,13 +367,11 @@ public class UsedStandardModules extends DepthFirstAdapter {
 		extendedStandardModules.add(StandardModule.BBuiltIns);
 	}
 
-	public void inAGeneralIntersectionExpression(
-			AGeneralIntersectionExpression node) {
+	public void inAGeneralIntersectionExpression(AGeneralIntersectionExpression node) {
 		extendedStandardModules.add(StandardModule.BBuiltIns);
 	}
 
-	public void inAQuantifiedIntersectionExpression(
-			AQuantifiedIntersectionExpression node) {
+	public void inAQuantifiedIntersectionExpression(AQuantifiedIntersectionExpression node) {
 		extendedStandardModules.add(StandardModule.BBuiltIns);
 	}
 

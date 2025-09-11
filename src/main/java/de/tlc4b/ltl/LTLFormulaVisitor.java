@@ -50,7 +50,6 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 
 	private final String name;
 	private final MachineContext machineContext;
-	private String ltlFormula;
 	private Start ltlFormulaStart;
 
 	private final LinkedHashMap<de.be4.ltl.core.parser.node.Node, de.be4.classicalb.core.parser.node.Node> ltlNodeToBNodeTable;
@@ -73,7 +72,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 			throw new LTLParseException("Error: LTL formula is not in a string representation.");
 		}
 		AStringExpression stringNode = (AStringExpression) def.getRhs();
-		this.ltlFormula = stringNode.getContent().getText();
+		String ltlFormula = stringNode.getContent().getText();
 		try {
 			this.ltlFormulaStart = parseLTLFormula(ltlFormula);
 		} catch (Exception e) {
@@ -164,7 +163,6 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	@Override
 	public void caseAExistsLtl(AExistsLtl node) {
 		handleQuantification(node, node.getExistsIdentifier().getText(), node.getPredicate().getText(), node.getLtl());
-
 	}
 
 	@Override
@@ -218,7 +216,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	public void caseAEnabledLtl(AEnabledLtl node) {
 		String operationName = node.getOperation().getText();
 		if (!machineContext.getOperations().containsKey(operationName)) {
-			throw new ScopeException("Unkown operation " + operationName + ".");
+			throw new ScopeException("Unknown operation " + operationName + ".");
 		}
 	}
 
@@ -226,7 +224,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	public void caseAWeakFairLtl(AWeakFairLtl node) {
 		String operationName = node.getOperation().getText().trim();
 		if (!machineContext.getOperations().containsKey(operationName)) {
-			throw new ScopeException("Unkown operation " + operationName + ".");
+			throw new ScopeException("Unknown operation " + operationName + ".");
 		}
 	}
 
@@ -234,7 +232,7 @@ public class LTLFormulaVisitor extends DepthFirstAdapter {
 	public void caseAStrongFairLtl(AStrongFairLtl node) {
 		String operationName = node.getOperation().getText().trim();
 		if (!machineContext.getOperations().containsKey(operationName)) {
-			throw new ScopeException("Unkown operation " + operationName + ".");
+			throw new ScopeException("Unknown operation " + operationName + ".");
 		}
 	}
 

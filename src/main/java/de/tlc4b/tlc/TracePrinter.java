@@ -109,8 +109,7 @@ public class TracePrinter {
 	private StringBuilder parseValue(Value val, BType type) {
 		// System.out.println(val.getClass());
 		StringBuilder res = new StringBuilder();
-		int valueType = val.getKind();
-		switch (valueType) {
+		switch (val.getKind()) {
 		case INTVALUE:
 		case BOOLVALUE:
 			return res.append(val);
@@ -151,7 +150,6 @@ public class TracePrinter {
 					res.append("]");
 				}
 				return res;
-
 			}
 			throw new NotSupportedException("Unknown type of tuple.");
 
@@ -228,6 +226,7 @@ public class TracePrinter {
 					.append(")");
 			return res;
 		}
+
 		case UNIONVALUE: {
 			UnionValue s = (UnionValue) val;
 			SetType t = (SetType) type;
@@ -278,6 +277,7 @@ public class TracePrinter {
 			res.append(parseValue(s.fcnRcd, type));
 			return res;
 		}
+
 		case SETPREDVALUE: {
 			SetPredValue s = (SetPredValue) val;
 			res.append(parseValue(s.inVal, type));

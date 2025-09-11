@@ -11,15 +11,15 @@ import tlc2.output.OutputCollector;
 import tlc2.tool.BuiltInOPs;
 import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
-import tlc2.tool.ToolGlobals;
 
 import java.util.*;
 import java.util.Map.Entry;
 
 import static de.tlc4b.tlc.TLCResults.TLCResult.*;
 import static tlc2.output.MP.*;
+import static tlc2.tool.ToolGlobals.OPCODE_be;
 
-public class TLCResults implements ToolGlobals {
+public class TLCResults {
 
 	private TLCResult tlcResult;
 	private String violatedDefinition, tlcErrorMessage;
@@ -111,16 +111,16 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private void evalCoverage() {
-		Hashtable<Integer, Long> lineCount = new Hashtable<>();
-		Set<Entry<Location, Long>> entrySet = TLC4BGlobals.getCurrentLineCounts().entrySet();
-		for (Entry<Location, Long> entry : entrySet) {
-			int endline = entry.getKey().endLine();
+		Map<Integer, Long> lineCount = new HashMap<>();
+		TLC4BGlobals.getCurrentLineCounts().forEach((location, count) -> {
+			int endline = location.endLine();
 			if (lineCount.containsKey(endline)) {
-				lineCount.put(endline, Math.max(lineCount.get(endline), entry.getValue()));
+				lineCount.put(endline, Math.max(lineCount.get(endline), count));
 			} else {
-				lineCount.put(endline, entry.getValue());
+				lineCount.put(endline, count);
 			}
-		}
+		});
+
 		List<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.getModuleNode());
 		operationsCount = new LinkedHashMap<>();
 		for (OpDefNode opDefNode : defs) {

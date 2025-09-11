@@ -408,8 +408,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			Node inv = invariants.get(i);
 			moduleStringAppend("Invariant" + (i + 1) + " == ");
 			if (TLC4BGlobals.isPartialInvariantEvaluation()) {
-				ArrayList<Node> operations = invariantPreservationAnalysis
-						.getPreservingOperations(inv);
+				List<Node> operations = invariantPreservationAnalysis.getPreservingOperations(inv);
 				if (!operations.isEmpty()) {
 					moduleStringAppend("last_action \\in {");
 					for (int j = 0; j < operations.size(); j++) {
@@ -1969,15 +1968,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseALambdaExpression(ALambdaExpression node) {
 		/*
-		 * B: %a,b.(P|e) TLA+ function: [<<a,b>> \in {<<a,b>> \in
-		 * type(a)*type(b) : P}|e] relation: TLA+: {<< <<a,b>>, e>>: <<a,b>> \in
-		 * {<<a,b>> \in type(a)*type(b): P}}
+		 * B: %a,b.(P|e)
+		 * TLA+ function: [<<a,b>> \in {<<a,b>> \in type(a)*type(b) : P}|e]
+		 * TLA+ relation: {<< <<a,b>>, e>>: <<a,b>> \in {<<a,b>> \in type(a)*type(b): P}}
 		 */
 		inALambdaExpression(node);
 		if (this.typechecker.getType(node) instanceof SetType) {
 			moduleStringAppend("{<<");
-			List<PExpression> copy = new ArrayList<>(
-				node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			printIdentifierList(copy);
 			moduleStringAppend(", ");
 			node.getExpression().apply(this);
@@ -2002,8 +2000,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 
 		} else {
 			moduleStringAppend("[");
-			List<PExpression> copy = new ArrayList<>(
-				node.getIdentifiers());
+			List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 			printIdentifierList(copy);
 
 			moduleStringAppend(" \\in ");
@@ -2033,16 +2030,14 @@ public class TLAPrinter extends DepthFirstAdapter {
 		inAFunctionExpression(node);
 
 		if (node.getIdentifier() instanceof AIdentifierExpression) {
-			AIdentifierExpression id = (AIdentifierExpression) node
-					.getIdentifier();
+			AIdentifierExpression id = (AIdentifierExpression) node.getIdentifier();
 			String name = Utils.getTIdentifierListAsString(id.getIdentifier());
 			if (isAbstractConstant(name)) {
 
 				moduleStringAppend(name);
 				// node.getIdentifier().apply(this);
 				moduleStringAppend("(");
-				List<PExpression> copy = new ArrayList<>(
-					node.getParameters());
+				List<PExpression> copy = new ArrayList<>(node.getParameters());
 				copy.get(0).apply(this);
 				moduleStringAppend(")");
 				return;
@@ -2055,8 +2050,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (type instanceof FunctionType) {
 			node.getIdentifier().apply(this);
 			moduleStringAppend("[");
-			List<PExpression> copy = new ArrayList<>(
-				node.getParameters());
+			List<PExpression> copy = new ArrayList<>(node.getParameters());
 			for (int i = 0; i < copy.size(); i++) {
 				if (i != 0) {
 					moduleStringAppend(", ");
@@ -2131,8 +2125,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		} else {
 			if (node.parent() instanceof AMemberPredicate
 					&& !typeRestrictor.isARemovedNode(node.parent())
-					&& !this.tlaModule.getInitPredicates().contains(
-							node.parent())) {
+					&& !this.tlaModule.getInitPredicates().contains(node.parent())) {
 				moduleStringAppend(REL_TOTAL_FUNCTION_ELEMENT_OF);
 			} else {
 				moduleStringAppend(REL_TOTAL_FUNCTION);
@@ -2213,8 +2206,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		BType subtype = ((SetType) type).getSubtype();
 		if (subtype instanceof FunctionType) {
 			Node parent = node.parent();
-			if (parent instanceof AMemberPredicate
-					&& !typeRestrictor.isARemovedNode(parent)) {
+			if (parent instanceof AMemberPredicate && !typeRestrictor.isARemovedNode(parent)) {
 				moduleStringAppend(funcEleOfName);
 				moduleStringAppend("(");
 				((AMemberPredicate) parent).getLeft().apply(this);
@@ -2286,8 +2278,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 			// 1 :> 2 @@ 2 :> 2
 			moduleStringAppend("(");
 			for (int i = 0; i < node.getExpressions().size(); i++) {
-				ACoupleExpression couple = (ACoupleExpression) node
-						.getExpressions().get(i);
+				ACoupleExpression couple = (ACoupleExpression) node.getExpressions().get(i);
 				Node left = couple.getList().get(0);
 				Node right = couple.getList().get(1);
 				left.apply(this);
@@ -2303,8 +2294,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		}
 		moduleStringAppend("{");
 		{
-			List<PExpression> copy = new ArrayList<>(
-				node.getExpressions());
+			List<PExpression> copy = new ArrayList<>(node.getExpressions());
 			for (int i = 0; i < copy.size(); i++) {
 				if (i != 0) {
 					moduleStringAppend(", ");

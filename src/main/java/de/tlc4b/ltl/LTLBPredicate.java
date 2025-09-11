@@ -1,30 +1,23 @@
 package de.tlc4b.ltl;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import de.be4.classicalb.core.parser.node.Node;
+
+import java.util.Map;
 
 public class LTLBPredicate {
-	LinkedHashMap<String, de.be4.classicalb.core.parser.node.Node> identifierHashTable;
-	
-	de.be4.classicalb.core.parser.node.Node predicate;
-	
-	public LTLBPredicate(LinkedHashMap<String, de.be4.classicalb.core.parser.node.Node> identifierHashTable, de.be4.classicalb.core.parser.node.Node predicate){
-		this.identifierHashTable = identifierHashTable;
+	private final Map<String, Node> identifierMap;
+	private final Node predicate;
+
+	public LTLBPredicate(Map<String, Node> identifierMap, Node predicate) {
+		this.identifierMap = identifierMap;
 		this.predicate = predicate;
 	}
 
-	public LTLBPredicate(
-			ArrayList<de.be4.classicalb.core.parser.node.Node> arrayList,
-			de.be4.classicalb.core.parser.node.Start start) {
-		// TODO Auto-generated constructor stub
-	}
-	
-	public de.be4.classicalb.core.parser.node.Node getBFormula(){
+	public Node getBFormula(){
 		return predicate;
 	}
 
-	public LinkedHashMap<String, de.be4.classicalb.core.parser.node.Node> getIdentifierList(){
-		return identifierHashTable;
+	public Map<String, Node> getIdentifierMap() {
+		return identifierMap;
 	}
-	
 }

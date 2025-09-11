@@ -129,9 +129,9 @@ public class MachineContext extends DepthFirstAdapter {
 		contextTable.add(getVariables());
 		contextTable.add(getDefinitions());
 
-		LinkedHashMap<String, Node> identifierHashTable = ltlbPredicate.getIdentifierList();
-		if (!identifierHashTable.isEmpty()) {
-			LinkedHashMap<String, Node> currentContext = new LinkedHashMap<>(identifierHashTable);
+		Map<String, Node> identifierMap = ltlbPredicate.getIdentifierMap();
+		if (!identifierMap.isEmpty()) {
+			LinkedHashMap<String, Node> currentContext = new LinkedHashMap<>(identifierMap);
 			contextTable.add(currentContext);
 		}
 		ltlbPredicate.getBFormula().apply(this);

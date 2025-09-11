@@ -72,8 +72,7 @@ public class PrimedNodesMarker extends DepthFirstAdapter {
 
 	@Override
 	public void caseABecomesElementOfSubstitution(ABecomesElementOfSubstitution node) {
-		List<PExpression> copy = new ArrayList<>(
-			node.getIdentifiers());
+		List<PExpression> copy = new ArrayList<>(node.getIdentifiers());
 		for (PExpression e : copy) {
 			Node ref = machineContext.getReferences().get(e);
 			if (machineContext.getVariables().containsValue(ref)) {
