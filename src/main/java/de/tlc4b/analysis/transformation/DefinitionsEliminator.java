@@ -1,8 +1,10 @@
 package de.tlc4b.analysis.transformation;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.Definitions;
 import de.be4.classicalb.core.parser.IDefinitions;
@@ -17,7 +19,6 @@ import de.be4.classicalb.core.parser.node.AExpressionDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.APredicateDefinitionDefinition;
 import de.be4.classicalb.core.parser.node.ASubstitutionDefinitionDefinition;
-import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PMachineClause;
@@ -33,21 +34,18 @@ import de.tlc4b.analysis.StandardModules;
  * Note: All parameters of a definition are replaced before a call of a
  * sub-definition is resolved. This behavior is similar to what ProB does when
  * eliminating all definitions.
- * 
  */
 public class DefinitionsEliminator extends DepthFirstAdapter {
 
 	private final IDefinitions definitions = new Definitions();
-	private final ArrayList<Hashtable<String, PExpression>> contextStack;
+	private final List<Map<String, PExpression>> contextStack = new ArrayList<>();
 
 	public static void eliminateDefinitions(Start start){
-		new DefinitionsEliminator(start);
+		start.apply(new DefinitionsEliminator(start));
 	}
 	
 	private DefinitionsEliminator(Start node) {
 		new DefinitionCollector(definitions).collectDefinitions(node);
-		contextStack = new ArrayList<>();
-		node.apply(this);
 	}
 
 	@Override
@@ -115,20 +113,11 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionSubstitution(ADefinitionSubstitution node) {
 		String name = node.getDefLiteral().getText();
-		PDefinition def = definitions.getDefinition(name);
 
-		ASubstitutionDefinitionDefinition clone = (ASubstitutionDefinitionDefinition) def.clone();
-		Hashtable<String, PExpression> context = new Hashtable<>();
-		ArrayList<PExpression> arguments = new ArrayList<>(node.getParameters());
-		for (int i = 0; i < clone.getParameters().size(); i++) {
-			AIdentifierExpression p = (AIdentifierExpression) clone
-					.getParameters().get(i);
-			String paramName = Utils.getTIdentifierListAsString(p.getIdentifier());
+		ASubstitutionDefinitionDefinition clone = (ASubstitutionDefinitionDefinition) definitions.getDefinition(name).clone();
+		Map<String, PExpression> context = new HashMap<>();
+		handleParameters(new LinkedList<>(node.getParameters()), clone.getParameters(), context);
 
-			Node arg = arguments.get(i);
-			arg.apply(this);
-			context.put(paramName, node.getParameters().get(i));
-		}
 		contextStack.add(context);
 		clone.getRhs().apply(this);
 		node.replaceBy(clone.getRhs());
@@ -138,25 +127,13 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionExpression(ADefinitionExpression node) {
 		String name = node.getDefLiteral().getText();
-		ArrayList<PExpression> arguments = new ArrayList<>(node.getParameters());
-		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {
-			for (PExpression arg : arguments) {
-				arg.apply(this);
-			}
+		if (checkExternalFunction(name, new ArrayList<>(node.getParameters())))
 			return;
-		}
 
-		PDefinition def = definitions.getDefinition(name);
-		AExpressionDefinitionDefinition clone = (AExpressionDefinitionDefinition) def.clone();
-		Hashtable<String, PExpression> context = new Hashtable<>();
+		AExpressionDefinitionDefinition clone = (AExpressionDefinitionDefinition) definitions.getDefinition(name).clone();
+		Map<String, PExpression> context = new HashMap<>();
+		handleParameters(new LinkedList<>(node.getParameters()), clone.getParameters(), context);
 
-		for (int i = 0; i < clone.getParameters().size(); i++) {
-			AIdentifierExpression p = (AIdentifierExpression) clone.getParameters().get(i);
-			String paramName = Utils.getTIdentifierListAsString(p.getIdentifier());
-			Node arg = arguments.get(i);
-			arg.apply(this);
-			context.put(paramName, node.getParameters().get(i));
-		}
 		contextStack.add(context);
 		clone.getRhs().apply(this);
 		node.replaceBy(clone.getRhs());
@@ -166,28 +143,13 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionPredicate(ADefinitionPredicate node) {
 		String name = node.getDefLiteral().getText();
-		PDefinition def = definitions.getDefinition(name);
-
-		ArrayList<PExpression> arguments = new ArrayList<>(node.getParameters());
-		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {
-			for (PExpression arg : arguments) {
-				arg.apply(this);
-			}
+		if (checkExternalFunction(name, new ArrayList<>(node.getParameters())))
 			return;
-		}
 
-		APredicateDefinitionDefinition clone = (APredicateDefinitionDefinition) def.clone();
-		Hashtable<String, PExpression> context = new Hashtable<>();
+		APredicateDefinitionDefinition clone = (APredicateDefinitionDefinition) definitions.getDefinition(name).clone();
+		Map<String, PExpression> context = new HashMap<>();
+		handleParameters(new LinkedList<>(node.getParameters()), clone.getParameters(), context);
 
-		for (int i = 0; i < clone.getParameters().size(); i++) {
-			AIdentifierExpression p = (AIdentifierExpression) clone.getParameters().get(i);
-			String paramName = Utils.getTIdentifierListAsString(p.getIdentifier());
-
-			Node arg = arguments.get(i);
-			arg.apply(this);
-			context.put(paramName, node.getParameters().get(i));
-			// context.put(paramName, arguments.get(i));
-		}
 		contextStack.add(context);
 		clone.getRhs().apply(this);
 		node.replaceBy(clone.getRhs());
@@ -201,12 +163,28 @@ public class DefinitionsEliminator extends DepthFirstAdapter {
 		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 
 		for (int i = contextStack.size() - 1; i >= 0; i--) {
-			Hashtable<String, PExpression> context = contextStack.get(i);
-			PExpression e = context.get(name);
+			PExpression e = contextStack.get(i).get(name);
 			if (e != null) {
 				node.replaceBy(e.clone());
 			}
 		}
 	}
 
+	private boolean checkExternalFunction(String name, List<PExpression> arguments) {
+		if (StandardModules.isKeywordInModuleExternalFunctions(name)) {
+			for (PExpression arg : arguments) {
+				arg.apply(this);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void handleParameters(List<PExpression> arguments, List<PExpression> cloneArguments, Map<String, PExpression> context) {
+		for (int i = 0; i < cloneArguments.size(); i++) {
+			arguments.get(i).apply(this);
+			AIdentifierExpression param = (AIdentifierExpression) cloneArguments.get(i);
+			context.put(Utils.getTIdentifierListAsString(param.getIdentifier()), arguments.get(i));
+		}
+	}
 }

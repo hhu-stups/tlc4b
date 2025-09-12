@@ -1,8 +1,11 @@
 package de.tlc4b.analysis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ADefinitionExpression;
@@ -19,40 +22,34 @@ import de.be4.classicalb.core.parser.node.PDefinition;
  * 
  * @author hansen
  */
-
 public class DefinitionsSorter extends DepthFirstAdapter {
 	private final MachineContext machineContext;
-	private final Hashtable<Node, HashSet<Node>> dependenciesTable;
-	private HashSet<Node> current;
+	private final Map<Node, Set<Node>> dependenciesMap;
+	private Set<Node> current;
 
-	private final ArrayList<PDefinition> allDefinitions;
+	private final List<PDefinition> allDefinitions;
 
-	public ArrayList<PDefinition> getAllDefinitions() {
+	public List<PDefinition> getAllDefinitions() {
 		return allDefinitions;
 	}
 
-	public DefinitionsSorter(MachineContext machineContext,
-			ArrayList<PDefinition> allDefinitions) {
+	public DefinitionsSorter(MachineContext machineContext, List<PDefinition> allDefinitions) {
 		this.machineContext = machineContext;
-		dependenciesTable = new Hashtable<>();
+		this.dependenciesMap = new HashMap<>();
 
-		for (PDefinition def : allDefinitions) {
-			def.apply(this);
-		}
-
+		allDefinitions.forEach(def -> def.apply(this));
 		this.allDefinitions = sort(new ArrayList<>(allDefinitions));
-
 	}
 
-	private ArrayList<PDefinition> sort(ArrayList<PDefinition> list) {
-		ArrayList<PDefinition> result = new ArrayList<>();
+	private List<PDefinition> sort(List<PDefinition> list) {
+		List<PDefinition> result = new ArrayList<>();
 		boolean newRun = true;
 		while (newRun) {
 			newRun = false;
 			for (PDefinition def : list) {
 				if (result.contains(def))
 					continue;
-				HashSet<Node> set = dependenciesTable.get(def);
+				Set<Node> set = dependenciesMap.get(def);
 				if (set.isEmpty()) {
 					newRun = true;
 					result.add(def);
@@ -80,56 +77,48 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 	}
 
 	private void removeDef(Node def) {
-		for (HashSet<Node> nodes : dependenciesTable.values()) {
-			nodes.remove(def);
-		}
+		dependenciesMap.values().forEach(nodes -> nodes.remove(def));
 	}
 
-	public void inAExpressionDefinitionDefinition(
-			AExpressionDefinitionDefinition node) {
+	private void startDefinition() {
 		current = new HashSet<>();
 	}
 
-	public void outAExpressionDefinitionDefinition(
-			AExpressionDefinitionDefinition node) {
-		dependenciesTable.put(node, current);
+	private void endDefinition(Node def) {
+		dependenciesMap.put(def, current);
 		current = null;
 	}
 
-	public void inAPredicateDefinitionDefinition(
-			APredicateDefinitionDefinition node) {
-		current = new HashSet<>();
+	public void inAExpressionDefinitionDefinition(AExpressionDefinitionDefinition node) {
+		startDefinition();
 	}
 
-	public void outAPredicateDefinitionDefinition(
-			APredicateDefinitionDefinition node) {
-		dependenciesTable.put(node, current);
-		current = null;
+	public void outAExpressionDefinitionDefinition(AExpressionDefinitionDefinition node) {
+		endDefinition(node);
 	}
 
-	public void inASubstitutionDefinitionDefinition(
-			ASubstitutionDefinitionDefinition node) {
-		current = new HashSet<>();
+	public void inAPredicateDefinitionDefinition(APredicateDefinitionDefinition node) {
+		startDefinition();
 	}
 
-	public void outASubstitutionDefinitionDefinition(
-			ASubstitutionDefinitionDefinition node) {
-		dependenciesTable.put(node, current);
-		current = null;
+	public void outAPredicateDefinitionDefinition(APredicateDefinitionDefinition node) {
+		endDefinition(node);
+	}
+
+	public void inASubstitutionDefinitionDefinition(ASubstitutionDefinitionDefinition node) {
+		startDefinition();
+	}
+
+	public void outASubstitutionDefinitionDefinition(ASubstitutionDefinitionDefinition node) {
+		endDefinition(node);
 	}
 
 	public void inADefinitionExpression(ADefinitionExpression node) {
-
 		Node refNode = machineContext.getReferences().get(node);
-		/*
-		 * If refNode is null, then the whole branch was cloned when a constant
-		 * assignment was generated
-		 */
-
+		// If refNode is null, then the whole branch was cloned when a constant assignment was generated
 		if (null != refNode) {
 			current.add(refNode);
 		}
-
 	}
 
 	public void inAIdentifierExpression(AIdentifierExpression node) {
@@ -145,6 +134,5 @@ public class DefinitionsSorter extends DepthFirstAdapter {
 		if (machineContext.getReferences().get(identifierRef) instanceof PDefinition) {
 			current.add(identifierRef);
 		}
-
 	}
 }
