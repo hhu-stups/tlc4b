@@ -26,9 +26,9 @@ import de.tlc4b.util.StopWatch;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.help.HelpFormatter;
 
 import static de.tlc4b.TLC4BOption.*;
 import static de.tlc4b.util.StopWatch.Watches.*;
@@ -363,9 +363,16 @@ public class TLC4B {
 				buildDir = new File(line.getOptionValue(OUTPUT.arg()));
 			}
 		} catch (ParseException e) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("java -jar TLC4B.jar [file]", options);
-			throw new TLC4BIOException(e);
+			HelpFormatter formatter = HelpFormatter.builder()
+				.setShowSince(false)
+				.get();
+			TLC4BException tlcException = new TLC4BIOException(e);
+			try {
+				formatter.printHelp("java -jar TLC4B.jar [file]", "", options, "", false);
+			} catch (IOException exc) {
+				tlcException.addSuppressed(exc);
+			}
+			throw tlcException;
 		}
 	}
 
