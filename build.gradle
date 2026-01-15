@@ -28,7 +28,7 @@ configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-def parserVersion = "2.15.2"
+def parserVersion = "2.15.4"
 
 dependencies {
 	// The upstream version of the TLA+ tools is only published to Sonatype Snapshots, not to Maven Central.
@@ -39,13 +39,13 @@ dependencies {
 	// https://github.com/tlaplus/tlaplus/issues/1247
 	//implementation("com.lamport:tla2tools:1.8.0-SNAPSHOT")
 
-	implementation("commons-cli:commons-cli:1.9.0")
+	implementation("commons-cli:commons-cli:1.11.0")
 	implementation("de.hhu.stups:tlatools:1.1.0")
 
 	implementation("de.hhu.stups:bparser:${parserVersion}")
 	implementation("de.hhu.stups:ltlparser:${parserVersion}")
 
-	testImplementation(platform("org.junit:junit-bom:5.13.2"))
+	testImplementation(platform("org.junit:junit-bom:5.14.2"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 	testImplementation("org.junit.jupiter:junit-jupiter-params")
 	testCompileOnly("junit:junit:4.13.2")
@@ -78,7 +78,7 @@ test {
 }
 
 jacoco {
-	toolVersion = "0.8.13"
+	toolVersion = "0.8.14"
 }
 
 jacocoTestReport {
