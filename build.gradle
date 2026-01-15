@@ -37,21 +37,21 @@ dependencies {
 	// See:
 	// https://github.com/tlaplus/tlaplus/issues/1220
 	// https://github.com/tlaplus/tlaplus/issues/1247
-	//implementation(group: 'com.lamport', name: 'tla2tools', version: '1.8.0-SNAPSHOT')
+	//implementation("com.lamport:tla2tools:1.8.0-SNAPSHOT")
 
-	implementation(group: 'commons-cli', name: 'commons-cli', version: '1.9.0')
-	implementation(group: 'de.hhu.stups', name: 'tlatools', version: '1.1.0')
+	implementation("commons-cli:commons-cli:1.9.0")
+	implementation("de.hhu.stups:tlatools:1.1.0")
 
-	implementation(group: 'de.hhu.stups', name: 'bparser', version: parserVersion)
-	implementation(group: 'de.hhu.stups', name: 'ltlparser', version: parserVersion)
+	implementation("de.hhu.stups:bparser:${parserVersion}")
+	implementation("de.hhu.stups:ltlparser:${parserVersion}")
 
-	testImplementation(platform(group: 'org.junit', name: 'junit-bom', version: '5.13.2'))
-	testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter')
-	testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params')
-	testCompileOnly(group: 'junit', name: 'junit', version: '4.13.2')
-	testRuntimeOnly(group: 'org.junit.vintage', name: 'junit-vintage-engine')
-	testRuntimeOnly(group: 'org.junit.platform', name: 'junit-platform-launcher')
-	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: '1.4.2')
+	testImplementation(platform("org.junit:junit-bom:5.13.2"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testImplementation("org.junit.jupiter:junit-jupiter-params")
+	testCompileOnly("junit:junit:4.13.2")
+	testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("de.hhu.stups:tla2bAST:1.4.2")
 }
 
 java {
