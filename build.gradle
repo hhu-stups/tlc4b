@@ -31,7 +31,14 @@ configurations.all {
 def parser_version = "2.15.2"
 
 dependencies {
+	// The upstream version of the TLA+ tools is only published to Sonatype Snapshots, not to Maven Central.
+	// Even the snapshot is currently (2026-01) unavailable since Sonatype shut down the old OSSRH service,
+	// because the TLA+ people haven't updated their snapshot upload for the new Maven Central Portal yet.
+	// See:
+	// https://github.com/tlaplus/tlaplus/issues/1220
+	// https://github.com/tlaplus/tlaplus/issues/1247
 	//implementation(group: 'com.lamport', name: 'tla2tools', version: '1.8.0-SNAPSHOT')
+
 	implementation(group: 'commons-cli', name: 'commons-cli', version: '1.9.0')
 	implementation(group: 'de.hhu.stups', name: 'tlatools', version: '1.1.0')
 
