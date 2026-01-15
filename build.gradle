@@ -65,10 +65,6 @@ javadoc {
 test {
 	useJUnitPlatform()
 
-	testLogging {
-		events 'passed', 'skipped', 'failed'
-	}
-
 	exclude('de/tlc4b/tlc/integration/probprivate')
 	exclude('testing')
 	//exclude('de/tlc4b/tlc/integration')
