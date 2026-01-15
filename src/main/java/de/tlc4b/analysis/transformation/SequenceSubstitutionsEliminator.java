@@ -24,7 +24,8 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 	}
 
 	private ASequenceSubstitution topLevel = null;
-	private boolean initialisationMode = false, replacementMode = false;
+	private boolean initialisationMode = false;
+	private boolean replacementMode = false;
 
 	private final Set<List<String>> parallelAssignedVariables = new HashSet<>();
 	private final Set<List<String>> currentAssignedVariables = new HashSet<>();

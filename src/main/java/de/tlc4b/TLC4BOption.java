@@ -28,7 +28,8 @@ public enum TLC4BOption {
 	OUTPUT("output", "provide path for output directory", String.class),
 	COVERAGE("coverage", "print operation coverage", null);
 
-	private final String arg, desc;
+	private final String arg;
+	private final String desc;
 	private final Class<?> expectsArg;
 
 	TLC4BOption(String arg, String desc, Class<?> expectsArg) {

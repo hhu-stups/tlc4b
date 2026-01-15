@@ -22,14 +22,16 @@ import static tlc2.tool.ToolGlobals.OPCODE_be;
 public class TLCResults {
 
 	private TLCResult tlcResult;
-	private String violatedDefinition, tlcErrorMessage;
+	private String violatedDefinition;
+	private String tlcErrorMessage;
 	private Date startTime;
 	private Date endTime;
 	private Map<String, Long> operationsCount;
 	private final List<String> violatedAssertions = new ArrayList<>();
 
 	private int lengthOfTrace;
-	private String traceString, traceFile;
+	private String traceString;
+	private String traceFile;
 
 	private int numberOfDistinctStates;
 	private int numberOfTransitions;

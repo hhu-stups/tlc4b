@@ -37,7 +37,8 @@ import static de.tlc4b.MP.*;
 public class TLC4B {
 	private static final String CSV_DELIMITER = ";";
 
-	private File mainfile, traceFile;
+	private File mainfile;
+	private File traceFile;
 	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
 	private File logFile;
