@@ -1,13 +1,13 @@
 package de.tlc4b.tla.config;
 
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import de.be4.classicalb.core.parser.node.ADeferredSetSet;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
 import de.be4.classicalb.core.parser.node.Node;
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.analysis.Renamer;
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * 

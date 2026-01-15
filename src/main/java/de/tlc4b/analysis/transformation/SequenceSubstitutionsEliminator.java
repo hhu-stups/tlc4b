@@ -1,13 +1,17 @@
 package de.tlc4b.analysis.transformation;
 
-import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
-import de.be4.classicalb.core.parser.node.*;
-import de.tlc4b.exceptions.NotSupportedException;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static de.tlc4b.MP.printlnVerbose;
+import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
+import de.be4.classicalb.core.parser.node.*;
+import de.tlc4b.MP;
+import de.tlc4b.exceptions.NotSupportedException;
 
 /**
  * Replace all SequenceSubstitutions by ParallelSubstitutions.
@@ -218,7 +222,7 @@ public class SequenceSubstitutionsEliminator extends DepthFirstAdapter {
 	@Override
 	public void outASequenceSubstitution(ASequenceSubstitution node) {
 		node.replaceBy(new AParallelSubstitution(new ArrayList<>(node.getSubstitutions())));
-		printlnVerbose(node.getStartPos() + "-" + node.getEndPos() + ": replaced sequential substitution by parallel substitution");
+		MP.printlnVerbose(node.getStartPos() + "-" + node.getEndPos() + ": replaced sequential substitution by parallel substitution");
 
 		if (modeStack.pollFirst() != SubstitutionMode.SEQUENTIAL) {
 			throw new IllegalStateException("expected SEQUENTIAL mode");

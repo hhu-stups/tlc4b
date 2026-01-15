@@ -1,9 +1,11 @@
 package de.tlc4b.tlc;
 
-import de.tlc4b.TLC4BGlobals;
-import tlc2.output.Message;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import de.tlc4b.TLC4BGlobals;
+
+import tlc2.output.Message;
 
 public abstract class TLCMessageListener extends Thread {
 

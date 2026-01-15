@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class DataTypesTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME \"abc\" = \"abc\" \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -27,7 +27,7 @@ public class DataTypesTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME <<3, 4>> = <<3, 4>> \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	
@@ -40,7 +40,7 @@ public class DataTypesTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME <<3, 4>> = <<3, 4>> \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

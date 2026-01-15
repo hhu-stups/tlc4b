@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class LogicalPredicatesTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -25,7 +25,7 @@ public class LogicalPredicatesTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME TRUE = (1=1) \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -36,7 +36,7 @@ public class LogicalPredicatesTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME 1 # 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -48,7 +48,7 @@ public class LogicalPredicatesTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME  1 = 1 => 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -61,6 +61,6 @@ public class LogicalPredicatesTest {
 				+ "EXTENDS Integers \n"
 				+ "ASSUME 0 \\in Int \\cap {0} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

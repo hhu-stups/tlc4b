@@ -1,10 +1,9 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.exceptions.SubstitutionException;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
-
-import de.tlc4b.exceptions.SubstitutionException;
 
 public class SubstitutionsTest {
 	
@@ -14,7 +13,7 @@ public class SubstitutionsTest {
 		String machine = "MACHINE test\n" + "VARIABLES x\n"
 				+ "INVARIANT x = 1 \n" + "INITIALISATION x := 1 || x := 1 \n"
 				+ "END";
-		compare(null, machine);
+		TestUtil.compare(null, machine);
 	}
 	
 	@Test (expected = SubstitutionException.class)
@@ -22,7 +21,7 @@ public class SubstitutionsTest {
 		String machine = "MACHINE test\n" + "VARIABLES x,y \n"
 				+ "INVARIANT x = 1 & y = 1 \n" + "INITIALISATION x := 1 \n"
 				+ "END";
-		compare(null, machine);
+		TestUtil.compare(null, machine);
 	}
 
 	@Test
@@ -62,7 +61,7 @@ public class SubstitutionsTest {
 			+ "\t\\/ op4\n"
 			+ "\t\\/ op5\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -103,7 +102,7 @@ public class SubstitutionsTest {
 			+ "\t\\/ op4\n"
 			+ "\t\\/ op5\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -143,7 +142,7 @@ public class SubstitutionsTest {
 			+ "\t\\/ op3\n"
 			+ "\t\\/ op4\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -179,7 +178,7 @@ public class SubstitutionsTest {
 			+ "\t\\/ op3\n"
 			+ "\t\\/ op4\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test (expected = SubstitutionException.class)
@@ -189,7 +188,7 @@ public class SubstitutionsTest {
 			+ "INVARIANT x = 1 & y = 3 \n"
 			+ "INITIALISATION x := 1 ; y := x ; x := y \n"
 			+ "END";
-		compare(null, machine);
+		TestUtil.compare(null, machine);
 	}
 	
 	@Test
@@ -207,7 +206,7 @@ public class SubstitutionsTest {
 				+ "Init == \\E a \\in {1}, b \\in {2} : TRUE /\\ x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -225,7 +224,7 @@ public class SubstitutionsTest {
 				+ "Init == \\E a \\in {1}, b \\in {2} : x = a + b \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -242,7 +241,7 @@ public class SubstitutionsTest {
 				+ "Init == 1 = 1 \n/\\ x = 1\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -260,7 +259,7 @@ public class SubstitutionsTest {
 				+ "Init == 1 = 1 \n/\\ x = 1\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -278,7 +277,7 @@ public class SubstitutionsTest {
 				+ "Init == x \\in {1}\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -296,7 +295,7 @@ public class SubstitutionsTest {
 				+ "Init == (CASE 1 = 1 -> x = 1 [] 1 = 2 -> x = 2 [] OTHER -> x = 4)\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

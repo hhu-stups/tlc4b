@@ -1,8 +1,9 @@
 package de.tlc4b.prettyprint;
 
+import de.tlc4b.util.TestUtil;
+
 import org.junit.Test;
 
-import static de.tlc4b.util.TestUtil.*;
 import static org.junit.Assert.assertEquals;
 
 public class FunctionTest {
@@ -16,7 +17,7 @@ public class FunctionTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME <<1>> = [x \\in {1} |-> 1 ]\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -28,7 +29,7 @@ public class FunctionTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME <<1>> = [x \\in {x \\in {1}: 1=1} |-> 1 ]\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -39,7 +40,7 @@ public class FunctionTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 = [x \\in {1} |-> 1 ][1]\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -51,7 +52,7 @@ public class FunctionTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME 4 = [<<a, b>> \\in { <<a, b>> \\in ((Int) \\times (Int)) : a = b} |-> a + b][2, 2]\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -64,7 +65,7 @@ public class FunctionTest {
 				+ "EXTENDS Integers, TLC\n"
 				+ "ASSUME (<<1, 2>>:>3) = [<<a, b>> \\in {<<a, b>> \\in ((Int) \\times (Int)) : a = b} |-> a + b] \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -75,7 +76,7 @@ public class FunctionTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME {1} = DOMAIN [x \\in {1} |-> 1 ]\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -86,7 +87,7 @@ public class FunctionTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME <<1, 2>>[1] = 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -96,7 +97,7 @@ public class FunctionTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME [{1} -> {1}] = [{1} -> {1}]\n"
 				+ "====";
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 
@@ -108,7 +109,7 @@ public class FunctionTest {
 				+ "EXTENDS Functions\n"
 				+ "ASSUME {} = ParFunc({1, 2}, {1, 2})\n"
 				+ "====";
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 }

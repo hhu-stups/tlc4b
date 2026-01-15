@@ -1,11 +1,10 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.exceptions.SubstitutionException;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
-
-import de.tlc4b.exceptions.SubstitutionException;
 
 public class OperationsTest {
 
@@ -23,7 +22,7 @@ public class OperationsTest {
 				+ "Init == x = 1 \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -43,7 +42,7 @@ public class OperationsTest {
 				+ "foo == x' = 2\n"
 				+ "Next == foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -55,7 +54,7 @@ public class OperationsTest {
 				+ "INITIALISATION a,b,c := 1,1,1 \n"
 				+ "OPERATIONS foo = a := 2 || a := 3 \n"
 				+ "END";
-		compare(null, machine);
+		TestUtil.compare(null, machine);
 	}
 	
 	@Test
@@ -72,7 +71,7 @@ public class OperationsTest {
 				+ "Init == x = 1 \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -90,7 +89,7 @@ public class OperationsTest {
 				+ "Init == x \\in {1} /\\ y \\in {1} \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x, y>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -111,7 +110,7 @@ public class OperationsTest {
 				+ "foo == x' \\in {1} /\\ y' \\in {1}\n"
 				+ "Next == foo\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -133,7 +132,7 @@ public class OperationsTest {
 				+ "foo == x' \\in {x + 1} /\\ UNCHANGED <<y>>\n"
 				+ "Next == foo\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -153,7 +152,7 @@ public class OperationsTest {
 				+ "foo(p) == x' = p\n"
 				+ "Next == \\E p \\in {1} : foo(p)\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -173,7 +172,7 @@ public class OperationsTest {
 				+ "foo == \\E p \\in {1} : x' = p\n"
 				+ "Next == foo\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -194,7 +193,7 @@ public class OperationsTest {
 				+ "foo(p) == \\E p2 \\in {1} : x' = p + p2\n"
 				+ "Next == \\E p \\in {1} : foo(p)\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -214,7 +213,7 @@ public class OperationsTest {
 				+ "foo == UNCHANGED <<x>>\n"
 				+ "Next == foo\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -234,7 +233,7 @@ public class OperationsTest {
 				+ "foo == 1 = 1 /\\ UNCHANGED <<x>>\n"
 				+ "Next == foo\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -256,7 +255,7 @@ public class OperationsTest {
 				+ "foo == x = 1 /\\ x' = x + 1\n"
 				+ "Next == foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -277,7 +276,7 @@ public class OperationsTest {
 				+ "foo(a) == x' = a\n"
 				+ "Next == \\E a \\in {1}: foo(a) \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -297,7 +296,7 @@ public class OperationsTest {
 				+ "foo == x' \\in {2} \n"
 				+ "Next == foo\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -317,7 +316,7 @@ public class OperationsTest {
 				+ "foo == (IF 1 = 1 THEN x' = 1 ELSE  UNCHANGED <<x>>)\n"
 				+ "Next ==  foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -338,7 +337,7 @@ public class OperationsTest {
 				+ "foo == (( ((x = 1) /\\ (x' = 1)) \\/ (x = 2 /\\ x' = 2)))\n"
 				+ "Next == foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -361,7 +360,7 @@ public class OperationsTest {
 				+ "foo ==  (( ((x = 1) /\\ (x' = 1)) \\/ (x = 2 /\\ UNCHANGED <<x>>)) /\\ UNCHANGED <<y>>)\n"
 				+ "Next == foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -383,7 +382,7 @@ public class OperationsTest {
 				+ "/\\ (((x = 1 /\\ x' = 1) \\/ (x = 2 /\\  UNCHANGED <<x>>)) /\\ y' = 1)\n"
 				+ "Next == foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -405,7 +404,7 @@ public class OperationsTest {
 				+ "foo == TRUE /\\ UNCHANGED <<x>>\n"
 				+ "Next == foo \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -426,7 +425,7 @@ public class OperationsTest {
 				+ "inc == x' = x + 1\n"
 				+ "Next == \\/ inc \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -447,7 +446,7 @@ public class OperationsTest {
 				+ "inc == x' = LET y == x+1 IN y+1\n"
 				+ "Next == \\/ inc\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -468,6 +467,6 @@ public class OperationsTest {
 				+ "inc == (\\E y \\in {1} : TRUE /\\ x = y /\\ x' = x + 1)\n"
 				+ "Next == \\/ inc\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.*;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class RelationTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME <<1,2>> = <<1,2>>\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -24,7 +24,7 @@ public class RelationTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME <<<<1, 2>>, 3>> = <<<<1, 2>>, 3>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -34,7 +34,7 @@ public class RelationTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME <<<<<<1, 2>>, 3>>, 4>> = <<<<<<1, 2>>, 3>>, 4>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

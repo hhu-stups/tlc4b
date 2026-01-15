@@ -1,7 +1,13 @@
 package de.tlc4b.analysis;
 
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -833,7 +839,7 @@ public class MachineContext extends DepthFirstAdapter {
 
 	public ArrayList<Node> getConstantArrayList() {
 		ArrayList<Node> list = new ArrayList<>();
-		for (Entry<String, Node> entry : constants.entrySet()) {
+		for (Map.Entry<String, Node> entry : constants.entrySet()) {
 			list.add(entry.getValue());
 		}
 		return list;

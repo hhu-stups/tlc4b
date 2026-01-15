@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -15,6 +15,6 @@ public class FunctionsVsRelationsTest {
 				+ "EXTENDS FiniteSets\n"
 				+ "ASSUME 1 = Cardinality(DOMAIN([x \\in {1} |-> 1 ]))\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

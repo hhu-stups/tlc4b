@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssertionsMachineClause;
@@ -226,7 +226,7 @@ public class Generator extends DepthFirstAdapter {
 		if (machineContext.getPropertiesMachineClause() == null)
 			return;
 		LinkedHashMap<Node, Node> conValueTable = constantsEvaluator.getValueOfIdentifierMap();
-		for (Entry<Node, Node> entry : conValueTable.entrySet()) {
+		for (Map.Entry<Node, Node> entry : conValueTable.entrySet()) {
 			AIdentifierExpression con = (AIdentifierExpression) entry.getKey();
 			Node value = entry.getValue();
 

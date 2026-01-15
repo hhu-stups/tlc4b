@@ -1,10 +1,11 @@
 package de.tlc4b.tlc.integration;
 
-import static de.tlc4b.tlc.TLCResults.TLCResult.*;
-import static de.tlc4b.util.TestUtil.testString;
-import static org.junit.Assert.assertEquals;
+import de.tlc4b.tlc.TLCResults;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class BBuiltInsTest {
 
@@ -12,6 +13,6 @@ public class BBuiltInsTest {
 	public void testIntersectionWDError() throws Exception {
 		String machine = "MACHINE Test\n" + "PROPERTIES \n"
 				+ "inter({}) = {} \n" + "END";
-		assertEquals(WellDefinednessError, testString(machine));
+		assertEquals(TLCResults.TLCResult.WellDefinednessError, TestUtil.testString(machine));
 	}
 }

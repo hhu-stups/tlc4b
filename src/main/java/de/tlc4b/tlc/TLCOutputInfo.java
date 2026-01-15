@@ -3,7 +3,6 @@ package de.tlc4b.tlc;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.node.Node;
 import de.tlc4b.analysis.MachineContext;

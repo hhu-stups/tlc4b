@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.*;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -17,6 +17,6 @@ public class EnumeratedSetsTest {
 				+ "set2 == {d}\n" 
 				+ "====";
 		final String config = "CONSTANTS\na = a\nb = b\nc = c\nd = d\n";
-		compareModuleAndConfig(expected, config, machine);
+		TestUtil.compareModuleAndConfig(expected, config, machine);
 	}
 }

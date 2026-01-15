@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.*;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class MachineParameterTest {
 		String expected = "---- MODULE test----\n" 
 				+ "a == 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -31,7 +31,7 @@ public class MachineParameterTest {
 				+ "Next == 1 = 2 /\\ UNCHANGED <<a>>\n"
 				+ "====";
 		String expectedConfig = "INIT Init\nNEXT Next\n";
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -44,7 +44,7 @@ public class MachineParameterTest {
 				+ "a == 1\n"
 				+ "b == 2 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -56,7 +56,7 @@ public class MachineParameterTest {
 				+ "CONSTANTS AA\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS\nAA = {AA1,AA2,AA3}\n";
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class MachineParameterTest {
 				+ "ASSUME Cardinality(B) = 2\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS\nB = {B1,B2,B3}\n";
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 }

@@ -1,8 +1,6 @@
 package de.tlc4b.analysis;
 
-
-
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,7 +19,7 @@ public class ConstantsTest {
 				+ "Init == k2 \\in {k} \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<k2>>\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -34,7 +32,7 @@ public class ConstantsTest {
 				+ "k == 1 \n"
 				+ "ASSUME 1 = 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -48,7 +46,7 @@ public class ConstantsTest {
 				+ "Init == k \\in {1} \n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<k>>\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -61,7 +59,7 @@ public class ConstantsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "k == 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -75,7 +73,7 @@ public class ConstantsTest {
 				+ "k == 2 \n"
 				+ "ASSUME k > 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -90,7 +88,7 @@ public class ConstantsTest {
 				+ "k == 1 \n"
 				+ "ASSUME 2 > k \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -103,7 +101,7 @@ public class ConstantsTest {
 				+ "t == 3 \n"
 				+ "ASSUME t > 2 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -117,7 +115,7 @@ public class ConstantsTest {
 				+ "N == {1,2,3,4}\n"
 				+ "ASSUME N \\subseteq Nat \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -132,7 +130,7 @@ public class ConstantsTest {
 				+ "Init == n \\in SUBSET({1, 2, 3})\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<n>>\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -145,7 +143,7 @@ public class ConstantsTest {
 		String expected = "---- MODULE test----\n"
 				+ "n == 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -158,7 +156,7 @@ public class ConstantsTest {
 		String expected = "---- MODULE test----\n"
 				+ "n == 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -171,7 +169,7 @@ public class ConstantsTest {
 		String expected = "---- MODULE test----\n"
 				+ "n == 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

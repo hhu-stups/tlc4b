@@ -1,7 +1,5 @@
 package de.tlc4b;
 
-import static de.tlc4b.util.StopWatch.Watches.MODEL_CHECKING_TIME;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -17,11 +15,13 @@ import java.util.Set;
 
 import de.tlc4b.tlc.TLCMessageListener;
 import de.tlc4b.util.StopWatch;
+
+import tlc2.TLC;
 import tlc2.TLCGlobals;
 import tlc2.tool.fp.FPSetFactory;
+
 import util.SimpleFilenameToStream;
 import util.ToolIO;
-import tlc2.TLC;
 
 public final class TLCRunner {
 
@@ -130,7 +130,7 @@ public final class TLCRunner {
 	}
 
 	public static void runTLC(String machineName, File path) {
-		StopWatch.start(MODEL_CHECKING_TIME);
+		StopWatch.start(StopWatch.Watches.MODEL_CHECKING_TIME);
 		MP.printlnSilent("--------------------------------");
 		MP.TLCOutputStream.changeOutputStream();
 		ToolIO.reset();
@@ -156,7 +156,7 @@ public final class TLCRunner {
 		// return messages;
 		MP.TLCOutputStream.resetOutputStream();
 		MP.println("--------------------------------");
-		StopWatch.stop(MODEL_CHECKING_TIME);
+		StopWatch.stop(StopWatch.Watches.MODEL_CHECKING_TIME);
 	}
 
 	private static void closeThreads() {

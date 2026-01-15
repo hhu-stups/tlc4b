@@ -1,10 +1,9 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.exceptions.ScopeException;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
-
-import de.tlc4b.exceptions.ScopeException;
 
 public class DefinitionsTest {
 
@@ -17,7 +16,7 @@ public class DefinitionsTest {
 				+ "INVARIANT x = 1"
 				+ "INITIALISATION x:= 1"  
 				+ "END";
-		compare("", machine);
+		TestUtil.compare("", machine);
 	}
 	
 	@Test
@@ -29,7 +28,7 @@ public class DefinitionsTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -41,7 +40,7 @@ public class DefinitionsTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -53,7 +52,7 @@ public class DefinitionsTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -70,6 +69,6 @@ public class DefinitionsTest {
 				+ "Init == x = 1\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<x>>\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

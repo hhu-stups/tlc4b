@@ -1,8 +1,9 @@
 package de.tlc4b.analysis;
 
+import de.tlc4b.util.TestUtil;
+
 import org.junit.Test;
 
-import static de.tlc4b.util.TestUtil.*;
 import static org.junit.Assert.assertEquals;
 
 public class RenamerTest {
@@ -16,7 +17,7 @@ public class RenamerTest {
 		String expected = "---- MODULE test ----\n"
 				+ "WITH_1 == 1\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -33,7 +34,7 @@ public class RenamerTest {
 				+ "Init == WITH_1 = 1 \n\n"
 				+ "Next == 1 = 2 /\\ UNCHANGED <<WITH_1>>\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -53,7 +54,7 @@ public class RenamerTest {
 				+ "WITH_1 == x' = 2\n"
 				+ "Next == WITH_1 \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -66,7 +67,7 @@ public class RenamerTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME 1 = 1\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -80,7 +81,7 @@ public class RenamerTest {
 				+ "x == 1\n"
 				+ "ASSUME 1 = 1\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -92,7 +93,7 @@ public class RenamerTest {
 				+ "x == 1\n"
 				+ "ASSUME (\\E x_1 \\in {1} : TRUE)\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -105,7 +106,7 @@ public class RenamerTest {
 				+ "S == {aa}\n"
 				+ "ASSUME \\E aa_1 \\in {1} : TRUE\n"
 				+ "====";
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 }

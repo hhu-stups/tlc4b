@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.node.ARecEntry;
@@ -44,11 +44,11 @@ public class StructType extends AbstractHasFollowers {
 		StringBuilder res = new StringBuilder();
 		res.append("struct(");
 
-		Iterator<Entry<String, BType>> iterator = types.entrySet().iterator();
+		Iterator<Map.Entry<String, BType>> iterator = types.entrySet().iterator();
 		if (!iterator.hasNext())
 			res.append("...");
 		while (iterator.hasNext()) {
-			Entry<String, BType> next = iterator.next();
+			Map.Entry<String, BType> next = iterator.next();
 			String fieldName = next.getKey();
 			res.append(fieldName).append(":").append(next.getValue());
 			if (iterator.hasNext())
@@ -59,7 +59,7 @@ public class StructType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType) {
-		for (Entry<String, BType> next : this.types.entrySet()) {
+		for (Map.Entry<String, BType> next : this.types.entrySet()) {
 			String name = next.getKey();
 			BType type = next.getValue();
 			if (type == oldType) {
@@ -83,7 +83,7 @@ public class StructType extends AbstractHasFollowers {
 		if (other instanceof StructType) {
 			StructType s = (StructType) other;
 
-			for (Entry<String, BType> next : s.types.entrySet()) {
+			for (Map.Entry<String, BType> next : s.types.entrySet()) {
 				String fieldName = next.getKey();
 				BType sType = next.getValue();
 				if (this.types.containsKey(fieldName)) {
@@ -147,7 +147,7 @@ public class StructType extends AbstractHasFollowers {
 					return false;
 				}
 			}
-			for (Entry<String, BType> next : types.entrySet()) {
+			for (Map.Entry<String, BType> next : types.entrySet()) {
 				String name = next.getKey();
 				BType value = next.getValue();
 				if (!this.types.get(name).compare(value)) {
@@ -185,8 +185,8 @@ public class StructType extends AbstractHasFollowers {
 	public PExpression createASTNode(Typechecker typechecker) {
 		ArrayList<PRecEntry> list = new ArrayList<>();
 
-		Set<Entry<String, BType>> entrySet = this.types.entrySet();
-		for (Entry<String, BType> entry : entrySet) {
+		Set<Map.Entry<String, BType>> entrySet = this.types.entrySet();
+		for (Map.Entry<String, BType> entry : entrySet) {
 			String name = entry.getKey();
 			BType type = entry.getValue();
 			ARecEntry recEntry = new ARecEntry(new TIdentifierLiteral(name), type.createASTNode(typechecker));

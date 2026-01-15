@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAnySubstitution;
@@ -117,7 +117,7 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	private void evalEnumValues() {
-		for (Entry<String, Node> entry : machineContext.getEnumValues().entrySet()) {
+		for (Map.Entry<String, Node> entry : machineContext.getEnumValues().entrySet()) {
 			String name = entry.getKey();
 			Node node = entry.getValue();
 
@@ -132,7 +132,7 @@ public class Renamer extends DepthFirstAdapter {
 	}
 
 	public void evalGlobalNames(LinkedHashMap<String, Node> map) {
-		for (Entry<String, Node> entry : map.entrySet()) {
+		for (Map.Entry<String, Node> entry : map.entrySet()) {
 			String name = entry.getKey();
 			String newName = incName(name);
 			namesTable.put(map.get(name), newName);

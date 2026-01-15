@@ -1,8 +1,8 @@
 package de.tlc4b.typechecking;
 
-import org.junit.Test;
-
 import de.be4.classicalb.core.parser.exceptions.BException;
+
+import org.junit.Test;
 
 public class LogicalOperatorTest {
 

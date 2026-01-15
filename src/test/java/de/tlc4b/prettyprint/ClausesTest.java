@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -15,7 +15,7 @@ public class ClausesTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME Assertion1 == 1 = 1\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -27,7 +27,7 @@ public class ClausesTest {
 				+ "ASSUME Assertion1 == 1 = 1\n"
 				+ "ASSUME Assertion2 == 2 = 2\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -39,7 +39,7 @@ public class ClausesTest {
 		String expected = "---- MODULE test ----\n"
 				+ "k == 1 "
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -51,7 +51,7 @@ public class ClausesTest {
 		String expected = "---- MODULE test ----\n"
 				+ "k == 1 "
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

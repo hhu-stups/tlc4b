@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ACardExpression;
@@ -130,7 +130,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 
 	private void removeConstant(AIdentifierExpression id) {
 		HashMap<String, Node> constants = machineContext.getConstants();
-		for (Entry<String, Node> entry : constants.entrySet()) {
+		for (Map.Entry<String, Node> entry : constants.entrySet()) {
 			if (entry.getValue() == id) {
 				constants.remove(entry.getKey());
 				break;

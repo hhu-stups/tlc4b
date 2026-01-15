@@ -1,6 +1,6 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "k == {x \\in {1}: x  = 1} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -26,7 +26,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\E x \\in {1}: 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -37,7 +37,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\E x \\in {1}: TRUE \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -48,7 +48,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n"
 				+ "k == {x \\in {1,2}: x \\in {1,2}} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -59,7 +59,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n"
 				+ "k == {x \\in {1,2}: x \\in {1,2} /\\ 1 = 1} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -71,7 +71,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n"
 				+ " k == {<<x, y>> \\in ({1, 2} \\times {1}): x \\in {1, 2} /\\ y = 1} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -83,7 +83,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\E x \\in {1}, y \\in Int: x = y \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -94,7 +94,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\E x \\in SUBSET({1, 2, 3}): 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -107,7 +107,7 @@ public class TypeRestrictionsTest {
 				+ "k == 1 \n"
 				+ "ASSUME \\E x \\in {1}, y \\in {k +1}: TRUE \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -119,7 +119,7 @@ public class TypeRestrictionsTest {
 				+ "k == 1 \n"
 				+ "ASSUME \\E x \\in {1} : (\\E y \\in {x} : TRUE) \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -131,7 +131,7 @@ public class TypeRestrictionsTest {
 				+ "k == 1 \n"
 				+ "ASSUME {1} = {x \\in ({1}): (\\E y \\in {x} : TRUE) /\\ 1 = 1}\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -144,7 +144,7 @@ public class TypeRestrictionsTest {
 				+ "k == 1 \n"
 				+ "ASSUME \\A x \\in {k} : 1 = 1 \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -157,7 +157,7 @@ public class TypeRestrictionsTest {
 				+ "k == 1 \n"
 				+ "ASSUME \\A x \\in {k} : 1 = 1 \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -181,7 +181,7 @@ public class TypeRestrictionsTest {
 				+ "foo(a) == x' = a\n"
 				+ "Next == \\E a \\in k: foo(a) \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -193,7 +193,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME \\E x \\in {1} \\cap {2} : TRUE\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -207,7 +207,7 @@ public class TypeRestrictionsTest {
 				+ "EXTENDS Integers \n"
 				+ "ASSUME \\E x \\in {1}, y \\in Int : y = x \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -219,7 +219,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME \\E x \\in {1} : x = x \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -239,7 +239,7 @@ public class TypeRestrictionsTest {
 				+ "foo(a) == (a = a)	/\\ x' = 3\n"
 				+ "Next == \\E a \\in {1} : foo(a) \n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -251,7 +251,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\E <<a,b>> \\in {<<1,1>>} : TRUE \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore // TODO improve type restriction algorithm
@@ -263,7 +263,7 @@ public class TypeRestrictionsTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\E <<a,b>> \\in {<<1,1>>} : TRUE \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -284,7 +284,7 @@ public class TypeRestrictionsTest {
 			+ "\n"
 			+ "Next == \\/ foo\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -305,7 +305,7 @@ public class TypeRestrictionsTest {
 			+ "\n"
 			+ "Next == \\/ foo\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Ignore // TODO: improve type restrictor
@@ -329,6 +329,6 @@ public class TypeRestrictionsTest {
 			+ "\n"
 			+ "Next == \\/ foo\n"
 			+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

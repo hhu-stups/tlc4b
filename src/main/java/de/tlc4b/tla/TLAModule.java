@@ -1,6 +1,7 @@
 package de.tlc4b.tla;
 
 import java.util.ArrayList;
+
 import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.POperation;
