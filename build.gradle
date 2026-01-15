@@ -44,7 +44,7 @@ dependencies {
 	testCompileOnly(group: 'junit', name: 'junit', version: '4.13.2')
 	testRuntimeOnly(group: 'org.junit.vintage', name: 'junit-vintage-engine')
 	testRuntimeOnly(group: 'org.junit.platform', name: 'junit-platform-launcher')
-	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: isSnapshot ? '1.4.3-SNAPSHOT' : '1.4.2')
+	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: '1.4.2')
 }
 
 java {
