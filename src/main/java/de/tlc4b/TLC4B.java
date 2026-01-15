@@ -364,7 +364,7 @@ public class TLC4B {
 			}
 		} catch (ParseException e) {
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("[file]", options);
+			formatter.printHelp("java -jar TLC4B.jar [file]", options);
 			throw new TLC4BIOException(e);
 		}
 	}
