@@ -5,19 +5,21 @@ plugins {
 	id "maven-publish"
 	id "signing"
 	id "de.undercouch.download" version "5.6.0"
+	id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
 }
 
 project.group = 'de.hhu.stups'
-project.version = "1.2.2"
-
+project.version = "1.2.3"
 final isSnapshot = project.version.endsWith("-SNAPSHOT")
 
+final snapshotsRepoUrl = "https://central.sonatype.com/repository/maven-snapshots/"
+final releasesStagingRepoUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
 repositories {
 	mavenCentral()
 	if (isSnapshot) {
 		maven {
-			name = "sonatype snapshots"
-			url = "https://oss.sonatype.org/content/repositories/snapshots"
+			name = "Sonatype snapshots"
+			url = snapshotsRepoUrl
 		}
 	}
 }
@@ -26,34 +28,56 @@ configurations.all {
 	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
-def parser_version = "2.15.2"
+def parserVersion = "2.15.4"
 
 dependencies {
-	//implementation(group: 'com.lamport', name: 'tla2tools', version: '1.8.0-SNAPSHOT')
-	implementation(group: 'commons-cli', name: 'commons-cli', version: '1.9.0')
-	implementation(group: 'de.hhu.stups', name: 'tlatools', version: '1.1.0')
+	// The upstream version of the TLA+ tools is only published to Sonatype Snapshots, not to Maven Central.
+	// Even the snapshot is currently (2026-01) unavailable since Sonatype shut down the old OSSRH service,
+	// because the TLA+ people haven't updated their snapshot upload for the new Maven Central Portal yet.
+	// See:
+	// https://github.com/tlaplus/tlaplus/issues/1220
+	// https://github.com/tlaplus/tlaplus/issues/1247
+	//implementation("com.lamport:tla2tools:1.8.0-SNAPSHOT")
 
-	implementation(group: 'de.hhu.stups', name: 'bparser', version: parser_version)
-	implementation(group: 'de.hhu.stups', name: 'ltlparser', version: parser_version)
+	implementation("commons-cli:commons-cli:1.11.0")
+	implementation("de.hhu.stups:tlatools:1.1.0")
 
-	testImplementation(platform(group: 'org.junit', name: 'junit-bom', version: '5.13.2'))
-	testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter')
-	testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-params')
-	testCompileOnly(group: 'junit', name: 'junit', version: '4.13.2')
-	testRuntimeOnly(group: 'org.junit.vintage', name: 'junit-vintage-engine')
-	testRuntimeOnly(group: 'org.junit.platform', name: 'junit-platform-launcher')
-	testImplementation(group: 'de.hhu.stups', name: 'tla2bAST', version: '1.4.2')
+	implementation("de.hhu.stups:bparser:${parserVersion}")
+	implementation("de.hhu.stups:ltlparser:${parserVersion}")
+
+	testImplementation(platform("org.junit:junit-bom:5.14.2"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testCompileOnly("junit:junit:4.13.2")
+	testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("de.hhu.stups:tla2bAST:1.4.2")
 }
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_1_8
-	
+
 	withSourcesJar()
 	withJavadocJar()
 }
 
+javadoc {
+	// silence warnings on missing javadoc
+	options.addBooleanOption('Xdoclint:all,-missing', true)
+	if (JavaVersion.current().isJava9Compatible()) {
+		options.addBooleanOption('html5', true)
+	}
+}
+
+test {
+	useJUnitPlatform()
+
+	exclude('de/tlc4b/tlc/integration/probprivate')
+	exclude('testing')
+	//exclude('de/tlc4b/tlc/integration')
+}
+
 jacoco {
-	toolVersion = "0.8.13"
+	toolVersion = "0.8.14"
 }
 
 jacocoTestReport {
@@ -62,18 +86,6 @@ jacocoTestReport {
 		csv.required = false
 		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
-}
-
-test {
-	useJUnitPlatform()
-
-	testLogging {
-		events 'passed', 'skipped', 'failed'
-	}
-
-	exclude('de/tlc4b/tlc/integration/probprivate')
-	exclude('testing')
-	//exclude('de/tlc4b/tlc/integration')
 }
 
 task downloadPublicExamples(type: Download) {
@@ -147,18 +159,13 @@ publishing {
 			}
 		}
 	}
+}
 
+nexusPublishing {
 	repositories {
-		maven {
-			final releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-			final snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
-			url = isSnapshot ? snapshotsRepoUrl : releasesRepoUrl
-			if (project.hasProperty("ossrhUsername") && project.hasProperty("ossrhPassword")) {
-				credentials {
-					username = project.ossrhUsername
-					password = project.ossrhPassword
-				}
-			}
+		mavenCentral {
+			snapshotRepositoryUrl.set(uri(snapshotsRepoUrl))
+			nexusUrl.set(uri(releasesStagingRepoUrl))
 		}
 	}
 }

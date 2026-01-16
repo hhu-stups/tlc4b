@@ -1,8 +1,12 @@
 package de.tlc4b.analysis.unchangedvariables;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
@@ -10,52 +14,36 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.tlc4b.analysis.MachineContext;
 
 public class InvariantPreservationAnalysis extends DepthFirstAdapter {
-	protected final Hashtable<Node, HashSet<Node>> foundVariablesTable;
+
 	private final MachineContext machineContext;
+	private final Map<Node, Set<Node>> preservingOperations = new HashMap<>(); // results
+	private Set<Node> usedVariables; //temp
 
-	// results
-	private final Hashtable<Node, HashSet<Node>> preservingOperationsTable;
-
-	// temp
-	private HashSet<Node> foundVariables;
-
-	public ArrayList<Node> getPreservingOperations(Node invariant) {
-		return new ArrayList<>(preservingOperationsTable.get(invariant));
+	public List<Node> getPreservingOperations(Node invariant) {
+		return new ArrayList<>(preservingOperations.get(invariant));
 	}
 
-	public InvariantPreservationAnalysis(MachineContext machineContext,
-			ArrayList<Node> invariants, UnchangedVariablesFinder unchangedFinder) {
-		this.foundVariablesTable = new Hashtable<>();
+	public InvariantPreservationAnalysis(MachineContext machineContext, List<Node> invariants,
+	                                     UnchangedVariablesFinder unchangedFinder) {
 		this.machineContext = machineContext;
 
-		this.preservingOperationsTable = new Hashtable<>();
-
 		for (Node inv : invariants) {
-			foundVariables = new HashSet<>();
+			usedVariables = new HashSet<>();
 			inv.apply(this);
-			foundVariablesTable.put(inv, foundVariables);
-		}
-
-		for (Node inv : invariants) {
-			HashSet<Node> preservingOperations = new HashSet<>();
-			HashSet<Node> usedVariables = foundVariablesTable.get(inv);
+			Set<Node> preservingOperations = new HashSet<>();
 			for (Node op : machineContext.getOperations().values()) {
-				HashSet<Node> assignedVariables = unchangedFinder
-						.getAssignedVariables(op);
-				HashSet<Node> temp = new HashSet<>(usedVariables);
-				temp.retainAll(assignedVariables);
-				if (temp.isEmpty()) {
+				if (Collections.disjoint(usedVariables, unchangedFinder.getAssignedVariables(op))) {
 					preservingOperations.add(op);
 				}
 			}
-			preservingOperationsTable.put(inv, preservingOperations);
+			this.preservingOperations.put(inv, preservingOperations);
 		}
 	}
 
 	public void inAIdentifierExpression(AIdentifierExpression node) {
 		Node identifier = machineContext.getReferenceNode(node);
 		if (machineContext.getVariables().containsValue(identifier)) {
-			foundVariables.add(identifier);
+			usedVariables.add(identifier);
 		}
 	}
 

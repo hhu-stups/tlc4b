@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.*;
@@ -14,12 +14,12 @@ import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.btypes.AbstractHasFollowers;
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.BoolType;
+import de.tlc4b.btypes.EnumeratedSetElement;
 import de.tlc4b.btypes.FunctionType;
 import de.tlc4b.btypes.ITypechecker;
 import de.tlc4b.btypes.IntegerOrSetOfPairType;
 import de.tlc4b.btypes.IntegerOrSetType;
 import de.tlc4b.btypes.IntegerType;
-import de.tlc4b.btypes.EnumeratedSetElement;
 import de.tlc4b.btypes.PairType;
 import de.tlc4b.btypes.SetType;
 import de.tlc4b.btypes.StringType;
@@ -70,7 +70,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		if (p != null) {
 			setType(p, BoolType.getInstance());
 			p.apply(this);
-			for (Entry<String, Node> entry : machineContext.getConstants().entrySet()) {
+			for (Map.Entry<String, Node> entry : machineContext.getConstants().entrySet()) {
 				String c = entry.getKey();
 				Node n = entry.getValue();
 				if (getType(n).isUntyped()) {
@@ -290,7 +290,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		for (Entry<String, Node> entry : machineContext.getScalarParameter().entrySet()) {
+		for (Map.Entry<String, Node> entry : machineContext.getScalarParameter().entrySet()) {
 			String name = entry.getKey();
 			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {
@@ -305,7 +305,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getPredicates(), BoolType.getInstance());
 			node.getPredicates().apply(this);
 		}
-		for (Entry<String, Node> entry : machineContext.getConstants().entrySet()) {
+		for (Map.Entry<String, Node> entry : machineContext.getConstants().entrySet()) {
 			String c = entry.getKey();
 			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {
@@ -318,7 +318,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	public void caseAInvariantMachineClause(AInvariantMachineClause node) {
 		setType(node.getPredicates(), BoolType.getInstance());
 		node.getPredicates().apply(this);
-		for (Entry<String, Node> entry : machineContext.getVariables().entrySet()) {
+		for (Map.Entry<String, Node> entry : machineContext.getVariables().entrySet()) {
 			String c = entry.getKey();
 			Node n = entry.getValue();
 			if (getType(n).isUntyped()) {

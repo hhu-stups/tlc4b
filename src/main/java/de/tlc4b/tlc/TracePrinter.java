@@ -9,12 +9,35 @@ import de.tlc4b.btypes.PairType;
 import de.tlc4b.btypes.SetType;
 import de.tlc4b.btypes.StructType;
 import de.tlc4b.exceptions.NotSupportedException;
+
 import tla2sany.semantic.OpDeclNode;
+
 import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
-import tlc2.value.impl.*;
+import tlc2.value.ValueConstants;
+import tlc2.value.impl.FcnLambdaValue;
+import tlc2.value.impl.FcnRcdValue;
+import tlc2.value.impl.IntervalValue;
+import tlc2.value.impl.LazyValue;
+import tlc2.value.impl.ModelValue;
+import tlc2.value.impl.RecordValue;
+import tlc2.value.impl.SetCapValue;
+import tlc2.value.impl.SetCupValue;
+import tlc2.value.impl.SetDiffValue;
+import tlc2.value.impl.SetEnumValue;
+import tlc2.value.impl.SetOfFcnsValue;
+import tlc2.value.impl.SetOfRcdsValue;
+import tlc2.value.impl.SetOfTuplesValue;
+import tlc2.value.impl.SetPredValue;
+import tlc2.value.impl.StringValue;
+import tlc2.value.impl.SubsetValue;
+import tlc2.value.impl.TupleValue;
+import tlc2.value.impl.UnionValue;
+import tlc2.value.impl.Value;
+import tlc2.value.impl.ValueEnumeration;
+import tlc2.value.impl.ValueVec;
+
 import util.UniqueString;
-import static tlc2.value.ValueConstants.*;
 
 public class TracePrinter {
 
@@ -109,13 +132,12 @@ public class TracePrinter {
 	private StringBuilder parseValue(Value val, BType type) {
 		// System.out.println(val.getClass());
 		StringBuilder res = new StringBuilder();
-		int valueType = val.getKind();
-		switch (valueType) {
-		case INTVALUE:
-		case BOOLVALUE:
+		switch (val.getKind()) {
+		case ValueConstants.INTVALUE:
+		case ValueConstants.BOOLVALUE:
 			return res.append(val);
 
-		case INTERVALVALUE: {
+		case ValueConstants.INTERVALVALUE: {
 			IntervalValue i = (IntervalValue) val;
 			res.append("(");
 			res.append(i.low).append("..").append(i.high);
@@ -123,7 +145,7 @@ public class TracePrinter {
 			return res;
 		}
 
-		case SETENUMVALUE:
+		case ValueConstants.SETENUMVALUE:
 			SetType set = (SetType) type;
 			res.append("{");
 			res.append(parseValueVec(((SetEnumValue) val).elems,
@@ -131,7 +153,7 @@ public class TracePrinter {
 			res.append("}");
 			return res;
 
-		case TUPLEVALUE:
+		case ValueConstants.TUPLEVALUE:
 			if (type instanceof PairType) {
 				BType first = ((PairType) type).getFirst();
 				BType second = ((PairType) type).getSecond();
@@ -151,11 +173,10 @@ public class TracePrinter {
 					res.append("]");
 				}
 				return res;
-
 			}
 			throw new NotSupportedException("Unknown type of tuple.");
 
-		case RECORDVALUE: {
+		case ValueConstants.RECORDVALUE: {
 			RecordValue rec = (RecordValue) val;
 			StructType struct = (StructType) type;
 			res.append("rec(");
@@ -172,7 +193,7 @@ public class TracePrinter {
 			return res;
 		}
 
-		case FCNRCDVALUE:
+		case ValueConstants.FCNRCDVALUE:
 			FcnRcdValue function = (FcnRcdValue) val;
 			FunctionType funcType = (FunctionType) type;
 			res.append("{");
@@ -189,7 +210,7 @@ public class TracePrinter {
 			res.append("}");
 			return res;
 
-		case MODELVALUE:
+		case ValueConstants.MODELVALUE:
 			ModelValue modelValue = (ModelValue) val;
 			String bName = tlcOutputInfo.getBName(modelValue.toString());
 			if (bName == null) {
@@ -198,37 +219,38 @@ public class TracePrinter {
 			res.append(bName);
 			return res;
 
-		case SETOFTUPLESVALUE: {
+		case ValueConstants.SETOFTUPLESVALUE: {
 			SetOfTuplesValue s = (SetOfTuplesValue) val;
 			ValueEnumeration e = s.elements();
 			return parseSetValue(res, s.size(), type, e);
 		}
 
-		case SETCUPVALUE: {
+		case ValueConstants.SETCUPVALUE: {
 			SetCupValue s = (SetCupValue) val;
 			ValueEnumeration e = s.elements();
 			return parseSetValue(res, s.size(), type, e);
 		}
-		case SETCAPVALUE: {
+		case ValueConstants.SETCAPVALUE: {
 			SetCapValue s = (SetCapValue) val;
 			ValueEnumeration e = s.elements();
 			return parseSetValue(res, s.size(), type, e);
 		}
 
-		case SETDIFFVALUE: {
+		case ValueConstants.SETDIFFVALUE: {
 			SetDiffValue s = (SetDiffValue) val;
 			ValueEnumeration e = s.elements();
 			return parseSetValue(res, s.size(), type, e);
 		}
 
-		case SUBSETVALUE: {
+		case ValueConstants.SUBSETVALUE: {
 			SubsetValue s = (SubsetValue) val;
 			SetType t = (SetType) type;
 			res.append("POW(").append(parseValue(s.set, t.getSubtype()))
 					.append(")");
 			return res;
 		}
-		case UNIONVALUE: {
+
+		case ValueConstants.UNIONVALUE: {
 			UnionValue s = (UnionValue) val;
 			SetType t = (SetType) type;
 			res.append("union(");
@@ -237,7 +259,7 @@ public class TracePrinter {
 			return res;
 		}
 
-		case SETOFRCDSVALUE: {
+		case ValueConstants.SETOFRCDSVALUE: {
 			SetOfRcdsValue s = (SetOfRcdsValue) val;
 			SetType t = (SetType) type;
 			StructType struct = (StructType) t.getSubtype();
@@ -255,7 +277,7 @@ public class TracePrinter {
 			return res;
 		}
 
-		case SETOFFCNSVALUE: {
+		case ValueConstants.SETOFFCNSVALUE: {
 			SetOfFcnsValue s = (SetOfFcnsValue) val;
 			SetType t = (SetType) type;
 			FunctionType func = (FunctionType) t.getSubtype();
@@ -267,24 +289,25 @@ public class TracePrinter {
 			return res;
 		}
 
-		case STRINGVALUE: {
+		case ValueConstants.STRINGVALUE: {
 			StringValue s = (StringValue) val;
 			res.append("\"").append(s.getVal()).append("\"");
 			return res;
 		}
 
-		case FCNLAMBDAVALUE: {
+		case ValueConstants.FCNLAMBDAVALUE: {
 			FcnLambdaValue s = (FcnLambdaValue) val;
 			res.append(parseValue(s.fcnRcd, type));
 			return res;
 		}
-		case SETPREDVALUE: {
+
+		case ValueConstants.SETPREDVALUE: {
 			SetPredValue s = (SetPredValue) val;
 			res.append(parseValue(s.inVal, type));
 			return res;
 		}
 
-		case LAZYVALUE: {
+		case ValueConstants.LAZYVALUE: {
 			LazyValue s = (LazyValue) val;
 			res.append(parseValue(s.getValue(), type));
 			return res;

@@ -5,15 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.tlc4b.tlc.TLCResults.TLCResult;
+import de.tlc4b.TLC4BOption;
+import de.tlc4b.tlc.TLCResults;
 import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static de.tlc4b.TLC4BOption.DFID;
-import static de.tlc4b.util.TestUtil.test;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -27,13 +26,13 @@ public class BasicTest {
 	@Test
 	public void testRunTLC() throws Exception {
 		String[] a = new String[] { machine.getPath() };
-		assertEquals(TLCResult.NoError, test(a));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 
 	@Test
 	public void testRunTLCDFS() throws Exception {
-		String[] a = new String[] { machine.getPath(), DFID.cliArg(), "20" };
-		assertEquals(TLCResult.NoError, test(a));
+		String[] a = new String[] { machine.getPath(), TLC4BOption.DFID.cliArg(), "20" };
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 
 	@Parameterized.Parameters(name = "{0}")

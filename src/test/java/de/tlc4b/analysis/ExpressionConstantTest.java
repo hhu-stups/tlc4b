@@ -1,10 +1,9 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.exceptions.NotSupportedException;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
-
-import de.tlc4b.exceptions.NotSupportedException;
 
 public class ExpressionConstantTest {
 
@@ -18,7 +17,7 @@ public class ExpressionConstantTest {
 				+ "k == 1 \n"
 				+ "ASSUME \\A x \\in {k} : 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -31,7 +30,7 @@ public class ExpressionConstantTest {
 				+ "k2 == 1 \n"
 				+ "k == k2 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -42,7 +41,7 @@ public class ExpressionConstantTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME \\A x \\in {1} : \\A y \\in {x} : 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test (expected = NotSupportedException.class)
@@ -54,7 +53,7 @@ public class ExpressionConstantTest {
 				+ "EXTENDS Integers \n"
 				+ "ASSUME \\A x \\in Int, y \\in {1} : x = y => 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

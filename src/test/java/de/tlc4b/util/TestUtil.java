@@ -16,12 +16,12 @@ import java.util.regex.Pattern;
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.tla2b.exceptions.TLA2BException;
 import de.tlc4b.TLC4BGlobals;
+import de.tlc4b.TLC4BOption;
 import de.tlc4b.Translator;
 import de.tlc4b.tlc.TLCResults.TLCResult;
 
 import util.ToolIO;
 
-import static de.tlc4b.TLC4BOption.NOTRACE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -146,7 +146,7 @@ public class TestUtil {
 
 	public static TLCResult test(String[] args) throws IOException {
 		String[] newArgs = Arrays.copyOf(args, args.length + 1);
-		newArgs[args.length] = NOTRACE.cliArg();
+		newArgs[args.length] = TLC4BOption.NOTRACE.cliArg();
 		String runnerClassName = TLC4BTester.class.getCanonicalName();
 		return runTLC(runnerClassName, newArgs);
 	}

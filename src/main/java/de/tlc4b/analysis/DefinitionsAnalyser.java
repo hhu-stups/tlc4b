@@ -2,6 +2,7 @@ package de.tlc4b.analysis;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
@@ -20,69 +21,44 @@ import de.tlc4b.exceptions.TranslationException;
  * @author hansen In this class we search for preferences set in the definitions
  *         clause, e.g. minint or maxint.
  */
-
 public class DefinitionsAnalyser extends DepthFirstAdapter {
 	private final MachineContext machineContext;
-	private final HashMap<Node, Integer> deferredSetSizeTable;
+	private final Map<Node, Integer> deferredSetSize = new HashMap<>();
 
 	public Integer getSize(Node node) {
-		return deferredSetSizeTable.get(node);
+		return deferredSetSize.get(node);
 	}
 
 	public DefinitionsAnalyser(MachineContext machineContext) {
 		this.machineContext = machineContext;
-		deferredSetSizeTable = new HashMap<>();
-		HashSet<Node> deferredSets = new HashSet<>(machineContext.getDeferredSets().values());
+		Set<Node> deferredSets = new HashSet<>(machineContext.getDeferredSets().values());
 
 		findDefaultSizesInDefinitions();
 
 		if (deferredSets.isEmpty())
 			return;
 
-		Set<String> strings = machineContext.getDeferredSets().keySet();
-		for (String string : strings) {
-			String s = "scope_" + string;
-			Node node = machineContext.getDefinitions().get(s);
-			if (null != node) {
-				try {
-					AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-					AIntervalExpression interval = (AIntervalExpression) d
-							.getRhs();
-					AIntegerExpression left = (AIntegerExpression) interval
-							.getLeftBorder();
-					AIntegerExpression right = (AIntegerExpression) interval
-							.getRightBorder();
-					int l_int = Integer.parseInt(left.getLiteral().getText());
-					int r_int = Integer.parseInt(right.getLiteral().getText());
-					int size = r_int - l_int + 1;
-					deferredSetSizeTable.put(machineContext.getDeferredSets()
-							.get(string), size);
-				} catch (ClassCastException e) {
+		for (String string : machineContext.getDeferredSets().keySet()) {
+			Node node = machineContext.getDefinitions().get("scope_" + string);
+			if (node instanceof AExpressionDefinitionDefinition) {
+				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
+				if (d.getRhs() instanceof AIntervalExpression) {
+					AIntervalExpression interval = (AIntervalExpression) d.getRhs();
+					int l_int = extractInteger(interval.getLeftBorder());
+					int r_int = extractInteger(interval.getRightBorder());
+					deferredSetSize.put(machineContext.getDeferredSets().get(string), r_int - l_int + 1);
+				} else if (d.getRhs() instanceof AIntegerExpression) {
+					deferredSetSize.put(machineContext.getDeferredSets().get(string), extractInteger(d.getRhs()));
 				}
-				try {
-					AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-					AIntegerExpression sizeExpr = (AIntegerExpression) d
-							.getRhs();
-					int size = Integer
-							.parseInt(sizeExpr.getLiteral().getText());
-					deferredSetSizeTable.put(machineContext.getDeferredSets()
-							.get(string), size);
-				} catch (ClassCastException e) {
-				}
-
 			}
 		}
 	}
 
 	private void findDefaultSizesInDefinitions() {
-		Node node = machineContext.getDefinitions().get(
-				"SET_PREF_DEFAULT_SETSIZE");
+		Node node = machineContext.getDefinitions().get("SET_PREF_DEFAULT_SETSIZE");
 		if (null != node) {
 			try {
-				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-				AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
-				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
-				TLC4BGlobals.setDEFERRED_SET_SIZE(value);
+				TLC4BGlobals.setDEFERRED_SET_SIZE(extractInteger(((AExpressionDefinitionDefinition) node).getRhs()));
 			} catch (ClassCastException e) {
 				throw new TranslationException("Unable to determine the default set size from definition SET_PREF_DEFAULT_SETSIZE: " + node.getEndPos(), e);
 			}
@@ -91,10 +67,7 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 		node = machineContext.getDefinitions().get("SET_PREF_MAXINT");
 		if (null != node) {
 			try {
-				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-				AIntegerExpression sizeExpr = (AIntegerExpression) d.getRhs();
-				int value = Integer.parseInt(sizeExpr.getLiteral().getText());
-				TLC4BGlobals.setMAX_INT(value);
+				TLC4BGlobals.setMAX_INT(extractInteger(((AExpressionDefinitionDefinition) node).getRhs()));
 			} catch (ClassCastException e) {
 				throw new TranslationException("Unable to determine MAXINT from definition SET_PREF_MAXINT: " + node.getEndPos(), e);
 			}
@@ -104,16 +77,11 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 		if (null != node) {
 			try {
 				AExpressionDefinitionDefinition d = (AExpressionDefinitionDefinition) node;
-				AIntegerExpression sizeExpr;
 				int value;
 				if (d.getRhs() instanceof AUnaryMinusExpression) {
-					AUnaryMinusExpression minus = (AUnaryMinusExpression) d
-							.getRhs();
-					sizeExpr = (AIntegerExpression) minus.getExpression();
-					value = -Integer.parseInt(sizeExpr.getLiteral().getText());
+					value = -extractInteger(((AUnaryMinusExpression) d.getRhs()).getExpression());
 				} else {
-					sizeExpr = (AIntegerExpression) d.getRhs();
-					value = Integer.parseInt(sizeExpr.getLiteral().getText());
+					value = extractInteger(d.getRhs());
 				}
 				TLC4BGlobals.setMIN_INT(value);
 			} catch (ClassCastException e) {
@@ -126,22 +94,17 @@ public class DefinitionsAnalyser extends DepthFirstAdapter {
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
 		// TODO never reached
 		Node ref_node = machineContext.getReferences().get(node);
-		if (deferredSetSizeTable.containsKey(ref_node)) {
+		if (deferredSetSize.containsKey(ref_node)) {
 			try {
 				ACardExpression cardNode = (ACardExpression) node.parent();
-				AEqualPredicate equalsNode = (AEqualPredicate) cardNode
-						.parent();
-				AIntegerExpression integer;
-				if (equalsNode.getLeft() == cardNode) {
-					integer = (AIntegerExpression) equalsNode.getRight();
-				} else {
-					integer = (AIntegerExpression) equalsNode.getLeft();
-				}
-				String intString = integer.getLiteral().getText();
-				deferredSetSizeTable.put(ref_node, Integer.parseInt(intString));
+				AEqualPredicate equalsNode = (AEqualPredicate) cardNode.parent();
+				deferredSetSize.put(ref_node, extractInteger(equalsNode.getLeft() == cardNode ? equalsNode.getRight() : cardNode));
 			} catch (ClassCastException e) {
 			}
-
 		}
+	}
+
+	private static int extractInteger(Node node) {
+		return Integer.parseInt(((AIntegerExpression) node).getLiteral().getText());
 	}
 }

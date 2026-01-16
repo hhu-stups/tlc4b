@@ -1,9 +1,10 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.*;
-import static org.junit.Assert.*;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SetTest {
 	
@@ -14,7 +15,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME {} = {}\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -24,7 +25,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME {3,2,1} = {1,2,3}\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -34,7 +35,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME {1} = {x \\in {1}: TRUE} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -44,7 +45,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME {1} = {x \\in {1}: 1 = 1 } \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -55,7 +56,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME {{},{1}} = SUBSET {1} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -66,7 +67,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS FiniteSets\n"
 				+ "ASSUME 2 =  Cardinality({1,2})  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -76,7 +77,7 @@ public class SetTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME {1} \\times {2} = {<<1, 2>>}\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -86,7 +87,7 @@ public class SetTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME ({1} \\times {2}) \\times {3} = {<<<<1, 2>>, 3>>}\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -96,7 +97,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME {1} \\cup {2} = {1,2}  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -106,7 +107,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME {1,2} \\cap {2} = {2}  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -116,7 +117,7 @@ public class SetTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME {1,2} \\ {2} = {1}\n"
 				+ "====";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -126,7 +127,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME {1,2} \\ {2} = {1}  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -136,7 +137,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 \\in {1}  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -146,7 +147,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 \\notin {1}  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -156,7 +157,7 @@ public class SetTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME {1} \\subseteq {1}  \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -167,7 +168,7 @@ public class SetTest {
 		String expected = "---- MODULE test ----\n"
 				+ "ASSUME UNION({{1}, {2}}) = {1, 2}\n"
 				+ "====";
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 	
@@ -179,7 +180,7 @@ public class SetTest {
 				+ "EXTENDS BBuiltIns\n"
 				+ "ASSUME Inter({{1}, {1, 2}}) = {1}\n"
 				+ "====";
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 	@Test
@@ -190,7 +191,7 @@ public class SetTest {
 				+ "ASSUME UNION({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {1, 2}\n"
 				+ "====";
 		//TODO ERROR in TLA2B
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 	@Test
@@ -201,7 +202,7 @@ public class SetTest {
 				+ "EXTENDS BBuiltIns\n"
 				+ "ASSUME Inter({{z}: z \\in {z \\in ({1, 2}): 1 = 1}}) = {}\n"
 				+ "====";
-		assertEquals(expected, translate(machine));
+		assertEquals(expected, TestUtil.translate(machine));
 	}
 	
 }

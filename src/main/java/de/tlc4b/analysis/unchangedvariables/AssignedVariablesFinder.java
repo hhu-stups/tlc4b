@@ -52,7 +52,6 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 		this.assignedVariablesTable = new Hashtable<>();
 		this.machineContext = machineContext;
 		machineContext.getStartNode().apply(this);
-
 	}
 
 	protected Hashtable<Node, HashSet<Node>> getAssignedVariablesTable() {
@@ -89,13 +88,11 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	@Override
 	public void caseAOperation(AOperation node) {
 		node.getOperationBody().apply(this);
-		assignedVariablesTable.put(node,
-				getVariableList(node.getOperationBody()));
+		assignedVariablesTable.put(node, getVariableList(node.getOperationBody()));
 	}
 
 	@Override
-	public void caseAInitialisationMachineClause(
-			AInitialisationMachineClause node) {
+	public void caseAInitialisationMachineClause(AInitialisationMachineClause node) {
 		// first visit the sub node
 		node.getSubstitutions().apply(this);
 		assignedVariablesTable.put(node,
@@ -111,10 +108,8 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 			HashSet<Node> missingVariables = new HashSet<>(machineContext.getVariables().values());
 			missingVariables.removeAll(allVariables);
 			throw new SubstitutionException(
-					"Initialisation Error: Missing assignment for variable(s): "
-							+ missingVariables);
+					"Initialisation Error: Missing assignment for variable(s): " + missingVariables);
 		}
-
 	}
 
 	@Override
@@ -224,8 +219,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 			HashSet<Node> temp = new HashSet<>(list);
 			temp.retainAll(listOfe);
 			if (!temp.isEmpty()) {
-				throw new SubstitutionException("The variable(s) " + temp
-						+ " are assigned twice");
+				throw new SubstitutionException("The variable(s) " + temp + " are assigned twice");
 			}
 			list.addAll(listOfe);
 		}

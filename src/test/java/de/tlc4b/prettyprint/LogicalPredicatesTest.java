@@ -1,10 +1,10 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
-public class LogicalPredicates {
+public class LogicalPredicatesTest {
 
 	@Test
 	public void testEquals() throws Exception {
@@ -14,7 +14,7 @@ public class LogicalPredicates {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -25,7 +25,7 @@ public class LogicalPredicates {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME TRUE = (1=1) \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -36,7 +36,7 @@ public class LogicalPredicates {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME 1 # 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -48,7 +48,19 @@ public class LogicalPredicates {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME  1 = 1 => 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
-	
+
+	@Test
+	public void testMembershipIntersection() throws Exception {
+		String machine = "MACHINE test\n"
+				+ "PROPERTIES 0 : (INTEGER /\\ {0}) \n"
+				+ "END";
+
+		String expected = "---- MODULE test----\n"
+				+ "EXTENDS Integers \n"
+				+ "ASSUME 0 \\in Int \\cap {0} \n"
+				+ "======";
+		TestUtil.compare(expected, machine);
+	}
 }

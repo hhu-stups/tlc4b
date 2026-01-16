@@ -1,6 +1,6 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {<<x, x + 1>>: x \\in {x \\in ((1 .. 10)): TRUE}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	/**
@@ -29,7 +29,7 @@ public class SetComprehensionOptimizerTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME {<<x, y>> \\in (({1}) \\times ({2})): TRUE} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -40,7 +40,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {<<y, y>>: y \\in {y \\in ((1 .. 10)): y = y}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -52,7 +52,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME {<<<<y + 1, y>>, c>>: <<y, c>> \\in {<<y, c>> \\in ((Int) \\times ({TRUE})): y + 1 \\in (1 .. 2) /\\ y = (y + 1) - 1}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -63,7 +63,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {<<y, y>>: y \\in {y \\in ((1 .. 2) \\cap (1 .. 100)): TRUE}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -74,7 +74,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME {<<<<<<t_[1], t_[2]>>, t_[3]>>, t_[4]>>: t_ \\in {<<a, b, c, d>> \\in (Int) \\times ({1}) \\times ({1}) \\times ({1}): a = b}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -86,7 +86,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {y: y \\in {y \\in ((1 .. 10)): TRUE}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -98,7 +98,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {<<a, {y + 1: y \\in {y \\in ((1 .. 10)): TRUE}}>>: a \\in {a \\in ((1 .. 3)): TRUE}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Ignore
@@ -110,7 +110,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {<<a, {y + 1: y \\in {y \\in ((1 .. 10)): TRUE}}>>: a \\in {a \\in ((1 .. 3)): TRUE}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -122,7 +122,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {1: c \\in {c \\in ((1 .. 10)): TRUE}} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -133,7 +133,7 @@ public class SetComprehensionOptimizerTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME {<<x, y>> \\in ((Int) \\times ((1 .. 10))): x = (x + 1) - 1} # {} \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

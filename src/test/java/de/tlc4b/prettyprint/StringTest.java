@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class StringTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME \"abc\" = \"abc\" \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -25,7 +25,7 @@ public class StringTest {
 		String expected = "---- MODULE test----\n" 
 				+ "ASSUME \\E x \\in STRING : TRUE \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 }

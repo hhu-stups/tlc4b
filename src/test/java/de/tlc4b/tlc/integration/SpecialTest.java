@@ -1,18 +1,18 @@
 package de.tlc4b.tlc.integration;
 
-import static de.tlc4b.TLC4BOption.*;
-import static de.tlc4b.tlc.TLCResults.TLCResult.*;
-import static de.tlc4b.util.TestUtil.test;
-import static de.tlc4b.util.TestUtil.testWithTrace;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import de.tlc4b.TLC4BOption;
+import de.tlc4b.tlc.TLCResults;
+import de.tlc4b.util.TestUtil;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SpecialTest {
 
@@ -21,7 +21,7 @@ public class SpecialTest {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantSetup.mch",
 				"-constantssetup", "(a = 1 &  b = 1) or (a = 1 &  b = 2)" };
-		assertEquals(NoError, test(a));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 	
 	@Test
@@ -29,7 +29,7 @@ public class SpecialTest {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantSetup.mch",
 				"-constantssetup", "a = 1 &  b = 1" };
-		assertEquals(NoError, test(a));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 	
 	@Test
@@ -37,7 +37,7 @@ public class SpecialTest {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantSetup.mch",
 				"-constantssetup", "(a = 1 &  b = 1) or (a = 2 &  b = 2)" };
-		assertEquals(NoError, test(a));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 	
 	@Test
@@ -45,28 +45,28 @@ public class SpecialTest {
 		String[] a = new String[] {
 				"./src/test/resources/special/ConstantsSetup2.mch",
 				"-constantssetup", "a = {(1,TRUE)}" };
-		assertEquals(NoError, test(a));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 	
 	@Test
 	public void testTraceFile() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/TraceCheck.mch"};
-		assertEquals(Deadlock, test(a));
+		assertEquals(TLCResults.TLCResult.Deadlock, TestUtil.test(a));
 	}
 	
 	@Test
 	public void testDefinitionsLoad() throws Exception {
 		String[] a = new String[] {
 				"./src/test/resources/special/LoadDefinitions.mch"};
-		assertEquals(NoError, test(a));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.test(a));
 	}
 
 	@Test
 	public void testCustomOutputDir() throws Exception {
 		Path specialDir = Paths.get("./src/test/resources/special/veryspecialoutput");
-		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch", OUTPUT.cliArg(), specialDir.toString()};
-		assertEquals(InvariantViolation, testWithTrace(a));
+		String[] a = new String[] { "./src/test/resources/errors/InvariantError.mch", TLC4BOption.OUTPUT.cliArg(), specialDir.toString()};
+		assertEquals(TLCResults.TLCResult.InvariantViolation, TestUtil.testWithTrace(a));
 
 		assertTrue(Files.deleteIfExists(specialDir.resolve("InvariantError.tla")));
 		assertTrue(Files.deleteIfExists(specialDir.resolve("InvariantError.cfg")));
@@ -81,8 +81,8 @@ public class SpecialTest {
 		Path tracePath = Paths.get("./src/test/resources/special/SimpleForLog/SimpleForLog.tla.trace");
 		logFile.toFile().delete();
 
-		String[] a = new String[] { machineFile.toString(), LOG.cliArg(), logFile.toString(), COVERAGE.cliArg()};
-		assertEquals(InvariantViolation, testWithTrace(a));
+		String[] a = new String[] { machineFile.toString(), TLC4BOption.LOG.cliArg(), logFile.toString(), TLC4BOption.COVERAGE.cliArg()};
+		assertEquals(TLCResults.TLCResult.InvariantViolation, TestUtil.testWithTrace(a));
 
 		List<String> lines = Files.readAllLines(logFile);
 		assertEquals(lines.size(), 12);

@@ -7,20 +7,20 @@ public enum TLC4BOption {
 	NOGOAL("nogoal", "do not look for GOAL predicate", null),
 	NOINV("noinv", "do not look for invariant violations", null),
 	NOASS("noass", "do not look for ASSERTION violations", null),
-	WDCHECK("wdcheck", "", null),
-	SYMMETRY("symmetry", "", null),
-	TMP("tmp", "", null),
+	WDCHECK("wdcheck", "welldefinedness check", null),
+	SYMMETRY("symmetry", "use symmetry", null),
+	TMP("tmp", "use temp folder as output dir", null),
 	NOLTL("noltl", "no checking of LTL assertions", null),
-	LAZYCONSTANTS("lazyconstants", "", null),
+	LAZYCONSTANTS("lazyconstants", "do not wrap constants in TLCEval call", null),
 	NOTRACE("notrace", "do not generate counter example trace", null),
-	DEL("del", "", null),
-	PARINVEVAL("parinveval", "", null),
+	DEL("del", "delete on exit", null),
+	PARINVEVAL("parinveval", "partial invariant evaluation", null),
 	LOG("log", "write statistics to CSV file", String.class),
 	MAXINT("maxint", "set value of MAXINT", Integer.class),
-	DEFAULT_SETSIZE("default_setsize", "", Integer.class),
+	DEFAULT_SETSIZE("default_setsize", "default deferred set size", Integer.class),
 	MININT("minint", "set value of MININT", Integer.class),
 	WORKERS("workers", "specify number of workers", Integer.class),
-	DFID("dfid", "depth-first model checking with iterative deepening, specify initial depth", Integer.class),
+	DFID("dfid", "depth-first model checking with iterative deepening, specify max depth", Integer.class),
 	CONSTANTSSETUP("constantssetup", "use constants found by ProB for TLC model checking", String.class),
 	LTLFORMULA("ltlformula", "provide an additional LTL formula", String.class),
 	VERBOSE("verbose", "put TLC4B in verbose mode", null),
@@ -28,7 +28,8 @@ public enum TLC4BOption {
 	OUTPUT("output", "provide path for output directory", String.class),
 	COVERAGE("coverage", "print operation coverage", null);
 
-	private final String arg, desc;
+	private final String arg;
+	private final String desc;
 	private final Class<?> expectsArg;
 
 	TLC4BOption(String arg, String desc, Class<?> expectsArg) {

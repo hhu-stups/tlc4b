@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public final class StandardModules {
 
 	private StandardModules() {
@@ -267,7 +266,6 @@ public final class StandardModules {
 
 	public static boolean isAbstractConstant(String name) {
 		return name.equals(SORT_SET) || name.equals(DECIMAL_TO_INT);
-
 	}
 
 	public static boolean isKeywordInModuleExternalFunctions(String name) {

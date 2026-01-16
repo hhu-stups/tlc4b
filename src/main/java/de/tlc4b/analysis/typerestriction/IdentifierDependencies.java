@@ -1,7 +1,10 @@
 package de.tlc4b.analysis.typerestriction;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;
@@ -11,25 +14,16 @@ import de.tlc4b.analysis.MachineContext;
 public class IdentifierDependencies extends DepthFirstAdapter {
 
 	private final MachineContext machineContext;
-	private final HashMap<Node, HashSet<Node>> usedIdentifier;
+	private final Map<Node, Set<Node>> usedIdentifier;
 
 	public IdentifierDependencies(MachineContext machineContext) {
 		this.machineContext = machineContext;
-
 		this.usedIdentifier = new HashMap<>();
-
 	}
 
-	public boolean containsIdentifier(Node node, HashSet<Node> list){
-		//if(!usedIdentifier.containsKey(node)){
-			node.apply(this);
-		//}
-		HashSet<Node> set = usedIdentifier.get(node);
-		for (Node id : list) {
-			if(set.contains(id))
-				return true;
-		}
-		return false;
+	public boolean containsIdentifier(Node node, Set<Node> set) {
+		node.apply(this);
+		return set.stream().anyMatch(usedIdentifier.get(node)::contains);
 	}
 	
 	public void defaultOut(Node node) {
@@ -40,23 +34,16 @@ public class IdentifierDependencies extends DepthFirstAdapter {
 	@Override
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
 		Node refNode = machineContext.getReferenceNode(node);
-		if(refNode == null)
+		if (refNode == null)
 			refNode = node;
-		HashSet<Node> set = new HashSet<>();
-		set.add(refNode);
-		setSetToNode(node, set);
-
+		setSetToNode(node, Collections.singleton(refNode));
 		defaultOut(node);
 	}
 
-	private void setSetToNode(Node node, HashSet<Node> set) {
-		HashSet<Node> oldSet = usedIdentifier.get(node);
-		if (oldSet == null) {
-			oldSet = new HashSet<>();
-		} 
-		if (set != null) {
+	private void setSetToNode(Node node, Set<Node> set) {
+		Set<Node> oldSet = usedIdentifier.computeIfAbsent(node, k -> new HashSet<>());
+		if (set != null)
 			oldSet.addAll(set);
-		}
 		usedIdentifier.put(node, oldSet);
 	}
 }

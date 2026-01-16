@@ -8,6 +8,7 @@ import tla2sany.drivers.SANY;
 import tla2sany.modanalyzer.SpecObj;
 import tla2sany.semantic.ModuleNode;
 import tla2sany.semantic.OpDefNode;
+
 import util.ToolIO;
 
 public class ModuleMatcher {

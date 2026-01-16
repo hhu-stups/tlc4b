@@ -1,6 +1,6 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Naturals\n"
 				+ "k == (1 .. 3) \\times (1 .. 3)\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -30,7 +30,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME 1 - 2 + 3 = 0 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -43,7 +43,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME 1 - (2 + 1) = -2 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -56,7 +56,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME 1 * 2 * 3 = 6\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -69,7 +69,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Integers\n"
 				+ "ASSUME (1 = 1 /\\ 1 = 1) \\/ 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -82,7 +82,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME TRUE = (2 > 1)\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -94,7 +94,7 @@ public class PrecedenceTest {
 				+ "EXTENDS Naturals\n"
 				+ "ASSUME {1} = Nat \\ (Nat \\ {0})\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 }

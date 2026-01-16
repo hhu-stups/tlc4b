@@ -1,6 +1,8 @@
 package de.tlc4b.btypes;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.be4.classicalb.core.parser.node.Node;
 
@@ -8,29 +10,14 @@ public abstract class AbstractHasFollowers implements BType {
 
 	public abstract boolean contains(BType other);
 
-	private final ArrayList<Object> followers = new ArrayList<>();
+	private final Set<Object> followers = new LinkedHashSet<>();
 
-	public ArrayList<Object> getFollowers() {
+	public Set<Object> getFollowers() {
 		return this.followers;
 	}
 
 	public void addFollower(Object obj) {
-		if (!followers.contains(obj))
-			followers.add(obj);
-	}
-
-	public String printFollower() {
-		StringBuilder res = new StringBuilder();
-		res.append("[");
-		for (Object o : followers) {
-			if (!(o instanceof Node)) {
-				res.append(o.hashCode());
-				res.append(o.getClass());
-				res.append(" ");
-			}
-		}
-		res.append("]");
-		return res.toString();
+		followers.add(obj);
 	}
 
 	public void deleteFollower(Object obj) {
@@ -41,15 +28,14 @@ public abstract class AbstractHasFollowers implements BType {
 		if (this == newType) {
 			return;
 		}
-		ArrayList<Object> list = new ArrayList<>(followers);
+		Set<Object> list = new LinkedHashSet<>(followers);
 		for (Object obj : list) {
 			if (obj instanceof Node) {
 				typechecker.setType((Node) obj, newType);
 			} else if (obj instanceof SetType) {
 				((SetType) obj).setSubtype(newType);
 			} else if (obj instanceof IntegerOrSetOfPairType) {
-				// System.out.println("this " +this + " old " + obj + " new " +
-				// newType);
+				// System.out.println("this " +this + " old " + obj + " new " + newType);
 				((IntegerOrSetOfPairType) obj).update(this, newType, typechecker);
 			} else if (obj instanceof PairType) {
 				((PairType) obj).update(this, newType);
@@ -62,6 +48,12 @@ public abstract class AbstractHasFollowers implements BType {
 			}
 		}
 		this.followers.clear();
+	}
 
+	public String printFollower() {
+		return followers.stream()
+				.filter(o -> !(o instanceof Node))
+				.map(o -> o.hashCode() + o.getClass().toString())
+				.collect(Collectors.joining(" ", "[", "]"));
 	}
 }

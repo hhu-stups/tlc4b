@@ -1,6 +1,6 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compareModuleAndConfig;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ public class DeferredSetSizeTest {
 				+ "CONSTANTS S\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS\nS = {S1,S2,S3}\n"; 
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -29,7 +29,7 @@ public class DeferredSetSizeTest {
 				+ "ASSUME Cardinality(S) = 4\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS\nS = {S1,S2,S3,S4}\n"; 
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -44,6 +44,6 @@ public class DeferredSetSizeTest {
 				+ "ASSUME 4 = Cardinality(S)\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS\nS = {S1,S2,S3,S4}\n"; 
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 }

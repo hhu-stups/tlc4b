@@ -38,8 +38,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 	private final TLAPrinter tlaPrinter;
 	private final TypeRestrictor typeRestrictor;
 
-	public LTLFormulaPrinter(TLAPrinter tlaPrinter,
-			LTLFormulaVisitor ltlFormulaVisitor, TypeRestrictor typeRestrictor) {
+	public LTLFormulaPrinter(TLAPrinter tlaPrinter, LTLFormulaVisitor ltlFormulaVisitor, TypeRestrictor typeRestrictor) {
 		this.ltlFormulaVisitor = ltlFormulaVisitor;
 		this.tlaPrinter = tlaPrinter;
 		this.typeRestrictor = typeRestrictor;
@@ -139,8 +138,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 
 	@Override
 	public void caseAWeakFairLtl(AWeakFairLtl node) {
-		tlaPrinter
-				.printWeakFairnessWithParameter(node.getOperation().getText());
+		tlaPrinter.printWeakFairnessWithParameter(node.getOperation().getText());
 	}
 
 	@Override
@@ -153,8 +151,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend("\\E ");
 		tlaPrinter.moduleStringAppend(node.getExistsIdentifier().getText());
 		tlaPrinter.moduleStringAppend(" \\in ");
-		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node
-				.getExistsIdentifier().getText());
+		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node.getExistsIdentifier().getText());
 		typeRestrictor.getRestrictedNode(id).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(": ");
 		Start start = (Start) ltlFormulaVisitor.getBAst(node);
@@ -171,8 +168,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 		tlaPrinter.moduleStringAppend("\\A ");
 		tlaPrinter.moduleStringAppend(node.getForallIdentifier().getText());
 		tlaPrinter.moduleStringAppend(" \\in ");
-		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node
-				.getForallIdentifier().getText());
+		Node id = this.ltlFormulaVisitor.getLTLIdentifier(node.getForallIdentifier().getText());
 		typeRestrictor.getRestrictedNode(id).apply(tlaPrinter);
 		tlaPrinter.moduleStringAppend(": ");
 		Start start = (Start) ltlFormulaVisitor.getBAst(node);
@@ -187,8 +183,7 @@ public class LTLFormulaPrinter extends DepthFirstAdapter {
 	@Override
 	public void caseADetLtl(ADetLtl node) {
 		List<PActions> copy = new ArrayList<>(node.getArgs());
-		LinkedHashMap<String, Node> operations = ltlFormulaVisitor
-				.getMachineContext().getOperations();
+		LinkedHashMap<String, Node> operations = ltlFormulaVisitor.getMachineContext().getOperations();
 		if (copy.size() > 1) {
 			tlaPrinter.moduleStringAppend("(");
 			for (int i = 0; i < copy.size() - 1; i++) {

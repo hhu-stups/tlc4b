@@ -1,10 +1,10 @@
 package de.tlc4b.typechecking;
 
-import static org.junit.Assert.assertEquals;
+import de.be4.classicalb.core.parser.exceptions.BException;
 
 import org.junit.Test;
 
-import de.be4.classicalb.core.parser.exceptions.BException;
+import static org.junit.Assert.assertEquals;
 
 public class FunctionsVsRelations {
 

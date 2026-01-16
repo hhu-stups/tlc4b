@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import de.be4.classicalb.core.parser.exceptions.BCompoundException;
 import de.tlc4b.exceptions.TLC4BException;
@@ -26,18 +25,15 @@ import de.tlc4b.util.StopWatch;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import static de.tlc4b.TLC4BOption.*;
-import static de.tlc4b.util.StopWatch.Watches.*;
-import static de.tlc4b.MP.*;
+import org.apache.commons.cli.help.HelpFormatter;
 
 public class TLC4B {
 	private static final String CSV_DELIMITER = ";";
 
-	private File mainfile, traceFile;
+	private File mainfile;
+	private File traceFile;
 	private String machineFileNameWithoutFileExtension;
 	// e.g. Test of file foo/bar/Test.mch
 	private File logFile;
@@ -55,16 +51,16 @@ public class TLC4B {
 		try {
 			run(args);
 		} catch (BCompoundException e) {
-			printlnErr("***** Parsing Error *****");
-			printlnErr(e.getMessage());
+			MP.printlnErr("***** Parsing Error *****");
+			MP.printlnErr(e.getMessage());
 			System.exit(-1);
 		} catch (TLC4BException e) {
-			printlnErr(e.getMessage());
-			println("Result: " + e.getError());
+			MP.printlnErr(e.getMessage());
+			MP.println("Result: " + e.getError());
 			System.exit(-1);
 		} catch (IOException e) {
-			printlnErr(e.getMessage());
-			println("Result: " + "I/O Error");
+			MP.printlnErr(e.getMessage());
+			MP.println("Result: " + "I/O Error");
 			System.exit(-1);
 		}
 		System.exit(0);
@@ -90,14 +86,14 @@ public class TLC4B {
 				tlc4b.printResults(results);
 				tlc4b.createLogFile(results);
 			} catch (NoClassDefFoundError e) {
-				printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
+				MP.printlnErr("Can not find TLC. The tlatools.jar must be included in the classpath.");
 			}
 		}
 		return results;
 	}
 
 	/**
-	 * Check whether TLC4B is applicable to the provided machine.
+	 * Check whether TLC4B (translation) is applicable to the provided machine.
 	 * This method has no return value - if it returns without throwing an exception, then TLC4B is applicable.
 	 * Be aware that this method may take a long time to run for large/complex machines.
 	 *
@@ -106,58 +102,83 @@ public class TLC4B {
 	 * @throws TLC4BException if translation fails for any other reason
 	 */
 	public static void checkTLC4BIsApplicable(String path) throws BCompoundException {
+		checkTLC4BIsApplicable(path, false);
+	}
+
+	/**
+	 * Check whether TLC4B is applicable to the provided machine.
+	 * This method has no return value - if it returns without throwing an exception, then TLC4B is applicable.
+	 * Be aware that this method may take a long time to run for large/complex machines.
+	 *
+	 * @param path path to B machine file
+	 * @param noTranslation if a translation is not required
+	 * @throws BCompoundException if the machine file could not be parsed
+	 * @throws TLC4BException if translation fails for any other reason
+	 */
+	public static void checkTLC4BIsApplicable(String path, boolean noTranslation) throws BCompoundException {
 		TLC4B tlc4B = new TLC4B();
-		tlc4B.processArgs(new String[]{path, SILENT.cliArg()});
-		tlc4B.translate();
-		// tlc4B.createFiles() is intentionally not called here!
+		List<String> args = new ArrayList<>();
+		args.add(path);
+		args.add(TLC4BOption.SILENT.cliArg());
+		if (noTranslation) {
+			args.add(TLC4BOption.NOTRANSLATION.cliArg());
+		}
+		tlc4B.processArgs(args.toArray(new String[0]));
+		if (TLC4BGlobals.isTranslate()) {
+			tlc4B.translate();
+			// tlc4B.createFiles() is intentionally not called here!
+		}
+		// TODO: verify if machine can be checked with TLC
 	}
 
 	private void printResults(TLCResults results) throws IOException {
 		printOperationsCount(results);
 		// options
-		printlnSilent("Used Options");
+		MP.printlnSilent("Used Options");
 		if (TLC4BGlobals.getDfidInitialDepth() > 0) // -1 if disabled
-			printlnSilent("| Use DFS with initial depth: " + TLC4BGlobals.getDfidInitialDepth());
-		printlnSilent("| Number of workers: " + TLC4BGlobals.getWorkers());
-		printlnSilent("| Invariants check: " + TLC4BGlobals.isInvariant());
-		printlnSilent("| Deadlock check: " + TLC4BGlobals.isDeadlockCheck());
-		printlnSilent("| Assertion check: " + TLC4BGlobals.isAssertion());
-		printlnSilent("| Find Goal check: " + TLC4BGlobals.isGOAL());
-		printlnSilent("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
-		printlnSilent("| Partial invariant evaluation: " + TLC4BGlobals.isPartialInvariantEvaluation());
-		printlnSilent("| Lazy constants setup: " + !TLC4BGlobals.isForceTLCToEvalConstants());
-		printlnSilent("| Aggressive well-definedness check: " + TLC4BGlobals.checkWelldefinedness());
-		printlnSilent("| ProB constant setup: " + TLC4BGlobals.isProBconstantsSetup());
-		printlnSilent("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
-		printlnSilent("| MIN Int: " + TLC4BGlobals.getMIN_INT());
-		printlnSilent("| MAX Int: " + TLC4BGlobals.getMAX_INT());
-		printlnSilent("| Standard deferred set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
-		printlnSilent("--------------------------------");
+			MP.printlnSilent("| Use DFS with initial depth: " + TLC4BGlobals.getDfidInitialDepth());
+		MP.printlnSilent("| Number of workers: " + TLC4BGlobals.getWorkers());
+		MP.printlnSilent("| Invariants check: " + TLC4BGlobals.isInvariant());
+		MP.printlnSilent("| Deadlock check: " + TLC4BGlobals.isDeadlockCheck());
+		MP.printlnSilent("| Assertion check: " + TLC4BGlobals.isAssertion());
+		MP.printlnSilent("| Find Goal check: " + TLC4BGlobals.isGOAL());
+		MP.printlnSilent("| LTL formulas check: " + TLC4BGlobals.isCheckLTL());
+		MP.printlnSilent("| Partial invariant evaluation: " + TLC4BGlobals.isPartialInvariantEvaluation());
+		MP.printlnSilent("| Lazy constants setup: " + !TLC4BGlobals.isForceTLCToEvalConstants());
+		MP.printlnSilent("| Aggressive well-definedness check: " + TLC4BGlobals.checkWelldefinedness());
+		MP.printlnSilent("| ProB constant setup: " + TLC4BGlobals.isProBconstantsSetup());
+		MP.printlnSilent("| Symmetry reduction: " + TLC4BGlobals.useSymmetry());
+		MP.printlnSilent("| MIN Int: " + TLC4BGlobals.getMIN_INT());
+		MP.printlnSilent("| MAX Int: " + TLC4BGlobals.getMAX_INT());
+		MP.printlnSilent("| Standard deferred set size: " + TLC4BGlobals.getDEFERRED_SET_SIZE());
+		MP.printlnSilent("--------------------------------");
 		if (TLC4BGlobals.isTranslate()) {
-			printlnSilent("Parsing time: " + StopWatch.getRunTime(PARSING_TIME) + " ms");
-			printlnSilent("Translation time: " + StopWatch.getRunTime(TRANSLATION_TIME) + " ms");
+			MP.printlnSilent("Parsing time: " + StopWatch.getRunTime(StopWatch.Watches.PARSING_TIME) + " ms");
+			MP.printlnSilent("Translation time: " + StopWatch.getRunTime(StopWatch.Watches.TRANSLATION_TIME) + " ms");
 		}
 		if (TLC4BGlobals.isRunTLC()) {
-			println("Model checking time: " + results.getModelCheckingTime() + " sec");
+			MP.println("Model checking time: " + results.getModelCheckingTime() + " sec");
 			// MP.printMessage("Number of workers: " +
 			// TLCGlobals.getNumWorkers());
 			if (!results.getViolatedAssertions().isEmpty()) {
-				println("Violated assertions: " + results.getViolatedAssertions());
+				MP.println("Violated assertions: " + results.getViolatedAssertions());
 			}
-			println("States analysed: " + results.getNumberOfDistinctStates());
-			println("Transitions fired: " + results.getNumberOfTransitions());
-			println("Result: " + results.getResultString());
+			MP.println("States analysed: " + results.getNumberOfDistinctStates());
+			MP.println("Transitions fired: " + results.getNumberOfTransitions());
+			MP.println("Result: " + results.getResultString());
 			String violatedDefinition = results.getViolatedDefinition();
 			if (violatedDefinition != null) {
-				println("Violated Definition: " + violatedDefinition);
+				MP.println("Violated Definition: " + violatedDefinition);
 			}
 
 			if (results.hasTrace() && TLC4BGlobals.isCreateTraceFile()) {
 				String trace = results.getTrace();
-				String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
-				traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
-				results.addTraceFilePath(traceFile.getAbsolutePath());
-				println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
+				if (trace != null) {
+					String tracefileName = machineFileNameWithoutFileExtension + ".tla.trace";
+					traceFile = createFile(buildDir, tracefileName, trace, TLC4BGlobals.isDeleteOnExit());
+					results.addTraceFilePath(traceFile.getAbsolutePath());
+					MP.println("Trace file '" + traceFile.getAbsolutePath() + "' created.");
+				}
 			}
 		}
 
@@ -166,11 +187,11 @@ public class TLC4B {
 	private void printOperationsCount(TLCResults results) {
 		Map<String, Long> operationCount = results.getOperationCount();
 		if (TLC4BGlobals.isPrintCoverage() && operationCount != null) {
-			printlnSilent("---------- Coverage statistics ----------");
-			for (Entry<String, Long> entry : operationCount.entrySet()) {
-				printlnSilent(entry.getKey() + ": " + entry.getValue().toString());
+			MP.printlnSilent("---------- Coverage statistics ----------");
+			for (Map.Entry<String, Long> entry : operationCount.entrySet()) {
+				MP.printlnSilent(entry.getKey() + ": " + entry.getValue().toString());
 			}
-			printlnSilent("---------- End of coverage statistics ----------");
+			MP.printlnSilent("---------- End of coverage statistics ----------");
 		}
 	}
 
@@ -183,7 +204,7 @@ public class TLC4B {
 			tlc4b.process(args);
 		} catch (Exception e) {
 			e.printStackTrace();
-			printlnErr(e.getMessage());
+			MP.printlnErr(e.getMessage());
 			throw e;
 		}
 		if (TLC4BGlobals.isRunTLC()) {
@@ -208,21 +229,21 @@ public class TLC4B {
 
 		tlc4b.machineFileNameWithoutFileExtension = "Test";
 
-		StopWatch.start(PARSING_TIME);
-		printSilent("Parsing... ");
+		StopWatch.start(StopWatch.Watches.PARSING_TIME);
+		MP.printSilent("Parsing... ");
 		tlc4b.translator = new Translator(machineString);
-		StopWatch.stop(PARSING_TIME);
-		printlnSilent("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
+		StopWatch.stop(StopWatch.Watches.PARSING_TIME);
+		MP.printlnSilent("(" + StopWatch.getRunTimeAsString(StopWatch.Watches.PARSING_TIME) + "ms)");
 
-		StopWatch.start(TRANSLATION_TIME);
-		printSilent("Translating... ");
+		StopWatch.start(StopWatch.Watches.TRANSLATION_TIME);
+		MP.printSilent("Translating... ");
 		tlc4b.translator.translate();
 		tlc4b.tlaModule = tlc4b.translator.getModuleString();
 		tlc4b.config = tlc4b.translator.getConfigString();
 		tlc4b.tlcOutputInfo = tlc4b.translator.getTLCOutputInfo();
-		StopWatch.stop(TRANSLATION_TIME);
-		printlnSilent("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
-		printlnSilent("Translated TLA:\n" + tlc4b.tlaModule);
+		StopWatch.stop(StopWatch.Watches.TRANSLATION_TIME);
+		MP.printlnSilent("(" + StopWatch.getRunTimeAsString(StopWatch.Watches.TRANSLATION_TIME) + "ms)");
+		MP.printlnSilent("Translated TLA:\n" + tlc4b.tlaModule);
 		tlc4b.createFiles();
 
 		if (TLC4BGlobals.isRunTLC()) {
@@ -259,88 +280,95 @@ public class TLC4B {
 
 			// reset all parameters to default, then apply current args
 			TLC4BGlobals.resetGlobals();
-			TLC4BGlobals.setVerbose(line.hasOption(VERBOSE.arg()));
-			TLC4BGlobals.setSilent(line.hasOption(SILENT.arg()));
-			TLC4BGlobals.setDeadlockCheck(!line.hasOption(NODEAD.arg()));
-			TLC4BGlobals.setRunTLC(!line.hasOption(NOTLC.arg()));
-			TLC4BGlobals.setTranslate(!line.hasOption(NOTRANSLATION.arg()));
-			TLC4BGlobals.setGOAL(!line.hasOption(NOGOAL.arg()));
-			TLC4BGlobals.setInvariant(!line.hasOption(NOINV.arg()));
-			TLC4BGlobals.setAssertionCheck(!line.hasOption(NOASS.arg()));
-			TLC4BGlobals.setWelldefinednessCheck(line.hasOption(WDCHECK.arg()));
-			TLC4BGlobals.setSymmetryUse(line.hasOption(SYMMETRY.arg()));
-			TLC4BGlobals.setCheckltl(!line.hasOption(NOLTL.arg()));
-			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(LAZYCONSTANTS.arg()));
-			TLC4BGlobals.setCreateTraceFile(!line.hasOption(NOTRACE.arg()));
-			TLC4BGlobals.setDeleteOnExit(line.hasOption(DEL.arg()));
-			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(PARINVEVAL.arg()));
-			TLC4BGlobals.setPrintCoverage(line.hasOption(COVERAGE.arg()));
+			TLC4BGlobals.setVerbose(line.hasOption(TLC4BOption.VERBOSE.arg()));
+			TLC4BGlobals.setSilent(line.hasOption(TLC4BOption.SILENT.arg()));
+			TLC4BGlobals.setDeadlockCheck(!line.hasOption(TLC4BOption.NODEAD.arg()));
+			TLC4BGlobals.setRunTLC(!line.hasOption(TLC4BOption.NOTLC.arg()));
+			TLC4BGlobals.setTranslate(!line.hasOption(TLC4BOption.NOTRANSLATION.arg()));
+			TLC4BGlobals.setGOAL(!line.hasOption(TLC4BOption.NOGOAL.arg()));
+			TLC4BGlobals.setInvariant(!line.hasOption(TLC4BOption.NOINV.arg()));
+			TLC4BGlobals.setAssertionCheck(!line.hasOption(TLC4BOption.NOASS.arg()));
+			TLC4BGlobals.setWelldefinednessCheck(line.hasOption(TLC4BOption.WDCHECK.arg()));
+			TLC4BGlobals.setSymmetryUse(line.hasOption(TLC4BOption.SYMMETRY.arg()));
+			TLC4BGlobals.setCheckltl(!line.hasOption(TLC4BOption.NOLTL.arg()));
+			TLC4BGlobals.setForceTLCToEvalConstants(!line.hasOption(TLC4BOption.LAZYCONSTANTS.arg()));
+			TLC4BGlobals.setCreateTraceFile(!line.hasOption(TLC4BOption.NOTRACE.arg()));
+			TLC4BGlobals.setDeleteOnExit(line.hasOption(TLC4BOption.DEL.arg()));
+			TLC4BGlobals.setPartialInvariantEvaluation(line.hasOption(TLC4BOption.PARINVEVAL.arg()));
+			TLC4BGlobals.setPrintCoverage(line.hasOption(TLC4BOption.COVERAGE.arg()));
 
-			if (line.hasOption(TMP.arg())) {
+			if (line.hasOption(TLC4BOption.TMP.arg())) {
 				buildDir = new File(System.getProperty("java.io.tmpdir"));
 			}
-			if (line.hasOption(LOG.arg())) {
-				String logFileString = line.getOptionValue(LOG.arg());
+			if (line.hasOption(TLC4BOption.LOG.arg())) {
+				String logFileString = line.getOptionValue(TLC4BOption.LOG.arg());
 				if (logFileString == null) {
 					throw new TLC4BIOException("Error: File required after option '-log'.");
 				}
 				logFile = new File(logFileString);
 			}
-			if (line.hasOption(MAXINT.arg())) {
-				String maxint = line.getOptionValue(MAXINT.arg());
+			if (line.hasOption(TLC4BOption.MAXINT.arg())) {
+				String maxint = line.getOptionValue(TLC4BOption.MAXINT.arg());
 				if (maxint == null) {
 					throw new TLC4BIOException("Error: Number required after option '-maxint'.");
 				}
 				TLC4BGlobals.setMAX_INT(Integer.parseInt(maxint));
 			}
-			if (line.hasOption(DEFAULT_SETSIZE.arg())) {
-				String deferredSetSize = line.getOptionValue(DEFAULT_SETSIZE.arg());
+			if (line.hasOption(TLC4BOption.DEFAULT_SETSIZE.arg())) {
+				String deferredSetSize = line.getOptionValue(TLC4BOption.DEFAULT_SETSIZE.arg());
 				if (deferredSetSize == null) {
 					throw new TLC4BIOException("Error: Number required after option '-default_setsize'.");
 				}
 				TLC4BGlobals.setDEFERRED_SET_SIZE(Integer.parseInt(deferredSetSize));
 			} 
-			if (line.hasOption(MININT.arg())) {
-				String minint = line.getOptionValue(MININT.arg());
+			if (line.hasOption(TLC4BOption.MININT.arg())) {
+				String minint = line.getOptionValue(TLC4BOption.MININT.arg());
 				if (minint == null) {
 					throw new TLC4BIOException("Error: Number required after option '-minint'.");
 				}
 				TLC4BGlobals.setMIN_INT(Integer.parseInt(minint));
 			}
-			if (line.hasOption(WORKERS.arg())) {
-				String workers = line.getOptionValue(WORKERS.arg());
+			if (line.hasOption(TLC4BOption.WORKERS.arg())) {
+				String workers = line.getOptionValue(TLC4BOption.WORKERS.arg());
 				if (workers == null) {
 					throw new TLC4BIOException("Error: Number required after option '-workers'.");
 				}
 				TLC4BGlobals.setWorkers(Integer.parseInt(workers));
 			}
-			if (line.hasOption(DFID.arg())) {
-				String dfid_initial_depth = line.getOptionValue(DFID.arg());
+			if (line.hasOption(TLC4BOption.DFID.arg())) {
+				String dfid_initial_depth = line.getOptionValue(TLC4BOption.DFID.arg());
 				if (dfid_initial_depth == null) {
 					throw new TLC4BIOException("Error: Number required after option '-dfid'.");
 				}
 				TLC4BGlobals.setDfidInitialDepth(Integer.parseInt(dfid_initial_depth));
 			}
-			if (line.hasOption(CONSTANTSSETUP.arg())) {
+			if (line.hasOption(TLC4BOption.CONSTANTSSETUP.arg())) {
 				TLC4BGlobals.setProBconstantsSetup(true);
-				constantsSetup = line.getOptionValue(CONSTANTSSETUP.arg());
+				constantsSetup = line.getOptionValue(TLC4BOption.CONSTANTSSETUP.arg());
 				if (constantsSetup == null) {
 					throw new TLC4BIOException("Error: String required after option '-constantssetup'.");
 				}
 			}
-			if (line.hasOption(LTLFORMULA.arg())) {
-				ltlFormula = line.getOptionValue(LTLFORMULA.arg());
+			if (line.hasOption(TLC4BOption.LTLFORMULA.arg())) {
+				ltlFormula = line.getOptionValue(TLC4BOption.LTLFORMULA.arg());
 				if (ltlFormula == null) {
 					throw new TLC4BIOException("Error: LTL formula required after option '-ltlformula'.");
 				}
 			}
-			if (line.hasOption(OUTPUT.arg())) {
-				buildDir = new File(line.getOptionValue(OUTPUT.arg()));
+			if (line.hasOption(TLC4BOption.OUTPUT.arg())) {
+				buildDir = new File(line.getOptionValue(TLC4BOption.OUTPUT.arg()));
 			}
 		} catch (ParseException e) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("[file]", options);
-			throw new TLC4BIOException(e);
+			HelpFormatter formatter = HelpFormatter.builder()
+				.setShowSince(false)
+				.get();
+			TLC4BException tlcException = new TLC4BIOException(e);
+			try {
+				formatter.printHelp("java -jar TLC4B.jar [file]", "", options, "", false);
+			} catch (IOException exc) {
+				tlcException.addSuppressed(exc);
+			}
+			throw tlcException;
 		}
 	}
 
@@ -353,25 +381,25 @@ public class TLC4B {
 			MP.printVerbose(string);
 			MP.printVerbose(" ");
 		}
-		printlnVerbose("");
+		MP.printlnVerbose("");
 	}
 
 	private void translate() throws BCompoundException {
-		StopWatch.start(PARSING_TIME);
+		StopWatch.start(StopWatch.Watches.PARSING_TIME);
 		MP.printSilent("Parsing... ");
 		translator = new Translator(machineFileNameWithoutFileExtension,
 			mainfile, this.ltlFormula, this.constantsSetup);
-		StopWatch.stop(PARSING_TIME);
-		printlnSilent("(" + StopWatch.getRunTimeAsString(PARSING_TIME) + "ms)");
+		StopWatch.stop(StopWatch.Watches.PARSING_TIME);
+		MP.printlnSilent("(" + StopWatch.getRunTimeAsString(StopWatch.Watches.PARSING_TIME) + "ms)");
 
-		StopWatch.start(TRANSLATION_TIME);
+		StopWatch.start(StopWatch.Watches.TRANSLATION_TIME);
 		MP.printSilent("Translating... ");
 		translator.translate();
 		this.tlaModule = translator.getModuleString();
 		this.config = translator.getConfigString();
 		this.tlcOutputInfo = translator.getTLCOutputInfo();
-		StopWatch.stop(TRANSLATION_TIME);
-		printlnSilent("(" + StopWatch.getRunTimeAsString(TRANSLATION_TIME) + "ms)");
+		StopWatch.stop(StopWatch.Watches.TRANSLATION_TIME);
+		MP.printlnSilent("(" + StopWatch.getRunTimeAsString(StopWatch.Watches.TRANSLATION_TIME) + "ms)");
 	}
 
 	public void process(String[] args) throws IOException, BCompoundException {
@@ -392,11 +420,21 @@ public class TLC4B {
 			throw new TLC4BIOException("The file '" + mainfile.getPath() + "' can not be accessed.", e);
 		}
 
-		machineFileNameWithoutFileExtension = mainfile.getName().substring(0,
-				mainfile.getName().length() - 4); // deleting .mch
+		String fileName = mainfile.getName();
+		int lastDot = fileName.lastIndexOf('.');
+		if (lastDot > 0) {
+			machineFileNameWithoutFileExtension = fileName.substring(0, lastDot);
+		} else{
+			machineFileNameWithoutFileExtension = fileName;
+		}
 
 		if (buildDir == null) {
 			buildDir = new File(mainfile.getParentFile(), machineFileNameWithoutFileExtension);
+		}
+
+		if (!TLC4BGlobals.isTranslate()) {
+			// override buildDir because no files will be generated
+			buildDir = mainfile.getParentFile();
 		}
 	}
 
@@ -413,15 +451,15 @@ public class TLC4B {
 		fieldValues.add(String.valueOf(tlcModelCheckingTime));
 
 		fieldNames.add("Parsing Time Of B machine (ms)");
-		long parseTime = StopWatch.getRunTime(PARSING_TIME);
+		long parseTime = StopWatch.getRunTime(StopWatch.Watches.PARSING_TIME);
 		fieldValues.add(String.valueOf(parseTime));
 
 		fieldNames.add("Translation Time (ms)");
-		long translationTime = StopWatch.getRunTime(TRANSLATION_TIME);
+		long translationTime = StopWatch.getRunTime(StopWatch.Watches.TRANSLATION_TIME);
 		fieldValues.add(String.valueOf(translationTime));
 
 		fieldNames.add("Model Checking Time (ms)");
-		long modelCheckingTime = StopWatch.getRunTime(MODEL_CHECKING_TIME);
+		long modelCheckingTime = StopWatch.getRunTime(StopWatch.Watches.MODEL_CHECKING_TIME);
 		fieldValues.add(String.valueOf(modelCheckingTime));
 		
 		fieldNames.add("TLC Result");
@@ -465,7 +503,7 @@ public class TLC4B {
 			try (FileWriter fw = new FileWriter(logFile, true)) { // the true will append the new data
 				fw.write(logCsvString);
 			}
-			println("Log file: " + logFile.getAbsolutePath());
+			MP.println("Log file: " + logFile.getAbsolutePath());
 		}
 	}
 
@@ -478,12 +516,12 @@ public class TLC4B {
 		File moduleFile = createFile(buildDir,
 				machineFileNameWithoutFileExtension + ".tla", tlaModule,
 				TLC4BGlobals.isDeleteOnExit());
-		println("TLA+ module '" + moduleFile.getAbsolutePath() + "' created.");
+		MP.println("TLA+ module '" + moduleFile.getAbsolutePath() + "' created.");
 
 		File configFile = createFile(buildDir,
 				machineFileNameWithoutFileExtension + ".cfg", config,
 				TLC4BGlobals.isDeleteOnExit());
-		println("Configuration file '" + configFile.getAbsolutePath() + "' created.");
+		MP.println("Configuration file '" + configFile.getAbsolutePath() + "' created.");
 
 		createStandardModules();
 	}
@@ -511,7 +549,7 @@ public class TLC4B {
 			while ((read = is.read(bytes)) != -1) {
 				fos.write(bytes, 0, read);
 			}
-			println("Standard module '" + file.getName() + "' created.");
+			MP.println("Standard module '" + file.getName() + "' created.");
 		} finally {
 			if (TLC4BGlobals.isDeleteOnExit() && file.exists()) {
 				file.deleteOnExit();

@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.*;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ public class SetsClauseTest {
 		String expectedConfig = "CONSTANTS\n" +
 				"d = {d1,d2,d3}\n";
 
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -38,7 +38,7 @@ public class SetsClauseTest {
 				+ "CONSTANTS\n"
 				+ "d = {d1,d2,d3}\n";
 
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 	
 	@Test
@@ -51,6 +51,6 @@ public class SetsClauseTest {
 				+ "S == {a, b, c}\n"
 				+ "====";
 		String expectedConfig = "CONSTANTS\na = a\nb = b\nc = c\n"; 
-		compareModuleAndConfig(expectedModule, expectedConfig, machine);
+		TestUtil.compareModuleAndConfig(expectedModule, expectedConfig, machine);
 	}
 }

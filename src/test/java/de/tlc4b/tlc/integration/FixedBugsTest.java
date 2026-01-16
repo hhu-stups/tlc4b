@@ -1,10 +1,11 @@
 package de.tlc4b.tlc.integration;
 
-import static de.tlc4b.tlc.TLCResults.TLCResult.*;
-import static de.tlc4b.util.TestUtil.testString;
-import static org.junit.Assert.assertEquals;
+import de.tlc4b.tlc.TLCResults;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class FixedBugsTest {
 
@@ -15,7 +16,7 @@ public class FixedBugsTest {
 				+ "CONSTANTS ACTION\n"
 				+ "PROPERTIES ACTION={1, 2, 3} \n"
 				+ "END";
-		assertEquals(NoError, testString(machine));
+		assertEquals(TLCResults.TLCResult.NoError, TestUtil.testString(machine));
 	}
 
 	@Test
@@ -26,7 +27,7 @@ public class FixedBugsTest {
 			+ "INITIALISATION x := {}\n"
 			+ "OPERATIONS foo = SELECT x = {} THEN x(1) := 1 END\n"
 			+ "END";
-		assertEquals(Deadlock, testString(machine));
+		assertEquals(TLCResults.TLCResult.Deadlock, TestUtil.testString(machine));
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class FixedBugsTest {
 			+ "INITIALISATION x := {}\n"
 			+ "OPERATIONS foo = SELECT x = {} THEN x(1)(2) := 1 END\n"
 			+ "END";
-		assertEquals(Deadlock, testString(machine));
+		assertEquals(TLCResults.TLCResult.Deadlock, TestUtil.testString(machine));
 	}
 
 	@Test
@@ -48,6 +49,6 @@ public class FixedBugsTest {
 			+ "INITIALISATION x := {}\n"
 			+ "OPERATIONS foo = SELECT x = {} THEN x(1)(2)(3) := 1 END\n"
 			+ "END";
-		assertEquals(Deadlock, testString(machine));
+		assertEquals(TLCResults.TLCResult.Deadlock, TestUtil.testString(machine));
 	}
 }

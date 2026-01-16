@@ -1,14 +1,11 @@
 package de.tlc4b;
 
-import static de.tlc4b.util.StopWatch.Watches.MODEL_CHECKING_TIME;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,24 +15,35 @@ import java.util.Set;
 
 import de.tlc4b.tlc.TLCMessageListener;
 import de.tlc4b.util.StopWatch;
+
+import tlc2.TLC;
 import tlc2.TLCGlobals;
 import tlc2.tool.fp.FPSetFactory;
+
 import util.SimpleFilenameToStream;
 import util.ToolIO;
-import tlc2.TLC;
 
-public class TLCRunner {
+public final class TLCRunner {
 
 	public static TLCMessageListener listener = null;
+
+	private TLCRunner() {
+		throw new AssertionError();
+	}
 
 	public static void addTLCMessageListener(final TLCMessageListener listener) {
 		TLCRunner.listener = listener;
 	}
 
+	/**
+	 * Don't call yourself, use {@link TLCRunner#runTLCInANewJVM(String, String)}
+	 */
 	public static void main(String[] args) {
 		// this method will be executed in a separate JVM
 		System.setProperty("apple.awt.UIElement", "true");
 		System.out.println("Starting TLC...");
+		ToolIO.reset();
+		ToolIO.setMode(ToolIO.SYSTEM);
 		String path = args[0];
 		ToolIO.setUserDir(path);
 		String[] parameters = new String[args.length - 1];
@@ -65,40 +73,8 @@ public class TLCRunner {
 		return processBuilder.start();
 	}
 
-	public static ArrayList<String> runTLCInANewJVM(String machineName, String path) throws IOException {
+	private static List<String> buildTlcArgs(String machineName) {
 		List<String> list = new ArrayList<>();
-		list.add(path);
-		list.add(machineName);
-		if (!TLC4BGlobals.isDeadlockCheck()) {
-			list.add("-deadlock");
-		}
-
-		if (TLC4BGlobals.isCheckLTL()) {
-			list.add("-cleanup");
-		}
-		// list.add("-coverage");
-		// list.add("1");
-
-		final Process p = startJVM(TLCRunner.class.getCanonicalName(), list);
-		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
-		stdOut.start();
-		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
-		errOut.start();
-		try {
-			p.waitFor();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		return stdOut.getLog();
-	}
-
-	public static void runTLC(String machineName, File path) {
-		StopWatch.start(MODEL_CHECKING_TIME);
-		MP.printlnSilent("--------------------------------");
-		MP.TLCOutputStream.changeOutputStream();
-		ToolIO.setMode(ToolIO.SYSTEM);
-
-		ArrayList<String> list = new ArrayList<>();
 		if (!TLC4BGlobals.isDeadlockCheck()) {
 			list.add("-deadlock");
 		}
@@ -124,7 +100,7 @@ public class TLCRunner {
 			list.add("-coverage");
 			list.add("" + 60);
 		}
-		
+
 		list.add("-maxSetSize");
 		list.add("100000000");
 
@@ -132,8 +108,36 @@ public class TLCRunner {
 		// list.add("-config");
 		// list.add(machineName + ".cfg");
 		list.add(machineName);
+
+		return list;
+	}
+
+	public static List<String> runTLCInANewJVM(String machineName, String path) throws IOException {
+		List<String> list = buildTlcArgs(machineName);
+		list.add(0, path); // userdir must be first arg
+
+		final Process p = startJVM(TLCRunner.class.getCanonicalName(), list);
+		StreamGobbler stdOut = new StreamGobbler(p.getInputStream());
+		stdOut.start();
+		StreamGobbler errOut = new StreamGobbler(p.getErrorStream());
+		errOut.start();
+		try {
+			p.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return stdOut.getLog();
+	}
+
+	public static void runTLC(String machineName, File path) {
+		StopWatch.start(StopWatch.Watches.MODEL_CHECKING_TIME);
+		MP.printlnSilent("--------------------------------");
+		MP.TLCOutputStream.changeOutputStream();
+		ToolIO.reset();
+		ToolIO.setMode(ToolIO.SYSTEM);
 		ToolIO.setUserDir(path.getPath());
-		String[] args = list.toArray(new String[0]);
+
+		String[] args = buildTlcArgs(machineName).toArray(new String[0]);
 		TLC tlc = new TLC();
 		// handle parameters
 		if (tlc.handleParameters(args)) {
@@ -143,7 +147,7 @@ public class TLCRunner {
 				if (listener != null) listener.start();
 				tlc.process();
 				if (listener != null) listener.finish();
-			} catch (Exception e) {
+			} catch (Exception ignored) {
 			}
 		}
 		// System.setOut(systemOut);
@@ -152,23 +156,22 @@ public class TLCRunner {
 		// return messages;
 		MP.TLCOutputStream.resetOutputStream();
 		MP.println("--------------------------------");
-		StopWatch.stop(MODEL_CHECKING_TIME);
+		StopWatch.stop(StopWatch.Watches.MODEL_CHECKING_TIME);
 	}
 
 	private static void closeThreads() {
 		Set<Thread> threadSet = new HashSet<>(Thread.getAllStackTraces().keySet());
 		Thread[] threadArray = threadSet.toArray(new Thread[0]);
 		for (Thread t : threadArray) {
-			// System.out.println(t.getId()+ " "+t.getThreadGroup());
 			if (t.getName().equals("RMI Reaper")) {
 				t.interrupt();
 			}
 		}
-		// System.exit(0);
 	}
 }
 
-class StreamGobbler extends Thread {
+final class StreamGobbler extends Thread {
+
 	private final InputStream is;
 	private final ArrayList<String> log;
 
@@ -177,8 +180,10 @@ class StreamGobbler extends Thread {
 	}
 
 	StreamGobbler(InputStream is) {
+		super("StreamGobbler for " + is);
 		this.is = is;
 		this.log = new ArrayList<>();
+		this.setDaemon(true);
 	}
 
 	public void run() {
@@ -187,10 +192,11 @@ class StreamGobbler extends Thread {
 			BufferedReader br = new BufferedReader(isr);
 			String line;
 			while ((line = br.readLine()) != null) {
-				System.out.println("> " + line);
+				if (TLC4BGlobals.isVerbose()) {
+					System.out.println("> " + line);
+				}
 				log.add(line);
 			}
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

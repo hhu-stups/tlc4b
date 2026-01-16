@@ -1,9 +1,25 @@
 package de.tlc4b.tlc;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.tlc4b.TLC4BGlobals;
 import de.tlc4b.exceptions.NotSupportedException;
-import tla2sany.semantic.*;
-import tla2sany.st.Location;
+
+import tla2sany.semantic.AssumeNode;
+import tla2sany.semantic.ExprNode;
+import tla2sany.semantic.ExprOrOpArgNode;
+import tla2sany.semantic.ModuleNode;
+import tla2sany.semantic.OpApplNode;
+import tla2sany.semantic.OpDefNode;
+import tla2sany.semantic.SymbolNode;
+import tla2sany.semantic.ThmOrAssumpDefNode;
+
 import tlc2.output.EC;
 import tlc2.output.MP;
 import tlc2.output.Message;
@@ -13,23 +29,19 @@ import tlc2.tool.TLCState;
 import tlc2.tool.TLCStateInfo;
 import tlc2.tool.ToolGlobals;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-import static de.tlc4b.tlc.TLCResults.TLCResult.*;
-import static tlc2.output.MP.*;
-
-public class TLCResults implements ToolGlobals {
+public class TLCResults {
 
 	private TLCResult tlcResult;
-	private String violatedDefinition, tlcErrorMessage;
+	private String violatedDefinition;
+	private String tlcErrorMessage;
 	private Date startTime;
 	private Date endTime;
 	private Map<String, Long> operationsCount;
 	private final List<String> violatedAssertions = new ArrayList<>();
 
 	private int lengthOfTrace;
-	private String traceString, traceFile;
+	private String traceString;
+	private String traceFile;
 
 	private int numberOfDistinctStates;
 	private int numberOfTransitions;
@@ -96,13 +108,13 @@ public class TLCResults implements ToolGlobals {
 
 		evalAllMessages();
 
-		if (hasTrace()) {
+		if (tlcOutputInfo != null && hasTrace()) {
 			evalTrace();
 		}
 
-		if (tlcResult == NoError && tlcOutputInfo.hasInitialisation() && numberOfDistinctStates == 0) {
+		if (tlcOutputInfo != null && tlcResult == TLCResult.NoError && tlcOutputInfo.hasInitialisation() && numberOfDistinctStates == 0) {
 			// Can not setup constants
-			tlcResult = InitialStateError;
+			tlcResult = TLCResult.InitialStateError;
 		}
 
 		if (TLC4BGlobals.isPrintCoverage() && !TLC4BGlobals.getCurrentLineCounts().isEmpty()) {
@@ -111,16 +123,16 @@ public class TLCResults implements ToolGlobals {
 	}
 
 	private void evalCoverage() {
-		Hashtable<Integer, Long> lineCount = new Hashtable<>();
-		Set<Entry<Location, Long>> entrySet = TLC4BGlobals.getCurrentLineCounts().entrySet();
-		for (Entry<Location, Long> entry : entrySet) {
-			int endline = entry.getKey().endLine();
+		Map<Integer, Long> lineCount = new HashMap<>();
+		TLC4BGlobals.getCurrentLineCounts().forEach((location, count) -> {
+			int endline = location.endLine();
 			if (lineCount.containsKey(endline)) {
-				lineCount.put(endline, Math.max(lineCount.get(endline), entry.getValue()));
+				lineCount.put(endline, Math.max(lineCount.get(endline), count));
 			} else {
-				lineCount.put(endline, entry.getValue());
+				lineCount.put(endline, count);
 			}
-		}
+		});
+
 		List<OpDefNode> defs = getActionsFromGeneratedModule(OutputCollector.getModuleNode());
 		operationsCount = new LinkedHashMap<>();
 		for (OpDefNode opDefNode : defs) {
@@ -168,7 +180,7 @@ public class TLCResults implements ToolGlobals {
 		OpApplNode op1 = (OpApplNode) arg;
 		SymbolNode opNode = op1.getOperator();
 		int opcode = BuiltInOPs.getOpCode(opNode.getName());
-		if (opcode == OPCODE_be) { // BoundedExists
+		if (opcode == ToolGlobals.OPCODE_be) { // BoundedExists
 			return findAction(op1.getArgs()[0]);
 		} else if (opNode instanceof OpDefNode) {
 			return (OpDefNode) opNode;
@@ -196,20 +208,20 @@ public class TLCResults implements ToolGlobals {
 		List<Message> messages = new ArrayList<>(TLC4BGlobals.getCurrentMessages());
 		for (Message m : messages) {
 			switch (m.getMessageClass()) {
-				case ERROR:
+				case MP.ERROR:
 					evalErrorMessage(m);
 					if (tlcResult == null) {
 						tlcErrorMessage = MP.getError(m.getMessageCode(), m.getParameters());
 					}
 					break;
-				case TLCBUG:
+				case MP.TLCBUG:
 					break;
-				case STATE:
+				case MP.STATE:
 					lengthOfTrace++;
 					break;
-				case WARNING:
+				case MP.WARNING:
 					break;
-				case NONE:
+				case MP.NONE:
 					evalStatusMessage(m);
 					break;
 				default:
@@ -218,7 +230,7 @@ public class TLCResults implements ToolGlobals {
 		}
 
 		if (this.tlcErrorMessage != null) {
-			this.tlcResult = TLCError;
+			this.tlcResult = TLCResult.TLCError;
 		}
 	}
 
@@ -254,13 +266,13 @@ public class TLCResults implements ToolGlobals {
 			case EC.TLC_INVARIANT_VIOLATED_INITIAL:
 			case EC.TLC_INVARIANT_VIOLATED_BEHAVIOR:
 				if (m.getParameters()[0].startsWith("Assertion")) {
-					tlcResult = AssertionError;
+					tlcResult = TLCResult.AssertionError;
 				} else if (m.getParameters()[0].equals("NotGoal")) {
-					tlcResult = Goal;
+					tlcResult = TLCResult.Goal;
 				} else if (m.getParameters()[0].startsWith("ASSERT_LTL") || m.getParameters()[0].equals("ltl")) {
-					tlcResult = TemporalPropertyViolation;
+					tlcResult = TLCResult.TemporalPropertyViolation;
 				} else {
-					tlcResult = InvariantViolation;
+					tlcResult = TLCResult.InvariantViolation;
 				}
 				if (m.getParameters().length > 0) {
 					violatedDefinition = m.getParameters()[0];
@@ -272,7 +284,7 @@ public class TLCResults implements ToolGlobals {
 				if (arg1.contains("Attempted to compute the number of elements in the overridden")) {
 					// TODO
 				}
-				tlcResult = EnumerationError;
+				tlcResult = TLCResult.EnumerationError;
 				return;
 			}
 
@@ -317,12 +329,12 @@ public class TLCResults implements ToolGlobals {
 				break;
 
 			case EC.TLC_VALUE_ASSERT_FAILED:
-				tlcResult = WellDefinednessError;
+				tlcResult = TLCResult.WellDefinednessError;
 				break;
 
 			case EC.TLC_MODULE_VALUE_JAVA_METHOD_OVERRIDE:
 				if (m.getParameters()[0].contains("tlc2.module.TLC.Assert")) {
-					tlcResult = WellDefinednessError;
+					tlcResult = TLCResult.WellDefinednessError;
 				}
 				break;
 
@@ -331,9 +343,9 @@ public class TLCResults implements ToolGlobals {
 				String id = m.getParameters()[1];
 				// third param should be "FALSE" (we are already in error case here)
 				if (kind.contains("property") && id.startsWith("ASSERT_LTL")) {
-					tlcResult = TemporalPropertyViolation;
+					tlcResult = TLCResult.TemporalPropertyViolation;
 				} else if (kind.contains("invariant") && id.startsWith("Assertion")) {
-					tlcResult = AssertionError;
+					tlcResult = TLCResult.AssertionError;
 				} else {
 					// just as fall-back
 					tlcResult = evaluatingParameter(m.getParameters());
@@ -363,11 +375,11 @@ public class TLCResults implements ToolGlobals {
 			if (s == null) {
 				break;
 			} else if (s.contains("not enumerable")) {
-				return EnumerationError;
+				return TLCResult.EnumerationError;
 			} else if (s.contains("The invariant of Assertion")) {
-				return AssertionError;
+				return TLCResult.AssertionError;
 			} else if (s.contains("The invariant of Invariant")) {
-				return InvariantViolation;
+				return TLCResult.InvariantViolation;
 			} else if (s.contains("In applying the function")
 				|| s.contains("which is not in the domain of the function")
 				|| s.contains("tlc2.module.TLC.Assert")
@@ -378,11 +390,11 @@ public class TLCResults implements ToolGlobals {
 				|| s.contains("Applied the inter operator to an empty set")
 				|| s.replace("\n","").matches(".*The.*argument.*operator should be.*sequence.*")
 				|| s.replace("\n","").matches(".*The.*argument.*operator is an invalid number.*")) {
-				return WellDefinednessError;
+				return TLCResult.WellDefinednessError;
 			} else if (s.contains("ASSERT_LTL")) {
-				return TemporalPropertyViolation;
+				return TLCResult.TemporalPropertyViolation;
 			} else if (s.contains("java.lang.InterruptedException")) {
-				return Interrupted;
+				return TLCResult.Interrupted;
 			}
 		}
 		// unknown error
@@ -404,7 +416,7 @@ public class TLCResults implements ToolGlobals {
 			return "Temporal Property Violation";
 		}
 		if (tlcResult == null) {
-			return TLCError.toString();
+			return TLCResult.TLCError.toString();
 		}
 		return tlcResult.toString();
 	}

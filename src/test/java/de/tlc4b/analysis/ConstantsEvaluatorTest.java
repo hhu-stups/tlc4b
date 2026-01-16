@@ -1,6 +1,6 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class ConstantsEvaluatorTest {
 				+ "k2 == 1 \n"
 				+ "k == k2 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -32,6 +32,6 @@ public class ConstantsEvaluatorTest {
 				+ "k2 == k3 \n"
 				+ "k == k2 + 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

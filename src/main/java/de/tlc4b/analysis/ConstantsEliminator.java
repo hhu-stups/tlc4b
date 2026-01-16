@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.ACardExpression;
@@ -119,8 +119,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 			ADefinitionsMachineClause clause = machineContext.getDefinitionMachineClause();
 			if (null == clause) {
 				clause = new ADefinitionsMachineClause(defsList);
-				machineContext.getAbstractMachineParseUnit()
-						.getMachineClauses().add(clause);
+				machineContext.getAbstractMachineParseUnit().getMachineClauses().add(clause);
 				machineContext.setDefinitionsMachineClause(clause);
 			} else {
 				clause.getDefinitions().addAll(defsList);
@@ -131,7 +130,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 
 	private void removeConstant(AIdentifierExpression id) {
 		HashMap<String, Node> constants = machineContext.getConstants();
-		for (Entry<String, Node> entry : constants.entrySet()) {
+		for (Map.Entry<String, Node> entry : constants.entrySet()) {
 			if (entry.getValue() == id) {
 				constants.remove(entry.getKey());
 				break;
@@ -166,8 +165,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 		}
 	}
 
-	private void removeIdentifier(Collection<Node> collection,
-			Node identifierToRemove) {
+	private void removeIdentifier(Collection<Node> collection, Node identifierToRemove) {
 		for (Node id : collection) {
 			HashSet<Node> idValues = valuesOfConstantsFinder.valuesOfIdentifierTable.get(id);
 			for (Node val : idValues) {
@@ -186,8 +184,7 @@ public class ConstantsEliminator extends DepthFirstAdapter {
 		@Override
 		public void defaultOut(Node node) {
 			HashSet<Node> set = dependsOnIdentifierTable.get(node);
-			Node parent = node.parent();
-			HashSet<Node> parentSet = dependsOnIdentifierTable.get(parent);
+			HashSet<Node> parentSet = dependsOnIdentifierTable.get(node.parent());
 			parentSet.addAll(set);
 		}
 

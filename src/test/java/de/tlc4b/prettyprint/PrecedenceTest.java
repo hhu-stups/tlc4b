@@ -1,6 +1,6 @@
 package de.tlc4b.prettyprint;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -14,6 +14,6 @@ public class PrecedenceTest {
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME (SUBSET{1}) \\times {1} = (SUBSET{1}) \\times {1}\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 }

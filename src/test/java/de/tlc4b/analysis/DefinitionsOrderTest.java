@@ -1,6 +1,6 @@
 package de.tlc4b.analysis;
 
-import static de.tlc4b.util.TestUtil.compare;
+import de.tlc4b.util.TestUtil;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class DefinitionsOrderTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -30,7 +30,7 @@ public class DefinitionsOrderTest {
 		String expected = "---- MODULE test----\n"
 				+ "ASSUME 1 = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	
@@ -44,7 +44,7 @@ public class DefinitionsOrderTest {
 		String expected = "---- MODULE test----\n"
 				+ "k == 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -58,7 +58,7 @@ public class DefinitionsOrderTest {
 				+ "k == 1\n"
 				+ "ASSUME k = 1 \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	@Test
@@ -74,7 +74,7 @@ public class DefinitionsOrderTest {
 				+ "def == k2 + 1 \n"
 				+ "k == def \n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 	
 	

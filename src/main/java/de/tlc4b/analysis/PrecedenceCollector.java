@@ -120,8 +120,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			}
 
 			if (parent != null) {
-				Precedence parentPrecedence = precedenceTable
-						.get(node.parent());
+				Precedence parentPrecedence = precedenceTable.get(node.parent());
 				if (Precedence.makeBrackets(p, parentPrecedence)) {
 					brackets.add(node);
 				}
@@ -131,8 +130,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 	}
 
 	public void inAConvertBoolExpression(AConvertBoolExpression node) {
-		Precedence parent = PRECEDENCES.get(node.parent().getClass()
-				.getSimpleName());
+		Precedence parent = PRECEDENCES.get(node.parent().getClass().getSimpleName());
 		if (parent != null) {
 			precedenceTable.put(node, parent);
 		}

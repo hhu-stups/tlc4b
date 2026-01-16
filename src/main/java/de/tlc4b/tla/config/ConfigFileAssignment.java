@@ -1,7 +1,5 @@
 package de.tlc4b.tla.config;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import de.be4.classicalb.core.parser.node.AIdentifierExpression;

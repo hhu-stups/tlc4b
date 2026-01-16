@@ -1,14 +1,15 @@
 package de.tlc4b;
 
-import tla2sany.semantic.ExprNode;
-import tla2sany.st.Location;
-import tlc2.output.Message;
-import tlc2.output.OutputCollector;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import tla2sany.semantic.ExprNode;
+import tla2sany.st.Location;
+
+import tlc2.output.Message;
+import tlc2.output.OutputCollector;
 
 public class TLC4BGlobals {
 	private static int DEFERRED_SET_SIZE;

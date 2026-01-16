@@ -1,14 +1,14 @@
 package de.tlc4b.prettyprint;
 
+import de.tlc4b.util.TestUtil;
+
+import org.junit.Test;
+
 /**
  * Test of arithmetic operators.
  * Modulo and Division are not tested here because their translation is defined in the module BBuiltins
  * and they are only tested via integration tests.
  */
-import static de.tlc4b.util.TestUtil.compare;
-
-import org.junit.Test;
-
 public class ArithmeticTest {
 
 	@Test
@@ -17,7 +17,7 @@ public class ArithmeticTest {
 				+ "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME Int = Int\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -26,7 +26,7 @@ public class ArithmeticTest {
 				+ "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME Nat = Nat\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class ArithmeticTest {
 				+ "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME Nat \\ {0} = Nat \\ {0}\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES INT = INT\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME (-1..3) = (-1..3)\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -51,7 +51,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES NAT = NAT\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME (0..3) = (0..3)\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES NAT1 = NAT1\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME (1..3) = (1..3)\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class ArithmeticTest {
 				+ "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME {1,2,3} = 1..3\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 2 > 1\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME 2 > 1\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 1 < 2\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME 1 < 2\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 1 >= 2\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME 1 >= 2\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -100,7 +100,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 1 <= 2\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals\n"
 				+ "ASSUME 1 =< 2\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 2 = 1 + 1\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals \n"
 				+ "ASSUME 2 = 1 + 1 \n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 1 = 2 - 1\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals \n"
 				+ "ASSUME 1 = 2 - 1 \n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES 1 = 1 * 1\n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Naturals \n"
 				+ "ASSUME 1 = 1 * 1 \n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 
@@ -133,7 +133,7 @@ public class ArithmeticTest {
 		String machine = "MACHINE test\n" + "PROPERTIES -1 = 1  \n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME -1 = 1\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -142,7 +142,7 @@ public class ArithmeticTest {
 				+ "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME -1 = -1\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class ArithmeticTest {
 				+ "END";
 		String expected = "---- MODULE test----\n" + "ASSUME 3 = 3\n"
 				+ "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 	@Test
@@ -160,7 +160,7 @@ public class ArithmeticTest {
 				+ "PROPERTIES {x| 1=1 => x = 1} = {} \n" + "END";
 		String expected = "---- MODULE test----\n" + "EXTENDS Integers\n"
 				+ "ASSUME {x \\in (Int): 1 = 1 => x = 1} = {}\n" + "======";
-		compare(expected, machine);
+		TestUtil.compare(expected, machine);
 	}
 
 }

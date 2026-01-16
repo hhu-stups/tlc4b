@@ -1,9 +1,8 @@
 package de.tlc4b.analysis.transformation;
 
-import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAbstractConstantsMachineClause;
@@ -20,58 +19,44 @@ import de.be4.classicalb.core.parser.node.APropertiesMachineClause;
 import de.be4.classicalb.core.parser.node.ASeesMachineClause;
 import de.be4.classicalb.core.parser.node.ASetsMachineClause;
 import de.be4.classicalb.core.parser.node.AVariablesMachineClause;
-import de.be4.classicalb.core.parser.node.PMachineClause;
 import de.be4.classicalb.core.parser.node.Start;
 
+/**
+ * Sort the machine clauses:
+ * 	1. import clauses
+ * 	2. declaration clauses
+ * 	3. properties clauses
+ * 	4. operation clauses
+ */
 public class MachineClauseSorter extends DepthFirstAdapter {
 
+	private static final Map<Object, Integer> PRIORITY = new HashMap<>();
+	static {
+		// declarations clauses
+		// TODO: can we add?: PRIORITY.put(AUsesMachineClause.class, 0);
+		PRIORITY.put(ASeesMachineClause.class, 1);
+		PRIORITY.put(ASetsMachineClause.class, 2);
+		PRIORITY.put(AAbstractConstantsMachineClause.class, 3);
+		PRIORITY.put(AConstantsMachineClause.class, 4);
+		PRIORITY.put(AVariablesMachineClause.class, 5);
+		PRIORITY.put(AConcreteVariablesMachineClause.class, 6);
+		PRIORITY.put(ADefinitionsMachineClause.class, 7);
+
+		// properties clauses
+		PRIORITY.put(AConstraintsMachineClause.class, 8);
+		PRIORITY.put(APropertiesMachineClause.class, 9);
+		PRIORITY.put(AInvariantMachineClause.class, 10);
+		PRIORITY.put(AAssertionsMachineClause.class, 11);
+		PRIORITY.put(AOperationsMachineClause.class, 12);
+		PRIORITY.put(AInitialisationMachineClause.class, 13);
+	}
+
 	public static void sortMachineClauses(Start start) {
-		MachineClauseSorter sorter = new MachineClauseSorter();
-		start.apply(sorter);
+		start.apply(new MachineClauseSorter());
 	}
 
 	@Override
 	public void caseAAbstractMachineParseUnit(AAbstractMachineParseUnit node) {
-
-		LinkedList<PMachineClause> machineClauses = node.getMachineClauses();
-
-		PMachineClauseComparator comparator = new PMachineClauseComparator();
-		// Sort the machine clauses:
-		// 1. import clauses
-		// 2. declaration clauses
-		// 3. properties clauses
-		// 4. operation clauses
-		machineClauses.sort(comparator);
+		node.getMachineClauses().sort(Comparator.comparing(arg -> PRIORITY.get(arg.getClass())));
 	}
-}
-
-class PMachineClauseComparator implements Comparator<PMachineClause>,
-		Serializable {
-
-	private static final long serialVersionUID = 2606332412649258695L;
-	private static final Hashtable<Object, Integer> priority = new Hashtable<>();
-	static {
-		// declarations clauses
-
-		priority.put(ASeesMachineClause.class, 12);
-		priority.put(ASetsMachineClause.class, 11);
-		priority.put(AAbstractConstantsMachineClause.class, 10);
-		priority.put(AConstantsMachineClause.class, 9);
-		priority.put(AVariablesMachineClause.class, 8);
-		priority.put(AConcreteVariablesMachineClause.class, 7);
-		priority.put(ADefinitionsMachineClause.class, 6);
-
-		// properties clauses
-		priority.put(AConstraintsMachineClause.class, 5);
-		priority.put(APropertiesMachineClause.class, 4);
-		priority.put(AInvariantMachineClause.class, 3);
-		priority.put(AAssertionsMachineClause.class, 2);
-		priority.put(AOperationsMachineClause.class, 1);
-		priority.put(AInitialisationMachineClause.class, 0);
-	}
-
-	public int compare(PMachineClause arg0, PMachineClause arg1) {
-		return priority.get(arg1.getClass()).compareTo(priority.get(arg0.getClass()));
-	}
-
 }
