@@ -1,7 +1,10 @@
 package de.tlc4b.tlc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import de.tlc4b.btypes.BType;
 import de.tlc4b.btypes.FunctionType;
@@ -222,31 +225,35 @@ public class TracePrinter {
 		case ValueConstants.SETOFTUPLESVALUE: {
 			SetOfTuplesValue s = (SetOfTuplesValue) val;
 			ValueEnumeration e = s.elements();
-			return parseSetValue(res, s.size(), type, e);
+			res.append(parseSetValue(type, e));
+			return res;
 		}
 
 		case ValueConstants.SETCUPVALUE: {
 			SetCupValue s = (SetCupValue) val;
 			ValueEnumeration e = s.elements();
-			return parseSetValue(res, s.size(), type, e);
+			res.append(parseSetValue(type, e));
+			return res;
 		}
+
 		case ValueConstants.SETCAPVALUE: {
 			SetCapValue s = (SetCapValue) val;
 			ValueEnumeration e = s.elements();
-			return parseSetValue(res, s.size(), type, e);
+			res.append(parseSetValue(type, e));
+			return res;
 		}
 
 		case ValueConstants.SETDIFFVALUE: {
 			SetDiffValue s = (SetDiffValue) val;
 			ValueEnumeration e = s.elements();
-			return parseSetValue(res, s.size(), type, e);
+			res.append(parseSetValue(type, e));
+			return res;
 		}
 
 		case ValueConstants.SUBSETVALUE: {
 			SubsetValue s = (SubsetValue) val;
 			SetType t = (SetType) type;
-			res.append("POW(").append(parseValue(s.set, t.getSubtype()))
-					.append(")");
+			res.append("POW(").append(parseValue(s.set, t.getSubtype())).append(")");
 			return res;
 		}
 
@@ -318,45 +325,24 @@ public class TracePrinter {
 		throw new RuntimeException("not supported construct: " + val);
 	}
 
-	private StringBuilder parseSetValue(StringBuilder res, int size,
-			BType type, ValueEnumeration e) {
+	private String parseSetValue(BType type, ValueEnumeration e) {
 		SetType t = (SetType) type;
-		res.append("{");
-		for (int i = 0; i < size; i++) {
-			Value v = e.nextElement();
-			if (i != 0) {
-				res.append(", ");
-			}
-			if (v != null) {
-				res.append(parseValue(v, t.getSubtype()));
-			}
-		}
-		res.append("}");
-		return res;
+		return "{" +
+				e.all().stream()
+						.filter(Objects::nonNull)
+						.map(v -> parseValue(v, t.getSubtype()))
+						.collect(Collectors.joining(", ")) +
+				"}";
 	}
 
-	private StringBuilder parseValueVec(ValueVec elems, BType bType) {
-		StringBuilder res = new StringBuilder();
-		for (int i = 0; i < elems.size(); i++) {
-			if (i > 0) {
-				res.append(", ");
-			}
-			Value val = elems.elementAt(i);
-			res.append(parseValue(val, bType));
-		}
-		return res;
+	private String parseValueVec(ValueVec elems, BType bType) {
+		return parseEnumerationValue(elems.toArray(), bType);
 	}
 
-	private StringBuilder parseEnumerationValue(Value[] a, BType bType) {
-
-		StringBuilder res = new StringBuilder();
-		for (int i = 0; i < a.length; i++) {
-			if (i > 0) {
-				res.append(",");
-			}
-			res.append(parseValue(a[i], bType));
-		}
-		return res;
+	private String parseEnumerationValue(Value[] a, BType bType) {
+		return Arrays.stream(a)
+				.map(value -> parseValue(value, bType))
+				.collect(Collectors.joining(","));
 	}
 
 }
