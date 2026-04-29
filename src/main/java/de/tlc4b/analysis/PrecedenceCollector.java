@@ -1,7 +1,9 @@
 package de.tlc4b.analysis;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AConvertBoolExpression;
@@ -18,7 +20,7 @@ import de.tlc4b.btypes.IntegerType;
 
 public class PrecedenceCollector extends DepthFirstAdapter {
 
-	private final static Hashtable<String, Precedence> PRECEDENCES = new Hashtable<>();
+	private final static Map<String, Precedence> PRECEDENCES = new HashMap<>();
 
 	private static void put(String s, int from, int to, boolean leftAssociative) {
 		PRECEDENCES.put(s, new Precedence(s, from, to, leftAssociative));
@@ -68,7 +70,6 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		put("ADivExpression", 13, 13, false);
 
 		put("AFunctionExpression", 20, 20, false);
-
 	}
 
 	private Precedence getPrecedence(Node node) {
@@ -76,17 +77,17 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		return PRECEDENCES.get(name);
 	}
 
-	private final Hashtable<Node, Precedence> precedenceTable;
-	private final HashSet<Node> brackets;
+	private final Map<Node, Precedence> precedences;
+	private final Set<Node> brackets;
 	private final Typechecker typechecker;
 
-	public HashSet<Node> getBrackets() {
+	public Set<Node> getBrackets() {
 		return brackets;
 	}
 
 	public PrecedenceCollector(Start start, Typechecker typeChecker,
 			MachineContext machineContext, TypeRestrictor typeRestrictor) {
-		precedenceTable = new Hashtable<>();
+		precedences = new HashMap<>();
 		brackets = new HashSet<>();
 		this.typechecker = typeChecker;
 		start.apply(this);
@@ -98,15 +99,6 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		for (Node node : typeRestrictor.getAllRestrictedNodes()) {
 			node.apply(this);
 		}
-
-	}
-
-	@Override
-	public void caseStart(final Start node) {
-		inStart(node);
-		node.getPParseUnit().apply(this);
-		node.getEOF().apply(this);
-		outStart(node);
 	}
 
 	@Override
@@ -114,13 +106,13 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 		Node parent = node.parent();
 		Precedence p = getPrecedence(node);
 		if (p != null) {
-			precedenceTable.put(node, p);
+			precedences.put(node, p);
 			if (parent instanceof ALabelPredicate) {
 				parent = parent.parent();
 			}
 
 			if (parent != null) {
-				Precedence parentPrecedence = precedenceTable.get(node.parent());
+				Precedence parentPrecedence = precedences.get(node.parent());
 				if (Precedence.makeBrackets(p, parentPrecedence)) {
 					brackets.add(node);
 				}
@@ -132,7 +124,7 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 	public void inAConvertBoolExpression(AConvertBoolExpression node) {
 		Precedence parent = PRECEDENCES.get(node.parent().getClass().getSimpleName());
 		if (parent != null) {
-			precedenceTable.put(node, parent);
+			precedences.put(node, parent);
 		}
 	}
 
@@ -148,9 +140,9 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			// \times
 			p = new Precedence("AMultOrCartExpression", 8, 13, false);
 		}
-		precedenceTable.put(node, p);
+		precedences.put(node, p);
 
-		Precedence parent = precedenceTable.get(node.parent());
+		Precedence parent = precedences.get(node.parent());
 		if (Precedence.makeBrackets(p, parent)) {
 			brackets.add(node);
 		}
@@ -165,19 +157,17 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			// Function
 			p = new Precedence("ADomainExpression", 9, 9, false);
 
-			precedenceTable.put(node, p);
+			precedences.put(node, p);
 
-			Precedence parent = precedenceTable.get(node.parent());
+			Precedence parent = precedences.get(node.parent());
 			if (Precedence.makeBrackets(p, parent)) {
 				brackets.add(node);
 			}
 		}
-
 	}
 
 	@Override
-	public void inAMinusOrSetSubtractExpression(
-			AMinusOrSetSubtractExpression node) {
+	public void inAMinusOrSetSubtractExpression(AMinusOrSetSubtractExpression node) {
 		BType type = typechecker.getType(node);
 		Precedence p;
 		if (type instanceof IntegerType) {
@@ -187,14 +177,13 @@ public class PrecedenceCollector extends DepthFirstAdapter {
 			// set difference
 			p = new Precedence("AMinusOrSetSubtractExpression", 8, 8, false);
 		}
-		precedenceTable.put(node, p);
+		precedences.put(node, p);
 
-		Precedence parent = precedenceTable.get(node.parent());
+		Precedence parent = precedences.get(node.parent());
 		if (Precedence.makeBrackets(p, parent)) {
 			brackets.add(node);
 		}
 	}
-
 }
 
 class Precedence {
@@ -218,7 +207,6 @@ class Precedence {
 			if (node.leftAssociative) {
 				return false;
 			}
-
 		}
 		if (node.from >= parent.from && node.from <= parent.to
 				|| node.to >= parent.from && node.to <= parent.to) {
