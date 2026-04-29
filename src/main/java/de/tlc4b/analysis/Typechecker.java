@@ -369,23 +369,20 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	/**
 	 * Expressions
 	 */
-
 	@Override
 	public void caseAIdentifierExpression(AIdentifierExpression node) {
-
 		BType expected = getType(node);
-
 		if (expected == null) {
-			System.out.println("Not implemented in Typechecker:" + node.parent().getClass());
-			throw new RuntimeException(node + " Pos: " + node.getStartPos());
+			throw new RuntimeException("Not implemented in Typechecker: " + node.parent().getClass().getSimpleName()
+					+ " ID: " + node + " Pos: " + node.getStartPos());
 		}
+
 		Node identifierDeclarationNode = referenceTable.get(node);
 		BType found = getType(identifierDeclarationNode);
-
-		String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 		try {
 			expected.unify(found, this);
 		} catch (UnificationException e) {
+			String name = Utils.getTIdentifierListAsString(node.getIdentifier());
 			throw new TypeErrorException("Excepted '" + expected + "' , found '" + found + "' at identifier " + name + "\n" + node.getStartPos(), e);
 		}
 	}
@@ -857,13 +854,12 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		} catch (UnificationException e) {
 			throw new TypeErrorException("Excepted '" + expected + "' , found " + found + "' at " + node.getClass().getSimpleName() + "\n " + node.getStartPos(), e);
 		}
-		//
+
 		// BType res2 = getType(node);
 		// if(res2 != result){
 		// AbstractHasFollowers a = (AbstractHasFollowers) res2;
 		// throw new RuntimeException();
 		// }
-		//
 
 		if (result instanceof IntegerOrSetOfPairType) {
 			setType(node.getLeft(), ((IntegerOrSetOfPairType) result).getFirst());
@@ -876,8 +872,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 			setType(node.getLeft(), new SetType(pair.getFirst()));
 			setType(node.getRight(), new SetType(pair.getSecond()));
 		} else {
-			System.out.println(result);
-			throw new RuntimeException();
+			throw new RuntimeException("Typecheck failed: " + result);
 		}
 
 		node.getLeft().apply(this);
@@ -1070,7 +1065,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 		try {
 			BoolType.getInstance().unify(getType(node), this);
 		} catch (UnificationException e) {
-			System.out.println(node.parent().getClass());
+			//System.out.println(node.parent().getClass());
 			throw new TypeErrorException("Excepted '" + getType(node) + "' , found 'BOOL' in ' <=> '", e);
 		}
 		setType(node.getLeft(), BoolType.getInstance());
