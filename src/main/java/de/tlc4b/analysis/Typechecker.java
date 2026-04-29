@@ -482,7 +482,6 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	 * Substitutions
 	 * 
 	 */
-
 	@Override
 	public void caseAPreconditionSubstitution(APreconditionSubstitution node) {
 		setType(node.getPredicate(), BoolType.getInstance());
@@ -845,7 +844,7 @@ public class Typechecker extends DepthFirstAdapter implements ITypechecker {
 	@Override
 	public void caseAMultOrCartExpression(AMultOrCartExpression node) {
 		BType expected = getType(node);
-		IntegerOrSetOfPairType found = new IntegerOrSetOfPairType(node.getStartPos(), node.getEndPos());
+		IntegerOrSetOfPairType found = new IntegerOrSetOfPairType();
 		// setType(node.getLeft(), found.getFirst());
 		// setType(node.getRight(), found.getSecond());
 		BType result;

@@ -1,10 +1,11 @@
 package de.tlc4b.btypes;
 
 import de.be4.classicalb.core.parser.node.PExpression;
-import de.hhu.stups.sablecc.patch.SourcePosition;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.exceptions.TypeErrorException;
 import de.tlc4b.exceptions.UnificationException;
+
+import java.util.Arrays;
 
 public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 
@@ -19,9 +20,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 		return second;
 	}
 
-	public IntegerOrSetOfPairType(SourcePosition sourcePosition,
-			SourcePosition sourcePosition2) {
-
+	public IntegerOrSetOfPairType() {
 		this.first = new IntegerOrSetType();
 		first.addFollower(this);
 
@@ -30,40 +29,28 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 	}
 
 	public void update(BType oldType, BType newType, ITypechecker typechecker) {
-		if(second.getFollowers().contains(first)){
-			System.out.println("integerOrsetOfPair");
-			throw new RuntimeException();
+		if (second.getFollowers().contains(first)){
+			throw new RuntimeException("IntegerOrSetOfPair: " + first + " is a follower of " + second);
 		}
 		if (newType instanceof IntegerType) {
-			// if newType is an Integer then both arguments and the result are
-			// Integers
-
-			if (this.first == oldType) {
-				// do nothing
-			} else {
-				first.deleteFollower(this); // we do not want to update this
-											// node twice
-				first.unify(newType, typechecker);
-			}
-			if (this.second == oldType) {
-				// do nothing
-			} else {
-				second.deleteFollower(this);
-				second.unify(newType, typechecker);
+			// if newType is an Integer then both arguments and the result are Integers
+			for (AbstractHasFollowers type : Arrays.asList(this.first, this.second)) {
+				if (type != oldType) {
+					type.deleteFollower(this); // we do not want to update this node twice
+					type.unify(newType, typechecker);
+				}
 			}
 			this.setFollowersTo(IntegerType.getInstance(), typechecker);
-
 		} else if (newType instanceof SetType) {
 			SetType newFirst;
 			SetType newSecond;
-			
 			
 			if (first == second && first != oldType){
 				first.deleteFollower(this);
 				newFirst = new SetType(new UntypedType());
 				newSecond = newFirst;
 				newFirst.addFollower(this);
-			}else {
+			} else {
 				if (this.first == oldType) {
 					first.deleteFollower(this);
 					newFirst = (SetType) newType;
@@ -89,8 +76,7 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 				PairType pair = new PairType(newFirst, newSecond);
 				((SetType) newType).getSubtype().unify(pair, typechecker);
 			} else {
-				SetType setOfPairSetType = new SetType(new PairType(
-						newFirst.getSubtype(), newSecond.getSubtype()));
+				SetType setOfPairSetType = new SetType(new PairType(newFirst.getSubtype(), newSecond.getSubtype()));
 				setOfPairSetType.unify(this, typechecker);
 			}
 		} else if (newType instanceof IntegerOrSetOfPairType) {
@@ -116,23 +102,20 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 				second.addFollower(this);
 			}
 		} else {
-			throw new TypeErrorException(
-					"Expected 'INTEGER' or 'POW(_A)', found " + newType);
+			throw new TypeErrorException("Expected 'INTEGER' or 'POW(_A)', found " + newType);
 		}
-
 	}
 
 	public BType unify(BType other, ITypechecker typechecker) {
 		if (!this.compare(other) || this.contains(other)){
 			throw new UnificationException();
 		}
-			
-		
+
 		if (other instanceof UntypedType) {
 			((UntypedType) other).setFollowersTo(this, typechecker);
 			return this;
 		}
-		
+
 		if (other instanceof IntegerType) {
 			this.setFollowersTo(IntegerType.getInstance(), typechecker);
 			this.getFirst().deleteFollower(this);
@@ -141,30 +124,28 @@ public class IntegerOrSetOfPairType extends AbstractHasFollowers {
 			second.unify(IntegerType.getInstance(), typechecker);
 			return IntegerType.getInstance();
 		}
-		
+
 		if (other instanceof IntegerOrSetType) {
 			((IntegerOrSetType) other).setFollowersTo(this, typechecker);
 			return this;
 		}
-		
-		if(other instanceof SetType){
+
+		if (other instanceof SetType){
 			first.deleteFollower(this);
 			second.deleteFollower(this);
-			
+
 			SetType newFirst = new SetType(new UntypedType()).unify(first, typechecker);
 			SetType newSecond =  new SetType(new UntypedType()).unify(second, typechecker);
-			
-			SetType found = new SetType(new PairType(newFirst.getSubtype(),
-					newSecond.getSubtype()));
-			
-			this.setFollowersTo(found, typechecker);
 
+			SetType found = new SetType(new PairType(newFirst.getSubtype(), newSecond.getSubtype()));
+
+			this.setFollowersTo(found, typechecker);
 			return found.unify(other, typechecker);
 		}
-		if(other instanceof FunctionType){
+		if (other instanceof FunctionType){
 			return other.unify(this, typechecker);
 		}
-		if(other instanceof IntegerOrSetOfPairType){
+		if (other instanceof IntegerOrSetOfPairType){
 			IntegerOrSetOfPairType o = (IntegerOrSetOfPairType) other;
 			o.first.deleteFollower(o);
 			o.second.deleteFollower(o);
