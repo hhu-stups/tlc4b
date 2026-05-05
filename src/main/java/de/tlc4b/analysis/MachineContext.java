@@ -209,9 +209,7 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
 		definitionMachineClause = node;
-
-		List<PDefinition> copy = node.getDefinitions();
-
+		List<PDefinition> definitions = node.getDefinitions();
 		/*
 		 * The definitions are not in a predefined order. In particular
 		 * definitions can depend on each other. First all definitions are added
@@ -219,7 +217,7 @@ public class MachineContext extends DepthFirstAdapter {
 		 */
 		Collection<PDefinition> definitionsToRemove = new HashSet<>();
 
-		for (PDefinition e : copy) {
+		for (PDefinition e : definitions) {
 			if (e instanceof AExpressionDefinitionDefinition) {
 				AExpressionDefinitionDefinition def = (AExpressionDefinitionDefinition) e;
 				String name = def.getName().getText();
@@ -244,10 +242,9 @@ public class MachineContext extends DepthFirstAdapter {
 		 * At this point all LTL definitions (ASSERT_LTL) are removed. LTL
 		 * formulas are stored in the Arraylist {@value #ltlVisitors}.
 		 */
-		copy.removeAll(definitionsToRemove);
+		definitions.removeAll(definitionsToRemove);
 		this.contextTable = new ArrayList<>();
-		ArrayList<MachineContext> list = lookupReferencedMachines();
-		for (MachineContext s : list) {
+		for (MachineContext s : lookupReferencedMachines()) {
 			contextTable.add(s.getDeferredSets());
 			contextTable.add(s.getEnumeratedSets());
 			contextTable.add(s.getEnumValues());
@@ -256,7 +253,7 @@ public class MachineContext extends DepthFirstAdapter {
 			contextTable.add(s.getDefinitions());
 		}
 
-		for (PDefinition e : copy) {
+		for (PDefinition e : definitions) {
 			e.apply(this);
 		}
 	}
