@@ -15,7 +15,6 @@ import de.be4.classicalb.core.parser.node.*;
 import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.MP;
 import de.tlc4b.TLC4BGlobals;
-import de.tlc4b.analysis.transformation.DefinitionsSorter;
 import de.tlc4b.analysis.transformation.MachineClauseSorter;
 import de.tlc4b.exceptions.NotSupportedException;
 import de.tlc4b.exceptions.ScopeException;
@@ -210,7 +209,6 @@ public class MachineContext extends DepthFirstAdapter {
 	@Override
 	public void caseADefinitionsMachineClause(ADefinitionsMachineClause node) {
 		definitionMachineClause = node;
-		DefinitionsSorter.sortDefinitions(node);
 
 		List<PDefinition> copy = node.getDefinitions();
 
