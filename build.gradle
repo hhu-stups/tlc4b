@@ -58,6 +58,12 @@ java {
 
 	withSourcesJar()
 	withJavadocJar()
+
+	if (project.hasProperty("javaToolchainVersion")) {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(project.javaToolchainVersion)
+		}
+	}
 }
 
 javadoc {
