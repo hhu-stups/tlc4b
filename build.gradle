@@ -82,10 +82,6 @@ test {
 	//exclude('de/tlc4b/tlc/integration')
 }
 
-jacoco {
-	toolVersion = "0.8.14"
-}
-
 jacocoTestReport {
 	reports {
 		xml.required = false
