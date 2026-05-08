@@ -19,6 +19,7 @@ import de.be4.classicalb.core.parser.node.AIfElsifSubstitution;
 import de.be4.classicalb.core.parser.node.AIfSubstitution;
 import de.be4.classicalb.core.parser.node.AInitialisationMachineClause;
 import de.be4.classicalb.core.parser.node.AOperation;
+import de.be4.classicalb.core.parser.node.AOperationCallSubstitution;
 import de.be4.classicalb.core.parser.node.AParallelSubstitution;
 import de.be4.classicalb.core.parser.node.ARecordFieldExpression;
 import de.be4.classicalb.core.parser.node.ASelectSubstitution;
@@ -28,6 +29,7 @@ import de.be4.classicalb.core.parser.node.Node;
 import de.be4.classicalb.core.parser.node.PDefinition;
 import de.be4.classicalb.core.parser.node.PExpression;
 import de.be4.classicalb.core.parser.node.PSubstitution;
+import de.be4.classicalb.core.parser.util.Utils;
 import de.tlc4b.analysis.MachineContext;
 import de.tlc4b.exceptions.NotSupportedException;
 import de.tlc4b.exceptions.SubstitutionException;
@@ -253,6 +255,17 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 		HashSet<Node> assignedVariables = assignedVariablesTable.get(refNode);
 		assignedVariablesTable.put(node, assignedVariables);
 		assignedVariablesTable.put(node.parent(), assignedVariables);
+	}
+
+	@Override
+	public void caseAOperationCallSubstitution(AOperationCallSubstitution node) {
+		Node op = machineContext.getOperations().get(Utils.getTIdentifierListAsString(node.getOperation()));
+		if (op != null) {
+			if (!assignedVariablesTable.containsKey(op)) {
+				op.apply(this); // explore original operation first
+			}
+			assignedVariablesTable.put(node, new HashSet<>(assignedVariablesTable.get(op)));
+		}
 	}
 
 	@Override
