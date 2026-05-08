@@ -9,7 +9,6 @@ import de.be4.classicalb.core.parser.analysis.DepthFirstAdapter;
 import de.be4.classicalb.core.parser.node.AAssignSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesElementOfSubstitution;
 import de.be4.classicalb.core.parser.node.ABecomesSuchSubstitution;
-import de.be4.classicalb.core.parser.node.ABlockSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceOrSubstitution;
 import de.be4.classicalb.core.parser.node.AChoiceSubstitution;
 import de.be4.classicalb.core.parser.node.ADefinitionSubstitution;
@@ -43,7 +42,6 @@ import de.tlc4b.exceptions.SubstitutionException;
  * handled as variables.
  * 
  */
-
 public class AssignedVariablesFinder extends DepthFirstAdapter {
 	protected final Hashtable<Node, HashSet<Node>> assignedVariablesTable;
 	private final MachineContext machineContext;
@@ -77,15 +75,6 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	}
 
 	@Override
-	public void caseABlockSubstitution(ABlockSubstitution node) {
-		inABlockSubstitution(node);
-		if (node.getSubstitution() != null) {
-			node.getSubstitution().apply(this);
-		}
-		outABlockSubstitution(node);
-	}
-
-	@Override
 	public void caseAOperation(AOperation node) {
 		node.getOperationBody().apply(this);
 		assignedVariablesTable.put(node, getVariableList(node.getOperationBody()));
@@ -95,8 +84,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 	public void caseAInitialisationMachineClause(AInitialisationMachineClause node) {
 		// first visit the sub node
 		node.getSubstitutions().apply(this);
-		assignedVariablesTable.put(node,
-				getVariableList(node.getSubstitutions()));
+		assignedVariablesTable.put(node, getVariableList(node.getSubstitutions()));
 
 		/*
 		 * In the INITIALISATION clause all variables must be assigned.
@@ -269,8 +257,7 @@ public class AssignedVariablesFinder extends DepthFirstAdapter {
 
 	@Override
 	public void caseASkipSubstitution(ASkipSubstitution node) {
-		HashSet<Node> list = new HashSet<>();
-		assignedVariablesTable.put(node, list);
+		assignedVariablesTable.put(node, new HashSet<>());
 		defaultOut(node);
 	}
 }
