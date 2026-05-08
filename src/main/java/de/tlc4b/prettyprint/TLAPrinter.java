@@ -19,6 +19,7 @@ import de.tlc4b.analysis.Renamer;
 import de.tlc4b.analysis.StandardModules;
 import de.tlc4b.analysis.Typechecker;
 import de.tlc4b.analysis.UsedStandardModules;
+import de.tlc4b.analysis.transformation.OperationCallInjector;
 import de.tlc4b.analysis.typerestriction.TypeRestrictor;
 import de.tlc4b.analysis.unchangedvariables.InvariantPreservationAnalysis;
 import de.tlc4b.analysis.unchangedvariables.UnchangedVariablesFinder;
@@ -63,6 +64,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 	private final InvariantPreservationAnalysis invariantPreservationAnalysis;
 
 	private boolean disablePrimedNodes = false;
+	private boolean inInitialisation = false;
 
 	public TLAPrinter(MachineContext machineContext, Typechecker typechecker,
 			UnchangedVariablesFinder unchangedVariablesFinder,
@@ -97,7 +99,9 @@ public class TLAPrinter extends DepthFirstAdapter {
 		printAssume();
 		printInvariant();
 		printAssertions();
+		inInitialisation = true;
 		printInit();
+		inInitialisation = false;
 		printOperations();
 		printSpecFormula();
 		printLTLFormulas();
@@ -1256,6 +1260,27 @@ public class TLAPrinter extends DepthFirstAdapter {
 			}
 
 			moduleStringAppend(">>");
+		}
+	}
+
+	@Override
+	public void caseAOperationCallSubstitution(AOperationCallSubstitution node) {
+		Node op = machineContext.getOperations().get(Utils.getTIdentifierListAsString(node.getOperation()));
+		if (inInitialisation) { // other definitions are unknown in Init: replace operation call with operation body
+			AOperation opClone = (AOperation) op.clone();
+			OperationCallInjector.injectArguments(opClone, node.getParameters());
+			opClone.getOperationBody().apply(this);
+		} else { // not in Init: just print operation call as definition call
+			moduleStringAppend(renamer.getNameOfRef(op));
+			if (!node.getParameters().isEmpty()) {
+				moduleStringAppend("(");
+				for (int i = 0; i < node.getParameters().size(); i++) {
+					if (i != 0)
+						moduleStringAppend(", ");
+					node.getParameters().get(i).apply(this);
+				}
+				moduleStringAppend(")");
+			}
 		}
 	}
 
