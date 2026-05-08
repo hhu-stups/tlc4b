@@ -1269,6 +1269,7 @@ public class TLAPrinter extends DepthFirstAdapter {
 		if (inInitialisation) { // other definitions are unknown in Init: replace operation call with operation body
 			AOperation opClone = (AOperation) op.clone();
 			OperationCallInjector.injectArguments(opClone, node.getParameters());
+			precedenceCollector.caseAOperation(opClone);
 			opClone.getOperationBody().apply(this);
 		} else { // not in Init: just print operation call as definition call
 			moduleStringAppend(renamer.getNameOfRef(op));
